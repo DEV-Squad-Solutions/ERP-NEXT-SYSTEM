@@ -12,7 +12,7 @@ export default function NewInvoiceModal({ invoiceId, isOpen, onClose }) {
       title={invoiceId ? "تعديل الفاتورة" : "فاتورة جديدة"}
       wide
     >
-      <NewInvoiceForm invoiceId={invoiceId} onSuccess={onClose} />
+      <NewInvoiceForm line={invoiceId} onSuccess={onClose} />
     </Modal>
   );
 }

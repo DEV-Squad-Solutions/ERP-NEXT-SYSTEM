@@ -12,6 +12,8 @@ import {
   ArrowUpCircle,
   Package,
   Loader2,
+  PackageCheckIcon,
+  ViewIcon,
 } from "lucide-react";
 import { useGetItemsQuery } from "../../inventory/inventoryApi";
 import { mockPackagingUnits } from "../../../mocks/data/packagingUnits";
@@ -19,7 +21,7 @@ import {
   useUpdateSaleLineMutation,
   useDeleteSaleLineMutation,
 } from "../salesApi";
-
+import { useGetPackagingUnitsQuery } from "../../PackagingUnits/packagingApi";
 const emptyItem = () => ({
   itemId: "",
   itemName: "",
@@ -37,12 +39,13 @@ const emptyItem = () => ({
  * @param {{ invoice: Object }} props
  */
 export default function InvoiceCard({ invoice }) {
+  const summary = invoice.summary;
   const { data: stockItems } = useGetItemsQuery();
+  const { data: packagingUnits } = useGetPackagingUnitsQuery();
   const navigate = useNavigate();
   const [updateInvoice, { isLoading: isSaving }] = useUpdateSaleLineMutation();
   const [deleteInvoice, { isLoading: isDeleting }] =
     useDeleteSaleLineMutation();
-
   const [isEditing, setIsEditing] = useState(false);
   const [draftItems, setDraftItems] = useState(invoice?.items || []);
   const [draftTotals, setDraftTotals] = useState({
@@ -90,7 +93,7 @@ export default function InvoiceCard({ invoice }) {
   const saveEdit = async () => {
     const items = draftItems.map((it) => {
       const selectedItem = stockItems?.find((s) => s.id === it.itemId);
-      const selectedUnit = mockPackagingUnits.find(
+      const selectedUnit = packagingUnits?.find(
         (u) => u.id === it.packagingUnitId,
       );
       return {
@@ -177,9 +180,6 @@ export default function InvoiceCard({ invoice }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="num font-semibold text-ink-900">
-            {itemsTotal.toLocaleString("ar-EG")} ج.م
-          </span>
           <div className="flex gap-1">
             {isEditing ? (
               <>
@@ -207,21 +207,35 @@ export default function InvoiceCard({ invoice }) {
               <>
                 <button
                   onClick={() => navigate("/dashboard/treasury")}
+                  className={`${iconBtnCls} text-green-600 hover:bg-green-50`}
+                  title="مخزن العبوات"
+                >
+                  <ViewIcon size={15} />
+                </button>
+                <button
+                  onClick={() => navigate("/dashboard/treasury")}
                   className={`${iconBtnCls} text-gold-600 hover:bg-gold-50`}
+                  title="مخزن العبوات"
+                >
+                  <PackageCheckIcon size={15} />
+                </button>
+                <button
+                  onClick={() => navigate("/dashboard/treasury")}
+                  className={`${iconBtnCls} text-teal-600 hover:bg-teal-50`}
                   title="الخزنة"
                 >
                   <Wallet2 size={15} />
                 </button>
                 <button
                   onClick={startEdit}
-                  className={`${iconBtnCls} text-primary-500 hover:bg-primary-50`}
+                  className={`${iconBtnCls} text-yellow-600 hover:bg-yellow-50`}
                   title="تعديل"
                 >
                   <Pencil size={15} />
                 </button>
                 <button
                   onClick={handlePrint}
-                  className={`${iconBtnCls} text-ink-400 hover:bg-ink-400/5`}
+                  className={`${iconBtnCls} text-gray-600 hover:bg-ink-400/5`}
                   title="طباعة"
                 >
                   <Printer size={15} />
@@ -261,75 +275,66 @@ export default function InvoiceCard({ invoice }) {
               <tr className="bg-ink-900/[0.02] text-ink-400 text-xs">
                 <th
                   className="p-2.5 font-medium border-b border-ink-400/10"
-                  rowSpan={2}
+                  rowSpan={1}
                 >
                   م
                 </th>
                 <th
                   className="p-2.5 font-medium border-b border-ink-400/10"
-                  rowSpan={2}
+                  rowSpan={1}
                 >
                   الصنف
                 </th>
                 <th
                   className="p-2 font-medium border-b border-x border-ink-400/10 text-center"
-                  colSpan={3}
+                  rowSpan={1}
                 >
-                  العبوة
+                  العدد
                 </th>
                 <th
                   className="p-2.5 font-medium border-b border-ink-400/10"
-                  rowSpan={2}
+                  rowSpan={1}
                 >
                   وزن
                 </th>
                 <th
                   className="p-2.5 font-medium border-b border-ink-400/10"
-                  rowSpan={2}
+                  rowSpan={1}
                 >
                   كمية
                 </th>
                 <th
                   className="p-2.5 font-medium border-b border-ink-400/10"
-                  rowSpan={2}
+                  rowSpan={1}
                 >
                   سعر
                 </th>
                 <th
                   className="p-2.5 font-medium border-b border-ink-400/10"
-                  rowSpan={2}
+                  rowSpan={1}
                 >
                   قيمة
                 </th>
                 <th
                   className="p-2.5 font-medium border-b border-ink-400/10"
-                  rowSpan={2}
+                  rowSpan={1}
                 >
                   ملاحظات
                 </th>
                 {isEditing && (
                   <th
                     className="p-2.5 font-medium border-b border-ink-400/10"
-                    rowSpan={2}
+                    rowSpan={1}
                   ></th>
                 )}
-              </tr>
-              <tr className="bg-ink-900/[0.015] text-ink-400 text-[11px]">
-                <th className="p-1.5 font-medium border-b border-x border-ink-400/10">
-                  النوع
-                </th>
-                <th className="p-1.5 font-medium border-b border-x border-ink-400/10 text-positive">
-                  وارد
-                </th>
-                <th className="p-1.5 font-medium border-b border-x border-ink-400/10 text-negative">
-                  صادر
-                </th>
               </tr>
             </thead>
             <tbody>
               {displayItems.map((item, index) => {
                 const value =
                   (Number(item.quantity) || 0) * (Number(item.price) || 0);
+                const quantity =
+                  Number(item?.count || 0) * Number(item.weight || 0);
                 return (
                   <tr
                     key={index}
@@ -360,69 +365,20 @@ export default function InvoiceCard({ invoice }) {
                         </span>
                       )}
                     </td>
-                    <td className="p-2 min-w-[100px] border-x border-ink-400/5">
-                      {isEditing ? (
-                        <select
-                          value={item.packagingUnitId}
-                          onChange={(e) =>
-                            setItemField(
-                              index,
-                              "packagingUnitId",
-                              e.target.value,
-                            )
-                          }
-                          className={selectCls}
-                        >
-                          <option value="">— العبوة —</option>
-                          {mockPackagingUnits.map((u) => (
-                            <option key={u.id} value={u.id}>
-                              {u.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span className="text-sm text-ink-600">
-                          {item.packagingUnitName}
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-2 w-16 text-center border-l border-ink-400/5">
+
+                    <td className="p-2 w-20 text-center">
                       {isEditing ? (
                         <input
                           type="number"
-                          value={item.packagingIn}
+                          value={item?.count}
                           onChange={(e) =>
-                            setItemField(
-                              index,
-                              "packagingIn",
-                              Number(e.target.value),
-                            )
+                            setItemField(index, "count", Number(e.target.value))
                           }
                           className={inputCls}
                         />
                       ) : (
-                        <span className="num text-positive">
-                          {item.packagingIn > 0 ? item.packagingIn : "—"}
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-2 w-16 text-center">
-                      {isEditing ? (
-                        <input
-                          type="number"
-                          value={item.packagingOut}
-                          onChange={(e) =>
-                            setItemField(
-                              index,
-                              "packagingOut",
-                              Number(e.target.value),
-                            )
-                          }
-                          className={inputCls}
-                        />
-                      ) : (
-                        <span className="num text-negative">
-                          {item.packagingOut > 0 ? item.packagingOut : "—"}
+                        <span className="num text-ink-600">
+                          {(item?.count || 0).toLocaleString("ar-EG")}
                         </span>
                       )}
                     </td>
@@ -430,7 +386,7 @@ export default function InvoiceCard({ invoice }) {
                       {isEditing ? (
                         <input
                           type="number"
-                          value={item.weight}
+                          value={item?.weight}
                           onChange={(e) =>
                             setItemField(
                               index,
@@ -442,29 +398,15 @@ export default function InvoiceCard({ invoice }) {
                         />
                       ) : (
                         <span className="num text-ink-600">
-                          {(item.weight || 0).toLocaleString("ar-EG")}
+                          {(item?.weight || 0).toLocaleString("ar-EG")}
                         </span>
                       )}
                     </td>
+
                     <td className="p-2 w-20 text-center">
-                      {isEditing ? (
-                        <input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            setItemField(
-                              index,
-                              "quantity",
-                              Number(e.target.value),
-                            )
-                          }
-                          className={inputCls}
-                        />
-                      ) : (
-                        <span className="num text-ink-900 font-medium">
-                          {(item.quantity || 0).toLocaleString("ar-EG")}
-                        </span>
-                      )}
+                      <span className="num text-ink-900 font-medium">
+                        {(quantity || 0).toLocaleString("ar-EG")}
+                      </span>
                     </td>
                     <td className="p-2 w-24 text-center">
                       {isEditing ? (
@@ -536,11 +478,13 @@ export default function InvoiceCard({ invoice }) {
           <div className="flex items-center gap-2">
             <span className="text-ink-400">الإجمالي</span>
             <span className="num font-semibold text-ink-900">
-              {itemsTotal.toLocaleString("ar-EG")}
+              {Number(summary?.total ?? 0).toLocaleString("ar-EG")}
             </span>
           </div>
+
           <div className="flex items-center gap-2">
             <span className="text-ink-400">الخصم</span>
+
             {isEditing ? (
               <input
                 type="number"
@@ -550,12 +494,14 @@ export default function InvoiceCard({ invoice }) {
               />
             ) : (
               <span className="num font-medium text-negative">
-                {discount.toLocaleString("ar-EG")}
+                {Number(summary?.discount ?? 0).toLocaleString("ar-EG")}
               </span>
             )}
           </div>
+
           <div className="flex items-center gap-2">
             <span className="text-ink-400">الضريبة</span>
+
             {isEditing ? (
               <input
                 type="number"
@@ -565,12 +511,14 @@ export default function InvoiceCard({ invoice }) {
               />
             ) : (
               <span className="num font-medium text-ink-600">
-                {tax.toLocaleString("ar-EG")}
+                {Number(summary?.tax ?? 0).toLocaleString("ar-EG")}
               </span>
             )}
           </div>
+
           <div className="flex items-center gap-2">
             <span className="text-ink-400">المدفوع</span>
+
             {isEditing ? (
               <input
                 type="number"
@@ -580,16 +528,22 @@ export default function InvoiceCard({ invoice }) {
               />
             ) : (
               <span className="num font-medium text-positive">
-                {paid.toLocaleString("ar-EG")}
+                {Number(summary?.paid ?? 0).toLocaleString("ar-EG")}
               </span>
             )}
           </div>
+
           <div className="flex items-center gap-2 border-r border-ink-400/10 pr-6">
             <span className="text-ink-900 font-medium">الباقي</span>
+
             <span
-              className={`num font-bold ${remaining > 0 ? "text-negative" : "text-positive"}`}
+              className={`num font-bold ${
+                Number(summary?.remaining ?? 0) > 0
+                  ? "text-negative"
+                  : "text-positive"
+              }`}
             >
-              {remaining.toLocaleString("ar-EG")} ج.م
+              {Number(summary?.remaining ?? 0).toLocaleString("ar-EG")} ج.م
             </span>
           </div>
         </div>

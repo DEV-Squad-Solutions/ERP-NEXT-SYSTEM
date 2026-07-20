@@ -8,10 +8,6 @@ function applyFilters(lines, filters) {
   let result = [...lines];
   const f = filters || {};
 
-  if (f.movementType && f.movementType !== "all") {
-    result = result.filter((r) => r.movementType === f.movementType);
-  }
-
   if (f.date) {
     result = result.filter((r) => r.date === f.date);
   }
@@ -36,7 +32,6 @@ function applyFilters(lines, filters) {
   if (f.carNumber) {
     result = result.filter((r) => r.carNumber.includes(f.carNumber));
   }
-  console.log("applyFilters after movementType:", result);
   return result;
 }
 
@@ -128,6 +123,10 @@ export const salesApi = baseApi.injectEndpoints({
       },
       invalidatesTags: ["Sale"],
     }),
+    getSaleSummary: builder.query({
+      query: (id) => `Sales/${id}/summary`,
+      providesTags: (result, error, id) => [{ type: "SaleSummary", id }],
+    }),
   }),
 });
 
@@ -137,4 +136,5 @@ export const {
   useDeleteSaleLineMutation,
   useGetInvoiceDetailsQuery,
   useCreateSaleInvoiceMutation,
+  useGetSaleSummaryQuery,
 } = salesApi;

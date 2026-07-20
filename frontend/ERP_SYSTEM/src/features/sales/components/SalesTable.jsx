@@ -1,15 +1,21 @@
-import { useState } from "react";
 import { FileSearch, AlertCircle, RefreshCw } from "lucide-react";
 import { useGetSaleLinesQuery } from "../salesApi";
 import InvoiceCard from "./SaleLineRow";
+import InvoiceDetailsModal from "./InvoiceDetailsModal";
+import { useState } from "react";
 
 /**
  * @param {{ filters: Object }} props
  */
 export default function SalesTable({ filters }) {
-  const { data: invoices, isLoading, isError } = useGetSaleLinesQuery(filters);
+  const {
+    data: invoices,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useGetSaleLinesQuery(filters);
 
-  // حالة التحميل — سكيلتون بشكل كروت الفواتير نفسها
   if (isLoading) {
     return (
       <div className="space-y-5">
@@ -40,7 +46,6 @@ export default function SalesTable({ filters }) {
     );
   }
 
-  // حالة الخطأ — أيقونة تحذير + زرار إعادة محاولة
   if (isError) {
     return (
       <div className="text-center py-14 border border-dashed border-negative/25 bg-negative/[0.02] rounded-2xl animate-fadeUp">
@@ -66,8 +71,8 @@ export default function SalesTable({ filters }) {
     );
   }
 
-  // حالة الفاضي — مفيش فواتير مطابقة
-  if (!invoices || invoices.length === 0) {
+  // حالة الفاضي — مفيش فواتير مطابقة (بس لو مش بيتم تحديث دلوقتي)
+  if (!isFetching && (!invoices || invoices.length === 0)) {
     return (
       <div className="text-center py-16 border border-dashed border-ink-400/20 rounded-2xl animate-fadeUp">
         <div className="w-14 h-14 rounded-full bg-ink-400/5 flex items-center justify-center mx-auto mb-3">
@@ -82,16 +87,30 @@ export default function SalesTable({ filters }) {
   }
 
   return (
-    <div className="space-y-5   overflow-y-scroll custom-scroll max-h-0 md:max-h-[calc(100vh-300px)]">
-      {invoices.map((invoice, i) => (
-        <div
-          key={invoice.id}
-          style={{ animationDelay: `${i * 60}ms` }}
-          className="animate-fadeUp"
-        >
-          <InvoiceCard invoice={invoice} />
+    <div className="relative">
+      {/* شريط تحديث خفيف يظهر فوق القائمة أثناء إعادة الفلترة، من غير ما يخفي البيانات القديمة فجأة */}
+      {isFetching && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 bg-primary-500 text-white text-xs px-3 py-1 rounded-full shadow-card animate-fadeUp">
+          <RefreshCw size={11} className="animate-spin" />
+          جاري التحديث...
         </div>
-      ))}
+      )}
+
+      <div
+        className={`space-y-5 overflow-y-auto custom-scroll max-h-[calc(100vh-300px)] transition-opacity duration-200 ${
+          isFetching ? "opacity-50" : "opacity-100"
+        }`}
+      >
+        {invoices?.map((invoice, i) => (
+          <div
+            key={invoice.id}
+            style={{ animationDelay: `${i * 60}ms` }}
+            className="animate-fadeUp"
+          >
+            <InvoiceCard invoice={invoice} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

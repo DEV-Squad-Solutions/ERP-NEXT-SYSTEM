@@ -10,6 +10,7 @@ export default function NewInvoiceLineRow({
   line,
   onChange,
   onRemove,
+  index,
   movementType,
 }) {
   const { data: items } = useGetItemsQuery();
@@ -47,6 +48,7 @@ export default function NewInvoiceLineRow({
 
   return (
     <tr className="border-b border-ink-400/5 last:border-0">
+      <td className="p-2">{index + 1}</td>
       <td className="p-2 min-w-[150px]">
         <select
           value={line.itemId}
@@ -61,36 +63,15 @@ export default function NewInvoiceLineRow({
           ))}
         </select>
       </td>
-      <td className="p-2 min-w-[100px]">
-        <select
-          value={line.packagingUnitId}
-          onChange={(e) => set("packagingUnitId", e.target.value)}
-          className={cellCls}
-        >
-          <option value="">— العبوة —</option>
-          {mockPackagingUnits.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.name}
-            </option>
-          ))}
-        </select>
-      </td>
       <td className="p-2 w-20">
         <input
           type="number"
-          value={line.packagingIn}
-          onChange={(e) => set("packagingIn", Number(e.target.value))}
+          value={line?.packagingCount || 0}
+          onChange={(e) => set("packagingCount", Number(e.target.value))}
           className={`${cellCls} num text-center`}
         />
       </td>
-      <td className="p-2 w-20">
-        <input
-          type="number"
-          value={line.packagingOut}
-          onChange={(e) => set("packagingOut", Number(e.target.value))}
-          className={`${cellCls} num text-center`}
-        />
-      </td>
+
       <td className="p-2 w-20">
         <input
           type="number"

@@ -548,6 +548,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTimeOffset>("CreatedAtUtc")
                         .HasColumnType("datetimeoffset");
 
@@ -574,10 +577,12 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyId");
+
                     b.HasIndex("TokenHash")
                         .IsUnique();
 
-                    b.HasIndex("UserId", "ExpiresAtUtc");
+                    b.HasIndex("UserId", "CompanyId", "ExpiresAtUtc");
 
                     b.ToTable("RefreshTokens", (string)null);
                 });
@@ -692,11 +697,18 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("MiniErp.Infrastructure.Identity.RefreshToken", b =>
                 {
+                    b.HasOne("MiniErp.Domain.Entities.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MiniErp.Infrastructure.Identity.ApplicationUser", "User")
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Company");
 
                     b.Navigation("User");
                 });

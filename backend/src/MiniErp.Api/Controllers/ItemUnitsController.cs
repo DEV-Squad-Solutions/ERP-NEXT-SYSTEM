@@ -6,6 +6,9 @@ using MiniErp.Application.Features.ItemUnits;
 
 namespace MiniErp.Api.Controllers;
 
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
 public sealed class ItemUnitsController(IItemUnitService itemUnitService) : ApiControllerBase
 {
     [HttpGet]

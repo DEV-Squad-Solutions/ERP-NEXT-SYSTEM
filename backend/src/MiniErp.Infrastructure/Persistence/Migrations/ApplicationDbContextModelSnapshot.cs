@@ -153,7 +153,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.BusinessPartner", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.BusinessPartners.BusinessPartner", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -255,7 +255,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("BusinessPartners", (string)null);
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Company", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Companies.Company", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -341,7 +341,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("Companies", (string)null);
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Driver", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Logistics.Driver", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -440,7 +440,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("Drivers", (string)null);
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Item", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.Item", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -520,7 +520,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("Items", (string)null);
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.ItemUnit", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.ItemUnit", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -586,7 +586,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("ItemUnits", (string)null);
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Store", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Inventory.Store", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -597,6 +597,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Property<string>("Address")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("BusinessPartnerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -633,6 +636,11 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsContainerStore")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -656,11 +664,17 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Name");
 
+                    b.HasIndex("CompanyId", "BusinessPartnerId")
+                        .HasFilter("[BusinessPartnerId] IS NOT NULL AND [IsDeleted] = 0");
+
                     b.HasIndex("CompanyId", "Code")
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
 
-                    b.ToTable("Stores", (string)null);
+                    b.ToTable("Stores", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Stores_TypeBusinessPartner", "([IsContainerStore] = 0 AND [BusinessPartnerId] IS NULL) OR ([IsContainerStore] = 1 AND [BusinessPartnerId] IS NOT NULL)");
+                        });
                 });
 
             modelBuilder.Entity("MiniErp.Infrastructure.Identity.ApplicationUser", b =>
@@ -854,9 +868,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.BusinessPartner", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.BusinessPartners.BusinessPartner", b =>
                 {
-                    b.HasOne("MiniErp.Domain.Entities.Company", "Company")
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -865,9 +879,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Driver", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Logistics.Driver", b =>
                 {
-                    b.HasOne("MiniErp.Domain.Entities.Company", "Company")
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -876,15 +890,15 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Item", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.Item", b =>
                 {
-                    b.HasOne("MiniErp.Domain.Entities.Company", "Company")
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MiniErp.Domain.Entities.ItemUnit", "ItemUnit")
+                    b.HasOne("MiniErp.Domain.Entities.Catalog.ItemUnit", "ItemUnit")
                         .WithMany("Items")
                         .HasForeignKey("CompanyId", "ItemUnitId")
                         .HasPrincipalKey("CompanyId", "Id")
@@ -896,9 +910,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("ItemUnit");
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.ItemUnit", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.ItemUnit", b =>
                 {
-                    b.HasOne("MiniErp.Domain.Entities.Company", "Company")
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -907,20 +921,28 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Store", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Inventory.Store", b =>
                 {
-                    b.HasOne("MiniErp.Domain.Entities.Company", "Company")
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("MiniErp.Domain.Entities.BusinessPartners.BusinessPartner", "BusinessPartner")
+                        .WithMany()
+                        .HasForeignKey("CompanyId", "BusinessPartnerId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("BusinessPartner");
 
                     b.Navigation("Company");
                 });
 
             modelBuilder.Entity("MiniErp.Infrastructure.Identity.RefreshToken", b =>
                 {
-                    b.HasOne("MiniErp.Domain.Entities.Company", "Company")
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -938,7 +960,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("MiniErp.Infrastructure.Identity.UserCompany", b =>
                 {
-                    b.HasOne("MiniErp.Domain.Entities.Company", "Company")
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -955,7 +977,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.ItemUnit", b =>
+            modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.ItemUnit", b =>
                 {
                     b.Navigation("Items");
                 });

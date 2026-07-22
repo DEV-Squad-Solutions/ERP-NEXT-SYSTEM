@@ -244,7 +244,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
 
-                    b.HasIndex("CompanyId", "Name");
+                    b.HasIndex("CompanyId", "Name")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.HasIndex("CompanyId", "TaxNumber")
                         .IsUnique()
@@ -427,7 +429,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
 
-                    b.HasIndex("CompanyId", "Name");
+                    b.HasIndex("CompanyId", "Name")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
 
                     b.HasIndex("CompanyId", "NationalId")
                         .IsUnique()

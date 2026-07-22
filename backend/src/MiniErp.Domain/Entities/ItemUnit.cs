@@ -8,11 +8,11 @@ public sealed class ItemUnit : AuditableEntity
 
     public int CompanyId { get; set; }
 
+    public Company Company { get; set; } = null!;
+
     public string Name { get; set; } = string.Empty;
 
     public bool IsActive { get; set; } = true;
-
-    public Company Company { get; set; } = null!;
 
     public ICollection<Item> Items { get; set; } = [];
 }

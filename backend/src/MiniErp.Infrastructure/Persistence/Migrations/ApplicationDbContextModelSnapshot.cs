@@ -665,7 +665,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.HasIndex("Name");
 
                     b.HasIndex("CompanyId", "BusinessPartnerId")
-                        .HasFilter("[BusinessPartnerId] IS NOT NULL AND [IsDeleted] = 0");
+                        .IsUnique()
+                        .HasDatabaseName("UX_Stores_CompanyId_BusinessPartnerId_ActiveContainer")
+                        .HasFilter("[BusinessPartnerId] IS NOT NULL AND [IsContainerStore] = 1 AND [IsActive] = 1 AND [IsDeleted] = 0");
 
                     b.HasIndex("CompanyId", "Code")
                         .IsUnique()

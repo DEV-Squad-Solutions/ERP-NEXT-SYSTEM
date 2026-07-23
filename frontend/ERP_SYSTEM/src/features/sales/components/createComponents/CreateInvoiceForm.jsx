@@ -10,7 +10,7 @@ import { useGetStoresSelectQuery } from "../../../stores/storesApi";
 import QuickAddCustomerModal from "../QuickAddCustomerModal";
 import QuickAddDriverModal from "../QuickAddDriverModal";
 import PackagingDrawer from "../PackagingDrawer";
-import { useCreateSaleInvoiceMutation } from "../../salesApi";
+import { useCreateInvoiceMutation } from "../../salesApi";
 import { generateInvoiceNumber } from "../../../../mocks/data/sales";
 import LedgerPanel from "../../../../shared/components/ui/LedgerPanel";
 import LedgerField from "../../../../shared/components/ui/LedgerField";
@@ -51,7 +51,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
   const { data: parties } = useGetPartiesSelectQuery();
   const { data: drivers } = useGetDriversSelectQuery();
   const { data: stores } = useGetStoresSelectQuery();
-  const [createInvoice, { isLoading }] = useCreateSaleInvoiceMutation();
+  const [createInvoice, { isLoading }] = useCreateInvoiceMutation();
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [showAddDriver, setShowAddDriver] = useState(false);
   const [showPackaging, setShowPackaging] = useState(false);

@@ -6,7 +6,7 @@ import InvoiceHeader from "../components/Detailscomponents/InvoiceHeader";
 import InvoiceInfoCard from "../components/Detailscomponents/InvoiceInfoCard";
 import InvoiceItemsTable from "../components/Detailscomponents/InvoiceItemsTable";
 import InvoiceSummaryCard from "../components/Detailscomponents/InvoiceSummaryCard";
-import PackagingDrawer from "../components/Detailscomponents/PackagingDrawer";
+import PackagingDrawer from "../components/PackagingDrawer";
 import AuditLogDrawer from "../components/Detailscomponents/AuditLogDrawer";
 import PrintPreviewModal from "../components/Detailscomponents/PrintPreviewModal";
 import ConfirmDeleteModal from "../components/Detailscomponents/ConfirmDeleteModal";
@@ -16,10 +16,10 @@ import {
 } from "../components/Detailscomponents/InvoiceDetailsStates";
 
 import {
-  useGetInvoiceDetailQuery,
+  useGetInvoicesQuery,
   useDuplicateInvoiceMutation,
-  useDeleteInvoiceMutation,
-} from "../invoicesApi";
+  useDeleteSaleLineMutation,
+} from "../salesApi";
 
 export default function InvoiceDetailsPage() {
   const { id } = useParams();
@@ -31,10 +31,11 @@ export default function InvoiceDetailsPage() {
     isFetching,
     isError,
     refetch,
-  } = useGetInvoiceDetailQuery(id);
+  } = useGetInvoicesQuery(id);
 
   const [duplicateInvoice] = useDuplicateInvoiceMutation();
-  const [deleteInvoice, { isLoading: isDeleting }] = useDeleteInvoiceMutation();
+  const [deleteInvoice, { isLoading: isDeleting }] =
+    useDeleteSaleLineMutation();
 
   const [packagingOpen, setPackagingOpen] = useState(false);
   const [auditOpen, setAuditOpen] = useState(false);

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { X, Boxes, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
-import { useGetSaleLinesQuery } from "../salesApi";
+import { useGetInvoicesQuery } from "../salesApi";
 import { useGetItemUnitsSelectQuery } from "../../units/itemUnitsApi";
 import Button from "../../../shared/components/ui/Button";
 
@@ -14,22 +14,24 @@ export default function PackagingDrawer({
   isOpen,
   onClose,
 }) {
-  const { data: invoices } = useGetSaleLinesQuery(
-    { partyName },
+  const { data } = useGetInvoicesQuery(
+    { partyId: partyName },
     { skip: !isOpen || !partyName },
   );
-  const [actionMode, setActionMode] = useState(null); // "receive" | "deliver" | null
+  const invoices = data?.items || [];
+
+  const { data: itemUnits } = useGetItemUnitsSelectQuery();
+
+  const [actionMode, setActionMode] = useState(null);
   const [actionUnit, setActionUnit] = useState("");
   const [actionCount, setActionCount] = useState(0);
   const [actionNotes, setActionNotes] = useState("");
-  const { data: itemUnits } = useGetItemUnitsSelectQuery();
 
   if (!isOpen) return null;
 
-  // "له" = عبوات خرجت للعميل (فواتير مبيعات)، "عليه" = عبوات رجعت (فواتير مشتريات/مرتجع)
   const balanceByUnit = {};
-  (invoices || []).forEach((inv) => {
-    inv.items.forEach((item) => {
+  invoices.forEach((inv) => {
+    (inv.items || []).forEach((item) => {
       if (!item.packagingUnitName || !item.packagingCount) return;
       const key = item.packagingUnitName;
       if (!balanceByUnit[key]) balanceByUnit[key] = { taken: 0, returned: 0 };
@@ -53,7 +55,6 @@ export default function PackagingDrawer({
       toast.error("اختر الوحدة وأدخل عدد صحيح");
       return;
     }
-    // تسجيل الحركة (mock — في الواقع هتتبعت للـ backend مربوطة برقم الفاتورة)
     toast.success(
       actionMode === "receive"
         ? "تم تسجيل استلام العبوات"
@@ -163,7 +164,7 @@ export default function PackagingDrawer({
                   className="w-full rounded-lg border border-ink-400/15 px-2.5 py-2 text-sm"
                 >
                   <option value="">— اختر —</option>
-                  {itemUnits.map((u) => (
+                  {itemUnits?.map((u) => (
                     <option key={u.id} value={u.name}>
                       {u.name}
                     </option>

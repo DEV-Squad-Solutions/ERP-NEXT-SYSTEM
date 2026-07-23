@@ -1,7 +1,7 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
 import Drawer from "./Drawer";
-import { useGetInvoiceAuditLogQuery } from "../../invoicesApi";
+import { useGetInvoiceAuditLogQuery } from "../../salesApi";
 
 export default function AuditLogDrawer({ open, onClose, invoiceId }) {
   const {

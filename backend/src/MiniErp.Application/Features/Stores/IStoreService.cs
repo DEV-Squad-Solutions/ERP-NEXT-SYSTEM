@@ -12,6 +12,9 @@ public interface IStoreService
     Task<Result<IReadOnlyList<SelectResponse>>> GetSelectAsync(
         CancellationToken cancellationToken = default);
 
+    Task<Result<IReadOnlyList<SelectResponse>>> GetContainerSelectAsync(
+        CancellationToken cancellationToken = default);
+
     Task<Result<StoreResponse>> GetByIdAsync(
         int id,
         CancellationToken cancellationToken = default);

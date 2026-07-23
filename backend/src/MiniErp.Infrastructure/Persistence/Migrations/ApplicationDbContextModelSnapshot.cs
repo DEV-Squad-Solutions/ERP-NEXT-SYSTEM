@@ -255,191 +255,6 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("BusinessPartners", (string)null);
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Companies.Company", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("CommercialRegister")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("CreatedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CreatedByPc")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedById")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DeletedByPc")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ManagerName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("TaxNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("UpdatedById")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UpdatedByPc")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CommercialRegister")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.HasIndex("Name");
-
-                    b.HasIndex("TaxNumber")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.ToTable("Companies", (string)null);
-                });
-
-            modelBuilder.Entity("MiniErp.Domain.Entities.Logistics.Driver", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CreatedByPc")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedById")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DeletedByPc")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateOnly?>("LicenseExpiryDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("LicenseNumber")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("NationalId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("UpdatedById")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UpdatedByPc")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId", "Code")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.HasIndex("CompanyId", "LicenseNumber")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.HasIndex("CompanyId", "Name")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.HasIndex("CompanyId", "NationalId")
-                        .IsUnique()
-                        .HasFilter("[NationalId] IS NOT NULL AND [IsDeleted] = 0");
-
-                    b.ToTable("Drivers", (string)null);
-                });
-
             modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.Item", b =>
                 {
                     b.Property<int>("Id")
@@ -586,6 +401,242 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("ItemUnits", (string)null);
                 });
 
+            modelBuilder.Entity("MiniErp.Domain.Entities.Companies.Company", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("CommercialRegister")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedByPc")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DeletedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ManagerName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TaxNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UpdatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UpdatedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommercialRegister")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("TaxNumber")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("Companies", (string)null);
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.Containers.Container", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedByPc")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DeletedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("UpdatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UpdatedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "Code")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Containers_CompanyId_Code_Active")
+                        .HasFilter("[IsActive] = 1 AND [IsDeleted] = 0");
+
+                    b.HasIndex("CompanyId", "Name");
+
+                    b.ToTable("Containers", (string)null);
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.Containers.StoreContainer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ContainerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedByPc")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DeletedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("StoreId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UpdatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UpdatedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "ContainerId");
+
+                    b.HasIndex("CompanyId", "StoreId");
+
+                    b.HasIndex("CompanyId", "StoreId", "ContainerId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_StoreContainers_CompanyId_StoreId_ContainerId_Active")
+                        .HasFilter("[IsActive] = 1 AND [IsDeleted] = 0");
+
+                    b.ToTable("StoreContainers", (string)null);
+                });
+
             modelBuilder.Entity("MiniErp.Domain.Entities.Inventory.Store", b =>
                 {
                     b.Property<int>("Id")
@@ -677,6 +728,181 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_Stores_TypeBusinessPartner", "([IsContainerStore] = 0 AND [BusinessPartnerId] IS NULL) OR ([IsContainerStore] = 1 AND [BusinessPartnerId] IS NOT NULL)");
                         });
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.Logistics.Driver", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedByPc")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DeletedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateOnly?>("LicenseExpiryDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("LicenseNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NationalId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UpdatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UpdatedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "Code")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("CompanyId", "LicenseNumber")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("CompanyId", "Name")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("CompanyId", "NationalId")
+                        .IsUnique()
+                        .HasFilter("[NationalId] IS NOT NULL AND [IsDeleted] = 0");
+
+                    b.ToTable("Drivers", (string)null);
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.ReferenceData.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ArabicName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedByPc")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DeletedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("UpdatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UpdatedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Countries_Code_Active")
+                        .HasFilter("[IsActive] = 1 AND [IsDeleted] = 0");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("MiniErp.Infrastructure.Identity.ApplicationUser", b =>
@@ -881,17 +1107,6 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Logistics.Driver", b =>
-                {
-                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Company");
-                });
-
             modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.Item", b =>
                 {
                     b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
@@ -923,6 +1138,46 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("MiniErp.Domain.Entities.Containers.Container", b =>
+                {
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.Containers.StoreContainer", b =>
+                {
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniErp.Domain.Entities.Containers.Container", "Container")
+                        .WithMany("StoreContainers")
+                        .HasForeignKey("CompanyId", "ContainerId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniErp.Domain.Entities.Inventory.Store", "Store")
+                        .WithMany("StoreContainers")
+                        .HasForeignKey("CompanyId", "StoreId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("Container");
+
+                    b.Navigation("Store");
+                });
+
             modelBuilder.Entity("MiniErp.Domain.Entities.Inventory.Store", b =>
                 {
                     b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
@@ -938,6 +1193,17 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("BusinessPartner");
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.Logistics.Driver", b =>
+                {
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Company");
                 });
@@ -982,6 +1248,16 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.ItemUnit", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.Containers.Container", b =>
+                {
+                    b.Navigation("StoreContainers");
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.Inventory.Store", b =>
+                {
+                    b.Navigation("StoreContainers");
                 });
 
             modelBuilder.Entity("MiniErp.Infrastructure.Identity.ApplicationUser", b =>

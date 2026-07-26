@@ -1455,9 +1455,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CompanyId", "DriverId");
 
-                    b.HasIndex("CompanyId", "InvoiceNumber")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
+                    b.HasIndex("CompanyId", "InvoiceNumber");
 
                     b.HasIndex("CompanyId", "StoreId");
 

@@ -1318,6 +1318,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ActualDriverId")
+                        .HasColumnType("int");
+
                     b.Property<int>("BusinessPartnerId")
                         .HasColumnType("int");
 
@@ -1445,6 +1448,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
+
+                    b.HasIndex("CompanyId", "ActualDriverId");
 
                     b.HasIndex("CompanyId", "ContainerStoreId");
 
@@ -1754,6 +1759,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ActualDriverId")
+                        .HasColumnType("int");
+
                     b.Property<int>("BusinessPartnerId")
                         .HasColumnType("int");
 
@@ -1823,6 +1831,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasAlternateKey("CompanyId", "Id");
+
+                    b.HasIndex("CompanyId", "ActualDriverId");
 
                     b.HasIndex("CompanyId", "BusinessPartnerId");
 
@@ -2406,6 +2416,12 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("MiniErp.Domain.Entities.Logistics.Driver", "ActualDriver")
+                        .WithMany()
+                        .HasForeignKey("CompanyId", "ActualDriverId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MiniErp.Domain.Entities.BusinessPartners.BusinessPartner", "BusinessPartner")
                         .WithMany()
                         .HasForeignKey("CompanyId", "BusinessPartnerId")
@@ -2431,6 +2447,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .HasPrincipalKey("CompanyId", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ActualDriver");
 
                     b.Navigation("BusinessPartner");
 
@@ -2531,6 +2549,12 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MiniErp.Domain.Entities.Logistics.Driver", "ActualDriver")
+                        .WithMany()
+                        .HasForeignKey("CompanyId", "ActualDriverId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MiniErp.Domain.Entities.BusinessPartners.BusinessPartner", "BusinessPartner")
                         .WithMany()
                         .HasForeignKey("CompanyId", "BusinessPartnerId")
@@ -2551,6 +2575,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .HasPrincipalKey("CompanyId", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("ActualDriver");
 
                     b.Navigation("BusinessPartner");
 

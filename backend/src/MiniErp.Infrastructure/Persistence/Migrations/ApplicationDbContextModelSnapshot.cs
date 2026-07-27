@@ -655,7 +655,6 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId", "VoucherNumber")
-                        .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
 
                     b.HasIndex("CompanyId", "BusinessPartnerId", "VoucherDate", "Id");

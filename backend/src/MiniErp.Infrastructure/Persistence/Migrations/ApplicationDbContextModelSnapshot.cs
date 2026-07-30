@@ -999,6 +999,86 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("ItemUnits", (string)null);
                 });
 
+            modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.ItemsCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedByPc")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DeletedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("UpdatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UpdatedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "Name")
+                        .IsUnique()
+                        .HasFilter("[IsActive] = 1 AND [IsDeleted] = 0");
+
+                    b.HasIndex("CompanyId", "IsActive", "Name", "Id");
+
+                    b.ToTable("ItemsCategories", (string)null);
+                });
+
             modelBuilder.Entity("MiniErp.Domain.Entities.Companies.Company", b =>
                 {
                     b.Property<int>("Id")
@@ -2479,6 +2559,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("ItemsCategoryId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("LastModifiedAt")
                         .HasColumnType("datetime2(7)");
 
@@ -2571,6 +2654,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.HasIndex("CompanyId", "ExchangeRateId");
 
                     b.HasIndex("CompanyId", "InvoiceNumber");
+
+                    b.HasIndex("CompanyId", "ItemsCategoryId");
 
                     b.HasIndex("CompanyId", "StoreId");
 
@@ -3570,6 +3655,17 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.ItemsCategory", b =>
+                {
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
             modelBuilder.Entity("MiniErp.Domain.Entities.Companies.CompanySettings", b =>
                 {
                     b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
@@ -4036,6 +4132,12 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .HasPrincipalKey("CompanyId", "Id")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("MiniErp.Domain.Entities.Catalog.ItemsCategory", "ItemsCategory")
+                        .WithMany("Invoices")
+                        .HasForeignKey("CompanyId", "ItemsCategoryId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MiniErp.Domain.Entities.Inventory.Store", "Store")
                         .WithMany()
                         .HasForeignKey("CompanyId", "StoreId")
@@ -4056,6 +4158,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("Driver");
 
                     b.Navigation("ExchangeRateRecord");
+
+                    b.Navigation("ItemsCategory");
 
                     b.Navigation("Store");
                 });
@@ -4276,6 +4380,11 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.ItemUnit", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.ItemsCategory", b =>
+                {
+                    b.Navigation("Invoices");
                 });
 
             modelBuilder.Entity("MiniErp.Domain.Entities.Companies.Company", b =>

@@ -598,10 +598,10 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Property<int?>("BusinessPartnerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CashMovementTypeId")
+                    b.Property<int?>("CashMovementTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CashboxId")
+                    b.Property<int?>("CashboxId")
                         .HasColumnType("int");
 
                     b.Property<int>("CompanyId")
@@ -734,6 +734,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("CK_CashVouchers_PartyShape", "([PartyType] = 1 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [ExternalPartyName] IS NULL) OR ([PartyType] = 2 AND [BusinessPartnerId] IS NOT NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [ExternalPartyName] IS NULL) OR ([PartyType] = 3 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NOT NULL AND [ExternalPartyName] IS NULL) OR ([PartyType] = 4 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [ExternalPartyName] IS NOT NULL)");
 
                             t.HasCheckConstraint("CK_CashVouchers_PartyType", "[PartyType] IN (1, 2, 3, 4)");
+
+                            t.HasCheckConstraint("CK_CashVouchers_PostingReferencesTogether", "([CashboxId] IS NULL AND [CashMovementTypeId] IS NULL) OR ([CashboxId] IS NOT NULL AND [CashMovementTypeId] IS NOT NULL)");
                         });
                 });
 
@@ -3564,15 +3566,13 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .WithMany("Vouchers")
                         .HasForeignKey("CompanyId", "CashMovementTypeId")
                         .HasPrincipalKey("CompanyId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MiniErp.Domain.Entities.CashManagement.Cashbox", "Cashbox")
                         .WithMany("Vouchers")
                         .HasForeignKey("CompanyId", "CashboxId")
                         .HasPrincipalKey("CompanyId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MiniErp.Domain.Entities.Logistics.Driver", "Driver")
                         .WithMany()

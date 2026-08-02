@@ -777,7 +777,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("CK_CashVouchers_PartyType", "[PartyType] IN (1, 2, 3, 4)");
 
-                            t.HasCheckConstraint("CK_CashVouchers_PostingReferencesTogether", "([CashboxId] IS NULL AND [CashMovementTypeId] IS NULL) OR ([CashboxId] IS NOT NULL AND [CashMovementTypeId] IS NOT NULL)");
+                            t.HasCheckConstraint("CK_CashVouchers_PostingReferencesTogether", "[CashMovementTypeId] IS NULL OR [CashboxId] IS NOT NULL");
                         });
                 });
 

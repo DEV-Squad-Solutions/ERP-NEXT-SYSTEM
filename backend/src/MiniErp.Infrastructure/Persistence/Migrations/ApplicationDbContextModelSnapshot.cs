@@ -529,6 +529,26 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<bool>("IsDefaultForPurchase")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDefaultForPurchaseReturn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDefaultForSales")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsDefaultForSalesReturn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -563,6 +583,26 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyId", "IsDefaultForPurchase")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CashMovementTypes_CompanyId_DefaultForPurchase")
+                        .HasFilter("[IsDeleted] = 0 AND [IsDefaultForPurchase] = 1");
+
+                    b.HasIndex("CompanyId", "IsDefaultForPurchaseReturn")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CashMovementTypes_CompanyId_DefaultForPurchaseReturn")
+                        .HasFilter("[IsDeleted] = 0 AND [IsDefaultForPurchaseReturn] = 1");
+
+                    b.HasIndex("CompanyId", "IsDefaultForSales")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CashMovementTypes_CompanyId_DefaultForSales")
+                        .HasFilter("[IsDeleted] = 0 AND [IsDefaultForSales] = 1");
+
+                    b.HasIndex("CompanyId", "IsDefaultForSalesReturn")
+                        .IsUnique()
+                        .HasDatabaseName("IX_CashMovementTypes_CompanyId_DefaultForSalesReturn")
+                        .HasFilter("[IsDeleted] = 0 AND [IsDefaultForSalesReturn] = 1");
+
                     b.HasIndex("CompanyId", "Direction", "Name")
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
@@ -572,6 +612,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("CashMovementTypes", null, t =>
                         {
                             t.HasCheckConstraint("CK_CashMovementTypes_Direction", "[Direction] IN (1, 2)");
+
+                            t.HasCheckConstraint("CK_CashMovementTypes_InvoiceDefaults", "(([IsDefaultForSales] = 0 AND [IsDefaultForPurchaseReturn] = 0) OR ([IsActive] = 1 AND [Direction] = 1 AND [PartnerEffect] = 2)) AND (([IsDefaultForPurchase] = 0 AND [IsDefaultForSalesReturn] = 0) OR ([IsActive] = 1 AND [Direction] = 2 AND [PartnerEffect] = 1))");
 
                             t.HasCheckConstraint("CK_CashMovementTypes_PartnerEffect", "[PartnerEffect] IN (0, 1, 2)");
                         });

@@ -2853,10 +2853,14 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ItemId")
+                    b.Property<int?>("ItemId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ItemUnitId")
+                    b.Property<string>("ItemName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("ItemUnitId")
                         .HasColumnType("int");
 
                     b.Property<string>("Notes")
@@ -2907,7 +2911,7 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CompanyId", "InvoiceId", "ItemId")
                         .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
+                        .HasFilter("[IsDeleted] = 0 AND [ItemId] IS NOT NULL");
 
                     b.ToTable("InvoiceLines", null, t =>
                         {
@@ -4264,15 +4268,13 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("CompanyId", "ItemId")
                         .HasPrincipalKey("CompanyId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MiniErp.Domain.Entities.Catalog.ItemUnit", "ItemUnit")
                         .WithMany()
                         .HasForeignKey("CompanyId", "ItemUnitId")
                         .HasPrincipalKey("CompanyId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("MiniErp.Domain.Entities.Invoicing.InvoiceLine", "SourceInvoiceLine")
                         .WithMany()

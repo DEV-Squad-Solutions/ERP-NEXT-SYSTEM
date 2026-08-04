@@ -104,10 +104,12 @@ public sealed class InventoryCountsController(
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Delete(
         int id,
+        [FromQuery] byte[]? rowVersion,
         CancellationToken cancellationToken)
     {
         var result = await inventoryCountService.DeleteAsync(
             id,
+            rowVersion,
             cancellationToken);
         return this.ToActionResult(result);
     }

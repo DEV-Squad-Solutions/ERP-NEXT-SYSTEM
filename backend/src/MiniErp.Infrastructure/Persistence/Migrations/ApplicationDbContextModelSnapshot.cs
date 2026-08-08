@@ -646,6 +646,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Property<int?>("CashboxId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CashboxTransferId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
@@ -757,6 +760,10 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.HasIndex("CompanyId", "VoucherNumber")
                         .HasFilter("[IsDeleted] = 0");
 
+                    b.HasIndex("CompanyId", "CashboxTransferId", "Direction")
+                        .IsUnique()
+                        .HasFilter("[CashboxTransferId] IS NOT NULL AND [IsDeleted] = 0");
+
                     b.HasIndex("CompanyId", "BusinessPartnerId", "VoucherDate", "Id");
 
                     b.HasIndex("CompanyId", "CashMovementTypeId", "VoucherDate", "Id");
@@ -778,6 +785,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("CK_CashVouchers_PartyType", "[PartyType] IN (1, 2, 3, 4)");
 
                             t.HasCheckConstraint("CK_CashVouchers_PostingReferencesTogether", "[CashMovementTypeId] IS NULL OR [CashboxId] IS NOT NULL");
+
+                            t.HasCheckConstraint("CK_CashVouchers_TransferShape", "[CashboxTransferId] IS NULL OR ([CashboxId] IS NOT NULL AND [CashMovementTypeId] IS NULL AND [InvoiceId] IS NULL AND [PartyType] = 1)");
                         });
                 });
 
@@ -895,6 +904,105 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.HasIndex("CompanyId", "IsActive", "Name", "Id");
 
                     b.ToTable("Cashboxes", (string)null);
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.CashManagement.CashboxTransfer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedByPc")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DeletedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DestinationCashboxId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastModifiedAt")
+                        .HasColumnType("datetime2(7)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<int>("SourceCashboxId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("TransferDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("TransferNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("UpdatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UpdatedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "DestinationCashboxId");
+
+                    b.HasIndex("CompanyId", "SourceCashboxId");
+
+                    b.HasIndex("CompanyId", "TransferNumber")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("CompanyId", "TransferDate", "Id")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("CashboxTransfers", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CashboxTransfers_DifferentCashboxes", "[SourceCashboxId] <> [DestinationCashboxId]");
+                        });
                 });
 
             modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.Item", b =>
@@ -3833,6 +3941,12 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .HasPrincipalKey("CompanyId", "Id")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("MiniErp.Domain.Entities.CashManagement.CashboxTransfer", "CashboxTransfer")
+                        .WithMany("Vouchers")
+                        .HasForeignKey("CompanyId", "CashboxTransferId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MiniErp.Domain.Entities.Logistics.Driver", "Driver")
                         .WithMany()
                         .HasForeignKey("CompanyId", "DriverId")
@@ -3863,6 +3977,8 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.Navigation("Cashbox");
 
+                    b.Navigation("CashboxTransfer");
+
                     b.Navigation("Company");
 
                     b.Navigation("Driver");
@@ -3891,6 +4007,35 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("OpeningExchangeRateRecord");
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.CashManagement.CashboxTransfer", b =>
+                {
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniErp.Domain.Entities.CashManagement.Cashbox", "DestinationCashbox")
+                        .WithMany()
+                        .HasForeignKey("CompanyId", "DestinationCashboxId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniErp.Domain.Entities.CashManagement.Cashbox", "SourceCashbox")
+                        .WithMany()
+                        .HasForeignKey("CompanyId", "SourceCashboxId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("DestinationCashbox");
+
+                    b.Navigation("SourceCashbox");
                 });
 
             modelBuilder.Entity("MiniErp.Domain.Entities.Catalog.Item", b =>
@@ -4707,6 +4852,11 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                 });
 
             modelBuilder.Entity("MiniErp.Domain.Entities.CashManagement.Cashbox", b =>
+                {
+                    b.Navigation("Vouchers");
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.CashManagement.CashboxTransfer", b =>
                 {
                     b.Navigation("Vouchers");
                 });

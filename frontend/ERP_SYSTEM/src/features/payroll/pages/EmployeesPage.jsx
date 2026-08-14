@@ -278,7 +278,7 @@ export default function EmployeesPage() {
                     <td className="p-2.5 border-l border-ink-400/5">
                       <button
                         onClick={() =>
-                          navigate(`/payroll/employees/${emp.code}`)
+                          navigate(`/dashboard/payroll/employees/${emp.code}`)
                         }
                         className="text-primary-600 hover:text-primary-700 hover:underline text-sm font-medium transition-colors"
                       >
@@ -309,7 +309,7 @@ export default function EmployeesPage() {
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() =>
-                            navigate(`/payroll/employees/${emp.code}`)
+                            navigate(`/dashboard/payroll/employees/${emp.code}`)
                           }
                           className="p-1.5 rounded-lg text-ink-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
                           title="عرض"

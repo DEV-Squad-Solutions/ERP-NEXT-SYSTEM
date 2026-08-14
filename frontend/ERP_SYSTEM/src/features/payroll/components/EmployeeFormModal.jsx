@@ -1,9 +1,8 @@
-// features/payroll/components/EmployeeFormModal.jsx
+// features/payroll/components/TransactionFormModal.jsx
 //
-// TODO INTEGRATION: بيفترض وجود Modal.jsx في shared/components/ui/Modal
-// بنفس نمط Button/Input/CompactSelect (مش متأكد من الـprops بتاعته بالظبط،
-// اتبنى على افتراض isOpen/onClose/title/children - عدّل الاستيراد والـprops
-// لو مختلفة عندك).
+// كومبوننت واحد بيتعاد استخدامه في 3 صفحات (الإضافي والبدلات / الخصومات / السلف)
+// بيفرق بينهم بس عن طريق "categoryOptions" اللي بتتبعت له. راجع تعليق
+// TRANSACTION_CATEGORY في payroll.constants.js لتفاصيل الـmock.
 
 import { useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
@@ -15,54 +14,45 @@ import Input from "../../../shared/components/ui/Input";
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import Button from "../../../shared/components/ui/Button";
 import {
-  useCreateEmployeeMutation,
-  useUpdateEmployeeMutation,
+  useCreateEmployeeTransactionMutation,
+  useUpdateEmployeeTransactionMutation,
+  useGetEmployeesSelectQuery,
 } from "../payrollApi";
-import { employeeTypeOptions } from "../payroll.constants";
+import {
+  encodeCategory,
+  parseCategory,
+  TRANSACTION_CATEGORY,
+} from "../payroll.constants";
 
 const schema = z.object({
-  code: z.string().min(1, "رقم الموظف مطلوب"),
-  name: z.string().min(1, "اسم الموظف مطلوب"),
-  jobTitle: z.string().min(1, "الوظيفة مطلوبة"),
-  phoneNumber: z.string().optional(),
-  email: z
-    .string()
-    .email("بريد إلكتروني غير صحيح")
-    .optional()
-    .or(z.literal("")),
-  address: z.string().optional(),
-  employeeType: z.string().min(1, "نوع الأجر مطلوب"),
-  salary: z.coerce.number().min(0, "لازم تكون قيمة موجبة"),
-  requiredWorkingDaysPerMonth: z.coerce.number().min(0).optional(),
-  lastDayOfReceivingSalary: z.string().optional(),
-  isActive: z.boolean().default(true),
+  employeeId: z.string().min(1, "الموظف مطلوب"),
+  category: z.string().min(1, "النوع مطلوب"),
+  transactionDate: z.string().min(1, "التاريخ مطلوب"),
+  amount: z.coerce.number().positive("القيمة لازم تكون أكبر من صفر"),
+  notes: z.string().optional(),
 });
 
 const defaultValues = {
-  code: "",
-  name: "",
-  jobTitle: "",
-  phoneNumber: "",
-  email: "",
-  address: "",
-  employeeType: "Daily",
-  salary: 0,
-  requiredWorkingDaysPerMonth: 0,
-  lastDayOfReceivingSalary: "",
-  isActive: true,
+  employeeId: "",
+  category: "",
+  transactionDate: "",
+  amount: 0,
+  notes: "",
 };
 
-export default function EmployeeFormModal({
+export default function TransactionFormModal({
   isOpen,
   onClose,
-  employee,
-  onSaved,
+  transaction,
+  categoryOptions,
+  title,
 }) {
-  const isEdit = Boolean(employee);
-  const [createEmployee, { isLoading: isCreating }] =
-    useCreateEmployeeMutation();
-  const [updateEmployee, { isLoading: isUpdating }] =
-    useUpdateEmployeeMutation();
+  const isEdit = Boolean(transaction);
+  const { data: employees } = useGetEmployeesSelectQuery();
+  const [createTransaction, { isLoading: isCreating }] =
+    useCreateEmployeeTransactionMutation();
+  const [updateTransaction, { isLoading: isUpdating }] =
+    useUpdateEmployeeTransactionMutation();
   const isSubmitting = isCreating || isUpdating;
 
   const {
@@ -71,31 +61,45 @@ export default function EmployeeFormModal({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
-    resolver: zodResolver(schema),
-    defaultValues,
-  });
+  } = useForm({ resolver: zodResolver(schema), defaultValues });
 
-  // reset فقط عند closed -> open (نفس pattern الحفاظ على تعديلات المستخدم أثناء SignalR refetch)
   const wasOpenRef = { current: false };
   useEffect(() => {
     if (isOpen && !wasOpenRef.current) {
-      reset(employee ? { ...defaultValues, ...employee } : defaultValues);
+      if (transaction) {
+        const { category, cleanNotes } = parseCategory(transaction.notes);
+        reset({
+          employeeId: transaction.employeeId,
+          category: category || "",
+          transactionDate: transaction.transactionDate,
+          amount: transaction.amount,
+          notes: cleanNotes,
+        });
+      } else {
+        reset(defaultValues);
+      }
     }
     wasOpenRef.current = isOpen;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const onSubmit = async (data) => {
+    const type = TRANSACTION_CATEGORY[data.category]?.type || "Debit";
+    const payload = {
+      employeeId: data.employeeId,
+      type,
+      amount: data.amount,
+      transactionDate: data.transactionDate,
+      notes: encodeCategory(data.category, data.notes),
+    };
     try {
       if (isEdit) {
-        await updateEmployee({ id: employee.code, ...data }).unwrap();
-        toast.success("تم تحديث بيانات الموظف بنجاح");
+        await updateTransaction({ id: transaction.id, ...payload }).unwrap();
+        toast.success("تم التحديث بنجاح");
       } else {
-        await createEmployee(data).unwrap();
-        toast.success("تم إضافة الموظف بنجاح");
+        await createTransaction(payload).unwrap();
+        toast.success("تمت الإضافة بنجاح");
       }
-      onSaved?.();
       onClose();
     } catch {
       toast.error("حصل خطأ أثناء الحفظ، حاول تاني");
@@ -106,93 +110,78 @@ export default function EmployeeFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل بيانات الموظف" : "إضافة موظف جديد"}
+      title={isEdit ? `تعديل ${title}` : `إضافة ${title}`}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            label="رقم الموظف"
-            {...register("code")}
-            error={errors.code?.message}
-            disabled={isEdit}
-          />
-          <Input
-            label="اسم الموظف"
-            {...register("name")}
-            error={errors.name?.message}
-          />
-          <Input
-            label="الوظيفة"
-            {...register("jobTitle")}
-            error={errors.jobTitle?.message}
-          />
-          <Input
-            label="رقم الهاتف"
-            {...register("phoneNumber")}
-            error={errors.phoneNumber?.message}
-          />
-          <Input
-            label="البريد الإلكتروني"
-            {...register("email")}
-            error={errors.email?.message}
-          />
-          <Input
-            label="العنوان"
-            {...register("address")}
-            error={errors.address?.message}
-          />
-
-          <div>
-            <label className="block text-xs font-medium text-ink-400 mb-1">
-              نوع الأجر
-            </label>
-            <Controller
-              name="employeeType"
-              control={control}
-              render={({ field }) => (
-                <CompactSelect
-                  options={employeeTypeOptions}
-                  value={field.value}
-                  onChange={field.onChange}
-                />
-              )}
-            />
-            {errors.employeeType && (
-              <p className="text-xs text-negative mt-1">
-                {errors.employeeType.message}
-              </p>
+        <div>
+          <label className="block text-xs font-medium text-ink-400 mb-1">
+            الموظف
+          </label>
+          <Controller
+            name="employeeId"
+            control={control}
+            render={({ field }) => (
+              <CompactSelect
+                options={
+                  employees?.map((e) => ({ value: e.id, label: e.name })) || []
+                }
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="اختر الموظف"
+              />
             )}
-          </div>
+          />
+          {errors.employeeId && (
+            <p className="text-xs text-negative mt-1">
+              {errors.employeeId.message}
+            </p>
+          )}
+        </div>
 
+        <div>
+          <label className="block text-xs font-medium text-ink-400 mb-1">
+            النوع
+          </label>
+          <Controller
+            name="category"
+            control={control}
+            render={({ field }) => (
+              <CompactSelect
+                options={categoryOptions}
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="اختر النوع"
+              />
+            )}
+          />
+          {errors.category && (
+            <p className="text-xs text-negative mt-1">
+              {errors.category.message}
+            </p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
           <Input
-            label="الراتب الأساسي"
+            label="التاريخ"
+            type="date"
+            {...register("transactionDate")}
+            error={errors.transactionDate?.message}
+          />
+          <Input
+            label="القيمة"
             type="number"
             step="0.01"
-            {...register("salary")}
-            error={errors.salary?.message}
-          />
-          <Input
-            label="أيام العمل المطلوبة بالشهر"
-            type="number"
-            {...register("requiredWorkingDaysPerMonth")}
-            error={errors.requiredWorkingDaysPerMonth?.message}
-          />
-          <Input
-            label="آخر يوم استحقاق مرتب"
-            type="date"
-            {...register("lastDayOfReceivingSalary")}
-            error={errors.lastDayOfReceivingSalary?.message}
+            {...register("amount")}
+            error={errors.amount?.message}
           />
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-ink-700 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            {...register("isActive")}
-            className="rounded border-ink-400/30 accent-primary-500"
-          />
-          موظف نشط
-        </label>
+        <Input
+          label="الوصف"
+          {...register("notes")}
+          error={errors.notes?.message}
+        />
 
         <div className="flex justify-end gap-2 pt-2 border-t border-ink-400/10">
           <Button type="button" variant="outline" onClick={onClose}>

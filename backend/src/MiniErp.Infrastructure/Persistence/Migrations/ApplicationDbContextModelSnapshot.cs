@@ -1494,6 +1494,9 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("CashVoucherId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
@@ -1527,14 +1530,18 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsProcessed")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Notes")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int?>("PayrollEntryId")
+                    b.Property<decimal>("RunningBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("SourceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SourceType")
                         .HasColumnType("int");
 
                     b.Property<DateOnly>("TransactionDate")
@@ -1558,12 +1565,15 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.HasAlternateKey("CompanyId", "Id");
 
-                    b.HasIndex("CompanyId", "PayrollEntryId")
-                        .HasFilter("[PayrollEntryId] IS NOT NULL AND [IsDeleted] = 0");
+                    b.HasIndex("CompanyId", "CashVoucherId")
+                        .HasFilter("[CashVoucherId] IS NOT NULL AND [IsDeleted] = 0");
+
+                    b.HasIndex("CompanyId", "EmployeeId", "Type");
+
+                    b.HasIndex("CompanyId", "SourceType", "SourceId")
+                        .HasFilter("[SourceId] IS NOT NULL AND [IsDeleted] = 0");
 
                     b.HasIndex("CompanyId", "EmployeeId", "TransactionDate", "Id");
-
-                    b.HasIndex("CompanyId", "EmployeeId", "Type", "IsProcessed");
 
                     b.ToTable("EmployeeTransactions", null, t =>
                         {
@@ -2512,9 +2522,16 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Property<int>("AbsentDays")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("Bonus")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("CalculatedSalary")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("CashVoucherId")
+                        .HasColumnType("int");
 
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
@@ -2531,6 +2548,14 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Deduction")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("Deductionbydayunit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("DeletedById")
                         .HasMaxLength(450)
@@ -2576,14 +2601,14 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("Overtimebydayunit")
+                    b.Property<decimal?>("Overtimebydayunit")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PresentDays")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("RequiredWorkingDays")
+                    b.Property<decimal?>("RequiredWorkingDays")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
@@ -2593,14 +2618,6 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.Property<DateOnly>("StartDate")
                         .HasColumnType("date");
-
-                    b.Property<decimal>("TotalCredits")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("TotalDebits")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("UpdatedById")
                         .HasMaxLength(450)
@@ -2613,16 +2630,17 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("WorkedDays")
-                        .HasColumnType("int");
+                    b.Property<decimal>("WorkedDaysbydayunit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
                     b.HasAlternateKey("CompanyId", "Id");
 
-                    b.HasIndex("CompanyId", "EmployeeType");
+                    b.HasIndex("CompanyId", "CashVoucherId");
 
-                    b.HasIndex("CompanyId", "IsTakeSalary");
+                    b.HasIndex("CompanyId", "EmployeeType");
 
                     b.HasIndex("CompanyId", "StartDate", "EndDate");
 
@@ -2632,11 +2650,11 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
 
                     b.ToTable("PayrollEntries", null, t =>
                         {
-                            t.HasCheckConstraint("CK_PayrollEntries_Amounts_NonNegative", "[Overtimebydayunit] >= 0 AND [RequiredWorkingDays] >= 0 AND ([SalaryPerDay] IS NULL OR [SalaryPerDay] >= 0) AND [CalculatedSalary] >= 0 AND [TotalCredits] >= 0 AND [TotalDebits] >= 0 AND ([GrossSalary] IS NULL OR [GrossSalary] >= 0) AND ([NetSalary] IS NULL OR [NetSalary] >= 0)");
+                            t.HasCheckConstraint("CK_PayrollEntries_Amounts_NonNegative", "([Overtimebydayunit] IS NULL OR [Overtimebydayunit] >= 0) AND ([RequiredWorkingDays] IS NULL OR [RequiredWorkingDays] >= 0) AND [Bonus] >= 0 AND [Deduction] >= 0 AND ([GrossSalary] IS NULL OR [GrossSalary] >= 0) AND ([NetSalary] IS NULL OR [NetSalary] >= 0) AND ([Deductionbydayunit] IS NULL OR [Deductionbydayunit] >= 0)");
 
                             t.HasCheckConstraint("CK_PayrollEntries_Dates", "[StartDate] <= [EndDate]");
 
-                            t.HasCheckConstraint("CK_PayrollEntries_Days", "[PresentDays] >= 0 AND [AbsentDays] >= 0 AND [WorkedDays] >= 0");
+                            t.HasCheckConstraint("CK_PayrollEntries_Days", "[PresentDays] >= 0 AND [AbsentDays] >= 0 AND [WorkedDaysbydayunit] >= 0");
                         });
                 });
 
@@ -3352,12 +3370,20 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MiniErp.Domain.Entities.CashManagement.CashVoucher", "CashVoucher")
+                        .WithMany()
+                        .HasForeignKey("CompanyId", "CashVoucherId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MiniErp.Domain.Entities.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("CompanyId", "EmployeeId")
                         .HasPrincipalKey("CompanyId", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CashVoucher");
 
                     b.Navigation("Company");
 
@@ -3669,12 +3695,20 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MiniErp.Domain.Entities.CashManagement.CashVoucher", "CashVoucher")
+                        .WithMany()
+                        .HasForeignKey("CompanyId", "CashVoucherId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MiniErp.Domain.Entities.Employees.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("CompanyId", "EmployeeId")
                         .HasPrincipalKey("CompanyId", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CashVoucher");
 
                     b.Navigation("Company");
 

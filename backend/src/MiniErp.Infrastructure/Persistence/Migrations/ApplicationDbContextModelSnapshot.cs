@@ -3739,6 +3739,24 @@ namespace MiniErp.Infrastructure.Persistence.Migrations
                     b.ToTable("UserCompanies", (string)null);
                 });
 
+            modelBuilder.Entity("MiniErp.Infrastructure.Persistence.EntityIdentifierSequence", b =>
+                {
+                    b.Property<string>("Scope")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Prefix")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<int>("LastNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Scope", "Prefix");
+
+                    b.ToTable("EntityIdentifierSequences", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)

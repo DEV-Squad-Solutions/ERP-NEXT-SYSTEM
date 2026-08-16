@@ -1334,6 +1334,7 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasDefaultValue(1);
 
                     b.Property<int>("StockBalanceCheckMode")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
 
@@ -3105,8 +3106,9 @@ namespace MiniErp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ActualDriverId")
-                        .HasColumnType("int");
+                    b.Property<string>("ActualDriverId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<decimal>("BaseDiscountAmount")
                         .ValueGeneratedOnAdd()
@@ -3304,8 +3306,6 @@ namespace MiniErp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CountryId");
-
-                    b.HasIndex("CompanyId", "ActualDriverId");
 
                     b.HasIndex("CompanyId", "ContainerStoreId");
 
@@ -3749,8 +3749,9 @@ namespace MiniErp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ActualDriverId")
-                        .HasColumnType("int");
+                    b.Property<string>("ActualDriverId")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("BusinessPartnerId")
                         .HasColumnType("int");
@@ -3833,8 +3834,6 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CompanyId", "ActualDriverId");
 
                     b.HasIndex("CompanyId", "BusinessPartnerId");
 
@@ -5237,12 +5236,6 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("MiniErp.Domain.Entities.Logistics.Driver", "ActualDriver")
-                        .WithMany()
-                        .HasForeignKey("CompanyId", "ActualDriverId")
-                        .HasPrincipalKey("CompanyId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("MiniErp.Domain.Entities.BusinessPartners.BusinessPartner", "BusinessPartner")
                         .WithMany()
                         .HasForeignKey("CompanyId", "BusinessPartnerId")
@@ -5280,8 +5273,6 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasPrincipalKey("CompanyId", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("ActualDriver");
 
                     b.Navigation("BusinessPartner");
 
@@ -5421,12 +5412,6 @@ namespace MiniErp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MiniErp.Domain.Entities.Logistics.Driver", "ActualDriver")
-                        .WithMany()
-                        .HasForeignKey("CompanyId", "ActualDriverId")
-                        .HasPrincipalKey("CompanyId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("MiniErp.Domain.Entities.BusinessPartners.BusinessPartner", "BusinessPartner")
                         .WithMany()
                         .HasForeignKey("CompanyId", "BusinessPartnerId")
@@ -5447,8 +5432,6 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasPrincipalKey("CompanyId", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("ActualDriver");
 
                     b.Navigation("BusinessPartner");
 

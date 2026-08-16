@@ -3106,7 +3106,7 @@ namespace MiniErp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ActualDriverId")
+                    b.Property<string>("ActualDriverName")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -3749,7 +3749,7 @@ namespace MiniErp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ActualDriverId")
+                    b.Property<string>("ActualDriverName")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 

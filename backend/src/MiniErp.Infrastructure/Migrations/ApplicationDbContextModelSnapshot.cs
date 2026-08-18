@@ -2391,7 +2391,7 @@ namespace MiniErp.Infrastructure.Migrations
 
                             t.HasCheckConstraint("CK_ItemMovements_NonPositiveState", "[QuantityAfter] > 0 OR ([AverageCostAfter] = 0 AND [InventoryValueAfter] = 0)");
 
-                            t.HasCheckConstraint("CK_ItemMovements_PendingWithinOutbound", "[PendingCostQuantity] <= [QuantityOut]");
+                            t.HasCheckConstraint("CK_ItemMovements_PendingWithinMovement", "[PendingCostQuantity] <= CASE WHEN [QuantityIn] > 0 THEN [QuantityIn] ELSE [QuantityOut] END");
 
                             t.HasCheckConstraint("CK_ItemMovements_Quantity_NonNegative", "[QuantityIn] >= 0 AND [QuantityOut] >= 0");
                         });
@@ -4222,7 +4222,10 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasDatabaseName("UX_Countries_Code_Active")
                         .HasFilter("[IsActive] = 1 AND [IsDeleted] = 0");
 
-                    b.HasIndex("Name");
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Countries_Name_Active")
+                        .HasFilter("[IsActive] = 1 AND [IsDeleted] = 0");
 
                     b.ToTable("Countries", (string)null);
                 });

@@ -701,6 +701,9 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Property<int?>("DriverTripId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("ExchangeRate")
                         .ValueGeneratedOnAdd()
                         .HasPrecision(28, 12)
@@ -783,15 +786,17 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.HasIndex("CompanyId", "DriverTripId", "VoucherDate", "Id");
 
+                    b.HasIndex("CompanyId", "EmployeeId", "VoucherDate", "Id");
+
                     b.ToTable("CashVouchers", null, t =>
                         {
                             t.HasCheckConstraint("CK_CashVouchers_Amount_Positive", "[Amount] > 0");
 
                             t.HasCheckConstraint("CK_CashVouchers_Direction", "[Direction] IN (1, 2)");
 
-                            t.HasCheckConstraint("CK_CashVouchers_PartyShape", "([PartyType] = 1 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [ExternalPartyName] IS NULL) OR ([PartyType] = 2 AND [BusinessPartnerId] IS NOT NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [ExternalPartyName] IS NULL) OR ([PartyType] = 3 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NOT NULL AND [ExternalPartyName] IS NULL) OR ([PartyType] = 4 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [ExternalPartyName] IS NOT NULL)");
+                            t.HasCheckConstraint("CK_CashVouchers_PartyShape", "([PartyType] = 1 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [EmployeeId] IS NULL AND [ExternalPartyName] IS NULL) OR ([PartyType] = 2 AND [BusinessPartnerId] IS NOT NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [EmployeeId] IS NULL AND [ExternalPartyName] IS NULL) OR ([PartyType] = 3 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NOT NULL AND [EmployeeId] IS NULL AND [ExternalPartyName] IS NULL) OR ([PartyType] = 4 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [EmployeeId] IS NULL AND [ExternalPartyName] IS NOT NULL) OR ([PartyType] = 5 AND [BusinessPartnerId] IS NULL AND [DriverId] IS NULL AND [DriverTripId] IS NULL AND [EmployeeId] IS NOT NULL AND [ExternalPartyName] IS NULL)");
 
-                            t.HasCheckConstraint("CK_CashVouchers_PartyType", "[PartyType] IN (1, 2, 3, 4)");
+                            t.HasCheckConstraint("CK_CashVouchers_PartyType", "[PartyType] IN (1, 2, 3, 4, 5)");
 
                             t.HasCheckConstraint("CK_CashVouchers_PostingReferencesTogether", "[CashMovementTypeId] IS NULL OR [CashboxId] IS NOT NULL");
 
@@ -4235,6 +4240,11 @@ namespace MiniErp.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreatedOn")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("SYSUTCDATETIME()");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -4298,6 +4308,9 @@ namespace MiniErp.Infrastructure.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("CreatedOn", "Id")
+                        .IsDescending();
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -4561,6 +4574,12 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasPrincipalKey("CompanyId", "Id")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("MiniErp.Domain.Entities.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("CompanyId", "EmployeeId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("MiniErp.Domain.Entities.Companies.ExchangeRate", "ExchangeRateRecord")
                         .WithMany()
                         .HasForeignKey("CompanyId", "ExchangeRateId")
@@ -4586,6 +4605,8 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Navigation("Driver");
 
                     b.Navigation("DriverTrip");
+
+                    b.Navigation("Employee");
 
                     b.Navigation("ExchangeRateRecord");
 

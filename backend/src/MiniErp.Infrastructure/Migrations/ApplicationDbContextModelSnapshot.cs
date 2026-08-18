@@ -494,6 +494,9 @@ namespace MiniErp.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Classification")
+                        .HasColumnType("int");
+
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
@@ -609,13 +612,19 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.HasIndex("CompanyId", "Direction", "IsActive", "Name", "Id");
 
+                    b.HasIndex("CompanyId", "Classification", "Direction", "IsActive", "Name", "Id");
+
                     b.ToTable("CashMovementTypes", null, t =>
                         {
+                            t.HasCheckConstraint("CK_CashMovementTypes_Classification", "[Classification] IN (1, 2, 3, 4)");
+
                             t.HasCheckConstraint("CK_CashMovementTypes_Direction", "[Direction] IN (1, 2)");
 
-                            t.HasCheckConstraint("CK_CashMovementTypes_InvoiceDefaults", "(([IsDefaultForSales] = 0 AND [IsDefaultForPurchaseReturn] = 0) OR ([IsActive] = 1 AND [Direction] = 1 AND [PartnerEffect] = 2)) AND (([IsDefaultForPurchase] = 0 AND [IsDefaultForSalesReturn] = 0) OR ([IsActive] = 1 AND [Direction] = 2 AND [PartnerEffect] = 1))");
+                            t.HasCheckConstraint("CK_CashMovementTypes_InvoiceDefaults", "(([IsDefaultForSales] = 0 AND [IsDefaultForPurchaseReturn] = 0) OR ([IsActive] = 1 AND [Direction] = 1 AND [Classification] = 1 AND [PartnerEffect] = 2)) AND (([IsDefaultForPurchase] = 0 AND [IsDefaultForSalesReturn] = 0) OR ([IsActive] = 1 AND [Direction] = 2 AND [Classification] = 1 AND [PartnerEffect] = 1))");
 
                             t.HasCheckConstraint("CK_CashMovementTypes_PartnerEffect", "[PartnerEffect] IN (0, 1, 2)");
+
+                            t.HasCheckConstraint("CK_CashMovementTypes_PartnerSettlement", "[Classification] <> 1 OR [PartnerEffect] <> 0");
                         });
                 });
 

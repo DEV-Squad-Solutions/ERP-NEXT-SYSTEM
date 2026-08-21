@@ -1904,13 +1904,11 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.ToTable("EmployeeAttendances", null, t =>
                         {
-                            t.HasCheckConstraint("CK_EmployeeAttendances_CheckOutAfterCheckIn", "[CheckIn] IS NULL OR [CheckOut] IS NULL OR [CheckOut] >= [CheckIn]");
+                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkDayRatio", "[WorkDayRatio] IN (1,2,3,4,5)");
 
-                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkDayRatio", "[WorkDayRatio] IN (25,33,50,75,100)");
+                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkDaysDeductionRatio", "[WorkDaysDeductionRatio] IS NULL OR [WorkDaysDeductionRatio] IN (1,2,3,4,5)");
 
-                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkDaysDeductionRatio", "[WorkDaysDeductionRatio] IS NULL OR [WorkDaysDeductionRatio] IN (25,33,50,75,100)");
-
-                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkOverTimeRatio", "[WorkOverTimeRatio] IS NULL OR [WorkOverTimeRatio] IN (25,33,50,75,100)");
+                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkOverTimeRatio", "[WorkOverTimeRatio] IS NULL OR [WorkOverTimeRatio] IN (1,2,3,4,5)");
                         });
                 });
 

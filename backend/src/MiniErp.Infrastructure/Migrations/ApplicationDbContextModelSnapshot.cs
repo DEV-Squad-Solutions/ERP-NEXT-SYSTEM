@@ -1938,7 +1938,10 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("CashVoucherId")
+                    b.Property<int>("CashBoxId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CashVoucherId")
                         .HasColumnType("int");
 
                     b.Property<int>("CompanyId")
@@ -2009,8 +2012,9 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.HasAlternateKey("CompanyId", "Id");
 
-                    b.HasIndex("CompanyId", "CashVoucherId")
-                        .HasFilter("[CashVoucherId] IS NOT NULL AND [IsDeleted] = 0");
+                    b.HasIndex("CompanyId", "CashBoxId");
+
+                    b.HasIndex("CompanyId", "CashVoucherId");
 
                     b.HasIndex("CompanyId", "EmployeeId", "Type");
 
@@ -3880,12 +3884,6 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("CashVoucherId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CashboxId")
-                        .HasColumnType("int");
-
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
@@ -3933,6 +3931,9 @@ namespace MiniErp.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("EmployeeTransactionId")
+                        .HasColumnType("int");
 
                     b.Property<int>("EmployeeType")
                         .HasColumnType("int");
@@ -3990,9 +3991,7 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompanyId", "CashVoucherId");
-
-                    b.HasIndex("CompanyId", "CashboxId");
+                    b.HasIndex("EmployeeTransactionId");
 
                     b.HasIndex("CompanyId", "EmployeeId");
 
@@ -4863,11 +4862,19 @@ namespace MiniErp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("MiniErp.Domain.Entities.CashManagement.Cashbox", "Cashbox")
+                        .WithMany()
+                        .HasForeignKey("CompanyId", "CashBoxId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("MiniErp.Domain.Entities.CashManagement.CashVoucher", "CashVoucher")
                         .WithMany()
                         .HasForeignKey("CompanyId", "CashVoucherId")
                         .HasPrincipalKey("CompanyId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("MiniErp.Domain.Entities.Employees.Employee", "Employee")
                         .WithMany()
@@ -4877,6 +4884,8 @@ namespace MiniErp.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("CashVoucher");
+
+                    b.Navigation("Cashbox");
 
                     b.Navigation("Company");
 
@@ -5490,17 +5499,9 @@ namespace MiniErp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MiniErp.Domain.Entities.CashManagement.CashVoucher", "CashVoucher")
+                    b.HasOne("MiniErp.Domain.Entities.Employees.EmployeeTransaction", "EmployeeTransaction")
                         .WithMany()
-                        .HasForeignKey("CompanyId", "CashVoucherId")
-                        .HasPrincipalKey("CompanyId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("MiniErp.Domain.Entities.CashManagement.Cashbox", "Cashbox")
-                        .WithMany()
-                        .HasForeignKey("CompanyId", "CashboxId")
-                        .HasPrincipalKey("CompanyId", "Id")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("EmployeeTransactionId");
 
                     b.HasOne("MiniErp.Domain.Entities.Employees.Employee", "Employee")
                         .WithMany()
@@ -5509,13 +5510,11 @@ namespace MiniErp.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("CashVoucher");
-
-                    b.Navigation("Cashbox");
-
                     b.Navigation("Company");
 
                     b.Navigation("Employee");
+
+                    b.Navigation("EmployeeTransaction");
                 });
 
             modelBuilder.Entity("MiniErp.Domain.Entities.Payroll.PayrollPeriod", b =>

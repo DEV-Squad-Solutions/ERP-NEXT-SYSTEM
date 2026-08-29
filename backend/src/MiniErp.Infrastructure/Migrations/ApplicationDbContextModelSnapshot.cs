@@ -3686,6 +3686,83 @@ namespace MiniErp.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MiniErp.Domain.Entities.Invoicing.InvoiceLinePricingExpense", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(28, 8)
+                        .HasColumnType("decimal(28,8)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedByPc")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DeletedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("InvoiceLineId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("UpdatedById")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UpdatedByPc")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "InvoiceLineId", "Name")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("InvoiceLinePricingExpenses", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_InvoiceLinePricingExpenses_Amount_Positive", "[Amount] > 0");
+                        });
+                });
+
             modelBuilder.Entity("MiniErp.Domain.Entities.Invoicing.InvoicePayment", b =>
                 {
                     b.Property<int>("Id")
@@ -5571,6 +5648,26 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Navigation("SourceInvoiceLine");
                 });
 
+            modelBuilder.Entity("MiniErp.Domain.Entities.Invoicing.InvoiceLinePricingExpense", b =>
+                {
+                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniErp.Domain.Entities.Invoicing.InvoiceLine", "InvoiceLine")
+                        .WithMany("PricingExpenses")
+                        .HasForeignKey("CompanyId", "InvoiceLineId")
+                        .HasPrincipalKey("CompanyId", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("InvoiceLine");
+                });
+
             modelBuilder.Entity("MiniErp.Domain.Entities.Invoicing.InvoicePayment", b =>
                 {
                     b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
@@ -5800,6 +5897,11 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Navigation("PaymentVouchers");
 
                     b.Navigation("Payments");
+                });
+
+            modelBuilder.Entity("MiniErp.Domain.Entities.Invoicing.InvoiceLine", b =>
+                {
+                    b.Navigation("PricingExpenses");
                 });
 
             modelBuilder.Entity("MiniErp.Infrastructure.Identity.ApplicationUser", b =>

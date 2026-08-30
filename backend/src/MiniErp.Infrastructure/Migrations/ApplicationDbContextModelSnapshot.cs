@@ -223,6 +223,9 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("Special")
+                        .HasColumnType("bit");
+
                     b.Property<string>("TaxNumber")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");

@@ -2034,6 +2034,8 @@ namespace MiniErp.Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[CashVoucherId] IS NOT NULL AND [IsDeleted] = 0");
 
+                    b.HasIndex("CompanyId", "Type", "MovementDate");
+
                     b.HasIndex("CompanyId", "EmployeeId", "Currency", "MovementDate", "Id");
 
                     b.ToTable("EmployeeMovements", null, t =>
@@ -4225,152 +4227,6 @@ namespace MiniErp.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("MiniErp.Domain.Entities.Payroll.PayrollPeriod", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("CalculatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .IsUnicode(true)
-                        .HasColumnType("nvarchar(450)")
-                        .HasComputedColumnSql("N'Roll-' + RIGHT(N'000' + CAST([Id] AS NVARCHAR(10)), 3)", true);
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CreatedById")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CreatedByPc")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedById")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DeletedByPc")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("TotalAbsentDays")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("TotalCredits")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("TotalDailyEmployees")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("TotalDebits")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("TotalEmployees")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("TotalGrossSalary")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("TotalMonthlyEmployees")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("TotalNetSalary")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("TotalOvertimeDays")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("TotalWorkedDays")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("UpdatedById")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("UpdatedByPc")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("WorkingDaysInPeriod")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasAlternateKey("CompanyId", "Id");
-
-                    b.HasIndex("CompanyId", "Code")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.HasIndex("CompanyId", "Name")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.HasIndex("CompanyId", "Status");
-
-                    b.HasIndex("CompanyId", "StartDate", "EndDate")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
-
-                    b.ToTable("PayrollPeriods", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_PayrollPeriods_Amounts", "([TotalGrossSalary] IS NULL OR [TotalGrossSalary] >= 0) AND ([TotalCredits] IS NULL OR [TotalCredits] >= 0) AND ([TotalDebits] IS NULL OR [TotalDebits] >= 0) AND ([TotalNetSalary] IS NULL OR [TotalNetSalary] >= 0) AND ([TotalWorkedDays] IS NULL OR [TotalWorkedDays] >= 0) AND ([TotalOvertimeDays] IS NULL OR [TotalOvertimeDays] >= 0) AND ([TotalAbsentDays] IS NULL OR [TotalAbsentDays] >= 0)");
-
-                            t.HasCheckConstraint("CK_PayrollPeriods_Dates", "[StartDate] <= [EndDate]");
-
-                            t.HasCheckConstraint("CK_PayrollPeriods_EmployeeCounts", "([TotalEmployees] IS NULL OR [TotalEmployees] >= 0) AND ([TotalMonthlyEmployees] IS NULL OR [TotalMonthlyEmployees] >= 0) AND ([TotalDailyEmployees] IS NULL OR [TotalDailyEmployees] >= 0)");
-
-                            t.HasCheckConstraint("CK_PayrollPeriods_WorkingDays", "[WorkingDaysInPeriod] > 0");
-                        });
-                });
-
             modelBuilder.Entity("MiniErp.Domain.Entities.ReferenceData.Country", b =>
                 {
                     b.Property<int>("Id")
@@ -5767,17 +5623,6 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("MiniErp.Domain.Entities.Payroll.PayrollPeriod", b =>
-                {
-                    b.HasOne("MiniErp.Domain.Entities.Companies.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("MiniErp.Infrastructure.Identity.RefreshToken", b =>

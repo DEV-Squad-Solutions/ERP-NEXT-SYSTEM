@@ -4247,6 +4247,9 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.HasIndex("CompanyId", "BusinessPartnerId", "InvoiceDate");
 
+                    b.HasIndex("CompanyId", "InvoiceDate", "InvoiceType")
+                        .HasDatabaseName("IX_Invoices_Company_Date_Type");
+
                     b.ToTable("Invoices", (string)null);
                 });
 

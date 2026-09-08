@@ -812,6 +812,12 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Property<int>("JournalEntryId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PartyId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PartyType")
+                        .HasColumnType("int");
+
                     b.Property<string>("UpdatedById")
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
@@ -831,9 +837,15 @@ namespace MiniErp.Infrastructure.Migrations
                     b.HasIndex("CompanyId", "JournalEntryId", "Id")
                         .HasDatabaseName("IX_JournalEntryLines_Company_Entry");
 
+                    b.HasIndex("CompanyId", "PartyType", "PartyId", "JournalEntryId")
+                        .HasDatabaseName("IX_JournalEntryLines_Company_Party")
+                        .HasFilter("[PartyType] IS NOT NULL AND [PartyId] IS NOT NULL");
+
                     b.ToTable("JournalEntryLines", null, t =>
                         {
                             t.HasCheckConstraint("CK_JournalEntryLines_DebitCredit", "(([Debit] > 0 AND [Credit] = 0) OR ([Credit] > 0 AND [Debit] = 0))");
+
+                            t.HasCheckConstraint("CK_JournalEntryLines_PartyShape", "(([PartyType] IS NULL AND [PartyId] IS NULL) OR ([PartyType] IN (1, 2, 3, 4, 5) AND [PartyId] IS NOT NULL))");
                         });
                 });
 

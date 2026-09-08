@@ -1360,6 +1360,9 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Property<int?>("CashboxTransferId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("Classification")
+                        .HasColumnType("int");
+
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 

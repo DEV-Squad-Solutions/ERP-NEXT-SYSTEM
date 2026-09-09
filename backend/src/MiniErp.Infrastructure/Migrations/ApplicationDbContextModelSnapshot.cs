@@ -787,6 +787,9 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
 
+                    b.Property<int>("Currency")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Debit")
                         .HasPrecision(19, 4)
                         .HasColumnType("decimal(19,4)");
@@ -806,6 +809,10 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<decimal>("ExchangeRate")
+                        .HasPrecision(28, 12)
+                        .HasColumnType("decimal(28,12)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -817,6 +824,14 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.Property<int?>("PartyType")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("TransactionCredit")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
+
+                    b.Property<decimal>("TransactionDebit")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("decimal(19,4)");
 
                     b.Property<string>("UpdatedById")
                         .HasMaxLength(450)
@@ -843,9 +858,15 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.ToTable("JournalEntryLines", null, t =>
                         {
+                            t.HasCheckConstraint("CK_JournalEntryLines_Currency", "[Currency] BETWEEN 1 AND 7");
+
                             t.HasCheckConstraint("CK_JournalEntryLines_DebitCredit", "(([Debit] > 0 AND [Credit] = 0) OR ([Credit] > 0 AND [Debit] = 0))");
 
+                            t.HasCheckConstraint("CK_JournalEntryLines_ExchangeRate", "[ExchangeRate] > 0");
+
                             t.HasCheckConstraint("CK_JournalEntryLines_PartyShape", "(([PartyType] IS NULL AND [PartyId] IS NULL) OR ([PartyType] IN (1, 2, 3, 4, 5) AND [PartyId] IS NOT NULL))");
+
+                            t.HasCheckConstraint("CK_JournalEntryLines_TransactionAmounts", "(([TransactionDebit] > 0 AND [TransactionCredit] = 0 AND [Debit] > 0 AND [Credit] = 0) OR ([TransactionCredit] > 0 AND [TransactionDebit] = 0 AND [Credit] > 0 AND [Debit] = 0))");
                         });
                 });
 

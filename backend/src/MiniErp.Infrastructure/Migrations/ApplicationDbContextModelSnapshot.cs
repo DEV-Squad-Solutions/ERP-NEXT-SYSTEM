@@ -2593,6 +2593,10 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("PlaceName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<int?>("RequiredWorkingDaysPerMonth")
                         .HasColumnType("int");
 
@@ -2610,6 +2614,9 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("WorkPlaceStatus")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId", "Code")
@@ -2624,6 +2631,8 @@ namespace MiniErp.Infrastructure.Migrations
                             t.HasCheckConstraint("CK_Employees_RequiredWorkingDays", "[RequiredWorkingDaysPerMonth] IS NULL OR ([RequiredWorkingDaysPerMonth] >= 1 AND [RequiredWorkingDaysPerMonth] <= 31)");
 
                             t.HasCheckConstraint("CK_Employees_Salary_NonNegative", "([DailySalary] IS NULL OR [DailySalary] >= 0) AND ([MonthlySalary] IS NULL OR [MonthlySalary] >= 0)");
+
+                            t.HasCheckConstraint("CK_Employees_WorkPlaceStatus", "[WorkPlaceStatus] IN (1, 2)");
                         });
                 });
 
@@ -2728,11 +2737,11 @@ namespace MiniErp.Infrastructure.Migrations
                         {
                             t.HasCheckConstraint("CK_EmployeeAttendances_EmployeeAttendanceStatus", "[Status] IN (0,1)");
 
-                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkDayRatio", "[WorkDayRatio] IN (1,2,3,4,5)");
+                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkDayRatio", "[WorkDayRatio] IN (1,2,3,4,5,6,7,8,9,10)");
 
-                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkDaysDeductionRatio", "[WorkDaysDeductionRatio] IS NULL OR [WorkDaysDeductionRatio] IN (1,2,3,4,5)");
+                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkDaysDeductionRatio", "[WorkDaysDeductionRatio] IS NULL OR [WorkDaysDeductionRatio] IN (1,2,3,4,5,6,7,8,9,10)");
 
-                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkOverTimeRatio", "[WorkOverTimeRatio] IS NULL OR [WorkOverTimeRatio] IN (1,2,3,4,5)");
+                            t.HasCheckConstraint("CK_EmployeeAttendances_WorkOverTimeRatio", "[WorkOverTimeRatio] IS NULL OR [WorkOverTimeRatio] IN (1,2,3,4,5,6,7,8,9,10)");
                         });
                 });
 
@@ -4894,6 +4903,9 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Property<bool>("IsSalaryMoveToEmployeeAccount")
                         .HasColumnType("bit")
                         .HasColumnName("IsTakeSalary");
+
+                    b.Property<bool>("IsSalaryMovedToEmployeeAccount")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("NetSalary")
                         .HasPrecision(18, 2)

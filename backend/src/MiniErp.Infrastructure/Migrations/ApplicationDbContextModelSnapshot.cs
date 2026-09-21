@@ -4455,12 +4455,23 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasPrecision(18, 6)
                         .HasColumnType("decimal(18,6)");
 
+                    b.Property<string>("ReturnPriceDifferenceReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("ReturnPriceMode")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("ReturnUnitCost")
                         .HasPrecision(24, 8)
                         .HasColumnType("decimal(24,8)");
 
                     b.Property<int?>("SourceInvoiceLineId")
                         .HasColumnType("int");
+
+                    b.Property<decimal?>("SourceUnitPriceSnapshot")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Total")
                         .HasPrecision(18, 2)
@@ -4500,6 +4511,8 @@ namespace MiniErp.Infrastructure.Migrations
                             t.HasCheckConstraint("CK_InvoiceLines_Price_NonNegative", "[Price] >= 0");
 
                             t.HasCheckConstraint("CK_InvoiceLines_Quantity_Positive", "[Quantity] > 0");
+
+                            t.HasCheckConstraint("CK_InvoiceLines_ReturnPriceMode_Valid", "[ReturnPriceMode] IS NULL OR [ReturnPriceMode] IN (1, 2)");
 
                             t.HasCheckConstraint("CK_InvoiceLines_Total_NonNegative", "[Total] >= 0");
 

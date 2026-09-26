@@ -338,7 +338,7 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.ToTable("AccountMappings", null, t =>
                         {
-                            t.HasCheckConstraint("CK_AccountMappings_MappingType", "[MappingType] IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19)");
+                            t.HasCheckConstraint("CK_AccountMappings_MappingType", "[MappingType] IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23)");
 
                             t.HasCheckConstraint("CK_AccountMappings_SourceShape", "(([MappingType] IN (1, 2) AND [SourceId] IS NOT NULL) OR ([MappingType] NOT IN (1, 2) AND [SourceId] IS NULL))");
                         });

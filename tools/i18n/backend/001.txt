@@ -1,0 +1,355 @@
+380|The employee movement identifier is invalid.
+381|Employee '{0}' does not exist.
+382|Employee '{0}' is not active.
+383|The exchange rate is required and must be greater than zero for foreign currencies.
+384|The amount must be greater than zero.
+385|The employee movement cannot be deleted because it is linked to a cash payment/receipt voucher.
+386|The specified movement type is invalid.
+387|The specified currency is invalid.
+388|The amount must be positive with at most two decimal places.
+389|At least one employee movement must be sent.
+390|The start date must be before or equal to the end date.
+391|The current record version must be sent for editing.
+392|An inactive employee cannot be used.
+393|The currency of the employee balance must match the currency of the selected employee.
+394|The employee balance number must be greater than zero.
+395|The balance carried forward from the year closing is view only and cannot be edited or deleted.
+396|Employee balance {0} was not found.
+397|The document number '{0}' is already used.
+398|The employee balance was modified by another operation. Reload the document and try again.
+399|A balance created automatically from the payroll sheet cannot be edited.
+400|A balance created automatically from the payroll sheet cannot be deleted.
+401|The payroll entry identifier is invalid.
+402|The specified balance type is invalid.
+403|The fiscal year identifier is invalid.
+404|The start date must be before or equal to the end date.
+405|The document date is required.
+406|The currency of an employee opening balance must always be Egyptian pounds (EGP).
+407|The employee name is required.
+408|The employee name must not exceed 200 characters.
+409|The job title must not exceed 200 characters.
+410|The phone number must not exceed 50 characters.
+411|The email must not exceed 256 characters.
+412|The email format is invalid.
+413|The address must not exceed 500 characters.
+414|The employee type is invalid, accepted values: 0 (daily) or 1 (monthly).
+415|The salary is required.
+416|The salary must be greater than zero.
+417|The salary must not exceed two decimal places.
+418|The workplace status is invalid. Accepted values: InCompany or OutCompany.
+419|The employee type is invalid, accepted values: Daily or Monthly.
+420|The required work days cannot be set for a daily employee.
+421|The required work days per month must be between 1 and 31.
+422|The workplace name must not exceed 200 characters.
+423|The exchange rate number must be greater than zero.
+424|Exchange rate {0} was not found.
+425|The exchange rate must be greater than zero and not exceed 12 decimal places.
+426|No exchange rate is created for the company base currency; its rate is always one.
+427|The exchange rate of the company base currency must equal one.
+428|There is no exchange rate for currency {0} on or before {1}.
+429|An active exchange rate for this currency already exists on the same date.
+430|The exchange rate is used in financial documents; it cannot be deleted, and to edit its value enable the update linked movements option.
+431|The currency or date of an exchange rate used in financial documents cannot be changed. Only the rate value can be edited, together with updating linked movements.
+432|A currency revaluation exists on or after the exchange rate date in the same fiscal year; editing the rate value would make the recorded revaluation differences incorrect.
+433|The current exchange rate version must be sent.
+434|The exchange rate was modified by another user. Reload the data and try again.
+435|The financial statement line number must be greater than zero.
+436|Financial statement line {0} was not found.
+437|The statement layout of a closed fiscal year cannot be changed. Reopen the year first.
+438|The statement line code '{0}' is already used in the same year and statement type.
+439|The current statement line version must be sent for editing.
+440|The statement line was modified by another user. Reload the data and try again.
+441|Parent statement line {0} does not exist in the same year and statement type.
+442|A statement line cannot be selected as its own parent.
+443|The parent statement line must be active.
+444|A sub-line cannot be added under a line that allows account mapping.
+445|This parent line cannot be selected because it would create a cycle in the financial statement tree.
+446|The statement line cannot be deleted because it has linked sub-lines.
+447|The statement line cannot be deleted because it has linked accounts.
+448|The line cannot be made linkable to accounts because it has sub-lines.
+449|A line with active sub-lines cannot be deactivated.
+450|The line cannot be deactivated or blocked from mapping because it has linked accounts.
+451|The year or statement type of a line linked to accounts cannot be changed.
+452|The year or statement type of a line with sub-lines cannot be changed.
+453|The fiscal year number must be greater than zero.
+454|The fiscal year name '{0}' is already used in the same company.
+455|The fiscal year start date must be before its end date.
+456|The search end date must be equal to or after the start date.
+457|The date {0} is outside fiscal year '{1}' from {2} to {3}.
+458|The specified period overlaps with another fiscal year in the same company.
+459|The current fiscal year version must be sent for editing.
+460|The fiscal year was modified by another user. Reload the data and try again.
+461|A closed fiscal year cannot be edited. Reopen it first.
+462|The fiscal year is already closed.
+463|The fiscal year is already open.
+464|Fiscal year '{0}' cannot be closed because {1} accounting issues must be resolved first.
+465|There is no equity account to carry the fiscal year balances forward to '{0}'.
+466|There is no {0} mapping to carry the operating employee balance forward to fiscal year '{1}'.
+467|The next fiscal year '{0}' is closed, and opening balances cannot be carried forward to it.
+468|Driver balances cannot be carried forward to fiscal year '{0}' because an opening balance is already recorded for one of the drivers in it.
+469|The fiscal year start date cannot be changed because driver opening balances are recorded.
+470|The fiscal year cannot be reopened because a later closed year exists: '{0}'. Reopen the later years first.
+471|The current fiscal year cannot be deleted. Make another year the current one first.
+472|A closed fiscal year cannot be deleted.
+473|The fiscal year cannot be deleted because financial statement layouts or mappings are linked to it.
+474|No fiscal year covers the movement date {0}.
+475|Fiscal year '{0}' is closed, and a movement dated {1} cannot be recorded, edited or deleted.
+488|The original sales movement reference is invalid for calculating the sales return cost.
+489|The sales return unit cost must be entered when no positive average cost is available.
+490|There is not enough priced balance in the source warehouse to complete the transfer. Add the item balance and its cost first or reduce the transfer quantity.
+491|The incoming inventory movement type is invalid for cost calculation.
+492|The cost source of inventory movement {0} could not be found.
+493|Transfer costs could not be finalized because of a circular dependency or repeated recalculation. Review the chain of transfers between warehouses.
+494|A valid warehouse must be selected for the average cost report.
+495|A valid item must be selected for the average cost report.
+496|The average cost report warehouse does not exist or does not belong to the current company.
+497|The item average cost report is available for product warehouses only.
+498|The item does not exist or does not belong to the current company.
+499|Warehouse {0} was not found.
+500|An inactive warehouse cannot be counted.
+501|A product warehouse must be selected, not a containers warehouse.
+502|The stocktake document filters are invalid.
+503|The stocktake document number must be greater than zero.
+504|Stocktake document {0} was not found.
+505|The current 8-byte record version must be sent for editing.
+506|The current 8-byte record version must be sent for settlement.
+507|The stocktake document was modified by another user. Reload it and try again.
+508|The stocktake document number '{0}' is already used.
+509|There are no active items with active units of measure to create the stocktake document.
+510|The complete set of stocktake snapshot items must be sent without additions, deletions or duplicates.
+511|The actual quantity must not be negative.
+512|A settled stocktake document cannot be edited or deleted.
+513|The stocktake document has already been settled.
+515|The inventory balance changed after the stocktake snapshot was taken. Create a new stocktake document and count again.
+516|The stocktake settlement surplus costs are invalid or contain duplicate items.
+518|The stocktake settlement document numbers could not be generated because they are already used.
+519|The stocktake date is required.
+520|Every line in the stocktake document is required.
+521|An item must not be repeated in a stocktake document.
+522|An item must not be repeated in the stocktake settlement surplus costs.
+523|Select the warehouse to view the balances report.
+524|The specified warehouse does not exist.
+525|Select a product warehouse, not a containers warehouse.
+526|The search text is too long. The maximum is 200 characters.
+527|The item number is invalid.
+528|The unit of measure number is invalid.
+529|A valid item must be specified.
+530|Item {0} does not exist.
+531|No more than 25 indicative expenses can be added to an item.
+532|An expense name cannot be repeated within an item.
+533|The invoice payment entry cannot be created because the cashbox linked to the payment was not specified.
+534|The invoice number in the search is too long. The maximum is 100 characters.
+535|The invoice type is invalid.
+536|The payment term is invalid.
+537|The item pricing method is invalid.
+538|Enter a party number greater than zero.
+539|Enter a country number greater than zero.
+540|Enter a warehouse number greater than zero.
+541|Enter a driver number greater than zero.
+542|Enter an item number greater than zero.
+543|Enter a fiscal year number greater than zero.
+544|The end date must be after the start date.
+545|Enter the invoice number (up to 100 characters).
+546|The invoice content type is invalid.
+547|This is a containers invoice. Delete the item lines.
+548|Add at least one container.
+549|Add at least one item.
+550|The return unit cost is only used with a sales return. Linking the original invoice is available for sales returns and purchase returns.
+551|The return unit cost must be zero or more.
+552|The return pricing method, price and price difference reason are only used with a return line linked to an original invoice.
+553|The return pricing method is invalid.
+554|State the reason the return price differs from the original invoice price.
+555|The price difference reason is only used with the manual price method.
+556|Select an original sales line from the same company, warehouse and item.
+557|The selected original invoice does not suit this return. Select an invoice for the same party, warehouse and item, and its date must not be after the return date.
+558|The requested quantity is greater than the quantity available for return. The available quantity of line {0} is {1}.
+559|Select all return items from a single original invoice. Do not mix linked and unlinked lines in the same return.
+560|Select the customer or supplier first.
+561|Select the warehouse first.
+562|The return type must be a sales return or a purchase return.
+563|Select the return date first.
+564|The search text is too long. The maximum is 100 characters.
+565|The current return invoice number is invalid.
+566|Do not repeat an item in the invoice.
+567|Do not repeat a container in the invoice.
+568|Container units must be non-negative and the movement must contain incoming or outgoing units.
+569|The quantity or total value exceeds the allowed precision.
+570|The amounts value exceeds the allowed precision.
+571|The quantity value exceeds the allowed precision.
+572|Customer or supplier {0} does not exist.
+573|The customer or supplier is not active.
+574|Select a containers warehouse for this invoice.
+575|Select the containers warehouse when adding a container line.
+576|Containers warehouse {0} does not exist.
+577|The containers warehouse is not active.
+578|Select the containers warehouse belonging to this customer or supplier.
+579|Country {0} does not exist or is not active.
+580|Item category {0} does not exist.
+581|The item category is not active.
+582|Select the main driver first.
+583|The actual driver cannot be sent with external driver mode.
+584|Enter the external driver name.
+585|Main driver {0} does not exist.
+586|The main driver is not active.
+588|Check the scale weights. Enter values that are not negative and do not exceed the total weight.
+589|The scale net weight ({0}) must equal the sum of item quantities ({1}).
+590|The discount must be zero or less than the invoice total.
+591|The paid amount must be zero or less than the invoice net.
+592|The amount after conversion is below the cashbox minimum.
+593|Enter the invoice identifier and its number together.
+594|The invoice version is required for editing.
+595|The warehouse number is invalid.
+596|Select the invoice date to calculate the balance.
+597|The excluded invoice number is invalid.
+598|Warehouse {0} does not exist.
+599|The warehouse is not active.
+600|Select the product warehouse, not the containers warehouse.
+604|The invoice number is invalid.
+605|Invoice {0} does not exist.
+606|The invoice was changed by another user. Reload it and try again.
+607|The invoice cannot be edited or deleted because the driver trip is linked to cash vouchers.
+608|The invoice cannot be edited or deleted because a return is linked to it.
+609|The {0} of the invoice cannot be changed because a return is linked to it.
+610|The date of the original invoice cannot be after the date of the linked return ({0}).
+611|Item line {0} cannot be deleted because it is used in a linked return.
+612|The quantity of line {0} cannot be less than the returned quantity {1}.
+614|A cash invoice must be paid in full.
+615|A credit invoice is not paid in full. Use a cash invoice.
+616|Select the cashbox to record the payment.
+617|Do not select a cashbox without entering a paid amount.
+618|Cashbox {0} does not exist.
+619|The cashbox is not active.
+620|The cashbox currency differs from the invoice currency.
+624|The balance of cashbox {0} is not enough for this payment.
+625|An item from the catalog must be specified or a text item name entered.
+626|The quantity or total result exceeds the allowed numeric precision.
+627|A container movement must contain outgoing or incoming units.
+628|The invoice exchange rate must be greater than zero.
+629|The cashbox exchange rate must be greater than zero.
+630|The current 8-byte record version must be sent.
+631|The invoice date is required.
+632|The main driver must be specified before the actual driver.
+633|The due date must not be before the invoice date.
+634|The number of invoice lines must not exceed {0}.
+635|Every invoice line is required.
+636|An item must not be repeated in the invoice lines.
+637|The number of container lines must not exceed {0}.
+638|Every container line in the invoice is required.
+639|A container must not be repeated in the invoice lines.
+640|The external driver name is required.
+641|The discount value must not be negative and cannot exceed the total of the invoice lines.
+642|The paid amount must not be negative and cannot exceed the invoice net.
+643|A cash invoice must be fully paid.
+644|A credit invoice does not accept full payment; use a cash invoice.
+645|The scale net weight must not be negative or exceed the allowed precision.
+646|The scale weight must not be negative or exceed the allowed precision.
+647|The scale difference must not be negative or exceed the allowed precision.
+648|The scale discount must not be negative or exceed the allowed precision.
+649|The sum of the scale difference and scale discount must not exceed the scale weight.
+650|The scale net weight must equal the sum of item quantities.
+651|A cashbox is required when recording a payment.
+652|A cashbox must not be specified without a payment.
+653|The item unit '{0}' already exists.
+654|Item unit {0} is not active.
+655|The item unit cannot be deleted because it is linked to current or historical items, documents or movements.
+656|The item unit number must be greater than zero.
+657|Item unit {0} was not found.
+658|The item code '{0}' is already used.
+659|The item number must be greater than zero.
+660|Item {0} was not found.
+661|The item cannot be deleted because it is linked to current or historical documents or movements.
+662|The item unit cannot be changed after the item is used in documents or movements; recorded quantities are measured in the current unit.
+663|The item category number must be greater than zero.
+664|Item category {0} was not found.
+665|The active item category '{0}' already exists.
+666|The current item category version must be sent for editing.
+667|The item category was modified by another user. Reload the data and try again.
+668|The item category cannot be deleted because it is linked to current or historical invoices. It can be deactivated instead.
+669|The entry cannot be moved to another fiscal year after it is created.
+670|The entry number must be greater than zero.
+671|Entry {0} was not found.
+672|The entry date must be within the selected fiscal year.
+673|An entry cannot be added, edited or deleted within a closed fiscal year.
+674|Account {0} is not active.
+675|Account {0} is a header account and does not allow posting.
+676|Account {0} is a header account. Journal entries are posted to sub-accounts only.
+677|The party must be selected when posting to account {0}.
+678|The party type and party number must be sent together.
+679|Account {0} does not accept a party link.
+680|The party type does not match the definition of account {0} in the fiscal year.
+681|Party {0} does not exist in the current company.
+682|Party {0} is not active.
+683|The line currency must match the party currency ({0}).
+684|Total debit must equal total credit and be greater than zero.
+685|The currency, exchange rate, and debit and credit in the original currency must be sent together.
+686|The line currency is invalid.
+687|The exchange rate must be greater than zero and within the allowed precision.
+688|The exchange rate of the company base currency must equal 1.
+689|Only a debit or credit in the original currency must be entered, matching the line direction.
+690|The amount in the original currency with the exchange rate does not equal the line amount in the base currency.
+691|The current entry version must be sent before editing or deleting it.
+692|The entry was changed by another user. Reload the data and try again.
+693|An automatic entry cannot be edited or deleted directly. Edit the source movement first.
+694|A driver balance carry-forward entry cannot be edited or deleted directly. Reopen the source fiscal year to handle the balance.
+695|An opening balance is recorded or carried forward for one of the drivers in the specified fiscal year.
+696|An automatic entry is only created from the source movement.
+697|The automatic entry source and movement number must be specified.
+698|An active automatic entry already exists for the same movement.
+699|A reversed entry cannot be edited or deleted.
+700|Specify the movement number with the entry source type.
+701|Specify the source type with the movement number.
+702|An automatic entry cannot be created manually.
+703|The entry must contain at least two lines.
+704|The current entry version must be sent before editing it.
+705|Only a debit or credit amount must be entered for each line.
+706|The account revaluation data is invalid.
+707|Account {0} does not exist or is not posted.
+708|The party type and party number must be sent together or left out together.
+709|The party linked to the account does not exist or is not active.
+710|The party currency does not match the currency required for revaluation.
+711|Revaluation is currently supported for cashboxes, customers and suppliers only; employees and drivers have no independent foreign currency.
+712|An account in the company base currency cannot be revalued.
+713|The same account/party was already revalued on {0}.
+714|The account linked to the party and the currency difference account must be set up for the fiscal year.
+715|A partner must be selected.
+716|The specified item is invalid.
+717|The specified country is invalid.
+718|The start date cannot be after the end date.
+719|The search text is too long.
+720|The movement type must be sale or purchase.
+721|The specified partner does not exist or does not belong to the current company.
+722|The specified item does not exist or does not belong to the current company.
+723|An inactive customer or supplier cannot be used.
+724|The currency of the partner balance must match the customer or supplier currency.
+725|The partner balance number must be greater than zero.
+726|Partner balance {0} was not found.
+727|The partner balance was modified by another operation. Reload the document and try again.
+728|The bonus must be greater than or equal to zero.
+729|The deduction must be greater than or equal to zero.
+730|At least one salary entry must be sent.
+731|Payroll entries cannot be created for more than {0} employees in one request.
+732|The same employee must not be repeated within one request.
+733|The payroll entry identifier is invalid.
+734|The payroll entries to be paid must be specified.
+735|More than {0} payroll entries cannot be paid in one request.
+736|A payroll entry must not be repeated within one request.
+737|The deduction must be greater than or equal to zero.
+738|At least one salary entry must be sent for editing.
+739|More than {0} payroll entries cannot be edited in one request.
+740|The employee must be specified.
+741|The start date is required.
+742|The end date is required.
+743|The number of attendance days must be zero or more.
+744|The number of attendance days cannot exceed the total days in the period.
+745|Work units must be zero or more.
+746|Overtime units must be zero or more.
+747|Deduction units must be zero or more.
+748|The bonus must be zero or more.
+749|The deduction must be zero or more.
+750|The start date is required for each entry.
+751|The end date is required for each entry.
+752|The number of attendance days cannot exceed the total days in the period for each entry.
+753|Payroll entry {0} cannot be edited because its salary was transferred to the employee account.
+754|The number of attendance days ({0}) is invalid. It must be between 0 and the total days in the period ({1}).
+755|A payroll sheet cannot be created for an inactive employee.
+756|An out-of-company payroll sheet is only for employees who work outside the company.

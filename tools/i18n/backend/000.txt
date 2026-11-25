@@ -1,0 +1,380 @@
+0|The request data is invalid.
+1|You must sign in first.
+2|You are not allowed to perform this action.
+3|The requested item does not exist.
+4|There is a data conflict.
+5|The external service provider is unavailable.
+6|The external service provider timed out.
+7|An error occurred while processing the request.
+8|Data validation failed.
+9|Please review the invalid fields and try again.
+10|The submitted value is invalid or does not match the required field type.
+11|An unexpected error occurred.
+12|An unexpected error occurred while processing the request.
+13|The service is temporarily not ready.
+14|The database connection is currently unavailable. Please try again.
+15|The submitted request could not be processed.
+16|The access token is missing, invalid or expired.
+17|You do not have the required permission to perform this action.
+18|The requested route does not exist.
+19|The requested route was not found.
+20|The request method is not allowed.
+21|The HTTP method used is not supported for this route.
+22|The request could not be completed because of a data conflict.
+23|The request content type is not supported.
+24|The request content must be sent as supported JSON.
+25|The request could not be completed.
+26|The date format is invalid.
+27|API liveness check
+28|Returns 200 when the API process itself is running. It does not check the database connection.
+29|Application readiness check
+30|Returns 200 when the database is ready, or 503 during recovery or connection failure.
+31|Database connection check
+32|Shows the current database initialization and connection state; returns 503 when it is not ready.
+33|The page number must be greater than zero, and the page size must be between 1 and {0}.
+34|Document date
+35|Document number
+36|Transfer date
+37|Source warehouse
+38|Destination warehouse
+39|Item
+40|Invoice number
+41|Document lines
+42|Notes
+43|Quantity
+44|Count
+45|Weight
+46|Price
+47|Total
+48|Record version
+49|Address
+50|Amount
+51|English name
+52|Partner balance type
+53|Customer or supplier
+54|Cashbox
+55|Cash movement type
+56|Cash movement category
+57|Code
+58|Commercial register
+59|Company
+60|Companies
+61|Container
+62|Containers
+63|Credit limit
+64|Currency
+65|Description
+66|Direction
+67|Driver
+68|Driver trip
+69|Email
+70|First name
+71|Warehouse type
+72|Item unit
+73|Last name
+74|License number
+75|Manager name
+76|Name
+77|National ID
+78|Page number
+79|Page size
+80|Reserved for a customer or supplier
+81|Party type
+82|Payment term
+83|Partner invoice number
+84|Item category
+85|Discount value
+86|Paid amount
+87|Password
+88|Phone number
+89|Refresh token
+90|Roles
+91|Company selection token
+92|Warehouse
+93|Tax number
+94|Username
+95|Voucher date
+96|Voucher number
+97|External party name
+98|Reference number
+99|Trip cost
+100|Items
+101|Stocktake date
+102|Actual quantity
+103|Reason
+104|The field {PropertyName} is required.
+105|The field {PropertyName} must be empty.
+106|The value of {PropertyName} must be greater than {ComparisonValue}.
+107|The value of {PropertyName} must not be less than {ComparisonValue}.
+108|The value of {PropertyName} must be between {From} and {To}.
+109|The length of {PropertyName} must not exceed {MaxLength} characters.
+110|The length of {PropertyName} must be at least {MinLength} characters.
+111|The format of {PropertyName} is invalid.
+112|The value of {PropertyName} is not supported.
+113|The format of {PropertyName} is invalid; the maximum is {ExpectedPrecision} digits including {ExpectedScale} decimal digits.
+114|The value of {PropertyName} is invalid.
+115|Fiscal year {0} does not exist in the current company.
+116|The accounting mapping of a closed fiscal year cannot be edited. Reopen the year first.
+117|The accounting mapping type '{0}' is not supported.
+118|The source must be specified for this mapping type.
+119|This mapping type does not accept a specific source.
+120|The mapping type and source are duplicated within the same fiscal year.
+121|Source {0} of mapping type '{1}' does not exist in the current company.
+122|Account {0} does not exist in the current company.
+123|Account {0} is inactive or does not allow posting.
+124|Account {0} is not compatible with mapping type '{1}'.
+125|The accounting mapping could not be saved because of a concurrent edit. Reload the data and try again.
+126|No account is mapped to mapping type '{0}' and source {1} in fiscal year {2}.
+127|No account is mapped to mapping type '{0}' in fiscal year {1}.
+128|Mapping type '{0}' does not accept a source this way.
+129|The financial statement type '{0}' is not supported.
+130|Statement mapping cannot be changed for a closed fiscal year. Reopen the year first.
+131|Account {0} is duplicated within the same statement type and fiscal year.
+132|The type of account {0} is not compatible with the financial statement type.
+133|Statement line {0} does not exist in the same year and statement type.
+134|Statement line {0} is inactive or does not allow account mapping.
+135|The statement mapping could not be saved because of a concurrent edit. Reload the data and try again.
+136|A valid fiscal year must be selected.
+137|Fiscal year {0} was not found.
+138|Fiscal year '{0}' must be reopened before running the legacy data migration.
+139|The migration could not be completed because revaluation '{0}' of type {1} has no entry, and a revaluation is a fixed record whose entry cannot be regenerated automatically.
+140|The account number must be greater than zero.
+141|Account {0} was not found.
+142|Account code '{0}' is already used in the same company.
+143|An automatic numeric code could not be generated for this level of the chart of accounts.
+144|The current account version must be sent for editing.
+145|The account was modified by another user. Reload the data and try again.
+146|Parent account {0} does not exist in the current company.
+147|The parent account must be active.
+148|A sub-account cannot be added under an account that allows posting.
+149|A sub-account cannot be created under an account that has financial movements.
+150|An account cannot be selected as its own parent.
+151|This parent account cannot be selected because it would create a cycle in the chart of accounts.
+152|The account cannot be converted to a postable account because it has sub-accounts.
+153|An account with active sub-accounts cannot be deactivated.
+154|The account type cannot be changed or made a header account because a financial statement mapping exists.
+155|The type or nature of a header account with sub-accounts cannot be changed.
+156|The account cannot be deleted because it has linked sub-accounts.
+157|The account cannot be deleted because it has a current or historical financial statement mapping. It can be deactivated instead.
+158|The account cannot be deleted because it is used in the accounting mapping settings. Change the mapped account first or deactivate the account.
+159|The account cannot be deleted because it has linked currency revaluation movements. It can be deactivated instead.
+160|The account cannot be deleted because it has linked receipt or payment vouchers. It can be deactivated instead.
+161|The account cannot be deleted because it has linked journal entries. It can be deactivated instead.
+162|The user does not have permission to access the selected company.
+163|Username or password is incorrect.
+164|The refresh token is invalid or expired.
+165|The signed-in user ID does not exist or is invalid.
+166|The company selection token is invalid or expired.
+167|The user is not linked to any active company.
+168|The customer or supplier name '{0}' already exists.
+169|The customer or supplier code '{0}' is already used.
+170|Another customer or supplier has the same tax number.
+171|The customer or supplier number must be greater than zero.
+172|No active containers warehouse linked to customer or supplier {0} was found.
+173|Customer or supplier {0} was not found.
+174|The customer or supplier cannot be deleted because it is linked to a current or historical containers warehouse.
+175|The customer or supplier cannot be deleted because it is linked to current or historical financial records.
+176|The currency of a customer or supplier cannot be changed after linked financial records are created.
+177|The cash movement type '{0}' already exists in the same direction.
+178|The cash movement type number must be greater than zero.
+179|Cash movement type {0} was not found.
+180|The current cash movement type version must be sent for editing.
+181|The cash movement type was modified by another user. Reload the data and try again.
+182|The cash movement type cannot be deleted because it is linked to current or historical vouchers. It can be deactivated instead.
+183|The direction, category or customer/supplier link of a movement type cannot be changed after it is used in a cash voucher.
+184|The cash movement category value is not supported.
+185|A customer or supplier settlement must be linked to a customer or supplier.
+186|Sale
+187|Purchase
+188|Sales return
+189|Purchase return
+190|The default movement for the {0} invoice must be a customer or supplier movement.
+191|The default movement for the {0} invoice must be of the customer or supplier settlement category.
+192|The default movement for the {0} invoice must be active.
+193|The default movement for the {0} invoice must be a receipt.
+194|The default movement for the {0} invoice must be a payment.
+195|The cash voucher date is required.
+196|The cash voucher exchange rate must be greater than zero with at most 12 decimal places.
+197|The current cash voucher version must be sent for editing.
+198|The cash voucher number must be greater than zero.
+199|Cash voucher {0} was not found.
+200|The cash voucher was modified by another user. Reload the voucher and try again.
+201|A draft can only be edited before the voucher is classified and posted; a posted voucher is view only.
+202|The cash voucher has been classified and posted; it cannot be edited after posting. The voucher is view only.
+203|A standalone cash voucher cannot be deleted, whether draft or posted.
+204|A payment voucher created automatically from an invoice cannot be edited or deleted; edit the invoice itself.
+205|A voucher created from a cashbox transfer cannot be edited or deleted; edit the transfer itself.
+206|Cashbox {0} was not found.
+207|An inactive cashbox cannot be used in a new voucher.
+208|An inactive cash movement type cannot be used in a new voucher.
+209|The direction of the cash movement type does not match the voucher direction.
+210|The selected cash movement type is not for customer or supplier accounts.
+211|The selected cash movement type is for customers or suppliers only.
+212|The cash movement type of a manual voucher must be income for a receipt voucher or expense for a payment voucher, and not linked to a customer or supplier account.
+213|The selected account must be active, detailed and allow posting.
+214|Select an expense account for a payment voucher or an income account for a receipt voucher.
+215|Select only one party, or one expense or income account, for the voucher.
+216|Select the driver before selecting the trip.
+217|Employee {0} was not found.
+218|Select the employee movement type for the employee voucher.
+219|The employee movement type is only used with an employee voucher.
+220|The selected employee movement type is invalid.
+221|The employee movement type does not match the voucher direction: Credit and Bonus for a receipt voucher, and the other types for a payment voucher.
+222|The cashbox currency differs from the customer or supplier currency. Select a cashbox with the same currency.
+223|Driver {0} was not found.
+224|Trip {0} belonging to the selected driver was not found.
+225|Select the cashbox and the movement type together when completing the voucher.
+226|The available balance in cashbox {0} does not allow this operation.
+227|The entry cannot be created because no counter account was set for the voucher. Select an account or a party linked to accounting.
+228|The end date must not be before the start date.
+229|The start date must be before the end date.
+230|The external party name cannot be empty.
+231|More than one party or account cannot be selected for the voucher.
+232|The cash voucher exchange rate must be greater than zero.
+233|Set the party exchange rate when classifying the voucher, not when recording the initial cashbox movement.
+234|Select the cashbox to complete the voucher.
+235|Select only one party, or one expense or income account, for the voucher.
+236|The party exchange rate must be greater than zero with at most 12 decimal places.
+237|The party exchange rate is only used with a partner voucher.
+238|Select only one party or one account when classifying the voucher.
+239|Send at least one cash voucher.
+240|The maximum is {0} cash vouchers per request.
+241|An id cannot be repeated between edit and delete operations.
+242|Voucher data is required for adding.
+243|Voucher data is required for editing.
+244|The current cash voucher version must be sent for deletion.
+245|The cashbox revaluation data is invalid.
+246|Cashbox {0} does not exist.
+247|A cashbox in the company base currency cannot be revalued.
+248|The closing rate must be greater than zero.
+249|The fiscal year of the revaluation date is closed or does not exist.
+250|Cashbox {0} was already revalued on {1}.
+251|A revaluation dated {0} cannot be created before a later revaluation.
+252|The revaluation date {0} is before the cashbox balance start date.
+253|A cashbox with a negative currency balance cannot be revalued; correct the movements first.
+254|The cashbox account and the currency difference account must be set up for the fiscal year.
+255|A cashbox movement dated {0} or earlier cannot be edited or deleted after a later revaluation is recorded.
+256|The cashbox transfer number is invalid.
+257|Cashbox transfer {0} was not found.
+258|The cashbox transfer data is invalid.
+259|A receiving cashbox different from the source cashbox must be selected.
+260|Cashbox {0} was not found.
+261|Cashbox {0} is not active.
+262|Enter the received amount or the conversion rate when transferring between two cashboxes with different currencies.
+263|The received amount does not match the source amount and the conversion rate.
+264|The received amount must equal the source amount when both cashboxes have the same currency.
+265|The received amount must equal the source amount in the base currency.
+266|The received amount does not match the exchange rates of the source and destination currencies.
+267|The available balance in cashbox {0} does not allow the transfer.
+268|Reload the transfer and try editing again.
+269|The cashbox transfer was modified by another user. Reload it and try again.
+270|The payment and receipt vouchers linked to the transfer are incomplete.
+271|The cashbox transfer filters are invalid.
+272|The transfer date is required.
+273|The exchange rate must be greater than zero.
+274|The conversion rate must be greater than zero.
+275|The destination exchange rate must be greater than zero.
+276|The cashbox code '{0}' is already used.
+277|The cashbox name '{0}' is already used.
+278|The cashbox number must be greater than zero.
+279|The current cashbox version must be sent for editing.
+280|The cashbox was modified by another user. Reload the data and try again.
+281|The cashbox cannot be deleted because undeleted cash vouchers exist on it. It can be deactivated after its balance is zeroed.
+282|A cashbox can only be deactivated when its current balance in the current fiscal year is zero in the cashbox currency.
+283|The cashbox cannot be deleted because transfers or financial entries are linked to it.
+284|The opening balance or currency cannot be changed after vouchers are created on the cashbox.
+285|The exchange rate could not be updated because one of the linked cashbox transfers does not have complete payment and receipt vouchers.
+286|The opening balance exchange rate must be greater than zero.
+287|The commercial register '{0}' is already used.
+288|The tax number '{0}' is already used.
+289|The company base currency cannot be changed after financial or inventory movements exist.
+290|The company number must be greater than zero.
+291|Company {0} was not found.
+292|The company name must not exceed 200 characters.
+293|The address must not exceed 500 characters.
+294|The commercial register must not exceed 50 characters.
+295|The tax number must not exceed 50 characters.
+296|The manager name must not exceed 200 characters.
+297|The company base currency is invalid.
+298|The movement number must be greater than zero.
+299|Container movement {0} was not found.
+300|The containers warehouse number must be greater than zero.
+301|The container number must be greater than zero.
+302|Containers warehouse {0} was not found.
+303|The selected warehouse must be a containers warehouse.
+304|A movement cannot be recorded on an inactive containers warehouse.
+305|The containers warehouse is not linked to a customer or supplier.
+306|Container {0} was not found.
+307|A movement cannot be recorded on an inactive container.
+308|The container is not assigned to this warehouse. Add it from container management first.
+309|The movement date is required.
+310|The number of outgoing or incoming units cannot be negative.
+311|An outgoing or incoming count greater than zero must be entered.
+312|The description must not exceed 
+313|{0} characters.
+314|The record fingerprint is required. Reload the data and try again.
+315|The movement was modified by another user. Reload the data and try again.
+316|Container movements produced by invoices cannot be edited or deleted from here. Edit the invoice itself.
+317|The container code '{0}' is already used by an active container.
+318|The container cannot be deleted because it is linked to a current or historical containers warehouse.
+319|The country name '{0}' already exists.
+320|The country number must be greater than zero.
+321|Country {0} was not found.
+322|The country code '{0}' is already used by an active country.
+323|The country cannot be deleted because it is linked to current or historical invoices.
+324|The company has no current fiscal year.
+325|The dashboard period must fall within the current fiscal year and not exceed 366 days.
+326|The end date must be equal to or after the start date.
+327|The dashboard period must not exceed 366 days.
+328|The opening balance document number is invalid.
+329|Opening balance {0} was not found.
+330|Driver {0} was not found.
+331|The driver must be active to add an opening balance.
+332|Fiscal year '{0}' is closed.
+333|An opening balance exists for this driver in the selected fiscal year.
+334|A carried-forward balance exists for this driver in the selected fiscal year.
+335|A previous opening entry exists for this driver in the selected fiscal year.
+336|The carried-forward balance is read only.
+337|The driver or fiscal year of an opening balance document cannot be changed.
+338|The opening balance changed. Reload the data and try again.
+339|The current version of the opening balance document must be sent in Base64.
+340|The amount must be positive, with at most 15 integer digits and two decimal places.
+341|The driver opening balance type is invalid.
+342|Notes must not exceed 1000 characters.
+343|The current driver trip version must be sent for editing.
+344|More than {0} trips cannot be edited in one request.
+345|A driver trip number must not be repeated within the request.
+346|The driver trip data is invalid.
+347|The current driver trip version must be sent.
+348|An invoice trip is managed through the invoice or the trip costs screen.
+349|Current or historical vouchers are linked to the trip; it cannot be deleted and the driver, party or date cannot be changed.
+350|The fiscal year of the trip cannot be changed.
+351|An active driver in the current company must be selected.
+352|An active party in the current company must be selected.
+353|The trip cost posting service is not available.
+354|The driver trip cost data is invalid.
+355|One or more trips could not be found in the current company.
+356|Driver trip {0} was modified by another user. Reload the data and try again.
+357|The edit conflicted with another operation on driver trips. Reload the data and try again.
+358|The driver name '{0}' already exists.
+359|The driver code '{0}' is already used.
+360|The driver license number '{0}' is already used.
+361|Another driver has the same national ID.
+362|The driver phone number '{0}' is already used.
+363|The driver number must be greater than zero.
+364|The driver cannot be deleted because they are linked to current or historical invoices, trips, cash vouchers or opening balances.
+365|The license end date must not be before the start date.
+366|The employee identifier is invalid.
+367|The attendance status is invalid.
+368|The work date is required.
+369|The check-in time is required when the employee is present.
+370|The check-out time is required when the employee is present.
+371|The work day ratio is invalid.
+372|The overtime ratio is invalid.
+373|The work day deduction ratio is invalid.
+374|The work location must not exceed 200 characters.
+375|Notes must not exceed 500 characters.
+376|At least one attendance record must be sent.
+377|Attendance for more than {0} employees cannot be recorded in one request.
+378|Attendance for the same employee on the same day must not be recorded twice in the request.
+379|Employee movement '{0}' does not exist.

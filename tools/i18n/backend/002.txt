@@ -1,0 +1,356 @@
+761|A payroll sheet already recorded{0} covers or overlaps this period ({1} to {2}).
+763|The entry date must be specified.
+764|The start date is required.
+765|The end date is required.
+766|The start date must be before or equal to the end date.
+767|Sales invoice {0} does not exist.
+768|The screens list is invalid.
+769|The user does not exist.
+770|The system has already been set up. Sign in as an administrator to add administrators or companies.
+771|The setup code is incorrect.
+772|Containers warehouse customer {0} was not found.
+773|There is no active containers warehouse for customer {0}.
+774|Fiscal year {0} was not found or does not cover the requested period.
+775|No fiscal year covering the requested period was found.
+776|The financial statement type {0} is not supported.
+777|The inventory adjustment direction is not supported.
+778|Valid adjustment lines with no duplicate items and positive quantities must be sent.
+779|The unit cost must be entered for each line when increasing inventory.
+780|The unit cost must not be entered in a deduction adjustment; the server uses the current average cost.
+781|The unit cost must not be less than zero.
+782|The inventory adjustment filters are invalid.
+783|The inventory adjustment number must be greater than zero.
+784|Inventory adjustment {0} was not found.
+785|The inventory adjustment was modified by another user. Reload it and try again.
+786|The adjustment document number '{0}' is already used.
+787|An inactive warehouse cannot be used.
+790|An inventory adjustment created from a stocktake document cannot be edited or deleted.
+791|The number of adjustment lines must not exceed {0}.
+792|Every adjustment line is required.
+793|An item must not be repeated in the adjustment lines.
+794|An opening balance carried forward automatically is read only; edit the source year and close it again to update it.
+796|The opening balance number must be greater than zero.
+797|Opening balance {0} was not found.
+798|The document was modified by another operation; reload it and try again.
+799|The quantity or total result exceeds the allowed numeric precision.
+800|The number of opening balance lines must not exceed {0}.
+801|Every line in the document is required.
+802|An item must not be repeated in the opening balance lines.
+803|The inventory transfer number is invalid.
+804|Inventory transfer {0} was not found.
+805|The inventory transfer number '{0}' is already used.
+806|A destination warehouse different from the source warehouse must be selected.
+807|Warehouse {0} is not active.
+808|Warehouse {0} is for containers and cannot be used to transfer items.
+810|Reload the inventory transfer and try editing again.
+811|The inventory transfer was modified by another user. Reload it and try again.
+812|The inventory transfer filters are invalid.
+813|The number of transfer lines must not exceed {0}.
+814|An item must not be repeated in the transfer lines.
+817|A containers warehouse must be selected, not a product warehouse.
+818|An active containers warehouse must be selected.
+819|The customer or supplier linked to the containers warehouse must be active.
+820|The container-to-warehouse link number must be greater than zero.
+821|The warehouse number must be greater than zero.
+822|The containers field is required.
+824|All container numbers must be greater than zero.
+825|A container number must not be repeated in the list.
+826|The container-to-warehouse link {0} was not found.
+827|A customer or supplier must not be specified for a product warehouse.
+828|A valid customer or supplier must be specified for the warehouse dedicated to containers.
+829|The containers warehouse must be linked to an active customer or supplier.
+830|The warehouse code '{0}' is already used.
+831|An active containers warehouse dedicated to customer or supplier {0} already exists.
+832|The containers warehouse cannot be deleted, and its type or linked customer or supplier cannot be changed, because a current or historical container link exists.
+833|The warehouse cannot be deleted because it is linked to current or historical documents or movements.
+834|The warehouse type or linked customer or supplier cannot be changed because current or historical documents or movements exist.
+835|The theme value is invalid.
+836|You do not have permission to access this company.
+837|You do not have permission to view this cashbox.
+838|You do not have permission to perform operations on this cashbox.
+839|Managing cashbox permissions is available to the administrator only.
+840|The user is not assigned to the current company.
+841|Cashboxes must belong to the current company and new cashboxes must be active.
+842|The cashbox permission data is invalid.
+843|The permissions have changed. Reload them before saving.
+844|Companies must not contain duplicate values.
+845|Roles must not contain duplicate values.
+846|A view or operate permission must be selected for each cashbox.
+847|The current user cannot delete their own account.
+848|The username '{0}' is already used.
+849|The email '{0}' is already used.
+852|The user number is required.
+853|User {0} was not found.
+854|The last administrator user cannot be deleted and the administrator role cannot be removed from their account.
+855|Credit (owed to the employee)
+856|Debit (owed by the employee)
+857|Balanced (zero)
+858|Credit movement
+859|Debit movement
+860|Financial deduction
+861|Financial bonus
+862|Employee account movement
+863|Egyptian pound
+864|US dollar
+865|Euro
+866|British pound
+867|Saudi riyal
+868|UAE dirham
+869|Kuwaiti dinar
+870|The token used is not an access token.
+871|The access token must contain exactly one valid company_id value.
+872|The access token must contain a valid user number.
+873|The access token does not contain the required session data.
+874|The session has expired or the user no longer has access to the company.
+875|An unknown error occurred.
+876|The data was modified by another operation; try again.
+877|The password is incorrect.
+878|The token is invalid.
+879|The sign-in details are linked to another account.
+880|The username '{0}' is invalid.
+881|The email '{0}' is invalid.
+882|The role name '{0}' is invalid.
+883|The role name '{0}' is already used.
+884|The user already has a password.
+885|The user lockout feature is not enabled.
+886|The user already has the role '{0}'.
+887|The user does not have the role '{0}'.
+888|The password must be at least {0} characters.
+889|The password must contain at least one special character.
+890|The password must contain at least one digit.
+891|The password must contain at least one lowercase English letter.
+892|The password must contain at least one uppercase English letter.
+893|The password must contain at least {0} distinct characters.
+894|The recovery code is invalid.
+897|No fiscal year covers the movement date {0} for company {1}.
+898|Fiscal year '{0}' is closed and does not accept movements dated {1}.
+899|The movement has a financial effect and no automatic entry was created for it.
+900|The automatic entry has no matching operational source with an effect within the year.
+901|There are {0} original entries for the same source.
+902|The entry has no lines.
+903|The entry is unbalanced: debit {0} and credit {1}.
+904|The cost of the inventory movement is still {0}.
+905|The opening balance line of item {0} has no OpeningBalance movement.
+906|There is an inventory stocktake with differences that has not been settled yet.
+907|Accounting mapping {0} does not exist.
+908|The account mapped to {0} is inactive or not postable.
+909|Assets
+910|Cash and cash equivalents
+911|Cashboxes
+912|Customers
+913|Inventory
+914|Employee receivables
+915|Liabilities
+916|Suppliers
+917|Employee payables
+918|Driver payables
+919|Equity
+920|Capital
+921|Opening balance offset
+922|Revenue
+923|Sales revenue
+924|Service revenue
+925|Other revenue
+926|Currency exchange gains
+927|Inventory surplus gains
+928|Expenses
+929|Cost of sales
+930|Operating expenses
+931|Service expenses
+932|Administrative expenses
+933|Currency exchange losses
+934|Inventory shortage losses
+935|Operating activities
+936|Customer collections and sales
+937|Supplier payments and inventory
+938|Operating and administrative payments
+939|Other operating cash flows
+940|Investing activities
+941|Purchase of fixed assets
+942|Sale of fixed assets
+943|Financing activities
+944|Capital contributions and increases
+945|Loan proceeds
+946|Loan repayments and distributions
+947|Conversion or rounding difference of a party settlement in a different currency
+948|Receipt voucher
+949|Payment voucher
+950|The invoice type, cash movement type and voucher direction must match the customer or supplier account.
+951|The operation type sent is invalid.
+952|The counter value in the base currency exceeds the allowed limit; review the exchange rate.
+953|The party exchange rate must equal the cashbox exchange rate when the currencies are the same.
+954|The settlement counter value in the party currency is below the smallest recordable value.
+955|Opening balance
+956|The opening balance
+957|The pagination data is invalid.
+958|Cashbox revaluation
+959|Currency revaluation difference gains
+960|Currency revaluation difference losses
+961|Revaluation of cashbox {0}
+962|Currency difference from a cashbox transfer
+963|Cashbox transfer {0}
+964|You do not have permission to access this cashbox.
+965|There are due invoices that have not been paid in full.
+966|There are inventory movements with a pending cost that affect profitability.
+967|There are receipt or payment vouchers that are still drafts.
+968|There are problems preventing accounting readiness from being complete.
+969|Driver trip cost TR-{0}
+970|Invoice trip cost {0}
+971|Driver trip expense
+972|Driver payables for the trip
+973|The search phrase is too long.
+974|The work date from must be before the work date to.
+975|The specified attendance status is invalid.
+976|The work date is invalid.
+977|The check-in time is missing.
+978|The check-out time must be after the check-in time.
+979|The attendance record identifier is invalid.
+980|The requested attendance record was not found.
+981|The specified employee does not exist.
+982|Attendance can only be recorded for active in-company employees.
+983|Attendance cannot be edited for an inactive employee or one who is not in the company.
+986|At least one attendance record must be sent for editing.
+989|The identifiers of the attendance records to delete must be specified.
+991|Balance carried forward from the closing of fiscal year 
+993|The employee code must not exceed 50 characters.
+994|The email is invalid.
+995|The employee type is invalid.
+996|The daily wage is invalid.
+997|The monthly salary is invalid.
+998|The workplace status is invalid.
+999|The specified balance status is invalid.
+1000|The monthly work days cannot be set for a daily employee.
+1001|The requested employee was not found.
+1002|The employee cannot be deleted because attendance records are linked to them.
+1003|The source price was published on {0}
+1004|The year cannot be closed because the balance of item {0} in warehouse {1} is negative.
+1005|Updating the carried-forward opening balance when the year is closed again
+1006|Carried forward from fiscal year {0}
+1007|Opening balance carried forward from fiscal year {0}
+1008|Balance carry-forward {0} - {1}
+1009|Balance carry-forward in base currency
+1010|Employee operating balance difference carry-forward
+1011|Offset for carrying forward statement of financial position balances
+1012|Opening balances carried forward from fiscal year {0}
+1013|Carried forward automatically from price {0}
+1014|Stocktake document settlement {0}
+1015|The search cannot exceed 200 characters.
+1016|The fiscal year number is invalid.
+1017|The invoice number is invalid.
+1018|The item number is invalid.
+1019|The invoice type is invalid.
+1020|Edit invoice {0}
+1021|Add invoice
+1022|Items
+1023|Services
+1024|Invoice cost {0}
+1025|Currency difference gain for invoice {0}
+1026|Currency difference loss for invoice {0}
+1027|Invoice {0} 
+1028|{0} for invoice {1}
+1029|Invoice party {0}
+1030|Purchase return party {0}
+1031|Purchase return inventory cost {0}
+1032|Purchase return cost difference {0}
+1033|Purchase return services {0}
+1034|Invoice payment {0}
+1035|Invoice payment settlement {0}
+1036|Sale
+1037|Purchase
+1038|Sales return
+1039|Purchase return
+1040|Invoice type
+1041|Invoice content
+1042|One of the linked source lines no longer exists.
+1043|The values of one of the return lines cannot be calculated after the source was updated.
+1044|Invoice payment {0}
+1045|Opening inventory balance {0}
+1046|Opening inventory value
+1047|Offset for the opening inventory balance
+1048|Inventory adjustment {0}
+1049|Offset for inventory adjustment {0}
+1050|Cashbox opening balance {0}
+1051|Cashbox opening balance
+1052|Offset for the cashbox opening balance
+1053|Party opening balance
+1054|Employee opening balance
+1055|Driver opening balance
+1056|Offset for the opening balance
+1057|Revaluation of an account in a foreign currency
+1058|Revaluation {0}
+1059|Balance carried forward from the closing of the fiscal year
+1060|The requested payroll entry was not found.
+1061|The employee works outside the company, please use the out-of-company employees payroll endpoint.
+1062|The employee's workplace status must be set to in-company to create a regular payroll sheet.
+1063|A payroll sheet already recorded for employee {0} covers or overlaps this period ({1} to {2}).
+1064|The salary or daily wage must be specified for the employee.
+1066|The start date for employee {0} ({1}) must be before or equal to the end date ({2}).
+1067|A payroll sheet already recorded for employee {0} covers or overlaps the specified period.
+1068|The salary or daily wage must be specified for employee {0}.
+1069|The requested payroll entry was not found.
+1070|The specified employee does not exist in the current company.
+1071|A payroll sheet belonging to a closed fiscal year cannot be edited. The carried-forward balance must be settled in the current year.
+1072|The salary of employee {0} for this period ({1} to {2}) was already transferred to their account.
+1073|Salary transfer of payroll sheet #{0} for the period from {1} to {2}
+1074|The salary of entry {0} was already transferred to the employee account.
+1076|The employee specified for entry {0} does not exist in the current company.
+1078|The salary of employee {0} for the period ({1} to {2}) was already transferred to their account.
+1079|The salary of some entries was already transferred to the employee account.
+1080|The employee of an already recorded payroll entry cannot be changed.
+1081|The employee data does not exist.
+1082|A payroll sheet of an inactive employee cannot be edited.
+1083|The payroll sheet overlaps another payroll sheet recorded for the same employee.
+1084|At least one payroll entry must be sent for editing.
+1086|A payroll sheet already recorded for employee {0} covers or overlaps the specified period ({1} to {2}).
+1087|A payroll entry cannot be recalculated after the salary was transferred to the employee account.
+1088|The employee data linked to the payroll entry was not found.
+1089|The identifiers of the payroll entries to delete must be specified.
+1090|Cash receipt voucher
+1091|Cash payment voucher
+1092|Payroll salary transfer
+1093|Credit opening balance
+1094|Debit opening balance
+1098|The start date cannot be after the end date.
+1099|The specified employee type is invalid.
+1101|The customer number is invalid.
+1102|The fiscal year number is invalid.
+1103|The item category number is invalid.
+1104|The end date must equal the start date or come after it.
+1105|Adjustment entry
+1106|Manual entry
+1107|Accounting entry
+1108|Net profit (loss) of the year to date
+1109|Customers and suppliers
+1110|Drivers
+1111|Employees
+1112|Opening balance for the period before {0}
+1113|Entry movement
+1114|Entered opening balance
+1115|Currency revaluation
+1116|Incoming cashbox transfer
+1117|Outgoing cashbox transfer
+1118|Opening entry
+1119|Automatic entry
+1120|Trip cost
+1121|Sales invoice
+1122|Purchase invoice
+1123|Opening balance for the period
+1124|Carried-forward opening balance
+1125|Driver trip
+1126|Cash voucher
+1127|Owed by
+1128|Owed to
+1129|Settled
+1130|Amount due from the driver
+1131|Amount due to the driver
+1132|No amount due
+1133|Unclassified
+1134|Delete inventory adjustment {0}
+1135|Add inventory adjustment {0}
+1136|Edit inventory adjustment {0}
+1137|Edit or delete opening balance {0}
+1138|Add inventory transfer {0}
+1139|Edit inventory transfer {0}
+1140|Delete inventory transfer {0}
+1141|Select the source warehouse and the destination warehouse.
+1142|Send non-duplicate items with positive whole quantities.

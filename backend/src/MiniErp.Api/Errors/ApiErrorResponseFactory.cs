@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using MiniErp.Api.Localization;
 using MiniErp.Application.Common.Results;
 
 namespace MiniErp.Api.Errors;
@@ -238,21 +239,43 @@ public static class ApiErrorResponseFactory
         string errorCode,
         string errorType,
         IReadOnlyDictionary<string, string[]>? errors = null) =>
-        new()
+        BuildResponse(httpContext, statusCode, title, detail, errorCode, errorType, errors);
+
+    private static ApiErrorResponse BuildResponse(
+        HttpContext httpContext,
+        int statusCode,
+        string title,
+        string detail,
+        string errorCode,
+        string errorType,
+        IReadOnlyDictionary<string, string[]>? errors)
+    {
+        var localizedDetail = ApiMessageLocalizer.Translate(detail, httpContext);
+        var english = ApiMessageLocalizer.WantsEnglish(httpContext);
+        IReadOnlyDictionary<string, string[]> localizedErrors = errors is null
+            ? new Dictionary<string, string[]> { ["General"] = [localizedDetail] }
+            : english
+                ? errors.ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value
+                        .Select(message => ApiMessageLocalizer.TranslateToEnglish(message))
+                        .ToArray(),
+                    StringComparer.Ordinal)
+                : errors;
+
+        return new ApiErrorResponse
         {
             Type = GetProblemType(statusCode),
-            Title = title,
+            Title = ApiMessageLocalizer.Translate(title, httpContext),
             Status = statusCode,
-            Detail = detail,
+            Detail = localizedDetail,
             Instance = GetInstance(httpContext),
             ErrorCode = errorCode,
             ErrorType = errorType,
-            Errors = errors ?? new Dictionary<string, string[]>
-            {
-                ["General"] = [detail]
-            },
+            Errors = localizedErrors,
             TraceId = Activity.Current?.Id ?? httpContext.TraceIdentifier
         };
+    }
 
     private static IReadOnlyDictionary<string, string[]> LocalizeValidationErrors(
         IEnumerable<KeyValuePair<string, string[]>> errors) =>

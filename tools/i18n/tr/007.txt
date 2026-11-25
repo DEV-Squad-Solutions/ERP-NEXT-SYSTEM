@@ -1,0 +1,448 @@
+2400|Partial cost
+2401|Invoice profitability report
+2402|invoice with a pending cost.
+2403|invoice-profitability-report-{0}-{1}
+2404|Set the period, customer, warehouse and item
+2405|Invoice number or customer name...
+2406|{0} invoices with a pending cost
+2407|Some invoices have an incomplete cost
+2408|Number of invoices with a pending cost:
+2409|The profit shown for these invoices is not final until the cost is complete.
+2410|Sales invoices
+2411|The movement is already classified — editing is for the admin or accountant only
+2412|Movement classification updated successfully
+2413|The voucher was modified by another user. Reload the data.
+2414|Could not update the movement classification
+2415|Enter the incoming or outgoing value
+2416|An error occurred while saving the movement
+2417|The voucher is already posted — editing is for the admin or accountant only.
+2418|The voucher is posted — use "Save changes" instead of saving as a draft.
+2419|The draft save service is not available
+2420|The voucher posting service is not available
+2421|Draft updated successfully
+2422|Voucher classified and posted successfully
+2423|Voucher changes saved successfully
+2424|The voucher was modified by another user. Reload the data and try again.
+2425|The voucher is posted and its data is read only. Reload the statement to see the latest version.
+2426|Could not update the voucher
+2427|The opening balance cannot be deleted after vouchers have been created on the cashbox.
+2428|The opening balance deletion service is not available
+2429|Are you sure you want to delete the manual opening balance of the cashbox? This cannot be undone.
+2430|The voucher was modified by another user. Reload the statement and try again.
+2431|This voucher was generated from an invoice and cannot be deleted here.
+2432|This voucher was generated from a transfer between cashboxes and cannot be deleted here.
+2433|Could not delete the movement
+2434|You do not have permission to delete the movement
+2435|The movement deletion service is not available
+2436|Are you sure you want to delete the movement? The linked accounting entry will be reversed and this cannot be undone.
+2437|An error occurred while loading the cashbox movement
+2438|Counterpart
+2439|Each movement has its own exchange rate
+2440|Add a new movement
+2441|" is closed or is not the current year — the screen is view only and movements cannot be added or edited on it.
+2442|You only have view permission on this cashbox — adding, editing and deleting movements is not available.
+2443|Voucher
+2444|Start by recording the first movement
+2445|Save movement - Enter
+2446|Cancel - Escape
+2447|Enter to save
+2448|Fetching the rate from exchange rates...
+2449|Loaded automatically from exchange rates by voucher date
+2450|Typed from the description column
+2451|Movement description (optional)
+2452|Enter to save
+2453|New draft
+2454|Opening balance — needs no classification
+2455|Transfer between cashboxes — needs no classification
+2456|Change account / classification
+2457|The movement is classified — editing is for the admin or accountant only
+2458|A movement is classified once, and editing is locked afterwards
+2459|Highlight the movement in the statement
+2460|Full edit
+2461|Delete the manual opening balance
+2462|Could not edit the transfer
+2463|Edit transfer
+2464|Search...
+2465|Custody handover report - {0}
+2466|Custody handover — {0}
+2467|These drafts are operational custody records only, and do not affect the actual cashbox balance, account statements or accounting entries until they are posted.
+2468|Voucher number or description
+2469|Clear filters
+2470|Loading the report...
+2471|An error occurred while loading the report
+2472|No vouchers match this filter
+2473|There are currently no pending draft vouchers on this cashbox
+2474|record on the page
+2475|Previous
+2476|Next
+2477|Cashbox name is required
+2478|Cashbox updated successfully
+2479|Cashbox created successfully
+2480|The cashbox cannot be deactivated because its current balance is not zero. Settle the balance to zero first.
+2481|Could not update the cashbox
+2482|Could not create the cashbox
+2483|Edit cashbox data
+2484|Example: main branch cashbox
+2485|Current balance (calculated from movements)
+2486|Opening balance date
+2487|Egyptian pound
+2488|US dollar
+2489|Euro
+2490|British pound
+2491|Saudi riyal
+2492|UAE dirham
+2493|Kuwaiti dinar
+2494|Enable the cashbox
+2495|The cashbox has a non-zero current balance. The server will refuse to deactivate it — the balance must reach zero first.
+2496|Deactivation is only available when the cashbox's current balance is zero. Reactivation is available at any time.
+2497|Warning: the opening balance and currency cannot be changed if vouchers are recorded on this cashbox — the server will refuse to save and explain why.
+2498|Save cashbox
+2499|Movement classification
+2500|Account (movement type)
+2501|Loading movement types...
+2502|No movement types are available for this classification.
+2503|Account (customer / supplier)
+2504|Account (driver)
+2505|Account (employee)
+2506|Beneficiary
+2507|Name of the person who benefits from the personal expense
+2508|This is an explanatory description only; the entry is recorded on "personal expense" as an account, not on this person.
+2509|Confirm
+2510|Opening
+2511|Opening date
+2512|Note:
+2513|Enter a valid conversion rate
+2514|The conversion rate must be greater than zero
+2515|The conversion rate between the two currencies must be entered
+2516|Transfer between cashboxes completed successfully
+2517|An error occurred while performing the transfer
+2518|Edit transfer between cashboxes
+2519|The currencies are different, the conversion rate was loaded automatically — you can edit it.
+2520|Same currency, the transfer needs no conversion rate.
+2521|Transferred amount ({0})
+2522|Conversion rate ({0} → {1})
+2523|Loaded automatically by the transfer date
+2524|Fetching the conversion rate...
+2525|Expected transfer value
+2526|will be deducted
+2527|from the first cashbox, and an approximate value will reach the second cashbox:
+2528|Example: cash transfer from the main cashbox to the sales cashbox
+2529|Additional notes (optional)
+2530|Performing the transfer...
+2531|Perform the transfer
+2532|Enter an amount greater than zero
+2533|Receipt voucher recorded (draft) — complete the classification later
+2534|Payment voucher recorded (draft) — complete the classification later
+2535|An error occurred while saving the voucher
+2536|Receive (receipt)
+2537|Pay (payment)
+2538|Example: receiving a payment on account
+2539|The voucher number is generated automatically by the server. The classification (movement type and party) is set later from the edit button in the statement. The exchange rate is recorded with the draft if entered here, and resolved automatically at classification time if left empty.
+2540|Save voucher
+2541|Amount is required
+2542|Amount must be greater than zero
+2543|Edit draft {0}
+2544|Edit voucher {0}
+2545|Voucher {0}
+2546|This voucher was generated from invoice number
+2547|, and cannot be edited here.
+2548|It can be edited through the invoice itself.
+2549|This voucher is already posted. Its data and accounting entry are read only, and it cannot be edited or deleted.
+2550|Direction:
+2551|Amount:
+2552|Description:
+2553|This voucher is already posted. Editing is available to the admin or accountant, and any save will be synchronized with the accounting entry, the cashbox balance and related movements.
+2554|Voucher date
+2555|The voucher is already classified — classification and editing are for the admin or accountant only. You can edit the movement data.
+2556|Select the classification then use "Classify and post" to approve it, or "Save as draft" to edit data without posting.
+2557|The voucher is posted — any edit will be synchronized with the accounting entry and the cashbox balance.
+2558|Partner settlement rate ({0} per {1})
+2559|Leave empty to be resolved automatically
+2560|Cashbox in currency
+2561|and partner account in currency
+2562|. The rate is in base currency units per unit of the partner's currency. If left empty, the system looks for a suitable rate covering the voucher date.
+2563|Saved partner settlement
+2564|Partner amount:
+2565|Base equivalent:
+2566|Reference number
+2567|Confirm classification and posting
+2568|Posting will affect the cashbox balance and accounting entries. After posting, the voucher can still be edited or deleted by the admin and accountant.
+2569|The accounting entry, the cashbox balance and the movements linked to the voucher will be updated immediately.
+2570|Posting...
+2571|Confirm posting
+2572|Save as draft
+2573|Classify and post
+2574|Failed to record the expense
+2575|Record an expense
+2576|Select the cashbox
+2577|Exchange rate (optional - the recorded rate is used if empty)
+2578|Expense type
+2579|Loading expense types...
+2580|Select the expense type
+2581|Party name
+2582|Enter the party name
+2583|Reference number
+2584|Save the expense
+2585|Loading transfer data...
+2586|The transfer was not found, or an error occurred while loading.
+2587|Transfer data
+2588|Amount in base currency
+2589|Linked vouchers
+2590|Payment voucher (from the source cashbox)
+2591|Receipt voucher (to the destination cashbox)
+2592|These vouchers are generated automatically with the transfer and cannot be edited independently.
+2593|Cashbox deleted successfully
+2594|The cashbox cannot be deleted because undeleted vouchers (even drafts) exist on it in a fiscal year. Delete or post the vouchers first.
+2595|The cashbox cannot be deleted because an active transfer or an existing cashbox journal entry exists. End the related movements first.
+2596|An error occurred while deleting the cashbox, please try again
+2597|Manage cash cashboxes and bank accounts
+2598|Search by code or name...
+2599|Cashbox code...
+2600|Cashbox name...
+2601|Active only
+2602|Inactive only
+2603|New cashbox
+2604|An error occurred while loading cashboxes
+2605|No cashboxes match the filters
+2606|No cashboxes yet
+2607|Delete cashbox
+2608|Deletion removes the cashbox from lists and selections, but historical records are kept. All linked vouchers and movements must be deleted first — if any vouchers or movements remain, the server will refuse the deletion and explain why.
+2609|Transfer deleted successfully
+2610|Could not delete the transfer
+2611|Log of financial transfers between company cashboxes
+2612|New transfer
+2613|An error occurred while loading transfers.
+2614|No transfers match the filters
+2615|No transfers yet
+2616|Are you sure you want to delete the transfer
+2617|Party settlement
+2618|Partner
+2619|Carried forward
+2620|Cashbox data is not available
+2621|Movement statement {0}
+2622|Daily cashbox movement log — incoming, outgoing and running balance
+2623|Print statement
+2624|Refresh data
+2625|General search
+2626|Voucher number, description, party...
+2627|Partner
+2628|Driver trip number
+2629|Account number (AccountId)
+2630|Yes
+2631|No
+2632|Voucher status
+2633|Current or historical vouchers are linked to the trip; it cannot be deleted and the driver, party or date cannot be changed.
+2634|The fiscal year of the trip cannot be changed.
+2635|An active driver in the current company must be selected.
+2636|An active party in the current company must be selected.
+2637|Could not send the current trip version. Reload the page and try again.
+2638|The driver trip data is not valid.
+2639|The trip date is outside the selected fiscal year.
+2640|Set the trip date
+2641|The trip cost cannot be negative
+2642|Trip updated successfully
+2643|Trip created successfully
+2644|Could not save the trip
+2645|Edit standalone trip
+2646|A standalone trip without an invoice. Fiscal year:
+2647|— trip number:
+2648|. The cost and currency are determined automatically from the company settings.
+2649|Trip date
+2650|Actual driver name (optional)
+2651|An empty or zero value means there is no cost on the trip.
+2652|If the trip is linked to a receipt or payment voucher (current or deleted), the driver, party or date cannot be changed — but the cost and notes can be edited.
+2653|This balance is read only.
+2654|An error occurred while loading driver opening balances
+2655|Driver data updated
+2656|Driver added successfully
+2657|Edit driver data
+2658|Driver name
+2659|License expiry date
+2660|An opening balance already exists for this driver in the selected fiscal year.
+2661|A carried-forward balance exists for this driver in the selected fiscal year.
+2662|A previous opening entry exists for this driver in the selected fiscal year.
+2663|The driver must be active to add an opening balance.
+2664|The carried-forward balance is read only.
+2665|The driver or fiscal year of an opening balance document cannot be changed.
+2666|Could not send the current document version. Reload the page and try again.
+2667|Enter a positive amount with at most 15 integer digits and two decimal places.
+2668|Notes must be 1000 characters or fewer.
+2669|Enter an amount greater than zero
+2670|Edit a driver opening balance
+2671|Add a driver opening balance
+2672|. The document number, date and currency are determined automatically from the fiscal year and company settings.
+2673|The driver or fiscal year cannot be changed after creation.
+2674|Standalone (no invoice)
+2675|Linked to an invoice
+2676|Current or historical vouchers are linked to the trip; it cannot be deleted.
+2677|Could not find the trip in the current company.
+2678|Trip deleted
+2679|Could not delete the trip
+2680|The cost of {0} trips was updated
+2681|A trip was modified elsewhere. Reload the data and try again.
+2682|Could not save the changes — make sure there is no stale or invalid row
+2683|Driver trip costs
+2684|Add standalone trips without invoices, or edit the cost of several trips and save them at once
+2685|Save changes (
+2686|Creating, editing or deleting driver trips is available to the manager only. You can view the trips and their costs here.
+2687|Trip type
+2688|An error occurred while loading trips
+2689|No matching trips
+2690|Standalone
+2691|Actual:
+2692|Enter the cost
+2693|Note...
+2694|Edit trip
+2695|Delete trip
+2696|Delete a trip
+2697|The standalone trip and its linked cost entry will be deleted. This action cannot be undone.
+2698|Drivers statement
+2699|Paid, received and trip costs
+2700|Could not load drivers
+2701|Could not load the drivers list, try again
+2702|Select a driver to view their statement
+2703|Statement —
+2704|Filters
+2705|Try again
+2706|General vouchers without a trip only
+2707|Total received from them
+2708|Not authorized to view the driver statement
+2709|An error occurred while loading the statement
+2710|View/edit trip cost
+2711|Could not load the driver data
+2712|The carried-forward balance is read only and cannot be deleted here.
+2713|Record and manage debit and credit opening balances for each driver
+2714|Adding, editing and deleting driver balances is available to the manager only. You can view the balances and the statement here.
+2715|Delete an opening balance
+2716|The opening balance and its linked entry will be deleted. This action cannot be undone.
+2717|License status
+2718|Expired
+2719|Valid
+2720|New driver
+2721|No drivers
+2722|Add the first driver
+2723|(expired)
+2724|Edit financial line item
+2725|Add financial line item
+2726|Statement type
+2727|Item code
+2728|Example: FP-110
+2729|Order
+2730|Parent item
+2731|No parent item
+2732|Can be linked to accounts
+2733|The current version number of the item will be used when saving.
+2734|Add the item
+2735|Delete financial statement item
+2736|Are you sure you want to delete this item?
+2737|The item will be deleted from the financial statement layout.
+2738|If the item is linked to accounts, or the fiscal year is closed, the backend will refuse the deletion.
+2739|Delete the item
+2740|Main
+2741|Linkable
+2742|Add a sub-item
+2743|A sub-item cannot be added under a linkable item
+2744|Item updated successfully
+2745|Item added successfully
+2746|An error occurred while performing the operation
+2747|Item deleted successfully
+2748|Could not delete the item
+2749|Manage and classify financial statement items
+2750|Add item
+2751|Financial statement type
+2752|Select the statement type
+2753|Total items
+2754|Main items
+2755|Linkable items
+2756|Search by code or item name...
+2757|Expand all
+2758|Collapse all
+2759|Loading items...
+2760|No items
+2761|No results match the search
+2762|No items have been created for this statement yet
+2763|Add the first item
+2764|Select the fiscal year and statement type to view and shape its items.
+2765|Make sure to enter a valid name and value for each expense
+2766|Item expenses — {0}
+2767|No expenses have been added to this item
+2768|Total manual expenses
+2769|Search by invoice number or item...
+2770|An error occurred while loading cost data
+2771|No cost data
+2772|/ unit
+2773|View and manage the expenses loaded onto the average cost of an item in each invoice
+2774|Company manager
+2775|Current company data
+2776|Could not load the company data
+2777|Arabic name is required
+2778|The Arabic name must not exceed 200 characters
+2779|English name is required
+2780|The English name must not exceed 200 characters
+2781|Country updated successfully
+2782|Country added successfully
+2783|The country code is already used
+2784|An error occurred while saving the country
+2785|Edit country
+2786|Arabic name
+2787|Example: Egypt
+2788|English name
+2789|Country deleted successfully
+2790|Manage the countries used as reference data in the system
+2791|Example: EG
+2792|An error occurred while loading countries
+2793|No matching countries
+2794|Add the first country
+2795|Name (En)
+2796|Name (Ar)
+2797|Country
+2798|Are you sure you want to delete the country
+2799|The user must have at least one role
+2800|The user must be linked to at least one company
+2801|Profile updated successfully
+2802|Could not update the profile
+2803|You do not have permission to edit the user
+2804|Edit account data
+2805|Account data
+2806|Update the user's basic information
+2807|You do not have permission to view user details
+2808|Back
+2809|User account details
+2810|Not registered
+2811|Company count
+2812|{0} companies
+2813|Linked companies
+2814|No linked companies
+2815|Not available
+2816|Missing entry
+2817|Pending inventory cost
+2818|Automatic entry without a source
+2819|Duplicate automatic entry
+2820|Unbalanced automatic entry
+2821|Incomplete accounting mapping
+2822|Done: {0} new entries, {1} updated entries
+2823|An error occurred while running the completion operation
+2824|Checks the fiscal year and shows completeness indicators of the unified general ledger without changing data
+2825|Complete entries
+2826|An error occurred while loading the readiness report
+2827|Select a fiscal year to view the readiness report
+2828|The fiscal year is ready, there are no blocking problems in the non-deferred sources
+2829|There are problems that need review before the year is considered ready
+2830|Total sources
+2831|Posted
+2832|Missing entries
+2833|Pending inventory costs
+2834|Incomplete accounting links
+2835|Deferred payroll
+2836|Source breakdown by type
+2837|Missing
+2838|Detailed problems
+2839|Problem
+2840|There are no problems at the moment
+2841|Number
+2842|Quick action
+2843|Fix the accounting mapping
+2844|Confirm completing the entries
+2845|Missing accounts and links will be completed, inventory cost will be recalculated, and automatic entries will be created or updated for older sources in this fiscal year. The operation is safe and will not duplicate entries if run more than once, but it is available to the administrator only.
+2846|Running...
+2847|Confirm completion

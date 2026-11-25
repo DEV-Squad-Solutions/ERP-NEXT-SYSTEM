@@ -1,0 +1,2203 @@
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import {
+  Plus,
+  Save,
+  Printer,
+  Loader2,
+  UserPlus,
+  Boxes,
+  X,
+  Truck,
+  Repeat2Icon,
+  FileText,
+  MapPin,
+  Wallet,
+  StoreIcon,
+  AlertTriangle,
+  CheckCircle2,
+  CircleDot,
+  RotateCcw,
+  Lock,
+  Unlock,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  useGetPartiesSelectQuery,
+  useGetPartyByIdQuery,
+  useGetPartyContainerStoreQuery,
+} from "../../../partners/partiesApi";
+import { useGetDriversSelectQuery } from "../../../drivers/driversApi";
+import { useGetStoresSelectQuery } from "../../../stores/storesApi";
+import StoreFormModal from "../../../stores/components/StoreFormModal";
+import { useGetCountriesSelectQuery } from "../../../countries/countriesApi";
+import CountryFormModal from "../../../countries/components/CountryFormModal";
+import QuickAddCustomerModal from "../../../partners/components/PartnerSetupWizard";
+import QuickAddDriverModal from "../../../drivers/components/QuickAddDriverModal";
+import PackagingDrawer from "../PackagingDrawer";
+import { useCreateInvoiceMutation } from "../../../invoices/invoicesApi";
+import { buildCreateInvoiceRequest } from "../../../invoices/components/buildInvoicePayload";
+import LedgerPanel from "../../../../shared/components/ui/LedgerPanel";
+import LedgerField from "../../../../shared/components/ui/LedgerField";
+import LedgerSelect from "../../../../shared/components/ui/LedgerSelect";
+import DateInput from "../../../../shared/components/ui/DateInput";
+import Button from "../../../../shared/components/ui/Button";
+import Modal from "../../../../shared/components/ui/Modal";
+import InvoiceLineRow from "./NewInvoiceLineRow";
+import ReturnSourcePicker from "./ReturnSourcePicker";
+import CompactSelect from "../../../../shared/components/ui/CompactSelect";
+import { useInvoicePrint } from "../../../../shared/hooks/useInvoicePrint";
+import InvoicePrintTemplate from "../../../../shared/components/print/InvoicePrintTemplate";
+import NumericInput from "../../../../shared/components/ui/NumericInput";
+import { useGetCashboxOptionsQuery } from "../../../cashboxes/cashboxesApi";
+import { useGetItemsSelectQuery } from "../../../inventory/inventoryApi";
+import { useSelector } from "react-redux";
+import { selectSelectedFiscalYear } from "../../../fiscalYears/fiscalYearSlice";
+import { getFiscalYearDateWarning } from "../../../../lib/fiscalYearDateRange";
+
+const emptyLine = () => ({
+  itemId: null,
+  itemName: "",
+  itemCode: "",
+  isTemporaryItem: false,
+  itemUnitId: null,
+  itemUnitName: "",
+  count: null,
+  weight: null,
+  quantity: null,
+  price: null,
+  originalPrice: null, // السعر الأصلي وقت الإضافة من فاتورة مصدر (مرتجع فقط)
+  returnPriceDifferenceReason: "", // سبب اختلاف السعر عن الأصلي (مرتجع فقط)
+  notes: "",
+  sourceInvoiceLineId: null,
+  sourceInvoiceId: null,
+  sourceInvoiceNumber: null,
+  isReturnLine: false,
+  maxReturnQuantity: null,
+});
+
+const RETURN_TYPES = new Set(["salesReturn", "purchaseReturn"]);
+
+// السطر له صنف صالح (من الكتالوج أو اسم يدوي)
+const lineHasItem = (l) =>
+  l.isTemporaryItem ? Boolean(l.itemName?.trim()) : Boolean(l.itemId);
+
+// السطر له كمية صالحة: كمية مباشرة، أو عدد × وزن
+const lineHasQuantity = (l) =>
+  (Number(l.quantity) || 0) > 0 ||
+  ((Number(l.count) || 0) > 0 && (Number(l.weight) || 0) > 0);
+
+const movementOptions = [
+  { value: "sale", label: "بيع" },
+  { value: "purchase", label: "شراء" },
+  { value: "salesReturn", label: "مرتجع بيع" },
+  { value: "purchaseReturn", label: "مرتجع شراء" },
+];
+
+const paymentOptions = [
+  { value: "cash", label: "نقدي" },
+  { value: "credit", label: "آجل" },
+];
+
+const invoiceContentTypeOptions = [
+  { value: "items", label: "أصناف" },
+  { value: "containers", label: "عبوات" },
+];
+
+const currencyLabels = { EGP: "جنيه مصري", USD: "دولار أمريكي" };
+
+// ==== الحالة الافتراضية لبيانات الفاتورة ====
+// دالة واحدة بيتم النداء عليها من مكانين: أول تحميل للفورم، وزرار
+// "مسح البيانات والبدء من جديد" - عشان الاتنين يفضلوا متزامنين لو
+// اتضافت حقول جديدة مستقبلًا.
+
+const getCairoDate = () => {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Cairo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+};
+const generateInvoiceNumber = () => {
+  const year = new Date().getFullYear();
+  return `INV-${year}-${Math.floor(Math.random() * 10000)}`;
+};
+const getDefaultHeader = () => ({
+  // رقم الفاتورة بيبدأ فاضي ومقفول: الباك إند هو اللي بيتحكم في
+  // الترقيم، ولو المستخدم حب يكتبه بنفسه بيفتح القفل من الزرار جنبه.
+  invoiceNumber: "",
+
+  movementType: "",
+
+  // تاريخ اليوم حسب توقيت القاهرة
+  date: getCairoDate(),
+
+  dueDate: getCairoDate(),
+
+  partyId: "",
+  partyName: "",
+  currency: "EGP",
+
+  driverId: "",
+  actualDriverName: "",
+  driverName: "",
+
+  storeId: "",
+  countryId: "",
+
+  carNumber: "",
+  exportInvoiceCode: "",
+  partnerInvoiceNo: "",
+
+  paymentMethod: "credit",
+
+  cashboxId: "",
+  cashboxName: "",
+  cashboxExchangeRate: "",
+
+  discount: "",
+  paid: "",
+
+  exchangeRate: 1,
+
+  invoiceContentType: "items",
+
+  generalNotes: "",
+
+  WBWeight: "",
+  WBScaleDifference: "",
+  WBDiscount: "",
+});
+
+function CurrencyChip({ currency }) {
+  const [renderedCurrency, setRenderedCurrency] = useState(currency);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    let hideTimer;
+    let showTimer;
+
+    if (currency) {
+      if (renderedCurrency && renderedCurrency !== currency) {
+        setVisible(false);
+        hideTimer = setTimeout(() => {
+          setRenderedCurrency(currency);
+          requestAnimationFrame(() => setVisible(true));
+        }, 160);
+      } else {
+        setRenderedCurrency(currency);
+        showTimer = setTimeout(() => setVisible(true), 10);
+      }
+    } else {
+      setVisible(false);
+      hideTimer = setTimeout(() => setRenderedCurrency(null), 160);
+    }
+
+    return () => {
+      clearTimeout(hideTimer);
+      clearTimeout(showTimer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currency]);
+
+  if (!renderedCurrency) return null;
+
+  const isUsd = renderedCurrency === "USD";
+
+  return (
+    <span
+      role="status"
+      aria-live="polite"
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold transition-all duration-200 ease-out ${
+        visible
+          ? "opacity-100 scale-100 translate-y-0"
+          : "opacity-0 scale-90 -translate-y-1"
+      } ${
+        isUsd
+          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+          : "border-primary-200 bg-primary-50 text-primary-600"
+      }`}
+    >
+      {isUsd ? "$" : "ج.م"}{" "}
+      {currencyLabels[renderedCurrency] || renderedCurrency}
+    </span>
+  );
+}
+
+// ==== شريط خطأ صغير قابل لإعادة المحاولة ====
+// بيستخدم لما query زي العملاء/السائقين/المخازن يفشل، عشان المستخدم
+// يعرف السبب بدل ما يواجه select فاضي من غير تفسير.
+function InlineErrorRetry({ message, onRetry }) {
+  return (
+    <div className="flex items-center justify-between gap-2 border-t border-negative/10 bg-negative/5 px-3 py-1.5 text-xs text-negative animate-[fadeIn_0.15s_ease-out]">
+      <span>{message}</span>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="shrink-0 font-medium underline-offset-2 hover:underline"
+      >
+        إعادة المحاولة
+      </button>
+    </div>
+  );
+}
+
+export default function CreateInvoiceForm({ onSuccess }) {
+  const {
+    data: parties,
+    refetch: refetchParties,
+    isError: isPartiesError,
+  } = useGetPartiesSelectQuery();
+  const {
+    data: drivers,
+    refetch: refetchDrivers,
+    isError: isDriversError,
+  } = useGetDriversSelectQuery();
+  const {
+    data: stores,
+    refetch: refetchStores,
+    isError: isStoresError,
+  } = useGetStoresSelectQuery();
+  const {
+    data: countries,
+    refetch: refetchCountries,
+    isError: isCountriesError,
+  } = useGetCountriesSelectQuery();
+
+  // ==== الأصناف (لكل سطور الفاتورة) ====
+  const {
+    data: items,
+    isLoading: isLoadingItems,
+    isError: isItemsError,
+  } = useGetItemsSelectQuery();
+
+  const itemOptions = useMemo(
+    () => items?.map((item) => ({ value: item.id, label: item.name })) || [],
+    [items],
+  );
+
+  // كل خيار بيعرض اسم العميل/المورد جنب عملته، وعلامة "خاص" لو
+  // special=true، عشان يبان في القائمة نفسها من غير ما تحتاج تفتح
+  // بيانات الطرف عشان تعرف عملته أو نوعه.
+  const partyOptions = useMemo(
+    () =>
+      parties?.map((p) => ({
+        value: p.id,
+        label: `${p.name} (${currencyLabels[p.currency] || p.currency})${
+          p.special ? " · خاص" : ""
+        }`,
+      })) || [],
+    [parties],
+  );
+  const driverOptions = useMemo(
+    () => drivers?.map((d) => ({ value: d.id, label: d.name })) || [],
+    [drivers],
+  );
+  const storeOptions = useMemo(
+    () => stores?.map((s) => ({ value: s.id, label: s.name })) || [],
+    [stores],
+  );
+  const countryOptions = useMemo(
+    () => countries?.map((c) => ({ value: c.id, label: c.name })) || [],
+    [countries],
+  );
+
+  const [createInvoice, { isLoading }] = useCreateInvoiceMutation();
+  const [showAddCustomer, setShowAddCustomer] = useState(false);
+  const [showAddDriver, setShowAddDriver] = useState(false);
+  const [showAddStore, setShowAddStore] = useState(false);
+  const [showAddCountry, setShowAddCountry] = useState(false);
+  const [showPackaging, setShowPackaging] = useState(false);
+  const [containersMovement, setContainersMovement] = useState({
+    containerStoreId: null,
+    items: [],
+  });
+  const [itemsLocked, setItemsLocked] = useState(true);
+  // قفل رقم الفاتورة: مقفول افتراضيًا وفاضي لحد ما المستخدم يفتحه
+  // ويكتب رقم يدوي (أو نسيبه فاضي فيتولّد تلقائيًا وقت الحفظ).
+  const [invoiceNumberLocked, setInvoiceNumberLocked] = useState(true);
+  const [isTemporaryDriver, setIsTemporaryDriver] = useState(false);
+  const [fullReturnState, setFullReturnState] = useState(null);
+  const [showErrors, setShowErrors] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  const [header, setHeader] = useState(getDefaultHeader);
+
+  const selectedFiscalYear = useSelector(selectSelectedFiscalYear);
+  const invoiceDateWarning = useMemo(
+    () => getFiscalYearDateWarning(header.date, selectedFiscalYear),
+    [header.date, selectedFiscalYear],
+  );
+
+  const [lines, setLines] = useState(() =>
+    Array.from({ length: 10 }, () => emptyLine()),
+  );
+
+  const partySelectRef = useRef(null);
+
+  const packagingBreakdown = useMemo(() => {
+    const totals = {};
+    lines.forEach((l) => {
+      const count = Number(l.count) || 0;
+      if (!l.itemUnitName || !count) return;
+      totals[l.itemUnitName] = (totals[l.itemUnitName] || 0) + count;
+    });
+    return Object.entries(totals).map(([unitName, count]) => ({
+      unitName,
+      count,
+    }));
+  }, [lines]);
+
+  const isSalesInvoice = header.movementType === "sale";
+  const isReturnInvoice = RETURN_TYPES.has(header.movementType);
+  const isCashPayment = header.paymentMethod === "cash";
+
+  // فاتورة عبوات فقط: بتسجل حركات العبوات بدون أصناف ولا قيمة مالية
+  // (خصم/مدفوع/خزنة). الباك إند بيطلب containerLines واحدة على الأقل
+  // وبيرفض وجود سطور أصناف مع النوع ده.
+  const isContainersInvoice = header.invoiceContentType === "containers";
+
+  const containerMovementCount = containersMovement.items.length;
+
+  const returnLines = useMemo(
+    () => lines.filter((l) => l.isReturnLine),
+    [lines],
+  );
+  const activeSourceInvoiceId = returnLines[0]?.sourceInvoiceId ?? null;
+
+  // سطور المرتجع اللي سعرها اتغيّر عن السعر الأصلي في الفاتورة
+  // المصدر - محتاجة سبب قبل ما نقدر نحفظ الفاتورة.
+  const priceModifiedReturnLines = useMemo(
+    () =>
+      lines.filter(
+        (l) =>
+          l.isReturnLine &&
+          l.originalPrice !== undefined &&
+          l.originalPrice !== null &&
+          Number(l.price) !== Number(l.originalPrice),
+      ),
+    [lines],
+  );
+
+  const setHeaderField = useCallback(
+    (key, value) => setHeader((h) => ({ ...h, [key]: value })),
+    [],
+  );
+
+  useEffect(() => {
+    setItemsLocked(!header.storeId);
+  }, [header.storeId]);
+
+  // ==== التحويل بين نوع الفاتورة العادي والمرتجع ====
+  const prevMovementTypeRef = useRef(header.movementType);
+  useEffect(() => {
+    const prev = prevMovementTypeRef.current;
+    const cur = header.movementType;
+    if (prev === cur) return;
+
+    const goingToReturn = RETURN_TYPES.has(cur);
+    const cameFromReturn = RETURN_TYPES.has(prev);
+
+    if (goingToReturn) {
+      setLines((ls) => ls.filter((l) => l.isReturnLine));
+      setFullReturnState(null);
+      setHeaderField("discount", 0);
+    } else if (cameFromReturn) {
+      setLines((ls) => {
+        const kept = ls.filter((l) => l.itemId || l.isTemporaryItem);
+        return kept.length > 0 ? kept : Array.from({ length: 10 }, emptyLine);
+      });
+      setFullReturnState(null);
+    }
+
+    prevMovementTypeRef.current = cur;
+  }, [header.movementType, setHeaderField]);
+
+  // لو "مرتجع كامل" واتعدلت الكمية/اتحذف سطر يدويًا، ارجع لحالة "جزئي" وصفّر الخصم
+  useEffect(() => {
+    if (!fullReturnState) return;
+
+    const currentReturnLines = lines.filter((l) => l.isReturnLine);
+    const stillFull =
+      currentReturnLines.length === fullReturnState.lineCount &&
+      currentReturnLines.every(
+        (l) => Number(l.quantity) === Number(l.maxReturnQuantity),
+      );
+
+    if (!stillFull) {
+      setFullReturnState(null);
+      setHeaderField("discount", 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lines]);
+
+  // مخزن العبوات بقى متاح مع كل أنواع الفواتير، مش بس البيع
+  const { data: partyContainerStoreData } = useGetPartyContainerStoreQuery(
+    header.partyId,
+    { skip: !header.partyId },
+  );
+
+  const hasPayment = Number(header.paid) > 0;
+
+  const { data: cashboxes } = useGetCashboxOptionsQuery(undefined, {
+    skip: !hasPayment,
+  });
+
+  const cashboxOptions = useMemo(
+    () =>
+      cashboxes?.map((c) => ({
+        value: c.id,
+        label: `${c.name} (${currencyLabels[c.currency] || c.currency})`,
+      })) || [],
+    [cashboxes],
+  );
+
+  const handleCashboxChange = useCallback(
+    (cashboxId) => {
+      const cashbox = cashboxes?.find(
+        (c) => String(c.id) === String(cashboxId),
+      );
+      setHeaderField("cashboxId", cashboxId);
+      setHeaderField("cashboxName", cashbox?.name || "");
+    },
+    [cashboxes, setHeaderField],
+  );
+
+  // أسماء العبوات لعرض ملخص الحركات في فاتورة العبوات.
+  const containerNameById = useMemo(() => {
+    const map = new Map();
+
+    (partyContainerStoreData?.containers || []).forEach((container) => {
+      map.set(String(container.id), container.name);
+    });
+
+    return map;
+  }, [partyContainerStoreData]);
+
+  // التحويل بين "أصناف" و"عبوات فقط".
+  // العبوات مسموحة مع كل أنواع الفواتير، لكن فاتورة "عبوات فقط" مالها
+  // أصناف ولا قيمة مالية: بنشيل سطور الأصناف والخصم والمدفوع والخزنة عند
+  // التحويل، وبالرجوع للأصناف بنفضّي حركات العبوات عشان ما تتبعتش بالغلط.
+  const handleInvoiceContentTypeChange = useCallback(
+    (value) => {
+      setShowErrors(false);
+
+      if (value === "containers") {
+        setLines(Array.from({ length: 10 }, emptyLine));
+        setFullReturnState(null);
+        setHeader((current) => ({
+          ...current,
+          invoiceContentType: value,
+          discount: "",
+          paid: "",
+          cashboxId: "",
+          cashboxName: "",
+          cashboxExchangeRate: "",
+        }));
+        return;
+      }
+
+      // رجوع للأصناف: المخزن كان متجبّر على مخزن العبوات، فلازم يختار
+      // المستخدم مخزنًا عاديًا من جديد (الباك إند بيرفض مخزن العبوات
+      // مع فاتورة أصناف).
+      setContainersMovement((current) => ({ ...current, items: [] }));
+      setHeader((current) => ({
+        ...current,
+        invoiceContentType: value,
+        storeId: "",
+      }));
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!hasPayment && header.cashboxId) {
+      setHeader((h) => ({
+        ...h,
+        cashboxId: "",
+        cashboxName: "",
+        cashboxExchangeRate: "",
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasPayment]);
+
+  useEffect(() => {
+    const store = partyContainerStoreData?.containerStore;
+    const nextStoreId = store?.id || null;
+
+    // لو مخزن العبوات اتغيّر (تغيير العميل) بنمسح الحركات القديمة عشان
+    // ما تتبعتش على مخزن تاني.
+    setContainersMovement((prev) =>
+      prev.containerStoreId === nextStoreId
+        ? prev
+        : { containerStoreId: nextStoreId, items: [] },
+    );
+
+    // في فاتورة العبوات فقط، المخزن المختار لازم يكون هو مخزن العبوات
+    // نفسه (الباك إند بيرفض أي مخزن عادي).
+    if (isContainersInvoice && nextStoreId) {
+      setHeader((prev) =>
+        String(prev.storeId) === String(nextStoreId)
+          ? prev
+          : { ...prev, storeId: nextStoreId },
+      );
+    }
+  }, [partyContainerStoreData, isContainersInvoice]);
+
+  const handlePartyChange = useCallback(
+    (id) => {
+      const party = parties?.find((p) => p.id === id);
+      setHeaderField("partyId", id);
+      setHeaderField("partyName", party?.name || "");
+
+      if (party?.currency) {
+        setHeaderField("currency", party.currency);
+      }
+    },
+    [parties, setHeaderField],
+  );
+
+  const handleCustomerCreated = useCallback(
+    async (newParty) => {
+      if (!newParty?.id) return;
+
+      // حدّث قائمة العملاء أولاً حتى يظهر العميل الجديد داخل الـ Select
+      // ثم حدده تلقائيًا.
+      try {
+        await refetchParties();
+      } catch {
+        toast.warning("تمت إضافة العميل لكن تعذر تحديث القائمة", {
+          description: "لو مش ظاهر في القائمة، حدّث الصفحة",
+        });
+      }
+
+      setHeaderField("partyId", newParty.id);
+      setHeaderField("partyName", newParty.name || "");
+
+      if (newParty.currency) {
+        setHeaderField("currency", newParty.currency);
+      }
+
+      // رجّع التركيز لقائمة العملاء بعد الإضافة.
+      requestAnimationFrame(() => {
+        partySelectRef.current?.focus?.();
+      });
+    },
+    [refetchParties, setHeaderField],
+  );
+
+  const handleStoreCreated = useCallback(
+    async (createdStore) => {
+      const store = createdStore?.data ?? createdStore;
+      if (!store?.id) return;
+
+      try {
+        await refetchStores();
+      } catch {
+        toast.warning("تمت إضافة المخزن لكن تعذر تحديث القائمة", {
+          description: "لو مش ظاهر في القائمة، حدّث الصفحة",
+        });
+      }
+
+      setHeaderField("storeId", store.id);
+      setShowAddStore(false);
+    },
+    [refetchStores, setHeaderField],
+  );
+
+  const handleCountryCreated = useCallback(
+    async (createdCountry) => {
+      const country = createdCountry?.data ?? createdCountry;
+
+      if (!country?.id) return;
+
+      try {
+        await refetchCountries();
+      } catch {
+        toast.warning("تمت إضافة الدولة لكن تعذر تحديث القائمة", {
+          description: "لو مش ظاهرة في القائمة، حدّث الصفحة",
+        });
+      }
+
+      setHeaderField("countryId", country.id);
+      setShowAddCountry(false);
+    },
+    [refetchCountries, setHeaderField],
+  );
+
+  const handleDriverChange = useCallback(
+    (driverId) => {
+      const driver = drivers?.find((d) => d.id === driverId);
+      setHeaderField("driverId", driverId);
+      setHeaderField("driverName", driver?.name || "");
+    },
+    [drivers, setHeaderField],
+  );
+
+  const handleDriverCreated = useCallback((createdDriver) => {
+    const driver = createdDriver?.data ?? createdDriver;
+
+    if (!driver?.id) {
+      toast.error("تم إنشاء السائق لكن لم يتم استلام بياناته");
+      return;
+    }
+
+    setHeader((prev) => ({
+      ...prev,
+      driverId: driver.id,
+      driverName: driver.name || "",
+    }));
+
+    setShowAddDriver(false);
+  }, []);
+
+  const updateLine = useCallback(
+    (index, newLine) =>
+      setLines((prev) => prev.map((l, i) => (i === index ? newLine : l))),
+    [],
+  );
+  const removeLine = useCallback(
+    (index) => setLines((prev) => prev.filter((_, i) => i !== index)),
+    [],
+  );
+  const addLine = useCallback(() => {
+    if (itemsLocked || isReturnInvoice) return;
+    setLines((prev) => [...prev, emptyLine()]);
+  }, [itemsLocked, isReturnInvoice]);
+
+  const handleAddReturnLines = useCallback(
+    (newLines, meta) => {
+      let rejected = false;
+
+      setLines((prev) => {
+        const existingReturnLines = prev.filter((l) => l.isReturnLine);
+        if (
+          existingReturnLines.length > 0 &&
+          existingReturnLines[0].sourceInvoiceId !== meta.sourceInvoiceId
+        ) {
+          rejected = true;
+          return prev;
+        }
+        const nonEmpty = prev.filter((l) => l.itemId || l.isTemporaryItem);
+
+        // نحفظ سعر الفاتورة الأصلية كـ originalPrice، عشان نقدر نكتشف
+        // لو المستخدم غيّر السعر بعدين ونطلب سبب الاختلاف.
+        const linesWithOriginalPrice = newLines.map((l) => ({
+          ...l,
+          originalPrice: l.price ?? null,
+          returnPriceDifferenceReason: l.returnPriceDifferenceReason || "",
+        }));
+
+        return [...nonEmpty, ...linesWithOriginalPrice];
+      });
+
+      if (rejected) {
+        toast.error("في أصناف مضافة بالفعل من فاتورة تانية", {
+          description:
+            "شيل الأصناف الحالية الأول لو عايز ترجع من فاتورة مختلفة",
+        });
+        return;
+      }
+
+      if (meta.isFullReturn) {
+        setHeaderField("discount", meta.discountAmount);
+        setFullReturnState({
+          sourceInvoiceId: meta.sourceInvoiceId,
+          discountAmount: meta.discountAmount,
+          lineCount: newLines.length,
+        });
+      } else {
+        setHeaderField("discount", 0);
+        setFullReturnState(null);
+      }
+    },
+    [setHeaderField],
+  );
+
+  // ==== الملخص المالي (عرض بس - أي تحقق/رفض بقى مسؤولية الباك) ====
+  const totalQuantity = useMemo(
+    () => lines.reduce((s, l) => s + (Number(l.quantity) || 0), 0),
+    [lines],
+  );
+
+  const pricedLines = useMemo(
+    () => lines.filter((l) => Number(l.price) > 0),
+    [lines],
+  );
+
+  const invoiceTotal = useMemo(
+    () =>
+      pricedLines.reduce(
+        (sum, l) => sum + (Number(l.quantity) || 0) * Number(l.price),
+        0,
+      ),
+    [pricedLines],
+  );
+
+  const unpricedCount = useMemo(
+    () => lines.filter((l) => l.itemId && !(Number(l.price) > 0)).length,
+    [lines],
+  );
+
+  const discount = parseFloat(header.discount) || 0;
+  const paid = parseFloat(header.paid) || 0;
+
+  const netTotal = Math.max(invoiceTotal - discount, 0);
+  const remaining = Math.max(netTotal - paid, 0);
+
+  // ==== نقدي = مدفوع بيتساوى تلقائيًا بالصافي (تعبئة تلقائية للراحة، مش validation) ====
+  useEffect(() => {
+    if (isCashPayment) {
+      setHeaderField("paid", netTotal > 0 ? String(netTotal) : "");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCashPayment, netTotal]);
+
+  const wbTotal = useMemo(
+    () =>
+      (parseFloat(header.WBWeight) || 0) -
+      (parseFloat(header.WBScaleDifference) || 0) -
+      (parseFloat(header.WBDiscount) || 0),
+    [header.WBWeight, header.WBScaleDifference, header.WBDiscount],
+  );
+
+  const handlePaymentMethodChange = useCallback(
+    (method) => setHeaderField("paymentMethod", method),
+    [setHeaderField],
+  );
+
+  const { printInvoice, printRef, invoiceToPrint } = useInvoicePrint();
+
+  // يروح لأول حقل فيه خطأ ويركّز عليه
+  const focusFirstError = useCallback(() => {
+    requestAnimationFrame(() => {
+      const el = document.querySelector('[data-invalid="true"]');
+
+      if (!el) return;
+
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      const focusable = el.querySelector(
+        "input:not([type=hidden]), select, textarea, button, [tabindex]",
+      );
+
+      focusable?.focus?.({ preventScroll: true });
+    });
+  }, []);
+
+  // ==== تحقق العميل قبل الحفظ ====
+  // الباك إند لسه هو مصدر الحقيقة النهائي، لكن هنا بنمنع المستخدم من
+  // إرسال بيانات ناقصة معروفة، وبنوضّح مكان الخطأ بالظبط بدل ما ياخد
+  // رسالة عامة من السيرفر بعد الإرسال.
+  const validation = useMemo(() => {
+    const headerErrors = {};
+    const lineErrors = {};
+    const messages = [];
+
+    const addMessage = (field, text) => messages.push({ field, text });
+
+    if (!header.movementType) {
+      headerErrors.movementType = "اختر نوع الفاتورة";
+      addMessage("movementType", "اختر نوع الفاتورة (بيع / شراء / مرتجع)");
+    }
+
+    if (!header.partyId) {
+      headerErrors.partyId = "اختر العميل أو المورد";
+      addMessage("partyId", "اختر العميل أو المورد");
+    }
+
+    if (isContainersInvoice) {
+      if (!containersMovement.containerStoreId) {
+        headerErrors.storeId = "العميل/المورد مالوش مخزن عبوات مرتبط";
+        addMessage(
+          "storeId",
+          "اختر عميلًا أو موردًا له مخزن عبوات مرتبط لفاتورة العبوات",
+        );
+      }
+    } else if (!header.storeId) {
+      headerErrors.storeId = "اختر المخزن";
+      addMessage("storeId", "اختر المخزن");
+    }
+
+    if (invoiceDateWarning) {
+      headerErrors.date = invoiceDateWarning;
+      addMessage("date", invoiceDateWarning);
+    }
+
+    if (header.dueDate && header.date && header.dueDate < header.date) {
+      headerErrors.dueDate = "تاريخ الاستحقاق لا يسبق تاريخ الفاتورة";
+      addMessage("dueDate", headerErrors.dueDate);
+    }
+
+    const foreignCurrency = Boolean(
+      header.currency && header.currency !== "EGP",
+    );
+
+    if (foreignCurrency && !((parseFloat(header.exchangeRate) || 0) > 0)) {
+      headerErrors.exchangeRate = "أدخل سعر صرف أكبر من صفر";
+      addMessage("exchangeRate", "أدخل سعر صرف صحيح للعملة الأجنبية");
+    }
+
+    if (
+      !isContainersInvoice &&
+      isCashPayment &&
+      (parseFloat(header.paid) || 0) > 0 &&
+      !header.cashboxId
+    ) {
+      headerErrors.cashboxId = "اختر الخزنة";
+      addMessage("cashboxId", "اختر الخزنة المستلمة للدفعة النقدية");
+    }
+
+    // فاتورة عبوات فقط: مطلوب حركة عبوة واحدة على الأقل، ومفيش أصناف.
+    if (isContainersInvoice) {
+      const validContainerLines = containersMovement.items.filter(
+        (item) =>
+          Number(item.containerId) > 0 &&
+          ((Number(item.issuedQuantity) || 0) > 0 ||
+            (Number(item.receivedQuantity) || 0) > 0),
+      );
+
+      if (validContainerLines.length === 0) {
+        headerErrors.containerLines = "أضف حركة عبوة واحدة على الأقل";
+        addMessage(
+          "containerLines",
+          "افتح مخزن العبوات وأضف كمية صادرة أو واردة لعبوة واحدة على الأقل",
+        );
+      }
+
+      return {
+        headerErrors,
+        lineErrors,
+        messages,
+        validLineCount: 0,
+        isValid:
+          Object.keys(headerErrors).length === 0 &&
+          Object.keys(lineErrors).length === 0,
+      };
+    }
+
+    if (isReturnInvoice && returnLines.length === 0) {
+      headerErrors.lines = "أضف أصناف المرتجع";
+      addMessage("lines", "اختر أصناف المرتجع من الفاتورة الأصلية");
+    }
+
+    const seenItemIds = new Map();
+
+    lines.forEach((line, index) => {
+      const touched =
+        lineHasItem(line) ||
+        (Number(line.quantity) || 0) > 0 ||
+        (Number(line.count) || 0) > 0 ||
+        (Number(line.weight) || 0) > 0 ||
+        (Number(line.price) || 0) > 0;
+
+      if (!touched) return;
+
+      const errs = {};
+
+      if (!lineHasItem(line)) {
+        errs.item = "اختر الصنف";
+      }
+
+      if (lineHasItem(line) && !lineHasQuantity(line)) {
+        errs.quantity = "أدخل الكمية أو (العدد والوزن)";
+      }
+
+      if (!line.isTemporaryItem && line.itemId) {
+        const key = String(line.itemId);
+
+        if (seenItemIds.has(key)) {
+          errs.duplicate = "صنف مكرر في الفاتورة";
+        } else {
+          seenItemIds.set(key, index);
+        }
+      }
+
+      if (
+        line.isReturnLine &&
+        line.originalPrice !== undefined &&
+        line.originalPrice !== null &&
+        Number(line.price) !== Number(line.originalPrice) &&
+        !line.returnPriceDifferenceReason?.trim()
+      ) {
+        errs.reason = "اكتب سبب اختلاف السعر";
+      }
+
+      if (Object.keys(errs).length > 0) {
+        lineErrors[index] = errs;
+      }
+    });
+
+    const validLineCount = lines.filter(
+      (line) => lineHasItem(line) && lineHasQuantity(line),
+    ).length;
+
+    if (!isReturnInvoice && validLineCount === 0) {
+      headerErrors.lines = "أضف صنف واحد على الأقل";
+      addMessage("lines", "أضف صنف واحد على الأقل بكمية صحيحة");
+    }
+
+    Object.keys(lineErrors)
+      .map(Number)
+      .sort((a, b) => a - b)
+      .forEach((index) => {
+        const errs = lineErrors[index];
+        const text =
+          errs.item ||
+          errs.duplicate ||
+          errs.quantity ||
+          errs.reason ||
+          "بيانات غير مكتملة";
+        addMessage(`line-${index}`, `سطر ${index + 1}: ${text}`);
+      });
+
+    return {
+      headerErrors,
+      lineErrors,
+      messages,
+      validLineCount,
+      isValid:
+        Object.keys(headerErrors).length === 0 &&
+        Object.keys(lineErrors).length === 0,
+    };
+  }, [
+    header,
+    lines,
+    isCashPayment,
+    isContainersInvoice,
+    containersMovement,
+    isReturnInvoice,
+    returnLines,
+    invoiceDateWarning,
+  ]);
+
+  const submitInvoice = useCallback(
+    async (shouldPrint = false) => {
+      if (isLoading) return;
+
+      // تحقق العميل: نمنع الإرسال ونوضّح مكان الخطأ بالظبط فورًا
+      // بدل ما نستنى رد السيرفر.
+      if (!validation.isValid) {
+        setShowErrors(true);
+
+        toast.error("راجع البيانات قبل الحفظ", {
+          description: `${validation.messages.length} ملاحظة محتاجة تصحيح`,
+        });
+
+        focusFirstError();
+        return;
+      }
+
+      setShowErrors(false);
+
+      // لو المستخدم ساب رقم الفاتورة فاضي (الحالة الافتراضية المقفولة)
+      // بنولّد رقم بديل قبل الإرسال، لأن الـ API حاليًا بيرفض الرقم
+      // الفاضي. الرقم الظاهر بعد الحفظ هو اللي راجع من السيرفر.
+      const effectiveInvoiceNumber =
+        header.invoiceNumber?.trim() || generateInvoiceNumber();
+
+      if (!header.invoiceNumber?.trim()) {
+        setHeader((current) => ({
+          ...current,
+          invoiceNumber: effectiveInvoiceNumber,
+        }));
+      }
+
+      // بعد كده الباك إند يبقى مصدر الحقيقة النهائي، وأي رفض إضافي
+      // (رصيد/سعر/سنة مالية...) بيوصل في الـ catch تحت.
+      const payload = buildCreateInvoiceRequest({
+        movementType: header.movementType,
+        header: { ...header, invoiceNumber: effectiveInvoiceNumber, wbTotal },
+        lines,
+        containersMovement,
+        isTemporaryDriver,
+      });
+
+      try {
+        const invoice = await createInvoice(payload).unwrap();
+
+        toast.success("تم حفظ الفاتورة بنجاح", {
+          description: `رقم الفاتورة: ${
+            invoice?.invoiceNumber || effectiveInvoiceNumber
+          }`,
+        });
+
+        onSuccess?.();
+
+        if (shouldPrint) {
+          printInvoice(invoice);
+        }
+      } catch (err) {}
+    },
+    [
+      isLoading,
+      header,
+      lines,
+      wbTotal,
+      containersMovement,
+      isTemporaryDriver,
+      validation,
+      focusFirstError,
+      createInvoice,
+      onSuccess,
+      printInvoice,
+    ],
+  );
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const isModifier = e.ctrlKey || e.metaKey;
+      if (!isModifier) return;
+
+      if (e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        submitInvoice(false);
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitInvoice(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [submitInvoice]);
+
+  const handleCancel = useCallback(() => {
+    onSuccess?.();
+  }, [onSuccess]);
+
+  const handleResetForm = useCallback(() => {
+    setHeader(getDefaultHeader());
+    setLines(Array.from({ length: 10 }, () => emptyLine()));
+    setContainersMovement({ containerStoreId: null, items: [] });
+    setIsTemporaryDriver(false);
+    setInvoiceNumberLocked(true);
+    setFullReturnState(null);
+    setShowErrors(false);
+    setShowResetConfirm(false);
+    toast.success("تم مسح بيانات الفاتورة");
+  }, []);
+
+  // انتقال سريع لحقل معيّن من قائمة الملاحظات
+  const jumpToField = useCallback((field) => {
+    if (!field) return;
+
+    const selector = field.startsWith("line-")
+      ? `[data-line-index="${field.split("-")[1]}"]`
+      : `[data-field="${field}"]`;
+
+    const el = document.querySelector(selector);
+
+    if (!el) return;
+
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.querySelector("input, select, textarea, button")?.focus?.({
+      preventScroll: true,
+    });
+  }, []);
+
+  const fmt = useCallback(
+    (v) => (Number.isFinite(v) ? v : 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 }),
+    [],
+  );
+  const currencySymbol = header.currency === "USD" ? "$" : "ج.م";
+  const isForeignCurrency = header.currency && header.currency !== "EGP";
+  const exchangeRateValue = parseFloat(header.exchangeRate) || 1;
+
+  return (
+    <div className="space-y-6 pb-4 animate-[fadeIn_0.15s_ease-out]">
+      <div className="space-y-6">
+        {/* ===== العمود الرئيسي ===== */}
+        <div className="min-w-0 space-y-6">
+      {/* ============ القسم 1: بيانات الفاتورة الأساسية ============ */}
+      <LedgerPanel
+        title={
+          <span className="flex items-center gap-2 pr-3">
+            <FileText size={15} />
+            بيانات الفاتورة
+          </span>
+        }
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-3">
+          <div data-field="invoiceNumber">
+            <LedgerField
+              label="رقم الفاتورة"
+              labelAddon={
+                <button
+                  type="button"
+                  onClick={() => setInvoiceNumberLocked((value) => !value)}
+                  className="
+                    inline-flex h-5 w-5 items-center justify-center rounded
+                    border border-ink-400/20 bg-white text-primary-700
+                    transition hover:border-primary-400/50 hover:bg-primary-50
+                    active:scale-95
+                  "
+                  aria-pressed={!invoiceNumberLocked}
+                  aria-label={
+                    invoiceNumberLocked
+                      ? "فتح الحقل لكتابة رقم الفاتورة يدويًا"
+                      : "قفل الحقل والرجوع للتوليد التلقائي"
+                  }
+                  title={
+                    invoiceNumberLocked
+                      ? "فتح الحقل لكتابة رقم الفاتورة يدويًا"
+                      : "قفل الحقل والرجوع للتوليد التلقائي"
+                  }
+                >
+                  {invoiceNumberLocked ? (
+                    <Unlock size={11} />
+                  ) : (
+                    <Lock size={11} />
+                  )}
+                </button>
+              }
+              value={header.invoiceNumber}
+              onChange={(e) => setHeaderField("invoiceNumber", e.target.value)}
+              readOnly={invoiceNumberLocked}
+              disabled={invoiceNumberLocked}
+              placeholder={
+                invoiceNumberLocked
+                  ? "يُولَّد تلقائيًا عند الحفظ"
+                  : "اكتب رقم الفاتورة يدويًا"
+              }
+              className={
+                invoiceNumberLocked
+                  ? "cursor-not-allowed bg-ink-900/[0.03] text-ink-500"
+                  : ""
+              }
+            />
+          </div>
+          <div
+            data-field="movementType"
+            data-invalid={
+              showErrors && Boolean(validation.headerErrors.movementType)
+            }
+          >
+            <LedgerSelect
+              label="نوع الفاتورة"
+              options={movementOptions}
+              value={header.movementType}
+              onChange={(e) => setHeaderField("movementType", e.target.value)}
+              error={
+                showErrors ? validation.headerErrors.movementType : undefined
+              }
+            />
+          </div>
+          <div>
+            <div className="flex items-stretch overflow-hidden rounded-lg border border-ink-400/10">
+              <div className="flex w-36 shrink-0 items-center border-l border-ink-400/10 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900">
+                التاريخ
+              </div>
+              <DateInput
+                value={header.date}
+                onChange={(e) => setHeaderField("date", e.target.value)}
+                className="min-h-0 flex-1 rounded-none border-0 px-3 py-2.5 text-sm shadow-none focus:ring-0"
+              />
+            </div>
+            {invoiceDateWarning && (
+              <p className="mt-1 text-xs font-medium text-negative">
+                {invoiceDateWarning}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3">
+          <div
+            data-field="dueDate"
+            data-invalid={
+              showErrors && Boolean(validation.headerErrors.dueDate)
+            }
+          >
+            <div>
+              <div className="flex items-stretch overflow-hidden rounded-lg border border-ink-400/10">
+                <div className="flex w-36 shrink-0 items-center border-l border-ink-400/10 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900">
+                  تاريخ الاستحقاق
+                </div>
+                <DateInput
+                  value={header.dueDate}
+                  onChange={(e) => setHeaderField("dueDate", e.target.value)}
+                  className="min-h-0 flex-1 rounded-none border-0 px-3 py-2.5 text-sm shadow-none focus:ring-0"
+                />
+              </div>
+              {showErrors && validation.headerErrors.dueDate && (
+                <p className="mt-1 text-xs font-medium text-negative">
+                  {validation.headerErrors.dueDate}
+                </p>
+              )}
+            </div>
+          </div>
+          <LedgerField
+            label="كود فاتورة التصدير"
+            value={header.exportInvoiceCode}
+            onChange={(e) =>
+              setHeaderField("exportInvoiceCode", e.target.value)
+            }
+          />
+          <LedgerField
+            label="رقم فاتورة الشريك"
+            value={header.partnerInvoiceNo}
+            onChange={(e) => setHeaderField("partnerInvoiceNo", e.target.value)}
+          />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3">
+          <div
+            data-field="exchangeRate"
+            data-invalid={
+              showErrors && Boolean(validation.headerErrors.exchangeRate)
+            }
+          >
+            <LedgerField
+              label="سعر الصرف"
+              type="number"
+              value={header.exchangeRate}
+              onChange={(e) => setHeaderField("exchangeRate", e.target.value)}
+              disabled={!isForeignCurrency}
+              hint={!isForeignCurrency ? "متاح فقط للعملات الأجنبية" : undefined}
+              error={
+                showErrors ? validation.headerErrors.exchangeRate : undefined
+              }
+            />
+          </div>
+          <LedgerSelect
+            label="محتوى الفاتورة"
+            options={invoiceContentTypeOptions}
+            value={header.invoiceContentType}
+            onChange={(e) =>
+              handleInvoiceContentTypeChange(e.target.value)
+            }
+          />
+        </div>
+      </LedgerPanel>
+
+      {/* ============ القسم 2: العميل والمخزن والنقل ============ */}
+      <LedgerPanel
+        title={
+          <span className="flex items-center gap-2 pr-3">
+            <MapPin size={15} />
+            العميل والنقل
+          </span>
+        }
+      >
+        <div
+          data-field="partyId"
+          data-invalid={showErrors && Boolean(validation.headerErrors.partyId)}
+        >
+        <div className="flex items-stretch">
+          <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+            عميل / مورد
+          </div>
+          <CompactSelect
+            ref={partySelectRef}
+            label="عميل / مورد"
+            options={partyOptions}
+            value={header.partyId}
+            onChange={handlePartyChange}
+            placeholder="اختر العميل أو المورد"
+            disabled={isLoading}
+          />
+          <button
+            type="button"
+            onClick={() => setShowAddCustomer(true)}
+            disabled={isLoading}
+            className="px-3 text-primary-500 border-r border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 disabled:cursor-not-allowed disabled:opacity-40"
+            title="إضافة عميل/مورد جديد"
+            aria-label="إضافة عميل أو مورد جديد"
+          >
+            <UserPlus size={17} />
+          </button>
+          <button
+            type="button"
+            onClick={() => header.partyName && setShowPackaging(true)}
+            disabled={!header.partyName}
+            className={`relative px-3 border-r border-ink-400/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
+              !header.partyName
+                ? "text-ink-400/40 pointer-events-none"
+                : "text-primary-500 hover:bg-primary-50"
+            }`}
+            title="مخزن العبوات"
+            aria-label="فتح مخزن العبوات"
+          >
+            <Boxes size={17} />
+            {containersMovement.items.length > 0 && (
+              <Repeat2Icon
+                className="absolute top-1 left-1 text-primary-600"
+                size={12}
+              />
+            )}
+          </button>
+        </div>
+        {showErrors && validation.headerErrors.partyId && (
+          <p className="bg-negative/5 px-3 py-1 text-xs text-negative">
+            {validation.headerErrors.partyId}
+          </p>
+        )}
+        </div>
+
+        {isPartiesError && (
+          <InlineErrorRetry
+            message="تعذر تحميل قائمة العملاء والموردين"
+            onRetry={refetchParties}
+          />
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2">
+          <div className="flex items-stretch">
+            <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+              العملة
+            </div>
+            <div className="flex flex-1 items-center gap-2 overflow-hidden px-3 py-2.5 text-sm">
+              <CurrencyChip
+                currency={header.partyName ? header.currency : null}
+              />
+              {header.partyName ? (
+                <span className="whitespace-nowrap text-xs text-ink-400">
+                  (تلقائي حسب العميل)
+                </span>
+              ) : (
+                <span className="whitespace-nowrap text-xs text-ink-400/50">
+                  هتظهر بعد اختيار العميل
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div
+            data-field="storeId"
+            data-invalid={showErrors && Boolean(validation.headerErrors.storeId)}
+          >
+          {isContainersInvoice ? (
+            <div className="flex items-stretch">
+              <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                مخزن العبوات
+              </div>
+              <div className="flex flex-1 items-center gap-2 bg-ink-400/5 px-3 py-2.5 text-sm text-ink-600">
+                {partyContainerStoreData?.containerStore?.name || (
+                  <span className="text-ink-400">
+                    {header.partyId
+                      ? "لا يوجد مخزن عبوات مرتبط بالعميل"
+                      : "اختر العميل أو المورد الأول"}
+                  </span>
+                )}
+              </div>
+            </div>
+          ) : (
+          <div className="flex items-stretch">
+            <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+              المخزن
+            </div>
+            <CompactSelect
+              label="المخزن"
+              options={storeOptions}
+              value={header.storeId}
+              onChange={(val) => setHeaderField("storeId", val)}
+              placeholder="اختر المخزن"
+              disabled={isLoading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowAddStore(true)}
+              disabled={isLoading}
+              className="px-3 text-primary-500 border-r border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 disabled:cursor-not-allowed disabled:opacity-40"
+              title="إضافة مخزن جديد"
+              aria-label="إضافة مخزن جديد"
+            >
+              <Plus size={17} />
+            </button>
+          </div>
+          )}
+          {showErrors && validation.headerErrors.storeId && (
+            <p className="bg-negative/5 px-3 py-1 text-xs text-negative">
+              {validation.headerErrors.storeId}
+            </p>
+          )}
+          </div>
+        </div>
+
+        {isStoresError && (
+          <InlineErrorRetry
+            message="تعذر تحميل قائمة المخازن"
+            onRetry={refetchStores}
+          />
+        )}
+
+        <div className="grid grid-cols-1">
+          <div className="flex items-stretch">
+            <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+              السائق
+            </div>
+            {isTemporaryDriver ? (
+              <input
+                type="text"
+                value={header.driverName}
+                onChange={(e) => setHeaderField("driverName", e.target.value)}
+                placeholder="اكتب اسم السائق"
+                className="flex-1 px-3 py-2 text-sm outline-none focus-visible:bg-ink-900/[0.02]"
+                aria-label="اسم السائق الوقتي"
+              />
+            ) : (
+              <CompactSelect
+                label="السائق"
+                options={driverOptions}
+                value={header.driverId}
+                onChange={handleDriverChange}
+                placeholder="اختر السائق"
+              />
+            )}
+            <button
+              type="button"
+              onClick={() => setShowAddDriver(true)}
+              className="px-3 text-primary-500 border-r border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+              title="إضافة سائق جديد"
+              aria-label="إضافة سائق جديد"
+            >
+              <UserPlus size={17} />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsTemporaryDriver((prev) => !prev);
+                setHeader((h) => ({
+                  ...h,
+                  driverId: "",
+                  driverName: "",
+                }));
+              }}
+              className={`px-3 border-r border-ink-400/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
+                isTemporaryDriver
+                  ? "bg-primary-100 text-primary-600"
+                  : "text-primary-500 hover:bg-primary-50"
+              }`}
+              title={isTemporaryDriver ? "إلغاء السائق الوقتي" : "سائق وقتي"}
+              aria-pressed={isTemporaryDriver}
+              aria-label="تبديل السائق الوقتي"
+            >
+              <Truck size={17} />
+            </button>
+          </div>
+        </div>
+
+        {isDriversError && (
+          <InlineErrorRetry
+            message="تعذر تحميل قائمة السائقين"
+            onRetry={refetchDrivers}
+          />
+        )}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2">
+          <div className="flex items-stretch">
+            <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+              السائق الفعلي
+            </div>
+            <input
+              type="text"
+              value={header.actualDriverName}
+              onChange={(e) =>
+                setHeaderField("actualDriverName", e.target.value)
+              }
+              placeholder="اكتب اسم السائق الفعلي (اختياري)"
+              className="flex-1 px-3 py-2 text-sm outline-none focus-visible:bg-ink-900/[0.02]"
+              aria-label="اسم السائق الفعلي"
+            />
+          </div>
+
+          <LedgerField
+            label="رقم السيارة"
+            value={header.carNumber}
+            onChange={(e) => setHeaderField("carNumber", e.target.value)}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2">
+          <div className="flex items-stretch">
+            <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+              البلد
+            </div>
+            <CompactSelect
+              label="البلد"
+              options={countryOptions}
+              value={header.countryId}
+              onChange={(val) => setHeaderField("countryId", val)}
+              placeholder="اختر البلد"
+              disabled={isLoading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowAddCountry(true)}
+              disabled={isLoading}
+              className="px-3 text-primary-500 border-r border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 disabled:cursor-not-allowed disabled:opacity-40"
+              title="إضافة دولة جديدة"
+              aria-label="إضافة دولة جديدة"
+            >
+              <Plus size={17} />
+            </button>
+          </div>
+        </div>
+
+        {isCountriesError && (
+          <InlineErrorRetry
+            message="تعذر تحميل قائمة الدول"
+            onRetry={refetchCountries}
+          />
+        )}
+      </LedgerPanel>
+
+      {/* ============ القسم 3: الدفع والملاحظات ============ */}
+      <LedgerPanel
+        title={
+          <span className="flex items-center gap-2 pr-3">
+            <Wallet size={15} />
+            الدفع والملاحظات
+          </span>
+        }
+      >
+        {isContainersInvoice ? (
+          <div className="rounded-xl border border-primary-200 bg-primary-50/40 px-4 py-3 text-xs leading-6 text-primary-700">
+            فاتورة عبوات فقط: بتسجل كميات العبوات بدون قيمة مالية، فمفيش خصم
+            أو مدفوع أو خزنة مرتبطة بالفاتورة.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2">
+            <LedgerSelect
+              label="طريقة الدفع"
+              options={paymentOptions}
+              value={header.paymentMethod}
+              onChange={(e) => handlePaymentMethodChange(e.target.value)}
+            />
+          </div>
+        )}
+
+        {!isContainersInvoice && hasPayment && (
+          <div className="grid grid-cols-1 gap-y-0 sm:grid-cols-2 animate-[fadeIn_0.15s_ease-out]">
+            <div
+              data-field="cashboxId"
+              data-invalid={
+                showErrors && Boolean(validation.headerErrors.cashboxId)
+              }
+            >
+            <div className="flex items-stretch">
+              <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                الخزنة
+              </div>
+              <CompactSelect
+                label="الخزنة"
+                options={cashboxOptions}
+                value={header.cashboxId}
+                onChange={handleCashboxChange}
+                placeholder="اختر الخزنة"
+              />
+            </div>
+            {showErrors && validation.headerErrors.cashboxId && (
+              <p className="bg-negative/5 px-3 py-1 text-xs text-negative">
+                {validation.headerErrors.cashboxId}
+              </p>
+            )}
+            </div>
+            <LedgerField
+              label="سعر صرف الخزنة"
+              type="number"
+              value={header.cashboxExchangeRate}
+              onChange={(e) =>
+                setHeaderField("cashboxExchangeRate", e.target.value)
+              }
+            />
+          </div>
+        )}
+
+        <div className="grid grid-cols-1">
+          <LedgerField
+            label="ملاحظات عامة"
+            value={header.generalNotes}
+            onChange={(e) => setHeaderField("generalNotes", e.target.value)}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2">
+          <LedgerField
+            label="وزن البسكال"
+            value={header.WBWeight}
+            onChange={(e) => setHeaderField("WBWeight", e.target.value)}
+          />
+          <LedgerField
+            label="فرق الميزان"
+            value={header.WBScaleDifference}
+            onChange={(e) =>
+              setHeaderField("WBScaleDifference", e.target.value)
+            }
+          />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2">
+          <LedgerField
+            label="الخصم"
+            value={header.WBDiscount}
+            onChange={(e) => setHeaderField("WBDiscount", e.target.value)}
+          />
+          <div className="flex items-stretch">
+            <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+              الإجمالي
+            </div>
+            <div className="flex flex-1 items-center gap-1.5 bg-ink-400/5 px-3 py-2.5 text-sm num text-ink-600">
+              {wbTotal.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+              <span className="text-[11px] text-ink-400">(يتحسب تلقائيًا)</span>
+            </div>
+          </div>
+        </div>
+      </LedgerPanel>
+
+      {/* ============ القسم 4: فواتير المصدر (للمرتجع فقط) ============ */}
+      {isReturnInvoice && (
+        <ReturnSourcePicker
+          movementType={header.movementType}
+          partyId={header.partyId}
+          storeId={header.storeId}
+          asOfDate={header.date}
+          activeSourceInvoiceId={activeSourceInvoiceId}
+          onAddLines={handleAddReturnLines}
+        />
+      )}
+
+      {isContainersInvoice ? (
+        <LedgerPanel
+          title={
+            <span className="flex items-center gap-2 pr-3">
+              <Boxes size={15} />
+              حركات العبوات
+            </span>
+          }
+        >
+          <div
+            className="space-y-3"
+            data-field="containerLines"
+            data-invalid={
+              showErrors && Boolean(validation.headerErrors.containerLines)
+            }
+          >
+            <div className="rounded-xl border border-primary-200 bg-primary-50/40 px-4 py-3 text-xs leading-6 text-primary-700">
+              فاتورة عبوات فقط بتسجل الكميات الصادرة والواردة على عبوات
+              العميل من غير أصناف ومن غير قيمة مالية. لازم تضيف حركة عبوة
+              واحدة على الأقل.
+            </div>
+
+            {showErrors && validation.headerErrors.containerLines && (
+              <div className="flex items-center gap-2 rounded-2xl border border-negative/20 bg-negative/5 px-4 py-2.5 text-xs text-negative">
+                <AlertTriangle size={14} />
+                {validation.headerErrors.containerLines}
+              </div>
+            )}
+
+            {!header.partyId && (
+              <div className="rounded-2xl border border-dashed border-gold-200 bg-gold-50/40 py-6 text-center">
+                <p className="text-sm text-gold-700">
+                  اختر العميل أو المورد الأول عشان تحدد مخزن العبوات
+                </p>
+              </div>
+            )}
+
+            {header.partyId && (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-ink-400/10 bg-white px-4 py-3">
+                <div className="text-sm">
+                  <p className="font-medium text-ink-900">
+                    {partyContainerStoreData?.containerStore?.name ||
+                      "لا يوجد مخزن عبوات مرتبط بالعميل"}
+                  </p>
+                  <p className="mt-0.5 text-[11px] text-ink-400">
+                    {containerMovementCount > 0
+                      ? `${containerMovementCount} عبوة متحركة في الفاتورة`
+                      : "لسه مفيش حركات عبوات"}
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowPackaging(true)}
+                  disabled={
+                    isLoading || !partyContainerStoreData?.containerStore
+                  }
+                >
+                  <Boxes size={15} />
+                  {containerMovementCount > 0
+                    ? "تعديل حركات العبوات"
+                    : "إضافة حركات العبوات"}
+                </Button>
+              </div>
+            )}
+
+            {containerMovementCount > 0 && (
+              <div className="overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card">
+                <table className="w-full min-w-[520px] border-collapse text-right">
+                  <thead>
+                    <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
+                      <th className="p-2.5 font-medium">#</th>
+                      <th className="p-2.5 font-medium">العبوة</th>
+                      <th className="p-2.5 font-medium">صادر</th>
+                      <th className="p-2.5 font-medium">وارد</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {containersMovement.items.map((item, index) => (
+                      <tr
+                        key={item.containerId ?? index}
+                        className="border-t border-ink-400/10"
+                      >
+                        <td className="p-2.5 text-xs num text-ink-400">
+                          {index + 1}
+                        </td>
+                        <td className="p-2.5 text-sm text-ink-900">
+                          {containerNameById.get(String(item.containerId)) ||
+                            `عبوة #${item.containerId}`}
+                        </td>
+                        <td className="p-2.5 text-sm num">
+                          {Number(item.issuedQuantity) || 0}
+                        </td>
+                        <td className="p-2.5 text-sm num">
+                          {Number(item.receivedQuantity) || 0}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </LedgerPanel>
+      ) : (
+        // القسم 5: الأصناف
+        <LedgerPanel
+        title={
+          <div className="mb-2 flex items-center justify-between px-1">
+            <span className="flex items-center gap-2 pr-3">
+              <StoreIcon size={15} />
+              {isReturnInvoice ? "أصناف المرتجع" : "الأصناف"}
+            </span>
+            {unpricedCount > 0 && (
+              <span className="rounded-full bg-gold-50 px-2 py-0.5 text-xs font-medium text-gold-600">
+                {unpricedCount} بدون سعر
+              </span>
+            )}
+          </div>
+        }
+      >
+        <div
+          className="grid grid-cols-1 items-start gap-4"
+          data-field="lines"
+          data-invalid={showErrors && Boolean(validation.headerErrors.lines)}
+        >
+          <div>
+            {showErrors && validation.headerErrors.lines && (
+              <div className="mb-3 flex items-center gap-2 rounded-2xl border border-negative/20 bg-negative/5 px-4 py-2.5 text-xs text-negative">
+                <AlertTriangle size={14} />
+                {validation.headerErrors.lines}
+              </div>
+            )}
+
+            {itemsLocked && (
+              <div className="mb-3 rounded-2xl border border-dashed border-gold-200 bg-gold-50/40 py-6 text-center">
+                <p className="text-sm text-gold-700">
+                  اختر المخزن أولاً قبل إضافة الأصناف
+                </p>
+              </div>
+            )}
+
+            {!itemsLocked && isReturnInvoice && lines.length === 0 && (
+              <div className="mb-3 rounded-2xl border border-dashed border-primary-200 bg-primary-50/40 py-6 text-center">
+                <p className="text-sm text-primary-700">
+                  اختر أصناف المرتجع من الفاتورة الأصلية فوق
+                </p>
+              </div>
+            )}
+
+            {isReturnInvoice && priceModifiedReturnLines.length > 0 && (
+              <div className="mb-3 flex items-center gap-2 rounded-2xl border border-gold-200 bg-gold-50/40 px-4 py-2.5 text-xs text-gold-700">
+                <span>
+                  في {priceModifiedReturnLines.length} صنف سعره مختلف عن
+                  الفاتورة الأصلية — اكتب سبب الاختلاف جنب السعر في الجدول تحت
+                  قبل الحفظ
+                </span>
+              </div>
+            )}
+
+            {lines.length > 0 && (
+              <div
+                className={`overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card transition-opacity duration-150 ${
+                  itemsLocked ? "pointer-events-none opacity-50" : ""
+                }`}
+              >
+                <table className="w-full min-w-[1350px] border-collapse text-right">
+                  <thead>
+                    <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
+                      <th className="p-2.5 font-medium">#</th>
+                      <th className="p-2.5 font-medium">الصنف</th>
+                      <th className="p-2.5 font-medium">العدد بالمخزن</th>
+                      <th className="p-2.5 font-medium">الوحدة</th>
+                      <th className="p-2.5 font-medium">العدد</th>
+                      <th className="p-2.5 font-medium">وزن الوحدة</th>
+                      <th className="p-2.5 font-medium">الكمية</th>
+                      <th className="p-2.5 font-medium">سعر الكيلو</th>
+                      <th className="p-2.5 font-medium">القيمة</th>
+                      <th className="p-2.5 font-medium">ملاحظات</th>
+                      <th className="p-2.5"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {lines.map((line, index) => (
+                      <InvoiceLineRow
+                        key={line.sourceInvoiceLineId ?? line.id ?? index}
+                        index={index}
+                        line={line}
+                        storeId={header.storeId}
+                        invoiceDate={header.date}
+                        items={items}
+                        itemOptions={itemOptions}
+                        isLoadingItems={isLoadingItems}
+                        isItemsError={isItemsError}
+                        errors={showErrors ? validation.lineErrors[index] : undefined}
+                        onChange={(newLine) => updateLine(index, newLine)}
+                        onRemove={() => removeLine(index)}
+                      />
+                    ))}
+                  </tbody>
+                </table>
+                {!isReturnInvoice && (
+                  <button
+                    type="button"
+                    onClick={addLine}
+                    disabled={itemsLocked}
+                    className="flex w-full items-center justify-center gap-2 border-t border-ink-400/10 py-3 text-sm font-medium text-primary-500 transition-colors hover:bg-primary-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-400 disabled:cursor-not-allowed"
+                  >
+                    <Plus size={16} />
+                    إضافة صنف آخر
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </LedgerPanel>
+      )}
+
+        </div>
+
+        {/* ===== الملاحظات + الملخص + الأزرار ===== */}
+        <aside className="space-y-4">
+          {showErrors && !validation.isValid && (
+            <div className="rounded-2xl border border-negative/20 bg-negative/5 p-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-negative">
+                <AlertTriangle size={15} />
+                راجع {validation.messages.length} ملاحظة
+              </div>
+              <ul className="mt-2 space-y-1">
+                {validation.messages.slice(0, 6).map((msg, i) => (
+                  <li key={i}>
+                    <button
+                      type="button"
+                      onClick={() => jumpToField(msg.field)}
+                      className="text-right text-xs leading-5 text-negative/90 hover:underline"
+                    >
+                      • {msg.text}
+                    </button>
+                  </li>
+                ))}
+                {validation.messages.length > 6 && (
+                  <li className="text-xs text-negative/70">
+                    و {validation.messages.length - 6} ملاحظات أخرى…
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
+
+          {/* قائمة جاهزية الفاتورة */}
+          <div className="rounded-2xl border border-ink-400/15 bg-white p-3 shadow-sm">
+            <p className="mb-2 text-xs font-semibold text-ink-600">
+              خطوات إنشاء الفاتورة
+            </p>
+            <ul className="space-y-1.5">
+              {[
+                { label: "نوع الفاتورة", done: Boolean(header.movementType) },
+                { label: "العميل / المورد", done: Boolean(header.partyId) },
+                { label: "المخزن", done: Boolean(header.storeId) },
+                isContainersInvoice
+                  ? {
+                      label: "حركات عبوات",
+                      done: containerMovementCount > 0,
+                    }
+                  : {
+                      label: "أصناف بكميات",
+                      done: validation.validLineCount > 0,
+                    },
+                ...(!isContainersInvoice && isCashPayment
+                  ? [{ label: "الخزنة", done: Boolean(header.cashboxId) }]
+                  : []),
+              ].map((step) => (
+                <li key={step.label} className="flex items-center gap-2 text-xs">
+                  {step.done ? (
+                    <CheckCircle2
+                      size={14}
+                      className="shrink-0 text-primary-500"
+                    />
+                  ) : (
+                    <CircleDot size={14} className="shrink-0 text-ink-400/50" />
+                  )}
+                  <span
+                    className={step.done ? "text-ink-700" : "text-ink-400"}
+                  >
+                    {step.label}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+      {/* ============ القسم 6: ملخص الفاتورة ============ */}
+      <LedgerPanel
+        title={
+          <div className="mb-2 flex items-center justify-between px-1">
+            <span className="flex items-center gap-2 pr-3 text-sm font-semibold">
+              <StoreIcon size={15} />
+              ملخص الفاتورة
+            </span>
+          </div>
+        }
+      >
+        <div className="space-y-3 lg:sticky lg:top-4">
+          <div className="overflow-hidden rounded-xl border border-ink-400/10 bg-white">
+            <div className="flex items-center justify-between border-b border-ink-400/10 px-3 py-2.5">
+              <span className="text-sm text-ink-600">عدد العبوات</span>
+              <span className="num text-sm font-semibold text-ink-900">
+                {packagingBreakdown.length > 0
+                  ? packagingBreakdown
+                      .map((p) => `${fmt(p.count)} ${p.unitName}`)
+                      .join("، ")
+                  : "—"}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between border-b border-ink-400/10 px-3 py-2.5">
+              <span className="text-sm text-ink-600">إجمالي الكمية</span>
+              <span className="num text-sm font-semibold text-ink-900">
+                {fmt(totalQuantity)}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between border-b border-ink-400/10 bg-primary-500/[0.03] px-3 py-2.5">
+              <span className="text-sm font-semibold text-ink-900">
+                إجمالي الفاتورة
+              </span>
+              <span className="num text-sm font-bold text-ink-900">
+                {fmt(invoiceTotal)} {currencySymbol}
+              </span>
+            </div>
+
+            {isContainersInvoice ? (
+              <div className="border-y border-ink-400/10 bg-primary-500/[0.03] px-3 py-3 text-xs leading-6 text-primary-700">
+                فاتورة عبوات فقط: القيمة المالية صفر — بيتسجل حركة العبوات بس.
+              </div>
+            ) : (
+              <>
+                <div className="flex items-stretch border-b border-ink-400/10">
+                  <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                    الخصم
+                  </div>
+                  <div className="flex-1 p-2">
+                    <NumericInput
+                      value={header.discount ?? ""}
+                      decimals
+                      disabled={isReturnInvoice}
+                      onChange={(value) => {
+                        if (isReturnInvoice) return;
+                        setHeaderField("discount", value === "" ? "" : value);
+                      }}
+                    />
+                    {isReturnInvoice && (
+                      <p className="mt-1 text-[11px] text-ink-400">
+                        {fullReturnState
+                          ? "خصم الفاتورة الأصلية بيتطبق تلقائيًا لأنه مرتجع كامل"
+                          : "مفيش خصم على المرتجع الجزئي"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between border-y border-ink-400/10 bg-ink-900/[0.02] px-3 py-2.5">
+                  <span className="text-sm font-semibold text-ink-900">
+                    الصافي
+                  </span>
+                  <span className="num text-sm font-bold text-ink-900">
+                    {fmt(netTotal)} {currencySymbol}
+                  </span>
+                </div>
+
+                <div className="flex items-stretch border-b border-ink-400/10">
+                  <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                    المدفوع
+                  </div>
+                  <div className="flex-1 p-2">
+                    <NumericInput
+                      value={header.paid ?? ""}
+                      decimals
+                      disabled={isCashPayment}
+                      onChange={(value) => {
+                        if (isCashPayment) return;
+                        setHeaderField("paid", value === "" ? "" : value);
+                      }}
+                    />
+                    {isCashPayment && (
+                      <p className="mt-1 text-[11px] text-ink-400">
+                        نقدي - بيتحسب تلقائيًا بقيمة الصافي كامل
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between bg-ink-900/[0.02] px-3 py-2.5">
+                  <span className="text-sm font-semibold text-ink-900">
+                    المتبقي
+                  </span>
+                  <span className="num text-sm font-bold text-ink-900">
+                    {fmt(remaining)} {currencySymbol}
+                  </span>
+                </div>
+              </>
+            )}
+
+            {isForeignCurrency && (
+              <div className="flex items-center justify-between border-t border-ink-400/10 px-3 py-2 text-xs text-ink-400">
+                <span>ما يقابل الصافي بالمصري</span>
+                <span className="num">
+                  {fmt(netTotal * exchangeRateValue)} ج.م
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </LedgerPanel>
+
+      {/* Buttons */}
+      <div className="space-y-2">
+        <Button
+          onClick={() => submitInvoice(false)}
+          disabled={isLoading}
+          title="حفظ (Ctrl+S)"
+          className="h-10 w-full shadow-sm"
+        >
+          {isLoading ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <Save size={16} />
+          )}
+          حفظ
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={() => submitInvoice(true)}
+          disabled={isLoading}
+          title="حفظ وطباعة (Ctrl+Enter)"
+          className="h-10 w-full"
+        >
+          <Printer size={16} />
+          حفظ وطباعة
+        </Button>
+
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <Button
+            variant="ghost"
+            type="button"
+            onClick={() => setShowResetConfirm(true)}
+            disabled={isLoading}
+            className="h-10 w-full"
+            title="امسح كل البيانات المكتوبة وابدأ فاتورة فاضية"
+          >
+            <RotateCcw size={15} />
+            مسح
+          </Button>
+
+          <Button
+            variant="ghost"
+            type="button"
+            onClick={handleCancel}
+            disabled={isLoading}
+            className="h-10 w-full"
+          >
+            <X size={15} />
+            إلغاء
+          </Button>
+        </div>
+      </div>
+        </aside>
+      </div>
+
+      {/* ===== تأكيد مسح البيانات ===== */}
+      <Modal
+        isOpen={showResetConfirm}
+        onClose={() => setShowResetConfirm(false)}
+        title="مسح بيانات الفاتورة"
+      >
+        <div className="space-y-5">
+          <div className="flex flex-col items-center text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold-50 text-gold-600">
+              <AlertTriangle size={28} />
+            </div>
+            <h4 className="mt-4 text-base font-bold text-ink-900">
+              هل تريد مسح كل البيانات والبدء من جديد؟
+            </h4>
+            <p className="mt-2 text-sm text-ink-600">
+              سيتم مسح كل ما كتبته في هذه الفاتورة والبدء بفاتورة فاضية.
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => setShowResetConfirm(false)}
+            >
+              رجوع
+            </Button>
+            <Button className="flex-1" onClick={handleResetForm}>
+              <RotateCcw size={15} />
+              مسح البيانات
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <QuickAddCustomerModal
+        isOpen={showAddCustomer}
+        onClose={() => setShowAddCustomer(false)}
+        onCreated={handleCustomerCreated}
+      />
+      <QuickAddDriverModal
+        isOpen={showAddDriver}
+        onClose={() => setShowAddDriver(false)}
+        onCreated={handleDriverCreated}
+      />
+      <StoreFormModal
+        isOpen={showAddStore}
+        onClose={() => setShowAddStore(false)}
+        onSaved={handleStoreCreated}
+      />
+      <CountryFormModal
+        isOpen={showAddCountry}
+        onClose={() => setShowAddCountry(false)}
+        onSaved={handleCountryCreated}
+      />
+      <PackagingDrawer
+        partyId={header.partyId}
+        partyName={header.partyName}
+        isOpen={showPackaging}
+        onClose={() => setShowPackaging(false)}
+        initialItems={containersMovement.items}
+        onSave={(data) => setContainersMovement(data)}
+      />
+      <div style={{ display: "none" }}>
+        <div ref={printRef}>
+          <InvoicePrintTemplate invoice={invoiceToPrint} />
+        </div>
+      </div>
+    </div>
+  );
+}

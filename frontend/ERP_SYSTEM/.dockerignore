@@ -1,0 +1,11 @@
+# المجلدات
+node_modules
+dist
+
+# ملفات البيئة المحلية — تمنع تسريب عنوان localhost داخل صورة الإنتاج
+.env
+.env.*
+
+# Git وذاتي
+.git
+.gitignore

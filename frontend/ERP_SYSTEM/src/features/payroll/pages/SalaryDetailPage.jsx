@@ -1,0 +1,461 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  ArrowRight,
+  Wallet,
+  Printer,
+  CalendarDays,
+  User,
+  Clock3,
+  PlusCircle,
+  MinusCircle,
+} from "lucide-react";
+import {
+  useGetPayrollEntryByIdQuery,
+  useCreateEmployeeMovementMutation,
+} from "../payrollApi";
+import { useGetCashboxOptionsQuery } from "../../cashboxes/cashboxesApi";
+import { EMPLOYEE_TYPE, fmtMoney } from "../payroll.constants";
+import Button from "../../../shared/components/ui/Button";
+import { useFiscalYearGuard } from "../../../lib/useFiscalYearGuard";
+import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFiscalYearBanner";
+import Modal from "../../../shared/components/ui/Modal";
+import Input from "../../../shared/components/ui/Input";
+import CompactSelect from "../../../shared/components/ui/CompactSelect";
+import PayrollDetailPrintTemplate from "../../../shared/components/print/PayrollDetailPrintTemplate";
+import { usePayrollDetailPrint } from "../../../shared/hooks/usePayrollDetailPrint";
+import { formatDate } from "../../../lib/date.js";
+
+export default function SalaryDetailPage() {
+  const { salaryId } = useParams();
+  const navigate = useNavigate();
+  const { isReadOnly: isFiscalYearReadOnly, fiscalYear } = useFiscalYearGuard();
+
+  const {
+    data: entry,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetPayrollEntryByIdQuery(salaryId);
+
+  const { data: cashboxesData, isLoading: isCashboxesLoading } =
+    useGetCashboxOptionsQuery();
+
+  const [createEmployeeMovement, { isLoading: isPaying }] =
+    useCreateEmployeeMovementMutation();
+
+  const [showPayModal, setShowPayModal] = useState(false);
+
+  const [postingDate, setPostingDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
+
+  const [cashboxId, setCashboxId] = useState("");
+
+  const [notes, setNotes] = useState("");
+
+  // ✅ لازم يتنادى هنا مع باقي الـ hooks، قبل أي return شرطي تحت
+  const { print, printRef } = usePayrollDetailPrint({
+    title: `إيصال-مرتب-${entry?.employeeCode || ""}`,
+  });
+
+  const cashboxOptions = Array.isArray(cashboxesData)
+    ? cashboxesData
+    : cashboxesData?.items ||
+      cashboxesData?.data ||
+      cashboxesData?.result ||
+      [];
+
+  useEffect(() => {
+    if (!showPayModal) {
+      return;
+    }
+
+    setCashboxId("");
+    setNotes("");
+    setPostingDate(new Date().toISOString().slice(0, 10));
+  }, [showPayModal]);
+
+  const handlePay = async () => {
+    if (!postingDate) {
+      toast.error("تاريخ الصرف مطلوب");
+      return;
+    }
+
+    if (!cashboxId) {
+      toast.error("اختار الخزنة اللي هيتم الصرف منها");
+      return;
+    }
+
+    if (!entry?.employeeId) {
+      toast.error("بيانات الموظف غير موجودة");
+      return;
+    }
+
+    const amount = Number(entry.netSalary);
+
+    if (!amount || amount <= 0) {
+      toast.error("صافي المرتب غير صالح للصرف");
+      return;
+    }
+
+    try {
+      await createEmployeeMovement({
+        employeeId: Number(entry.employeeId),
+        type: "Credit",
+        amount,
+        currency: entry.currency || "EGP",
+        exchangeRate: Number(entry.exchangeRate) || 1,
+        movementDate: postingDate,
+        cashboxId: Number(cashboxId),
+        notes:
+          notes.trim() ||
+          `صرف مرتب ${entry.startDate || ""} إلى ${entry.endDate || ""}`,
+      }).unwrap();
+
+      toast.success("تم صرف المرتب وتسجيل الحركة بنجاح");
+
+      setShowPayModal(false);
+      setNotes("");
+      setCashboxId("");
+
+      refetch();
+    } catch (error) {
+      toast.error(
+        error?.data?.message ||
+          error?.data?.detail ||
+          "حصل خطأ أثناء صرف المرتب، حاول تاني",
+      );
+    }
+  };
+
+  // ✅ الـ early returns بعد ما كل الـ hooks اتنادت
+  if (isLoading) {
+    return (
+      <div className="p-6 text-sm text-ink-400" dir="rtl">
+        جاري تحميل بيانات المرتب...
+      </div>
+    );
+  }
+
+  if (isError || !entry) {
+    return (
+      <div className="p-6 text-center" dir="rtl">
+        <p className="text-sm text-negative mb-3">تعذر تحميل بيانات المرتب</p>
+
+        <Button
+          variant="outline"
+          onClick={() => navigate("/dashboard/payroll/salaries")}
+        >
+          العودة للمرتبات
+        </Button>
+      </div>
+    );
+  }
+
+  const attendance = entry.attendanceSummary || {};
+
+  return (
+    <div className="animate-fadeUp space-y-5" dir="rtl">
+      {isFiscalYearReadOnly && (
+        <ReadOnlyFiscalYearBanner fiscalYear={fiscalYear} />
+      )}
+
+      <button
+        type="button"
+        onClick={() => navigate("/dashboard/payroll/salaries")}
+        className="flex items-center gap-1.5 text-sm text-emerald-700 hover:underline"
+      >
+        <ArrowRight size={14} />
+        رجوع لقائمة المرتبات
+      </button>
+
+      <div className="rounded-2xl border border-ink-400/10 bg-white shadow-card p-5">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center">
+                <User size={19} className="text-primary-600" />
+              </div>
+
+              <div>
+                <h1 className="text-xl font-bold text-ink-900">
+                  {entry.employeeName}
+                </h1>
+
+                <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-ink-400">
+                  {entry.employeeCode && <span>كود: {entry.employeeCode}</span>}
+
+                  <span>•</span>
+
+                  <span>
+                    {EMPLOYEE_TYPE[entry.employeeType] || entry.employeeType}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={print}>
+              <Printer size={14} />
+              طباعة
+            </Button>
+
+            <Button
+              onClick={() => setShowPayModal(true)}
+              disabled={isPaying || isFiscalYearReadOnly}
+            >
+              <Wallet size={14} />
+              صرف المرتب
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-5 pt-4 border-t border-ink-400/10">
+          <div className="flex items-center gap-2 text-sm text-ink-700">
+            <CalendarDays size={15} className="text-ink-400" />
+
+            <span>الفترة:</span>
+
+            <strong>{formatDate(entry.startDate)}</strong>
+
+            <span className="text-ink-400">إلى</span>
+
+            <strong>{formatDate(entry.endDate)}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        <SummaryCard label="إجمالي المرتب" value={entry.grossSalary} />
+
+        <SummaryCard
+          label="الإضافات والمكافآت"
+          value={entry.bonus}
+          positive
+          icon={<PlusCircle size={15} />}
+        />
+
+        <SummaryCard
+          label="الخصومات"
+          value={entry.deduction}
+          negative
+          icon={<MinusCircle size={15} />}
+        />
+
+        <SummaryCard label="صافي المرتب" value={entry.netSalary} primary />
+      </div>
+
+      <div className="rounded-2xl border border-ink-400/10 bg-white shadow-card p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Clock3 size={17} className="text-primary-600" />
+
+          <h2 className="text-sm font-bold text-ink-900">ملخص الحضور</h2>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <AttendanceCard label="أيام الحضور" value={attendance.presentDays} />
+
+          <AttendanceCard
+            label="أيام الغياب"
+            value={attendance.absentDays}
+            negative
+          />
+
+          <AttendanceCard
+            label="إجمالي أيام الحضور"
+            value={attendance.totalPresentDays}
+          />
+
+          <AttendanceCard
+            label="أيام الإضافي"
+            value={attendance.totalOvertimeDays}
+          />
+
+          <AttendanceCard
+            label="أيام الخصم"
+            value={attendance.totalDeductionDays}
+            negative
+          />
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-ink-400/10 bg-white shadow-card overflow-hidden">
+        <div className="px-5 py-4 border-b border-ink-400/10">
+          <h2 className="text-sm font-bold text-ink-900">ملخص حساب المرتب</h2>
+        </div>
+
+        <div className="divide-y divide-ink-400/5">
+          <SalaryRow label="إجمالي المرتب" value={entry.grossSalary} />
+
+          <SalaryRow label="الإضافات والمكافآت" value={entry.bonus} positive />
+
+          <SalaryRow label="الخصومات" value={entry.deduction} negative />
+
+          <div className="flex items-center justify-between px-5 py-4 bg-primary-500/[0.04]">
+            <span className="text-sm font-bold text-ink-900">صافي المرتب</span>
+
+            <span className="num text-xl font-bold text-primary-600">
+              {fmtMoney(entry.netSalary)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <Modal
+        isOpen={showPayModal}
+        onClose={() => !isPaying && setShowPayModal(false)}
+        title="صرف المرتب"
+      >
+        <div className="space-y-4">
+          <div className="rounded-xl bg-primary-50 border border-primary-100 p-4">
+            <p className="text-xs text-ink-400 mb-1">الموظف</p>
+
+            <p className="text-sm font-bold text-ink-900">
+              {entry.employeeName}
+            </p>
+
+            <p className="text-xs text-ink-400 mt-3">صافي المرتب</p>
+
+            <p className="text-xl font-bold num text-primary-600">
+              {fmtMoney(entry.netSalary)}
+            </p>
+          </div>
+
+          <CompactSelect
+            label="الخزنة"
+            value={cashboxId}
+            onChange={(value) => setCashboxId(value)}
+            options={cashboxOptions.map((cashbox) => ({
+              value: String(cashbox.id),
+              label:
+                cashbox.name ||
+                cashbox.cashboxName ||
+                cashbox.label ||
+                cashbox.code ||
+                `خزنة ${cashbox.id}`,
+            }))}
+            placeholder={
+              isCashboxesLoading ? "جاري تحميل الخزائن..." : "اختر الخزنة"
+            }
+            disabled={isCashboxesLoading || isPaying}
+          />
+
+          <Input
+            label="تاريخ الصرف"
+            type="date"
+            value={postingDate}
+            onChange={(e) => setPostingDate(e.target.value)}
+          />
+
+          <Input
+            label="ملاحظات"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="ملاحظات الصرف..."
+          />
+
+          <div className="rounded-xl border border-primary-100 bg-primary-50 px-3 py-2.5">
+            <p className="text-xs text-primary-700">
+              سيتم تسجيل المرتب كحركة موظف من نوع Credit، مع خصم قيمة المرتب من
+              الخزنة المحددة.
+            </p>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-3 border-t border-ink-400/10">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowPayModal(false)}
+              disabled={isPaying}
+            >
+              إلغاء
+            </Button>
+
+            <Button
+              type="button"
+              onClick={handlePay}
+              disabled={isPaying || isCashboxesLoading}
+            >
+              <Wallet size={14} />
+
+              {isPaying ? "جارِ تسجيل الصرف..." : "تأكيد صرف المرتب"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      <div style={{ display: "none" }}>
+        <div ref={printRef}>
+          <PayrollDetailPrintTemplate entry={entry} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SummaryCard({ label, value, positive, negative, primary, icon }) {
+  let valueClass = "text-ink-900";
+
+  if (positive) {
+    valueClass = "text-positive";
+  }
+
+  if (negative) {
+    valueClass = "text-negative";
+  }
+
+  if (primary) {
+    valueClass = "text-primary-600";
+  }
+
+  return (
+    <div className="rounded-2xl border border-ink-400/10 bg-white shadow-card p-4">
+      <div className="flex items-center gap-2 text-xs text-ink-400 mb-2">
+        {icon}
+        {label}
+      </div>
+
+      <p className={`num text-xl font-bold ${valueClass}`}>{fmtMoney(value)}</p>
+    </div>
+  );
+}
+
+function AttendanceCard({ label, value, negative }) {
+  return (
+    <div className="rounded-xl bg-ink-900/[0.025] border border-ink-400/5 p-3">
+      <p className="text-[11px] text-ink-400 mb-1">{label}</p>
+
+      <p
+        className={`num text-lg font-bold ${
+          negative ? "text-negative" : "text-ink-900"
+        }`}
+      >
+        {Number(value || 0)}
+      </p>
+    </div>
+  );
+}
+
+function SalaryRow({ label, value, positive, negative }) {
+  let valueClass = "text-ink-900";
+
+  if (positive) {
+    valueClass = "text-positive";
+  }
+
+  if (negative) {
+    valueClass = "text-negative";
+  }
+
+  return (
+    <div className="flex items-center justify-between px-5 py-3">
+      <span className="text-sm text-ink-600">{label}</span>
+
+      <span className={`num text-sm font-semibold ${valueClass}`}>
+        {fmtMoney(value)}
+      </span>
+    </div>
+  );
+}

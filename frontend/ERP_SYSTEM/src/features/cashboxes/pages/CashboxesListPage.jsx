@@ -1,0 +1,430 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Plus,
+  ArrowLeftRight,
+  Search,
+  SlidersHorizontal,
+  RotateCcw,
+} from "lucide-react";
+import { toast } from "sonner";
+import {
+  useGetCashboxesQuery,
+  useDeleteCashboxMutation,
+} from "../cashboxesApi";
+import CashboxCard from "../components/CashboxCard";
+import CashboxFormModal from "../components/CashboxFormModal";
+import CashboxTransferModal from "../components/CashboxTransferFormModal";
+import { useCashboxScope } from "../hooks/useCashboxScope";
+import Pagination from "../../../shared/components/ui/Pagination";
+import Button from "../../../shared/components/ui/Button";
+import DeleteConfirmModal from "../../../shared/components/ui/DeleteConfirmModal";
+
+export default function CashboxesListPage() {
+  const navigate = useNavigate();
+
+  // صلاحية إنشاء/تعديل/حذف الخزائن نفسها تحتاج وصول كامل لكل خزائن
+  // الشركة (hasAllCashboxes). غير كذا المستخدم بيتعامل مع الخزائن
+  // المسموح له بها بس.
+  const {
+    hasAllCashboxes,
+    executeCashboxIds,
+    isReady: isScopeReady,
+  } = useCashboxScope();
+  // أثناء تحميل النطاق (أو لو رجع خطأ) بنسيب الأزرار ظاهرة؛ السيرفر
+  // بيتحقق وقت التنفيذ. بعد التحميل بيتطبّق القفل الفعلي.
+  const canManageCashboxes = !isScopeReady || hasAllCashboxes;
+  const canTransfer =
+    !isScopeReady || hasAllCashboxes || executeCashboxIds.length > 0;
+
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
+
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
+  const [currency, setCurrency] = useState("");
+  const [isActive, setIsActive] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [editingCashbox, setEditingCashbox] = useState(null);
+  const [cashboxToDelete, setCashboxToDelete] = useState(null);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPageNumber(1);
+    }, 400);
+
+    return () => clearTimeout(timeout);
+  }, [searchInput]);
+
+  const {
+    data: cashboxes,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useGetCashboxesQuery({
+    pageNumber,
+    pageSize,
+    search: search || undefined,
+    code: code || undefined,
+    name: name || undefined,
+    currency: currency || undefined,
+    isActive: isActive === "" ? undefined : isActive === "true",
+  });
+
+  const items = cashboxes?.items ?? [];
+
+  const [deleteCashbox, { isLoading: isDeleting }] = useDeleteCashboxMutation();
+
+  const handleDelete = (cashbox) => {
+    setCashboxToDelete(cashbox);
+  };
+
+  const confirmDelete = async () => {
+    if (!cashboxToDelete) return;
+
+    try {
+      await deleteCashbox(cashboxToDelete.id).unwrap();
+      toast.success("تم حذف الخزنة بنجاح");
+      setCashboxToDelete(null);
+    } catch (err) {
+      const code = err?.data?.code ?? err?.data?.errorCode;
+
+      if (code === "Cashboxes.HasVouchers") {
+        toast.error(
+          err?.data?.detail ||
+            "لا يمكن حذف الخزنة لوجود سندات غير محذوفة عليها (حتى المسودات) في سنة مالية. احذف السندات أو رحّلها أولًا.",
+        );
+        return;
+      }
+
+      if (code === "Cashboxes.HasMovements") {
+        toast.error(
+          err?.data?.detail ||
+            "لا يمكن حذف الخزنة لوجود تحويل نشط أو قيد يومية خزنة قائم. أنهِ الحركات المرتبطة أولًا.",
+        );
+        return;
+      }
+
+      if (code === "Cashboxes.Concurrency") {
+        toast.error("تم تعديل الخزنة من مكان آخر، حدّث الصفحة وحاول تاني");
+        return;
+      }
+
+      toast.error(
+        err?.data?.message ||
+          err?.data?.title ||
+          err?.data?.detail ||
+          "حصل خطأ أثناء حذف الخزنة، حاول تاني",
+      );
+    }
+  };
+
+  const openCreate = () => {
+    setEditingCashbox(null);
+    setShowFormModal(true);
+  };
+
+  const openEdit = (cashbox) => {
+    setEditingCashbox(cashbox);
+    setShowFormModal(true);
+  };
+
+  const resetFilters = () => {
+    setSearchInput("");
+    setSearch("");
+    setCode("");
+    setName("");
+    setCurrency("");
+    setIsActive("");
+    setPageNumber(1);
+  };
+
+  const hasActiveFilters = Boolean(
+    search || code || name || currency || isActive,
+  );
+
+  return (
+    <div dir="rtl" className="animate-fadeUp space-y-4 p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/20 bg-white p-5 shadow-sm">
+        <div>
+          <h1 className="text-xl font-bold text-ink">الخزائن</h1>
+
+          <p className="mt-1 text-sm text-ink/60">
+            إدارة الخزائن النقدية والحسابات البنكية
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowFilters((state) => !state)}
+              className={`flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-sm font-medium transition-colors ${
+                showFilters
+                  ? "border-emerald-600 bg-emerald-50 text-emerald-800"
+                  : "border-gold/30 bg-white text-ink/70 hover:bg-ink/5"
+              }`}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              فلاتر
+              {hasActiveFilters && (
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+              )}
+            </button>
+
+            {showFilters && (
+              <>
+                <div
+                  className="fixed inset-0 z-10"
+                  onClick={() => setShowFilters(false)}
+                />
+
+                <div className="absolute left-0 z-20 mt-2 w-80 animate-fadeUp space-y-3 rounded-2xl border border-gold/20 bg-white p-4 shadow-lg">
+                  <div>
+                    <label className="mb-1.5 block text-xs text-ink/50">
+                      بحث
+                    </label>
+
+                    <div className="relative">
+                      <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
+
+                      <input
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        placeholder="ابحث بالكود أو الاسم..."
+                        className="w-full rounded-xl border border-gold/30 bg-white py-2 pe-9 ps-3 text-sm outline-none transition-colors focus:border-emerald-600"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs text-ink/50">
+                      الكود
+                    </label>
+
+                    <input
+                      value={code}
+                      onChange={(e) => {
+                        setCode(e.target.value);
+                        setPageNumber(1);
+                      }}
+                      placeholder="كود الخزنة..."
+                      className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs text-ink/50">
+                      اسم الخزنة
+                    </label>
+
+                    <input
+                      value={name}
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        setPageNumber(1);
+                      }}
+                      placeholder="اسم الخزنة..."
+                      className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs text-ink/50">
+                      العملة
+                    </label>
+
+                    <select
+                      value={currency}
+                      onChange={(e) => {
+                        setCurrency(e.target.value);
+                        setPageNumber(1);
+                      }}
+                      className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
+                    >
+                      <option value="">كل العملات</option>
+                      <option value="EGP">EGP</option>
+                      <option value="USD">USD</option>
+                      <option value="EUR">EUR</option>
+                      <option value="GBP">GBP</option>
+                      <option value="SAR">SAR</option>
+                      <option value="AED">AED</option>
+                      <option value="KWD">KWD</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="mb-1.5 block text-xs text-ink/50">
+                      الحالة
+                    </label>
+
+                    <select
+                      value={isActive}
+                      onChange={(e) => {
+                        setIsActive(e.target.value);
+                        setPageNumber(1);
+                      }}
+                      className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
+                    >
+                      <option value="">كل الحالات</option>
+                      <option value="true">نشطة فقط</option>
+                      <option value="false">غير نشطة فقط</option>
+                    </select>
+                  </div>
+
+                  {hasActiveFilters && (
+                    <button
+                      type="button"
+                      onClick={resetFilters}
+                      className="flex items-center gap-1.5 pt-1 text-xs text-ink/50 transition-colors hover:text-emerald-700"
+                    >
+                      <RotateCcw className="h-3 w-3" />
+                      إعادة تعيين الفلاتر
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+
+          {canTransfer && (
+            <Button
+              variant="outline"
+              onClick={() => setShowTransferModal(true)}
+            >
+              <ArrowLeftRight size={16} />
+              تحويل بين الخزائن
+            </Button>
+          )}
+
+          {canManageCashboxes && (
+            <Button onClick={openCreate}>
+              <Plus size={16} />
+              خزنة جديدة
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {isLoading && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[...Array(6)].map((_, index) => (
+            <div
+              key={index}
+              className="h-64 animate-pulse rounded-2xl bg-ink/5"
+            />
+          ))}
+        </div>
+      )}
+
+      {isError && !isLoading && (
+        <div className="rounded-2xl border border-dashed border-red-200 bg-white py-20 text-center">
+          <p className="mb-3 text-red-500">حدث خطأ أثناء تحميل الخزائن</p>
+
+          <Button variant="outline" onClick={refetch}>
+            إعادة المحاولة
+          </Button>
+        </div>
+      )}
+
+      {!isLoading && !isError && items.length === 0 && (
+        <div className="rounded-2xl border border-dashed border-ink-400/20 bg-white py-20 text-center">
+          <p className="mb-3 text-ink-400">
+            {hasActiveFilters ? "مفيش خزائن مطابقة للفلاتر" : "مفيش خزائن لسه"}
+          </p>
+
+          {hasActiveFilters ? (
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-gold/30 px-4 py-2 text-sm text-ink transition-colors hover:bg-ink/5"
+            >
+              <RotateCcw className="h-4 w-4" />
+              إعادة تعيين الفلاتر
+            </button>
+          ) : canManageCashboxes ? (
+            <button
+              type="button"
+              onClick={openCreate}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-800"
+            >
+              <Plus className="h-4 w-4" />
+              إضافة خزنة جديدة
+            </button>
+          ) : null}
+        </div>
+      )}
+
+      {!isLoading && !isError && items.length > 0 && (
+        <div
+          className={`grid grid-cols-1 gap-4 transition-opacity duration-200 sm:grid-cols-2 lg:grid-cols-3 ${
+            isFetching ? "opacity-60" : "opacity-100"
+          }`}
+        >
+          {items.map((cashbox) => (
+            <CashboxCard
+              key={cashbox.id}
+              cashbox={cashbox}
+              onClick={() => navigate(`/dashboard/treasury/${cashbox.id}`)}
+              onEdit={canManageCashboxes ? openEdit : undefined}
+              onDelete={canManageCashboxes ? handleDelete : undefined}
+            />
+          ))}
+        </div>
+      )}
+
+      {cashboxes?.totalCount > 0 && (
+        <Pagination
+          page={pageNumber}
+          pageSize={pageSize}
+          totalCount={cashboxes.totalCount}
+          totalPages={cashboxes.totalPages ?? 1}
+          isFetching={isFetching}
+          onPageChange={setPageNumber}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPageNumber(1);
+          }}
+          label="خزنة"
+        />
+      )}
+
+      <CashboxFormModal
+        isOpen={showFormModal}
+        onClose={() => setShowFormModal(false)}
+        cashbox={editingCashbox}
+        onSaved={(saved) => {
+          if (!editingCashbox && saved?.id) {
+            navigate(`/dashboard/treasury/${saved.id}`);
+          }
+        }}
+      />
+
+      <DeleteConfirmModal
+        isOpen={!!cashboxToDelete}
+        onClose={() => setCashboxToDelete(null)}
+        onConfirm={confirmDelete}
+        itemName={cashboxToDelete?.name}
+        title="حذف الخزنة"
+        description="الحذف بيشيل الخزنة من القوائم والاختيارات، لكن السجلات التاريخية بتفضل محفوظة. لازم تكون كل السندات والحركات المرتبطة اتحذفت الأول — لو لسه فيه سندات أو حركات، السيرفر هيرفض الحذف ويوضح السبب."
+        isDeleting={isDeleting}
+      />
+
+      <CashboxTransferModal
+        isOpen={showTransferModal}
+        onClose={() => setShowTransferModal(false)}
+        cashboxes={items}
+        onSaved={() => {
+          refetch();
+        }}
+      />
+    </div>
+  );
+}

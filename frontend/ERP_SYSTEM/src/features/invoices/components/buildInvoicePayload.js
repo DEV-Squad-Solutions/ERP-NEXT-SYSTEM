@@ -1,0 +1,396 @@
+// features/invoices/components/buildInvoicePayload.js
+
+const invoiceTypeMap = {
+  sale: "Sales",
+  purchase: "Purchase",
+  salesReturn: "SalesReturn",
+  purchaseReturn: "PurchaseReturn",
+};
+
+const paymentTermMap = {
+  cash: "Cash",
+  credit: "Credit",
+};
+
+const contentTypeMap = {
+  items: "Items",
+  containers: "Containers",
+};
+
+function withOptionalNumber(obj, key, value) {
+  if (value !== undefined && value !== null && value !== "") {
+    obj[key] = Number(value);
+  }
+
+  return obj;
+}
+
+function withOptionalString(obj, key, value) {
+  if (value !== undefined && value !== null && value !== "") {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+// بنضيف الرقم فقط لو أكبر من صفر
+function withPositiveNumber(obj, key, value) {
+  if (
+    value !== undefined &&
+    value !== null &&
+    value !== "" &&
+    Number(value) > 0
+  ) {
+    obj[key] = Number(value);
+  }
+
+  return obj;
+}
+
+function buildLineObject({ line, isReturnInvoice }) {
+  const lineObj = {
+    price: Number(line.price) || 0,
+    notes: line.notes || "",
+  };
+
+  // =====================================================
+  // مهم جدًا — الفيكس الأساسي:
+  //
+  // لازم نبعت id السطر نفسه لو السطر ده موجود بالفعل في الفاتورة
+  // (يعني جاي من invoice.lines وقت التعديل)، وإلا السيرفر مالوش
+  // أي وسيلة يربط بيها الـ line object ده بسطر موجود في الداتابيز
+  // عشان يعمل update عليه — فأي تعديل (زي السعر) على سطر قديم كان
+  // بيضيع بصمت لأن مفيش id بيوصل خالص.
+  //
+  // ده منفصل تمامًا عن sourceInvoiceLineId اللي بيشاور على سطر
+  // الفاتورة *الأصلية* في حالة المرتجع — مش نفس المفهوم.
+  // =====================================================
+
+  withOptionalNumber(lineObj, "id", line.id);
+
+  if (line.isTemporaryItem) {
+    lineObj.itemName = (line.itemName || "").trim();
+  } else {
+    lineObj.itemId = Number(line.itemId);
+  }
+
+  const hasCount =
+    line.count !== undefined && line.count !== null && line.count !== "";
+
+  const hasWeight =
+    line.weight !== undefined && line.weight !== null && line.weight !== "";
+
+  if (hasCount && hasWeight) {
+    withOptionalNumber(lineObj, "count", line.count);
+    withOptionalNumber(lineObj, "weight", line.weight);
+  } else {
+    withOptionalNumber(lineObj, "quantity", line.quantity);
+  }
+
+  if (isReturnInvoice) {
+    withOptionalNumber(
+      lineObj,
+      "sourceInvoiceLineId",
+      line.sourceInvoiceLineId,
+    );
+
+    withOptionalNumber(lineObj, "returnUnitCost", line.returnUnitCost);
+
+    // لو السعر اتغيّر عن السعر الأصلي في الفاتورة المصدر، لازم يبقى
+    // ManualPrice ومعاه سبب الاختلاف. غير كده OriginalPrice من غير سبب.
+    const priceChanged =
+      line.originalPrice !== undefined &&
+      line.originalPrice !== null &&
+      Number(line.price) !== Number(line.originalPrice);
+
+    lineObj.returnPriceMode = priceChanged ? "ManualPrice" : "OriginalPrice";
+
+    if (priceChanged) {
+      lineObj.returnPriceDifferenceReason =
+        line.returnPriceDifferenceReason?.trim() || "";
+    }
+  }
+
+  return lineObj;
+}
+
+function buildLinesForCreate({ lines, isReturnInvoice }) {
+  const result = [];
+
+  for (const line of lines) {
+    const hasValidItem = line.isTemporaryItem
+      ? Boolean(line.itemName?.trim())
+      : Boolean(line.itemId);
+
+    if (!hasValidItem || !(Number(line.quantity) > 0)) {
+      continue;
+    }
+
+    // المرتجع لازم يكون مربوط بسطر حقيقي من فاتورة أصلية
+    if (
+      isReturnInvoice &&
+      (line.isTemporaryItem || !line.sourceInvoiceLineId)
+    ) {
+      continue;
+    }
+
+    result.push(
+      buildLineObject({
+        line,
+        isReturnInvoice,
+      }),
+    );
+  }
+
+  return result;
+}
+
+// الحاويات متاحة مع جميع أنواع الفواتير
+function buildContainerLinesForCreate({ containersMovement }) {
+  return (containersMovement?.items || []).map((item) => ({
+    containerId: Number(item.containerId),
+    outgoingUnits: Number(item.issuedQuantity) || 0,
+    incomingUnits: Number(item.receivedQuantity) || 0,
+  }));
+}
+
+/**
+ * السائق الفعلي أصبح String فقط.
+ *
+ * قبل:
+ * actualDriverId
+ * externalDriverName
+ * usesExternalDriver
+ *
+ * الآن:
+ * actualDriverName
+ */
+function withActualDriver(obj, header) {
+  withOptionalString(obj, "actualDriverName", header.actualDriverName);
+
+  return obj;
+}
+
+export function buildCreateInvoiceRequest({
+  movementType,
+  header,
+  lines,
+  containersMovement,
+  isTemporaryDriver,
+}) {
+  const isSalesInvoice = movementType === "sale";
+
+  const isReturnInvoice =
+    movementType === "salesReturn" || movementType === "purchaseReturn";
+
+  const resolvedInvoiceType = invoiceTypeMap[movementType];
+
+  const resolvedPaymentTerm = paymentTermMap[header.paymentMethod];
+
+  const resolvedContentType = contentTypeMap[header.invoiceContentType];
+
+  // فاتورة عبوات فقط: سطور الأصناف فاضية والقيمة المالية صفر
+  // (مفيش خصم/مدفوع/خزنة) حتى لو فيه قيم قديمة في الفورم.
+  const isContainersInvoice = resolvedContentType === "Containers";
+
+  const builtLines = isContainersInvoice
+    ? []
+    : buildLinesForCreate({
+        lines,
+        isReturnInvoice,
+      });
+
+  const paidAmount = isContainersInvoice ? 0 : Number(header.paid) || 0;
+  const discountAmount = isContainersInvoice
+    ? 0
+    : Number(header.discount) || 0;
+
+  // في فاتورة العبوات فقط، الباك إند بيشترط إن storeId يكون هو مخزن
+  // العبوات نفسه، مش المخزن العادي المختار في الفورم.
+  const storeId = isContainersInvoice
+    ? containersMovement?.containerStoreId ?? header.storeId
+    : header.storeId;
+
+  const payload = {
+    invoiceNumber: header.invoiceNumber,
+
+    invoiceType: resolvedInvoiceType,
+
+    contentType: resolvedContentType,
+
+    paymentTerm: resolvedPaymentTerm,
+
+    invoiceDate: header.date,
+
+    dueDate: header.dueDate || header.date,
+
+    storeId: Number(storeId),
+
+    businessPartnerId: Number(header.partyId),
+
+    vehicleNumber: header.carNumber || "",
+
+    exportInvoiceCode: header.exportInvoiceCode || "",
+
+    discountAmount,
+
+    paidAmount,
+
+    notes: header.generalNotes || "",
+
+    lines: builtLines,
+
+    // الحاويات متاحة مع جميع أنواع الفواتير
+    containerLines: buildContainerLinesForCreate({
+      containersMovement,
+    }),
+  };
+
+  withOptionalNumber(payload, "itemsCategoryId", header.itemsCategoryId);
+
+  withOptionalString(payload, "partnerInvoiceNo", header.partnerInvoiceNo);
+
+  // مخزن الحاويات متاح مع جميع أنواع الفواتير
+  withOptionalNumber(
+    payload,
+    "containerStoreId",
+    containersMovement?.containerStoreId,
+  );
+
+  withOptionalNumber(payload, "countryId", header.countryId);
+
+  // السائق الأساسي
+  withOptionalNumber(
+    payload,
+    "driverId",
+    isTemporaryDriver ? null : header.driverId,
+  );
+
+  // السائق الفعلي كنص
+  withActualDriver(payload, header);
+
+  withOptionalNumber(payload, "exchangeRate", header.exchangeRate);
+
+  if (paidAmount > 0) {
+    withOptionalNumber(payload, "cashboxId", header.cashboxId);
+
+    withOptionalNumber(
+      payload,
+      "cashboxExchangeRate",
+      header.cashboxExchangeRate,
+    );
+  }
+
+  withOptionalNumber(payload, "wbWeight", header.WBWeight);
+
+  withOptionalNumber(payload, "wbScaleDifference", header.WBScaleDifference);
+
+  withOptionalNumber(payload, "wbDiscount", header.WBDiscount);
+
+  withPositiveNumber(payload, "wbTotal", header.wbTotal);
+
+  return payload;
+}
+
+export function buildInvoiceUpdateBody({
+  form,
+  lines,
+  containerLines,
+  rowVersion,
+}) {
+  const isReturnInvoice =
+    form.invoiceType === "SalesReturn" || form.invoiceType === "PurchaseReturn";
+
+  // فاتورة عبوات فقط: مفيش سطور أصناف ولا قيمة مالية.
+  const isContainersInvoice = form.contentType === "Containers";
+
+  const validLines = isContainersInvoice
+    ? []
+    : buildLinesForCreate({
+        lines,
+        isReturnInvoice,
+      });
+
+  const paidAmount = isContainersInvoice ? 0 : Number(form.paidAmount) || 0;
+
+  const discountAmount = isContainersInvoice
+    ? 0
+    : Number(form.discountAmount) || 0;
+
+  // في فاتورة العبوات فقط، الباك إند بيشترط إن storeId يكون هو مخزن
+  // العبوات نفسه، مش المخزن العادي.
+  const storeId = isContainersInvoice
+    ? form.containerStoreId ?? form.storeId
+    : form.storeId;
+
+  const body = {
+    invoiceType: form.invoiceType,
+
+    paymentTerm: form.paymentTerm,
+
+    contentType: form.contentType,
+
+    invoiceDate: form.invoiceDate,
+
+    dueDate: form.dueDate || form.invoiceDate,
+
+    businessPartnerId: Number(form.businessPartnerId),
+
+    storeId: Number(storeId),
+
+    vehicleNumber: form.vehicleNumber || "",
+
+    exportInvoiceCode: form.exportInvoiceCode || "",
+
+    discountAmount,
+
+    paidAmount,
+
+    notes: form.notes || "",
+
+    lines: validLines,
+
+    // الحاويات متاحة مع جميع أنواع الفواتير
+    containerLines: (containerLines || []).map((c) => ({
+      containerId: Number(c.containerId),
+
+      outgoingUnits: Number(c.outgoingUnits) || 0,
+
+      incomingUnits: Number(c.incomingUnits) || 0,
+    })),
+
+    rowVersion,
+  };
+
+  withOptionalNumber(body, "containerStoreId", form.containerStoreId);
+
+  withOptionalNumber(body, "countryId", form.countryId);
+
+  // السائق الأساسي
+  withOptionalNumber(body, "driverId", form.driverId);
+
+  // السائق الفعلي كنص
+  withActualDriver(body, form);
+
+  withOptionalString(body, "partnerInvoiceNo", form.partnerInvoiceNo);
+
+  withOptionalNumber(body, "itemsCategoryId", form.itemsCategoryId);
+
+  withOptionalNumber(body, "exchangeRate", form.exchangeRate);
+
+  if (paidAmount > 0) {
+    withOptionalNumber(body, "cashboxId", form.cashboxId);
+
+    withOptionalNumber(body, "cashboxExchangeRate", form.cashboxExchangeRate);
+  }
+
+  withOptionalNumber(body, "wbWeight", form.wbWeight);
+
+  withOptionalNumber(body, "wbScaleDifference", form.wbScaleDifference);
+
+  withOptionalNumber(body, "wbDiscount", form.wbDiscount);
+
+  withPositiveNumber(body, "wbTotal", form.wbTotal);
+
+  return body;
+}

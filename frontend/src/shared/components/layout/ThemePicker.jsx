@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Moon, Palette, Sun } from "lucide-react";
+import { useSelector } from "react-redux";
+import { selectIsAdmin } from "../../../features/auth/authSlice";
+import {
+  useGetThemeQuery,
+  useSetCompanyThemeMutation,
+  useSetMyThemeMutation,
+} from "../../../features/theme/themeApi";
 
 import {
   COLOR_THEMES,
@@ -14,6 +21,24 @@ export default function ThemePicker() {
   const [mode, setMode] = useState(getMode);
   const [color, setColor] = useState(getColorTheme);
   const ref = useRef(null);
+  const isAdmin = useSelector(selectIsAdmin);
+  const { data: server } = useGetThemeQuery();
+  const [setMyTheme] = useSetMyThemeMutation();
+  const [setCompanyTheme, { isLoading: savingCompany }] =
+    useSetCompanyThemeMutation();
+
+  // Server wins: user's own choice, else the company default.
+  useEffect(() => {
+    if (!server) return;
+    const nextMode = server.effectiveMode === "dark" ? "dark" : "light";
+    const nextColor = COLOR_THEMES.some((t) => t.id === server.effectiveColorTheme)
+      ? server.effectiveColorTheme
+      : "default";
+    applyMode(nextMode);
+    applyColorTheme(nextColor);
+    setMode(nextMode);
+    setColor(nextColor);
+  }, [server]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -27,11 +52,13 @@ export default function ThemePicker() {
   const chooseMode = (next) => {
     applyMode(next);
     setMode(next);
+    setMyTheme({ colorTheme: color, mode: next });
   };
 
   const chooseColor = (id) => {
     applyColorTheme(id);
     setColor(id);
+    setMyTheme({ colorTheme: id, mode });
   };
 
   return (
@@ -95,6 +122,32 @@ export default function ThemePicker() {
               </li>
             ))}
           </ul>
+
+          <div className="mt-3 space-y-1.5 border-t border-ink-100 pt-3 text-xs dark:border-white/10">
+            {server?.userColorTheme || server?.userMode ? (
+              <button
+                type="button"
+                onClick={() => setMyTheme({ colorTheme: null, mode: null })}
+                className="w-full rounded-lg border border-ink-100 px-2 py-1.5 text-ink-500 hover:bg-ink-50 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/5"
+              >
+                استخدام افتراضي الشركة
+              </button>
+            ) : (
+              <p className="text-ink-400 dark:text-slate-400">
+                بتستخدم الافتراضي اللي حدده الأدمن للشركة.
+              </p>
+            )}
+            {isAdmin && (
+              <button
+                type="button"
+                disabled={savingCompany}
+                onClick={() => setCompanyTheme({ colorTheme: color, mode })}
+                className="w-full rounded-lg bg-primary-500 px-2 py-1.5 font-semibold text-white disabled:opacity-60"
+              >
+                {savingCompany ? "جارٍ الحفظ..." : "تعيين كافتراضي للشركة"}
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

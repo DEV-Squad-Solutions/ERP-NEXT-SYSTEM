@@ -9,6 +9,7 @@ export const baseApi = createApi({
   tagTypes: [
     // ==================== Auth / Administration ====================
     "Company",
+    "Theme",
     "User",
 
     // ==================== Partners ====================

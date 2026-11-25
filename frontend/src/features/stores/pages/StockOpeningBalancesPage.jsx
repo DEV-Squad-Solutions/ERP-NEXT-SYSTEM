@@ -18,6 +18,7 @@ import { useFiscalYearGuard } from "../../../lib/useFiscalYearGuard";
 import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFiscalYearBanner";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
 const emptyFilters = {
   documentNumber: "",
   storeId: "",
@@ -87,13 +88,13 @@ export default function StockOpeningBalancesPage() {
   };
 
   const handleDelete = async (item) => {
-    if (!window.confirm(`متأكد من حذف السند "${item.documentNumber}"؟`)) return;
+    if (!window.confirm(t("متأكد من حذف السند \"{0}\"؟", { 0: item.documentNumber }))) return;
     setDeletingId(item.id);
     try {
       await deleteBalance(item.id).unwrap();
-      toast.success("تم حذف الرصيد الافتتاحي المخزني");
+      toast.success(t("تم حذف الرصيد الافتتاحي المخزني"));
     } catch {
-      toast.error("تعذر حذف الرصيد الافتتاحي");
+      toast.error(t("تعذر حذف الرصيد الافتتاحي"));
     } finally {
       setDeletingId(null);
     }
@@ -113,7 +114,7 @@ export default function StockOpeningBalancesPage() {
           className="inline-flex items-center gap-2 text-sm text-ink-500 hover:text-primary-600 transition"
         >
           <ArrowRight size={16} />
-          العودة للأرصدة الافتتاحية
+          {t("العودة للأرصدة الافتتاحية")}
         </button>
 
         <StockOpeningBalanceForm
@@ -130,10 +131,10 @@ export default function StockOpeningBalancesPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-ink-900">
-            الأرصدة الافتتاحية المخزنية
+            {t("الأرصدة الافتتاحية المخزنية")}
           </h2>
           <p className="mt-1 text-sm text-ink-400">
-            تسجيل الأرصدة الافتتاحية للأصناف بكل مخزن
+            {t("تسجيل الأرصدة الافتتاحية للأصناف بكل مخزن")}
           </p>
         </div>
 
@@ -143,7 +144,7 @@ export default function StockOpeningBalancesPage() {
           disabled={isFiscalYearReadOnly}
         >
           <Plus size={14} />
-          إضافة رصيد افتتاحي
+          {t("إضافة رصيد افتتاحي")}
         </Button>
       </div>
 
@@ -155,7 +156,7 @@ export default function StockOpeningBalancesPage() {
         <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              رقم المستند
+              {t("رقم المستند")}
             </label>
             <input
               type="text"
@@ -167,7 +168,7 @@ export default function StockOpeningBalancesPage() {
 
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              المخزن
+              {t("المخزن")}
             </label>
             <CompactSelect
               options={
@@ -175,13 +176,13 @@ export default function StockOpeningBalancesPage() {
               }
               value={draft.storeId}
               onChange={(value) => setField("storeId", value)}
-              placeholder="الكل"
+              placeholder={t("الكل")}
             />
           </div>
 
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              من تاريخ
+              {t("من تاريخ")}
             </label>
             <DateInput
               type="date"
@@ -193,7 +194,7 @@ export default function StockOpeningBalancesPage() {
 
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              إلى تاريخ
+              {t("إلى تاريخ")}
             </label>
             <DateInput
               type="date"
@@ -207,11 +208,11 @@ export default function StockOpeningBalancesPage() {
         <div className="mt-3 flex justify-end gap-2">
           <Button variant="outline" onClick={handleReset} className="h-9">
             <RotateCcw size={14} />
-            إعادة تعيين
+            {t("إعادة تعيين")}
           </Button>
           <Button onClick={handleSearch} disabled={isFetching} className="h-9">
             <Search size={14} />
-            بحث
+            {t("بحث")}
           </Button>
         </div>
       </div>

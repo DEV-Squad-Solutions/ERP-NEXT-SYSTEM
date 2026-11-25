@@ -9,6 +9,7 @@ import {
 import { toast } from "sonner";
 import Modal from "../../../shared/components/ui/Modal";
 
+import { t } from "../../../i18n";
 const DEFAULT_FLAG_DIRECTION = {
   isDefaultForSales: "Receipt",
   isDefaultForPurchaseReturn: "Receipt",
@@ -17,10 +18,10 @@ const DEFAULT_FLAG_DIRECTION = {
 };
 
 const CLASSIFICATION_OPTIONS = [
-  { value: "PartnerSettlement", label: "تسوية عميل/مورد" },
-  { value: "Expense", label: "مصروفات" },
-  { value: "Revenue", label: "إيرادات" },
-  { value: "Other", label: "أخرى" },
+  { value: "PartnerSettlement", label: t("تسوية عميل/مورد") },
+  { value: "Expense", label: t("مصروفات") },
+  { value: "Revenue", label: t("إيرادات") },
+  { value: "Other", label: t("أخرى") },
 ];
 
 const schema = z
@@ -28,15 +29,15 @@ const schema = z
     name: z
       .string()
       .trim()
-      .min(1, "اسم النوع مطلوب")
-      .max(100, "الاسم طويل جدًا"),
+      .min(1, t("اسم النوع مطلوب"))
+      .max(100, t("الاسم طويل جدًا")),
     direction: z.enum(["Receipt", "Payment"], {
-      errorMap: () => ({ message: "اختر اتجاه الحركة" }),
+      errorMap: () => ({ message: t("اختر اتجاه الحركة") }),
     }),
     classification: z.enum(
       ["PartnerSettlement", "Expense", "Revenue", "Other"],
       {
-        errorMap: () => ({ message: "اختر تصنيف النوع" }),
+        errorMap: () => ({ message: t("اختر تصنيف النوع") }),
       },
     ),
     forPartner: z.boolean(),
@@ -47,7 +48,7 @@ const schema = z
     isDefaultForPurchaseReturn: z.boolean(),
     notes: z
       .string()
-      .max(500, "الملاحظات طويلة جدًا")
+      .max(500, t("الملاحظات طويلة جدًا"))
       .optional()
       .or(z.literal("")),
   })
@@ -57,7 +58,7 @@ const schema = z
       ctx.addIssue({
         code: z.custom,
         path: ["forPartner"],
-        message: 'تصنيف "تسوية عميل/مورد" لازم يكون مرتبط بعميل/مورد',
+        message: t("تصنيف \"تسوية عميل/مورد\" لازم يكون مرتبط بعميل/مورد"),
       });
     }
 
@@ -69,7 +70,7 @@ const schema = z
         ctx.addIssue({
           code: z.custom,
           path: [flag],
-          message: `الافتراضي ده لازم يكون اتجاهه ${requiredDirection === "Receipt" ? "قبض" : "صرف"}`,
+          message: t("الافتراضي ده لازم يكون اتجاهه {0}", { 0: requiredDirection === "Receipt" ? "قبض" : "صرف" }),
         });
       }
     }
@@ -85,7 +86,7 @@ const schema = z
       ctx.addIssue({
         code: z.custom,
         path: ["isDefaultForSales"],
-        message: 'الافتراضي للفواتير متاح بس لتصنيف "تسوية عميل/مورد"',
+        message: t("الافتراضي للفواتير متاح بس لتصنيف \"تسوية عميل/مورد\""),
       });
     }
 
@@ -93,7 +94,7 @@ const schema = z
       ctx.addIssue({
         code: z.custom,
         path: ["isActive"],
-        message: "النوع لازم يكون نشط عشان يبقى افتراضي لفاتورة",
+        message: t("النوع لازم يكون نشط عشان يبقى افتراضي لفاتورة"),
       });
     }
   });
@@ -114,22 +115,22 @@ const DEFAULT_VALUES = {
 const DEFAULT_FLAG_LABELS = [
   {
     key: "isDefaultForSales",
-    label: "افتراضي لفواتير البيع",
+    label: t("افتراضي لفواتير البيع"),
     direction: "Receipt",
   },
   {
     key: "isDefaultForPurchaseReturn",
-    label: "افتراضي لمرتجع المشتريات",
+    label: t("افتراضي لمرتجع المشتريات"),
     direction: "Receipt",
   },
   {
     key: "isDefaultForPurchase",
-    label: "افتراضي لفواتير الشراء",
+    label: t("افتراضي لفواتير الشراء"),
     direction: "Payment",
   },
   {
     key: "isDefaultForSalesReturn",
-    label: "افتراضي لمرتجع المبيعات",
+    label: t("افتراضي لمرتجع المبيعات"),
     direction: "Payment",
   },
 ];
@@ -213,10 +214,10 @@ export default function CashMovementTypeFormModal({
   }, [direction, setValue]);
 
   const accentEffect = useMemo(() => {
-    if (!forPartner) return "بدون تأثير على حساب عميل/مورد";
+    if (!forPartner) return t("بدون تأثير على حساب عميل/مورد");
     return direction === "Receipt"
-      ? "دائن (Credit) على حساب العميل/المورد"
-      : "مدين (Debit) على حساب العميل/المورد";
+      ? t("دائن (Credit) على حساب العميل/المورد")
+      : t("مدين (Debit) على حساب العميل/المورد");
   }, [direction, forPartner]);
 
   const canEditDefaults = classification === "PartnerSettlement";
@@ -230,17 +231,17 @@ export default function CashMovementTypeFormModal({
           rowVersion: editingType.rowVersion,
           ...payload,
         }).unwrap();
-        toast.success("تم تعديل نوع الحركة");
+        toast.success(t("تم تعديل نوع الحركة"));
       } else {
         await createType(payload).unwrap();
-        toast.success("تم إنشاء نوع الحركة");
+        toast.success(t("تم إنشاء نوع الحركة"));
       }
       onClose();
     } catch (err) {
       if (err?.status === 409) {
-        toast.error("في نوع حركة بنفس الاسم والاتجاه موجود بالفعل");
+        toast.error(t("في نوع حركة بنفس الاسم والاتجاه موجود بالفعل"));
       } else {
-        toast.error("حصل خطأ أثناء الحفظ، حاول تاني");
+        toast.error(t("حصل خطأ أثناء الحفظ، حاول تاني"));
       }
     }
   };
@@ -249,17 +250,17 @@ export default function CashMovementTypeFormModal({
     <Modal
       isOpen={open}
       onClose={onClose}
-      title={isEdit ? "تعديل نوع حركة" : "إضافة نوع حركة جديد"}
+      title={isEdit ? t("تعديل نوع حركة") : t("إضافة نوع حركة جديد")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* الاسم */}
         <div>
           <label className="mb-1 block text-sm font-medium text-ink">
-            اسم النوع
+            {t("اسم النوع")}
           </label>
           <input
             {...register("name")}
-            placeholder="مثال: تحصيل من عميل"
+            placeholder={t("مثال: تحصيل من عميل")}
             className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-emerald-600"
           />
           {errors.name && (
@@ -270,7 +271,7 @@ export default function CashMovementTypeFormModal({
         {/* التصنيف */}
         <div>
           <label className="mb-1 block text-sm font-medium text-ink">
-            التصنيف
+            {t("التصنيف")}
           </label>
           <Controller
             control={control}
@@ -295,15 +296,14 @@ export default function CashMovementTypeFormModal({
             )}
           />
           <p className="mt-1 text-xs text-ink/50">
-            مصروفات/إيرادات مستقلة عن الاتجاه ويمكن ربطها بعميل/مورد اختياريًا.
-            تسوية عميل/مورد لازم تكون مرتبطة بطرف.
+            {t("مصروفات/إيرادات مستقلة عن الاتجاه ويمكن ربطها بعميل/مورد اختياريًا. تسوية عميل/مورد لازم تكون مرتبطة بطرف.")}
           </p>
         </div>
 
         {/* الاتجاه */}
         <div>
           <label className="mb-1 block text-sm font-medium text-ink">
-            اتجاه الحركة
+            {t("اتجاه الحركة")}
           </label>
           <Controller
             control={control}
@@ -311,8 +311,8 @@ export default function CashMovementTypeFormModal({
             render={({ field }) => (
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { value: "Receipt", label: "قبض (يزوّد رصيد الخزنة)" },
-                  { value: "Payment", label: "صرف (يقلّل رصيد الخزنة)" },
+                  { value: "Receipt", label: t("قبض (يزوّد رصيد الخزنة)") },
+                  { value: "Payment", label: t("صرف (يقلّل رصيد الخزنة)") },
                 ].map((opt) => (
                   <button
                     type="button"
@@ -341,10 +341,10 @@ export default function CashMovementTypeFormModal({
           }`}
         >
           <span className="text-sm text-ink">
-            مرتبط بعميل/مورد (forPartner)
+            {t("مرتبط بعميل/مورد (forPartner)")}
             {classification === "PartnerSettlement" && (
               <span className="mr-1 text-xs text-ink/40">
-                — إجباري لهذا التصنيف
+                {t("— إجباري لهذا التصنيف")}
               </span>
             )}
           </span>
@@ -361,13 +361,13 @@ export default function CashMovementTypeFormModal({
 
         {/* الأثر المحاسبي المشتق */}
         <div className="rounded-xl bg-ink/5 px-3 py-2 text-xs text-ink/70">
-          الأثر المحاسبي التلقائي:{" "}
+          {t("الأثر المحاسبي التلقائي:")}{" "}
           <span className="font-medium text-ink">{accentEffect}</span>
         </div>
 
         {/* نشط */}
         <label className="flex cursor-pointer items-center justify-between rounded-xl border border-gold/20 bg-white px-3 py-2">
-          <span className="text-sm text-ink">نشط</span>
+          <span className="text-sm text-ink">{t("نشط")}</span>
           <input
             type="checkbox"
             {...register("isActive")}
@@ -378,10 +378,10 @@ export default function CashMovementTypeFormModal({
         {/* افتراضي للفواتير — محصور في تسوية عميل/مورد */}
         <div>
           <p className="mb-2 text-sm font-medium text-ink">
-            افتراضي لأنواع الفواتير
+            {t("افتراضي لأنواع الفواتير")}
             {!canEditDefaults && (
               <span className="mr-1 text-xs text-ink/40">
-                — متاح بس لتصنيف "تسوية عميل/مورد"
+                {t("— متاح بس لتصنيف \"تسوية عميل/مورد\"")}
               </span>
             )}
           </p>
@@ -398,9 +398,9 @@ export default function CashMovementTypeFormModal({
                   }`}
                   title={
                     !canEditDefaults
-                      ? "متاح بس لتصنيف تسوية عميل/مورد"
+                      ? t("متاح بس لتصنيف تسوية عميل/مورد")
                       : disabled
-                        ? `يتطلب اتجاه ${reqDir === "Receipt" ? "قبض" : "صرف"}`
+                        ? t("يتطلب اتجاه {0}", { 0: reqDir === "Receipt" ? "قبض" : "صرف" })
                         : ""
                   }
                 >
@@ -420,7 +420,7 @@ export default function CashMovementTypeFormModal({
         {/* ملاحظات */}
         <div>
           <label className="mb-1 block text-sm font-medium text-ink">
-            ملاحظات (اختياري)
+            {t("ملاحظات (اختياري)")}
           </label>
           <textarea
             {...register("notes")}
@@ -435,7 +435,7 @@ export default function CashMovementTypeFormModal({
             onClick={onClose}
             className="rounded-xl border border-gold/30 px-4 py-2 text-sm text-ink hover:bg-ink/5"
           >
-            إلغاء
+            {t("إلغاء")}
           </button>
           <button
             type="submit"
@@ -443,10 +443,10 @@ export default function CashMovementTypeFormModal({
             className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
           >
             {isSaving
-              ? "جاري الحفظ..."
+              ? t("جاري الحفظ...")
               : isEdit
-                ? "حفظ التعديلات"
-                : "إضافة النوع"}
+                ? t("حفظ التعديلات")
+                : t("إضافة النوع")}
           </button>
         </div>
       </form>

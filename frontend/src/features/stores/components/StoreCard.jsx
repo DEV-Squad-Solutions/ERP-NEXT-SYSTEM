@@ -1,5 +1,6 @@
 import { Pencil, Trash2 } from "lucide-react";
 
+import { t } from "../../../i18n";
 export default function StoreCard({ store, onClick, onEdit, onDelete }) {
   return (
     <div className="bg-white border border-ink-400/10 rounded-2xl p-5 hover:border-emerald-700/40 hover:shadow-md transition-all">
@@ -14,7 +15,7 @@ export default function StoreCard({ store, onClick, onEdit, onDelete }) {
                 : "text-red-500 text-xs font-semibold bg-red-500/10 px-2 py-0.5 rounded-full"
             }
           >
-            {store.isActive ? "نشط" : "غير نشط"}
+            {store.isActive ? t("نشط") : t("غير نشط")}
           </span>
 
           <div className="flex items-center gap-1 border-r border-ink-400/10 pr-2 mr-1">
@@ -24,7 +25,7 @@ export default function StoreCard({ store, onClick, onEdit, onDelete }) {
                 onEdit?.(store);
               }}
               className="text-ink-400 hover:text-emerald-700 p-1"
-              title="تعديل"
+              title={t("تعديل")}
             >
               <Pencil size={14} />
             </button>
@@ -34,7 +35,7 @@ export default function StoreCard({ store, onClick, onEdit, onDelete }) {
                 onDelete?.(store);
               }}
               className="text-ink-400 hover:text-red-600 p-1"
-              title="حذف"
+              title={t("حذف")}
             >
               <Trash2 size={14} />
             </button>
@@ -50,7 +51,7 @@ export default function StoreCard({ store, onClick, onEdit, onDelete }) {
 
         {store.businessPartnerName && (
           <p className="text-xs text-ink-400 mt-3 border-t border-ink-400/10 pt-3">
-            الشريك التجاري: {store.businessPartnerName}
+            {t("الشريك التجاري:")} {store.businessPartnerName}
           </p>
         )}
       </button>

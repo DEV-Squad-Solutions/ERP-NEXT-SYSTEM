@@ -1,3 +1,5 @@
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 function Field({ label, value }) {
   return (
     <div>
@@ -13,23 +15,23 @@ export default function StoreOverviewTab({ store }) {
   if (!store) return null;
 
   return (
-    <div dir="rtl" className="rounded-2xl bg-white p-6 shadow-card">
+    <div dir={getDir()} className="rounded-2xl bg-white p-6 shadow-card">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Field label="اسم المخزن" value={store.name} />
+        <Field label={t("اسم المخزن")} value={store.name} />
 
-        <Field label="كود المخزن" value={store.code} />
+        <Field label={t("كود المخزن")} value={store.code} />
 
         <Field
-          label="نوع المخزن"
-          value={store.isContainerStore ? "مخزن عبوات" : "مخزن اصناف"}
+          label={t("نوع المخزن")}
+          value={store.isContainerStore ? t("مخزن عبوات") : t("مخزن اصناف")}
         />
 
-        <Field label="العنوان" value={store.address} />
+        <Field label={t("العنوان")} value={store.address} />
 
-        <Field label="الحالة" value={store.isActive ? "نشط" : "غير نشط"} />
+        <Field label={t("الحالة")} value={store.isActive ? t("نشط") : t("غير نشط")} />
 
         {store.isContainerStore && (
-          <Field label="العميل / المورد" value={store.businessPartnerName} />
+          <Field label={t("العميل / المورد")} value={store.businessPartnerName} />
         )}
       </div>
     </div>

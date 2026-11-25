@@ -1,43 +1,45 @@
 import { useSelector } from "react-redux";
 import { formatDate as sharedFormatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 // ============================================================
 // Helpers
 // ============================================================
 
 const SOURCE_TYPE_LABELS = {
-  OpeningBalance: "رصيد افتتاحي",
-  Invoice: "فاتورة",
-  SalesInvoice: "فاتورة بيع",
-  PurchaseInvoice: "فاتورة شراء",
-  SalesReturn: "مرتجع بيع",
-  PurchaseReturn: "مرتجع شراء",
-  CashVoucher: "سند نقدي",
-  CashMovement: "حركة نقدية",
-  BankMovement: "حركة بنكية",
-  Movement: "حركة",
-  JournalEntry: "قيد يومية",
+  OpeningBalance: t("رصيد افتتاحي"),
+  Invoice: t("فاتورة"),
+  SalesInvoice: t("فاتورة بيع"),
+  PurchaseInvoice: t("فاتورة شراء"),
+  SalesReturn: t("مرتجع بيع"),
+  PurchaseReturn: t("مرتجع شراء"),
+  CashVoucher: t("سند نقدي"),
+  CashMovement: t("حركة نقدية"),
+  BankMovement: t("حركة بنكية"),
+  Movement: t("حركة"),
+  JournalEntry: t("قيد يومية"),
 };
 
 const MOVEMENT_TYPE_LABELS = {
-  Sale: "بيع",
-  Purchase: "شراء",
-  SalesReturn: "مرتجع بيع",
-  PurchaseReturn: "مرتجع شراء",
-  CashReceipt: "قبض نقدي",
-  CashPayment: "دفع نقدي",
-  Receipt: "قبض",
-  Payment: "دفع",
+  Sale: t("بيع"),
+  Purchase: t("شراء"),
+  SalesReturn: t("مرتجع بيع"),
+  PurchaseReturn: t("مرتجع شراء"),
+  CashReceipt: t("قبض نقدي"),
+  CashPayment: t("دفع نقدي"),
+  Receipt: t("قبض"),
+  Payment: t("دفع"),
 };
 
 const fmt = (value) =>
-  Number(value || 0).toLocaleString("ar-EG", {
+  Number(value || 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
 const formatRate = (value) =>
-  Number(value || 0).toLocaleString("ar-EG", {
+  Number(value || 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -157,7 +159,7 @@ export default function PartnerStatementPrintTemplate({
     partner?.name ||
     partner?.Name ||
     partner?.businessPartnerName ||
-    "العميل / المورد";
+    t("العميل / المورد");
 
   const businessPartnerId =
     data?.businessPartnerId || partner?.id || partner?.Id || "—";
@@ -288,7 +290,7 @@ export default function PartnerStatementPrintTemplate({
 
       <div
         className="partner-statement-print-page"
-        dir="rtl"
+        dir={getDir()}
         style={{
           width: "297mm",
           minHeight: "210mm",
@@ -335,7 +337,7 @@ export default function PartnerStatementPrintTemplate({
                 margin: "4px 0 0",
               }}
             >
-              كشف حساب عميل / مورد
+              {t("كشف حساب عميل / مورد")}
             </p>
 
             {companyAddress && (
@@ -373,12 +375,12 @@ export default function PartnerStatementPrintTemplate({
             }}
           >
             <p style={{ margin: "2px 0" }}>
-              تاريخ الطباعة: {formatDate(today)}
+              {t("تاريخ الطباعة:")} {formatDate(today)}
             </p>
 
-            <p style={{ margin: "2px 0" }}>عدد الحركات: {items.length}</p>
+            <p style={{ margin: "2px 0" }}>{t("عدد الحركات:")} {items.length}</p>
 
-            <p style={{ margin: "2px 0" }}>العملة: {currency}</p>
+            <p style={{ margin: "2px 0" }}>{t("العملة:")} {currency}</p>
           </div>
         </div>
 
@@ -410,7 +412,7 @@ export default function PartnerStatementPrintTemplate({
                 marginBottom: "3px",
               }}
             >
-              العميل / المورد
+              {t("العميل / المورد")}
             </div>
 
             <div
@@ -440,7 +442,7 @@ export default function PartnerStatementPrintTemplate({
                 marginBottom: "3px",
               }}
             >
-              رقم الحساب
+              {t("رقم الحساب")}
             </div>
 
             <div
@@ -470,7 +472,7 @@ export default function PartnerStatementPrintTemplate({
                 marginBottom: "3px",
               }}
             >
-              عملة الحساب
+              {t("عملة الحساب")}
             </div>
 
             <div
@@ -500,7 +502,7 @@ export default function PartnerStatementPrintTemplate({
                 marginBottom: "3px",
               }}
             >
-              العملة الأساسية
+              {t("العملة الأساسية")}
             </div>
 
             <div
@@ -541,7 +543,7 @@ export default function PartnerStatementPrintTemplate({
                 marginBottom: "6px",
               }}
             >
-              معايير الكشف
+              {t("معايير الكشف")}
             </div>
 
             <div
@@ -553,23 +555,23 @@ export default function PartnerStatementPrintTemplate({
                 color: "#6F7C75",
               }}
             >
-              {fromDate && <span>من: {formatDate(fromDate)}</span>}
+              {fromDate && <span>{t("من:")} {formatDate(fromDate)}</span>}
 
-              {toDate && <span>إلى: {formatDate(toDate)}</span>}
+              {toDate && <span>{t("إلى:")} {formatDate(toDate)}</span>}
 
-              {sourceType && <span>المصدر: {getSourceLabel(sourceType)}</span>}
+              {sourceType && <span>{t("المصدر:")} {getSourceLabel(sourceType)}</span>}
 
               {movementType && (
-                <span>نوع الحركة: {getMovementLabel(movementType)}</span>
+                <span>{t("نوع الحركة:")} {getMovementLabel(movementType)}</span>
               )}
 
               {cashMovementTypeId && (
-                <span>نوع الحركة النقدية: {cashMovementTypeId}</span>
+                <span>{t("نوع الحركة النقدية:")} {cashMovementTypeId}</span>
               )}
 
-              {classification && <span>التصنيف: {classification}</span>}
+              {classification && <span>{t("التصنيف:")} {classification}</span>}
 
-              {search && <span>البحث: {search}</span>}
+              {search && <span>{t("البحث:")} {search}</span>}
             </div>
           </div>
         )}
@@ -611,7 +613,7 @@ export default function PartnerStatementPrintTemplate({
                   whiteSpace: "nowrap",
                 }}
               >
-                التاريخ
+                {t("التاريخ")}
               </th>
 
               <th
@@ -622,7 +624,7 @@ export default function PartnerStatementPrintTemplate({
                   whiteSpace: "nowrap",
                 }}
               >
-                رقم المستند
+                {t("رقم المستند")}
               </th>
 
               <th
@@ -633,7 +635,7 @@ export default function PartnerStatementPrintTemplate({
                   whiteSpace: "nowrap",
                 }}
               >
-                الحركة
+                {t("الحركة")}
               </th>
 
               <th
@@ -643,7 +645,7 @@ export default function PartnerStatementPrintTemplate({
                   fontWeight: 700,
                 }}
               >
-                البيان
+                {t("البيان")}
               </th>
 
               <th
@@ -654,7 +656,7 @@ export default function PartnerStatementPrintTemplate({
                   whiteSpace: "nowrap",
                 }}
               >
-                مدين ({currency})
+                {t("مدين (")}{currency})
               </th>
 
               <th
@@ -665,7 +667,7 @@ export default function PartnerStatementPrintTemplate({
                   whiteSpace: "nowrap",
                 }}
               >
-                دائن ({currency})
+                {t("دائن (")}{currency})
               </th>
 
               <th
@@ -676,7 +678,7 @@ export default function PartnerStatementPrintTemplate({
                   whiteSpace: "nowrap",
                 }}
               >
-                الرصيد ({currency})
+                {t("الرصيد (")}{currency})
               </th>
 
               {isForeignCurrency && (
@@ -688,7 +690,7 @@ export default function PartnerStatementPrintTemplate({
                     whiteSpace: "nowrap",
                   }}
                 >
-                  سعر الصرف
+                  {t("سعر الصرف")}
                 </th>
               )}
             </tr>
@@ -719,7 +721,7 @@ export default function PartnerStatementPrintTemplate({
                   fontWeight: 700,
                 }}
               >
-                رصيد افتتاحي
+                {t("رصيد افتتاحي")}
               </td>
 
               <td
@@ -728,7 +730,7 @@ export default function PartnerStatementPrintTemplate({
                   fontWeight: 600,
                 }}
               >
-                {summary?.openingBalanceDescription || "الرصيد الافتتاحي"}
+                {summary?.openingBalanceDescription || t("الرصيد الافتتاحي")}
               </td>
 
               <td style={cellNumber}>
@@ -830,7 +832,7 @@ export default function PartnerStatementPrintTemplate({
                     <div>{description}</div>
 
                     {item?.referenceNumber && item?.invoiceNumber && (
-                      <div style={baseAmount}>مرجع: {item.referenceNumber}</div>
+                      <div style={baseAmount}>{t("مرجع:")} {item.referenceNumber}</div>
                     )}
                   </td>
 
@@ -881,7 +883,7 @@ export default function PartnerStatementPrintTemplate({
                     background: "#F7F9F8",
                   }}
                 >
-                  لا توجد حركات خلال الفترة المحددة
+                  {t("لا توجد حركات خلال الفترة المحددة")}
                 </td>
               </tr>
             )}
@@ -904,7 +906,7 @@ export default function PartnerStatementPrintTemplate({
                   fontWeight: 700,
                 }}
               >
-                الإجمالي
+                {t("الإجمالي")}
               </td>
 
               <td
@@ -960,19 +962,19 @@ export default function PartnerStatementPrintTemplate({
           >
             <tbody>
               <tr>
-                <td style={summaryTitle}>الرصيد الافتتاحي</td>
+                <td style={summaryTitle}>{t("الرصيد الافتتاحي")}</td>
 
                 <td style={summaryValue}>{fmt(calculatedOpeningBalance)}</td>
               </tr>
 
               <tr>
-                <td style={summaryTitle}>إجمالي المدين</td>
+                <td style={summaryTitle}>{t("إجمالي المدين")}</td>
 
                 <td style={summaryValue}>{fmt(calculatedTotalDebits)}</td>
               </tr>
 
               <tr>
-                <td style={summaryTitle}>إجمالي الدائن</td>
+                <td style={summaryTitle}>{t("إجمالي الدائن")}</td>
 
                 <td
                   style={{
@@ -992,7 +994,7 @@ export default function PartnerStatementPrintTemplate({
                     fontWeight: 700,
                   }}
                 >
-                  الرصيد الختامي
+                  {t("الرصيد الختامي")}
                 </td>
 
                 <td
@@ -1029,7 +1031,7 @@ export default function PartnerStatementPrintTemplate({
                   {summary?.totalDebitsBaseCurrency !== undefined && (
                     <tr>
                       <td style={summaryTitle}>
-                        إجمالي المدين ({baseCurrency})
+                        {t("إجمالي المدين (")}{baseCurrency})
                       </td>
 
                       <td style={summaryValue}>
@@ -1041,7 +1043,7 @@ export default function PartnerStatementPrintTemplate({
                   {summary?.totalCreditsBaseCurrency !== undefined && (
                     <tr>
                       <td style={summaryTitle}>
-                        إجمالي الدائن ({baseCurrency})
+                        {t("إجمالي الدائن (")}{baseCurrency})
                       </td>
 
                       <td style={summaryValue}>
@@ -1058,7 +1060,7 @@ export default function PartnerStatementPrintTemplate({
                           fontWeight: 700,
                         }}
                       >
-                        الرصيد الختامي ({baseCurrency})
+                        {t("الرصيد الختامي (")}{baseCurrency})
                       </td>
 
                       <td
@@ -1101,7 +1103,7 @@ export default function PartnerStatementPrintTemplate({
                 paddingTop: "6px",
               }}
             >
-              توقيع العميل / المورد
+              {t("توقيع العميل / المورد")}
             </div>
           </div>
 
@@ -1117,7 +1119,7 @@ export default function PartnerStatementPrintTemplate({
                 paddingTop: "6px",
               }}
             >
-              توقيع المسؤول
+              {t("توقيع المسؤول")}
             </div>
           </div>
         </div>
@@ -1138,14 +1140,14 @@ export default function PartnerStatementPrintTemplate({
             color: "#6F7C75",
           }}
         >
-          <span>كشف حساب تشغيلي — {partnerName}</span>
+          <span>{t("كشف حساب تشغيلي —")} {partnerName}</span>
 
           <span>
-            العملة: {currency}
-            {isForeignCurrency ? ` | الأساسية: ${baseCurrency}` : ""}
+            {t("العملة:")} {currency}
+            {isForeignCurrency ? t(" | الأساسية: {0}", { 0: baseCurrency }) : ""}
           </span>
 
-          <span>عدد السجلات: {items.length}</span>
+          <span>{t("عدد السجلات:")} {items.length}</span>
         </div>
       </div>
     </>

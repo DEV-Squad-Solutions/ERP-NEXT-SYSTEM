@@ -1,6 +1,8 @@
 import { fmtMoney } from "../../../features/payroll/payroll.constants";
 import { formatDate as formatDateDisplay } from "../../../lib/date";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 function formatDate(date) {
   if (!date) return "—";
 
@@ -34,13 +36,13 @@ export default function PayrollDashboardPrintTemplate({
 
   const employeeTypeLabel =
     employeeType === "Daily"
-      ? "يومي"
+      ? t("يومي")
       : employeeType === "Monthly"
-        ? "شهري"
-        : "كل الأنواع";
+        ? t("شهري")
+        : t("كل الأنواع");
 
   return (
-    <div dir="rtl" style={styles.page}>
+    <div dir={getDir()} style={styles.page}>
       <style>
         {`
           @page {
@@ -78,15 +80,15 @@ export default function PayrollDashboardPrintTemplate({
       {/* Header */}
       <div style={styles.header}>
         <div>
-          <h1 style={styles.title}>تقرير الأجور والمرتبات</h1>
+          <h1 style={styles.title}>{t("تقرير الأجور والمرتبات")}</h1>
 
           <p style={styles.subtitle}>
-            تقرير ملخص لحالة الرواتب والمدفوعات والاستحقاقات
+            {t("تقرير ملخص لحالة الرواتب والمدفوعات والاستحقاقات")}
           </p>
         </div>
 
         <div style={styles.reportDate}>
-          <div>تاريخ الطباعة</div>
+          <div>{t("تاريخ الطباعة")}</div>
 
           <strong>{formatDate(new Date())}</strong>
         </div>
@@ -95,72 +97,72 @@ export default function PayrollDashboardPrintTemplate({
       {/* Filters */}
       <div style={styles.filterBox}>
         <div style={styles.filterItem}>
-          <span style={styles.filterLabel}>من تاريخ</span>
+          <span style={styles.filterLabel}>{t("من تاريخ")}</span>
           <strong>{formatDate(fromDate)}</strong>
         </div>
 
         <div style={styles.filterItem}>
-          <span style={styles.filterLabel}>إلى تاريخ</span>
+          <span style={styles.filterLabel}>{t("إلى تاريخ")}</span>
           <strong>{formatDate(toDate)}</strong>
         </div>
 
         <div style={styles.filterItem}>
-          <span style={styles.filterLabel}>الموظف</span>
-          <strong>{employeeId ? employeeName || "—" : "كل الموظفين"}</strong>
+          <span style={styles.filterLabel}>{t("الموظف")}</span>
+          <strong>{employeeId ? employeeName || "—" : t("كل الموظفين")}</strong>
         </div>
 
         <div style={styles.filterItem}>
-          <span style={styles.filterLabel}>نوع الموظف</span>
+          <span style={styles.filterLabel}>{t("نوع الموظف")}</span>
           <strong>{employeeTypeLabel}</strong>
         </div>
       </div>
 
       {/* Stats */}
       <div style={styles.statsGrid}>
-        <StatBox title="إجمالي كشوف الرواتب" value={data?.totalPayrolls ?? 0} />
+        <StatBox title={t("إجمالي كشوف الرواتب")} value={data?.totalPayrolls ?? 0} />
 
-        <StatBox title="صافي المستحق" value={fmtMoney(data?.netPayable ?? 0)} />
+        <StatBox title={t("صافي المستحق")} value={fmtMoney(data?.netPayable ?? 0)} />
 
         <StatBox
-          title="إجمالي المدفوع"
+          title={t("إجمالي المدفوع")}
           value={fmtMoney(data?.totalPaid ?? 0)}
         />
 
         <StatBox
-          title="إجمالي الخصومات"
+          title={t("إجمالي الخصومات")}
           value={fmtMoney(data?.totalDeductions ?? 0)}
         />
 
         <StatBox
-          title="إجمالي السلف"
+          title={t("إجمالي السلف")}
           value={fmtMoney(data?.totalAdvances ?? 0)}
         />
 
-        <StatBox title="عدد الموظفين" value={data?.employeeCount ?? 0} />
+        <StatBox title={t("عدد الموظفين")} value={data?.employeeCount ?? 0} />
       </div>
 
       {/* Pending Payrolls */}
       <section className="print-section" style={styles.section}>
         <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>كشوف الرواتب المعلقة</h2>
+          <h2 style={styles.sectionTitle}>{t("كشوف الرواتب المعلقة")}</h2>
 
           <span style={styles.sectionCount}>{pendingPayrolls.length}</span>
         </div>
 
         {pendingPayrolls.length === 0 ? (
-          <div style={styles.empty}>لا توجد كشوف رواتب معلقة.</div>
+          <div style={styles.empty}>{t("لا توجد كشوف رواتب معلقة.")}</div>
         ) : (
           <table>
             <thead>
               <tr>
-                <th style={styles.th}>الكود</th>
-                <th style={styles.th}>الموظف</th>
-                <th style={styles.th}>النوع</th>
-                <th style={styles.th}>من</th>
-                <th style={styles.th}>إلى</th>
-                <th style={styles.th}>الإجمالي</th>
-                <th style={styles.th}>الخصم</th>
-                <th style={styles.th}>الصافي</th>
+                <th style={styles.th}>{t("الكود")}</th>
+                <th style={styles.th}>{t("الموظف")}</th>
+                <th style={styles.th}>{t("النوع")}</th>
+                <th style={styles.th}>{t("من")}</th>
+                <th style={styles.th}>{t("إلى")}</th>
+                <th style={styles.th}>{t("الإجمالي")}</th>
+                <th style={styles.th}>{t("الخصم")}</th>
+                <th style={styles.th}>{t("الصافي")}</th>
               </tr>
             </thead>
 
@@ -172,7 +174,7 @@ export default function PayrollDashboardPrintTemplate({
                   <td style={styles.td}>{item.employeeName || "—"}</td>
 
                   <td style={styles.td}>
-                    {item.employeeType === "Daily" ? "يومي" : "شهري"}
+                    {item.employeeType === "Daily" ? t("يومي") : t("شهري")}
                   </td>
 
                   <td style={styles.td}>{formatDate(item.startDate)}</td>
@@ -196,24 +198,24 @@ export default function PayrollDashboardPrintTemplate({
       {/* Recent Operations */}
       <section className="print-section" style={styles.section}>
         <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>آخر العمليات</h2>
+          <h2 style={styles.sectionTitle}>{t("آخر العمليات")}</h2>
 
           <span style={styles.sectionCount}>{recentOperations.length}</span>
         </div>
 
         {recentOperations.length === 0 ? (
-          <div style={styles.empty}>لا توجد عمليات حديثة.</div>
+          <div style={styles.empty}>{t("لا توجد عمليات حديثة.")}</div>
         ) : (
           <table>
             <thead>
               <tr>
-                <th style={styles.th}>التاريخ</th>
-                <th style={styles.th}>العملية</th>
-                <th style={styles.th}>الموظف</th>
-                <th style={styles.th}>المرجع</th>
-                <th style={styles.th}>المبلغ</th>
-                <th style={styles.th}>العملة</th>
-                <th style={styles.th}>ملاحظات</th>
+                <th style={styles.th}>{t("التاريخ")}</th>
+                <th style={styles.th}>{t("العملية")}</th>
+                <th style={styles.th}>{t("الموظف")}</th>
+                <th style={styles.th}>{t("المرجع")}</th>
+                <th style={styles.th}>{t("المبلغ")}</th>
+                <th style={styles.th}>{t("العملة")}</th>
+                <th style={styles.th}>{t("ملاحظات")}</th>
               </tr>
             </thead>
 
@@ -246,10 +248,10 @@ export default function PayrollDashboardPrintTemplate({
 
       {/* Footer */}
       <div style={styles.footer}>
-        <span>تقرير الأجور والمرتبات</span>
+        <span>{t("تقرير الأجور والمرتبات")}</span>
 
         <span>
-          الفترة: {formatDate(fromDate)} — {formatDate(toDate)}
+          {t("الفترة:")} {formatDate(fromDate)} — {formatDate(toDate)}
         </span>
       </div>
     </div>

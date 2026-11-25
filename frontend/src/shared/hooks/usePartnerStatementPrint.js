@@ -1,10 +1,11 @@
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
+import { t } from "../../i18n";
 /**
  * Hook لطباعة كشف حساب عميل / مورد
  */
-export function usePartnerStatementPrint({ title = "كشف حساب" } = {}) {
+export function usePartnerStatementPrint({ title = t("كشف حساب") } = {}) {
   const printRef = useRef(null);
 
   const printStatement = useReactToPrint({

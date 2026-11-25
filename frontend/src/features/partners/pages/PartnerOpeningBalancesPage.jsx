@@ -18,19 +18,20 @@ import PartnerOpeningBalancesTable from "../components/Partneropeningbalancestab
 import PartnerOpeningBalanceModal from "../components/PartnerOpeningBalanceModal";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
 const currencyOptions = [
-  { value: "EGP", label: "جنيه مصري" },
-  { value: "USD", label: "دولار أمريكي" },
-  { value: "EUR", label: "يورو" },
-  { value: "GBP", label: "جنيه إسترليني" },
-  { value: "SAR", label: "ريال سعودي" },
-  { value: "AED", label: "درهم إماراتي" },
-  { value: "KWD", label: "دينار كويتي" },
+  { value: "EGP", label: t("جنيه مصري") },
+  { value: "USD", label: t("دولار أمريكي") },
+  { value: "EUR", label: t("يورو") },
+  { value: "GBP", label: t("جنيه إسترليني") },
+  { value: "SAR", label: t("ريال سعودي") },
+  { value: "AED", label: t("درهم إماراتي") },
+  { value: "KWD", label: t("دينار كويتي") },
 ];
 
 const balanceTypeOptions = [
-  { value: "Receivable", label: "مدين" },
-  { value: "Payable", label: "دائن" },
+  { value: "Receivable", label: t("مدين") },
+  { value: "Payable", label: t("دائن") },
 ];
 
 const emptyFilters = {
@@ -104,7 +105,7 @@ export default function PartnerOpeningBalancesPage() {
     setDeletingId(item.id);
     try {
       await deleteBalance(item.id).unwrap();
-      toast.success("تم حذف الرصيد الافتتاحي");
+      toast.success(t("تم حذف الرصيد الافتتاحي"));
     } catch {
     } finally {
       setDeletingId(null);
@@ -122,10 +123,10 @@ export default function PartnerOpeningBalancesPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-ink-900">
-            الأرصدة الافتتاحية للعملاء والموردين
+            {t("الأرصدة الافتتاحية للعملاء والموردين")}
           </h2>
           <p className="mt-1 text-sm text-ink-400">
-            تسجيل وإدارة الأرصدة الافتتاحية المدينة والدائنة
+            {t("تسجيل وإدارة الأرصدة الافتتاحية المدينة والدائنة")}
           </p>
         </div>
 
@@ -135,7 +136,7 @@ export default function PartnerOpeningBalancesPage() {
           disabled={isFiscalYearReadOnly}
         >
           <Plus size={14} />
-          إضافة رصيد افتتاحي
+          {t("إضافة رصيد افتتاحي")}
         </Button>
       </div>
 
@@ -148,7 +149,7 @@ export default function PartnerOpeningBalancesPage() {
         <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-6">
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              رقم المستند
+              {t("رقم المستند")}
             </label>
             <input
               type="text"
@@ -160,7 +161,7 @@ export default function PartnerOpeningBalancesPage() {
 
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              العميل / المورد
+              {t("العميل / المورد")}
             </label>
             <CompactSelect
               options={
@@ -168,37 +169,37 @@ export default function PartnerOpeningBalancesPage() {
               }
               value={draft.businessPartnerId}
               onChange={(value) => setField("businessPartnerId", value)}
-              placeholder="الكل"
+              placeholder={t("الكل")}
             />
           </div>
 
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              العملة
+              {t("العملة")}
             </label>
             <CompactSelect
               options={currencyOptions}
               value={draft.currency}
               onChange={(value) => setField("currency", value)}
-              placeholder="الكل"
+              placeholder={t("الكل")}
             />
           </div>
 
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              نوع الرصيد
+              {t("نوع الرصيد")}
             </label>
             <CompactSelect
               options={balanceTypeOptions}
               value={draft.balanceType}
               onChange={(value) => setField("balanceType", value)}
-              placeholder="الكل"
+              placeholder={t("الكل")}
             />
           </div>
 
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              من تاريخ
+              {t("من تاريخ")}
             </label>
             <DateInput
               type="date"
@@ -210,7 +211,7 @@ export default function PartnerOpeningBalancesPage() {
 
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              إلى تاريخ
+              {t("إلى تاريخ")}
             </label>
             <DateInput
               type="date"
@@ -224,11 +225,11 @@ export default function PartnerOpeningBalancesPage() {
         <div className="mt-3 flex justify-end gap-2">
           <Button variant="outline" onClick={handleReset} className="h-9">
             <RotateCcw size={14} />
-            إعادة تعيين
+            {t("إعادة تعيين")}
           </Button>
           <Button onClick={handleSearch} disabled={isFetching} className="h-9">
             <Search size={14} />
-            بحث
+            {t("بحث")}
           </Button>
         </div>
       </div>

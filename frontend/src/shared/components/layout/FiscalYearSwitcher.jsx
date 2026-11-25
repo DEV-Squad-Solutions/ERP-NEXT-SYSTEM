@@ -18,6 +18,7 @@ import {
 import { selectIsAuthenticated } from "../../../features/auth/authSlice";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
 /**
  * زر السنة المالية في الـ Navbar. يحمّل قائمة سنوات الشركة الحالية،
  * يخزّنها في fiscalYearSlice، ويسمح للمستخدم بتغيير السنة المعروضة
@@ -58,7 +59,7 @@ export default function FiscalYearSwitcher() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        aria-label="تغيير السنة المالية"
+        aria-label={t("تغيير السنة المالية")}
         className={[
           "group flex items-center gap-1.5",
           "rounded-lg",
@@ -98,7 +99,7 @@ export default function FiscalYearSwitcher() {
       <Modal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        title="السنة المالية"
+        title={t("السنة المالية")}
       >
         <div className="space-y-2">
           {fiscalYears.map((year) => {
@@ -142,7 +143,7 @@ export default function FiscalYearSwitcher() {
 
                   {year.isCurrent && (
                     <span className="rounded-md bg-primary-500/10 px-1.5 py-0.5 text-[10px] font-bold text-primary-600 dark:text-primary-400">
-                      الحالية
+                      {t("الحالية")}
                     </span>
                   )}
                 </div>

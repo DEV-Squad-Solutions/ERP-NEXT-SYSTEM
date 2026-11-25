@@ -18,13 +18,15 @@ import {
 } from "../stockAdjustmentsApi";
 import { formatDate } from "../../../lib/date.js";
 
-const fmt = (v) => Number(v || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
+const fmt = (v) => Number(v || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 const COST_STATUS_LABELS = {
-  Final: "نهائية",
-  PartiallyCosted: "مكلفة جزئيًا",
-  Pending: "معلقة",
-  Revalued: "معاد تقييمها",
+  Final: t("نهائية"),
+  PartiallyCosted: t("مكلفة جزئيًا"),
+  Pending: t("معلقة"),
+  Revalued: t("معاد تقييمها"),
 };
 
 export default function StockAdjustmentDetailPage() {
@@ -48,28 +50,28 @@ export default function StockAdjustmentDetailPage() {
 
   const handleDelete = async () => {
     if (isLocked) {
-      toast.error("التسوية دي ناتجة عن جرد ومش قابلة للحذف يدويًا");
+      toast.error(t("التسوية دي ناتجة عن جرد ومش قابلة للحذف يدويًا"));
       return;
     }
     if (
       !window.confirm(
-        `هل أنت متأكد من حذف التسوية "${adjustment.documentNumber}"؟ هيتم عكس تأثيرها على رصيد المخزن.`,
+        t("هل أنت متأكد من حذف التسوية \"{0}\"؟ هيتم عكس تأثيرها على رصيد المخزن.", { 0: adjustment.documentNumber }),
       )
     )
       return;
 
     try {
       await deleteStockAdjustment(adjustmentId).unwrap();
-      toast.success("تم حذف التسوية بنجاح");
+      toast.success(t("تم حذف التسوية بنجاح"));
       navigate("/dashboard/stock-adjustments");
     } catch (err) {
-      toast.error(err?.data?.title || "فشل حذف التسوية");
+      toast.error(err?.data?.title || t("فشل حذف التسوية"));
     }
   };
 
   if (isLoading) {
     return (
-      <div className="p-6 max-w-4xl mx-auto animate-pulse" dir="rtl">
+      <div className="p-6 max-w-4xl mx-auto animate-pulse" dir={getDir()}>
         <div className="bg-ink-100 rounded-2xl h-24 mb-6" />
         <div className="bg-ink-100 rounded-2xl h-64" />
       </div>
@@ -78,24 +80,24 @@ export default function StockAdjustmentDetailPage() {
 
   if (isError || !adjustment) {
     return (
-      <div className="p-6 max-w-4xl mx-auto text-center" dir="rtl">
+      <div className="p-6 max-w-4xl mx-auto text-center" dir={getDir()}>
         <AlertCircle size={28} className="mx-auto text-rose-400 mb-3" />
         <p className="text-ink-900 font-medium text-sm mb-3">
-          تعذر تحميل بيانات التسوية
+          {t("تعذر تحميل بيانات التسوية")}
         </p>
         <button
           onClick={refetch}
           className="inline-flex items-center gap-2 text-xs font-medium text-ink-600 hover:text-ink-900 bg-ink-50 hover:bg-ink-100 px-4 py-2 rounded-lg transition-colors"
         >
           <RefreshCw size={13} />
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto" dir="rtl">
+    <div className="p-6 max-w-4xl mx-auto" dir={getDir()}>
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-card p-6 mb-6">
         <div className="flex items-start justify-between flex-wrap gap-4">
@@ -116,12 +118,12 @@ export default function StockAdjustmentDetailPage() {
                 ) : (
                   <ArrowDownCircle size={12} />
                 )}
-                {isIncrease ? "زيادة" : "نقص"}
+                {isIncrease ? t("زيادة") : t("نقص")}
               </span>
               {isLocked && (
                 <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-ink-100 text-ink-500">
                   <Lock size={11} />
-                  ناتجة عن جرد
+                  {t("ناتجة عن جرد")}
                 </span>
               )}
             </div>
@@ -140,7 +142,7 @@ export default function StockAdjustmentDetailPage() {
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-ink-600 hover:bg-ink-50 transition-colors"
             >
               <ArrowRight className="w-4 h-4" />
-              رجوع
+              {t("رجوع")}
             </button>
             {isAdmin && !isLocked && (
               <>
@@ -153,7 +155,7 @@ export default function StockAdjustmentDetailPage() {
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-ink-700 bg-ink-50 hover:bg-ink-100 transition-colors"
                 >
                   <Pencil className="w-4 h-4" />
-                  تعديل
+                  {t("تعديل")}
                 </button>
                 <button
                   onClick={handleDelete}
@@ -161,7 +163,7 @@ export default function StockAdjustmentDetailPage() {
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors disabled:opacity-60"
                 >
                   <Trash2 className="w-4 h-4" />
-                  {isDeleting ? "جاري الحذف..." : "حذف"}
+                  {isDeleting ? t("جاري الحذف...") : t("حذف")}
                 </button>
               </>
             )}
@@ -172,28 +174,28 @@ export default function StockAdjustmentDetailPage() {
       {/* Lines */}
       <div className="bg-white rounded-2xl shadow-card p-6">
         <h3 className="font-display text-sm font-semibold text-ink-900 mb-4">
-          الأصناف ({adjustment.lines?.length ?? 0})
+          {t("الأصناف (")}{adjustment.lines?.length ?? 0})
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-ink-500 text-xs border-b border-ink-100">
-                <th className="py-2.5 px-3 text-right font-medium">الصنف</th>
-                <th className="py-2.5 px-3 text-right font-medium">الكمية</th>
+                <th className="py-2.5 px-3 text-right font-medium">{t("الصنف")}</th>
+                <th className="py-2.5 px-3 text-right font-medium">{t("الكمية")}</th>
                 <th className="py-2.5 px-3 text-right font-medium">
-                  تكلفة الوحدة
+                  {t("تكلفة الوحدة")}
                 </th>
                 <th className="py-2.5 px-3 text-right font-medium">
-                  إجمالي التكلفة
+                  {t("إجمالي التكلفة")}
                 </th>
                 <th className="py-2.5 px-3 text-right font-medium">
-                  الرصيد بعدها
+                  {t("الرصيد بعدها")}
                 </th>
                 <th className="py-2.5 px-3 text-right font-medium">
-                  متوسط التكلفة بعدها
+                  {t("متوسط التكلفة بعدها")}
                 </th>
                 <th className="py-2.5 px-3 text-right font-medium">
-                  حالة التكلفة
+                  {t("حالة التكلفة")}
                 </th>
               </tr>
             </thead>
@@ -231,7 +233,7 @@ export default function StockAdjustmentDetailPage() {
                     {line.costStatus === "PartiallyCosted" &&
                       line.pendingCostQuantity > 0 && (
                         <span className="block text-[11px] text-amber-600 mt-0.5">
-                          معلق: {fmt(line.pendingCostQuantity)}
+                          {t("معلق:")} {fmt(line.pendingCostQuantity)}
                         </span>
                       )}
                   </td>

@@ -4,6 +4,7 @@ import { useGetPartyContainerStoreQuery } from "../../partners/partiesApi";
 import Button from "../../../shared/components/ui/Button";
 import Modal from "../../../shared/components/ui/Modal";
 
+import { t } from "../../../i18n";
 export default function PackagingDrawer({
   partyId,
   partyName,
@@ -63,19 +64,19 @@ export default function PackagingDrawer({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`عبوات ${partyName || ""}`}
+      title={t("عبوات {0}", { 0: partyName || "" })}
       size="lg"
     >
       {isLoading && (
         <div className="flex items-center justify-center py-10 text-ink-400">
           <Loader2 size={20} className="animate-spin ml-2" />
-          جاري تحميل بيانات العبوات...
+          {t("جاري تحميل بيانات العبوات...")}
         </div>
       )}
 
       {isError && !isLoading && (
         <div className="text-center py-6 text-sm text-negative border border-dashed border-negative/30 rounded-xl">
-          تعذر تحميل بيانات العبوات لهذا العميل
+          {t("تعذر تحميل بيانات العبوات لهذا العميل")}
         </div>
       )}
 
@@ -83,28 +84,28 @@ export default function PackagingDrawer({
         <div className="space-y-4">
           <div className="flex items-stretch rounded-xl overflow-hidden border border-ink-400/10">
             <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
-              مخزن الحاويات
+              {t("مخزن الحاويات")}
             </div>
             <div className="flex-1 px-3 py-2.5 text-sm flex items-center gap-2">
               <Package size={15} className="text-primary-500" />
-              {containerStore?.name || "لا يوجد مخزن عبوات مرتبط"}
+              {containerStore?.name || t("لا يوجد مخزن عبوات مرتبط")}
             </div>
           </div>
 
           {containers.length === 0 ? (
             <div className="text-center py-6 text-sm text-ink-400 border border-dashed border-ink-400/20 rounded-xl">
-              لا توجد عبوات مرتبطة بهذا العميل
+              {t("لا توجد عبوات مرتبطة بهذا العميل")}
             </div>
           ) : (
             <div className="overflow-x-auto rounded-2xl border border-ink-400/10">
               <table className="w-full text-right border-collapse min-w-[560px]">
                 <thead>
                   <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
-                    <th className="p-2.5 font-medium">الكود</th>
-                    <th className="p-2.5 font-medium">اسم العبوة</th>
-                    <th className="p-2.5 font-medium">الحالة</th>
-                    <th className="p-2.5 font-medium">وارد</th>
-                    <th className="p-2.5 font-medium">صادر</th>
+                    <th className="p-2.5 font-medium">{t("الكود")}</th>
+                    <th className="p-2.5 font-medium">{t("اسم العبوة")}</th>
+                    <th className="p-2.5 font-medium">{t("الحالة")}</th>
+                    <th className="p-2.5 font-medium">{t("وارد")}</th>
+                    <th className="p-2.5 font-medium">{t("صادر")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -120,7 +121,7 @@ export default function PackagingDrawer({
                               : "bg-ink-400/10 text-ink-400"
                           }`}
                         >
-                          {c.isAssigned ? "مخصصة" : "غير مخصصة"}
+                          {c.isAssigned ? t("مخصصة") : t("غير مخصصة")}
                         </span>
                       </td>
                       <td className="p-2">
@@ -155,11 +156,11 @@ export default function PackagingDrawer({
           <div className="flex gap-2 pt-2">
             <Button onClick={handleSave} className="flex-1">
               <Save size={16} />
-              تأكيد بيانات العبوات
+              {t("تأكيد بيانات العبوات")}
             </Button>
             <Button variant="ghost" onClick={onClose} type="button">
               <X size={16} />
-              إغلاق
+              {t("إغلاق")}
             </Button>
           </div>
         </div>

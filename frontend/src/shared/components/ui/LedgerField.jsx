@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { CalendarDays } from "lucide-react";
 
+import { t } from "../../../i18n";
 /**
  * تاريخ اليوم بتوقيت القاهرة بصيغة YYYY-MM-DD
  */
@@ -217,7 +218,7 @@ export default function LedgerField({
               type="text"
               value={formatDateForDisplay(value)}
               onChange={handleDateTextChange}
-              placeholder="يوم/شهر/سنة"
+              placeholder={t("يوم/شهر/سنة")}
               inputMode="numeric"
               maxLength={10}
               className={`
@@ -256,7 +257,7 @@ export default function LedgerField({
                 hover:bg-primary-50
                 transition
               "
-              aria-label="اختيار التاريخ"
+              aria-label={t("اختيار التاريخ")}
             >
               <CalendarDays className="w-4 h-4" />
             </button>

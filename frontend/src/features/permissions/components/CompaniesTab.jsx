@@ -16,14 +16,15 @@ import {
 } from "../companiesApi";
 import QuickAddCompanyModal from "../components/QuickAddCompanyModal";
 
+import { t } from "../../../i18n";
 const currencyLabels = {
-  EGP: "جنيه مصري",
-  USD: "دولار أمريكي",
-  EUR: "يورو",
-  GBP: "جنيه إسترليني",
-  SAR: "ريال سعودي",
-  AED: "درهم إماراتي",
-  KWD: "دينار كويتي",
+  EGP: t("جنيه مصري"),
+  USD: t("دولار أمريكي"),
+  EUR: t("يورو"),
+  GBP: t("جنيه إسترليني"),
+  SAR: t("ريال سعودي"),
+  AED: t("درهم إماراتي"),
+  KWD: t("دينار كويتي"),
 };
 
 export default function CompaniesTab() {
@@ -51,13 +52,13 @@ export default function CompaniesTab() {
   };
 
   const handleDelete = async (company) => {
-    if (!confirm(`متأكد من حذف شركة "${company.name}"؟`)) return;
+    if (!confirm(t("متأكد من حذف شركة \"{0}\"؟", { 0: company.name }))) return;
     setDeletingId(company.id);
     try {
       await deleteCompany(company.id).unwrap();
-      toast.success("تم حذف الشركة");
+      toast.success(t("تم حذف الشركة"));
     } catch (err) {
-      toast.error(err?.data?.detail || "تعذر حذف الشركة");
+      toast.error(err?.data?.detail || t("تعذر حذف الشركة"));
     } finally {
       setDeletingId(null);
     }
@@ -71,8 +72,8 @@ export default function CompaniesTab() {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <p className="text-sm text-ink-500">كل الشركات المسجلة في النظام</p>
-        <Button onClick={openCreate}>+ شركة جديدة</Button>
+        <p className="text-sm text-ink-500">{t("كل الشركات المسجلة في النظام")}</p>
+        <Button onClick={openCreate}>{t("+ شركة جديدة")}</Button>
       </div>
 
       {isLoading ? (
@@ -92,14 +93,14 @@ export default function CompaniesTab() {
             strokeWidth={1.6}
           />
           <p className="mb-1 font-medium text-ink-900">
-            حدث خطأ في تحميل الشركات
+            {t("حدث خطأ في تحميل الشركات")}
           </p>
           <button
             onClick={refetch}
             className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
           >
             <RefreshCw size={15} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : !isFetching && items.length === 0 ? (
@@ -111,7 +112,7 @@ export default function CompaniesTab() {
               strokeWidth={1.6}
             />
           </div>
-          <p className="font-medium text-ink-900">لا توجد شركات مطابقة</p>
+          <p className="font-medium text-ink-900">{t("لا توجد شركات مطابقة")}</p>
         </div>
       ) : (
         <div
@@ -123,17 +124,17 @@ export default function CompaniesTab() {
             <table className="min-w-full border-collapse text-sm">
               <thead className="bg-ink-900/[0.03]">
                 <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-400">
-                  <th className="px-4 py-3 text-right">الاسم</th>
+                  <th className="px-4 py-3 text-right">{t("الاسم")}</th>
                   <th className="min-w-[140px] px-4 py-3 text-right">
-                    السجل التجاري
+                    {t("السجل التجاري")}
                   </th>
                   <th className="min-w-[140px] px-4 py-3 text-right">
-                    الرقم الضريبي
+                    {t("الرقم الضريبي")}
                   </th>
                   <th className="min-w-[160px] px-4 py-3 text-right">
-                    المدير المسؤول
+                    {t("المدير المسؤول")}
                   </th>
-                  <th className="w-32 px-4 py-3 text-center">العملة</th>
+                  <th className="w-32 px-4 py-3 text-center">{t("العملة")}</th>
                   <th className="w-20 px-4 py-3"></th>
                 </tr>
               </thead>
@@ -165,7 +166,7 @@ export default function CompaniesTab() {
                           type="button"
                           onClick={() => openEdit(c)}
                           className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                          title="تعديل"
+                          title={t("تعديل")}
                         >
                           <Pencil size={14} />
                         </button>
@@ -174,7 +175,7 @@ export default function CompaniesTab() {
                           onClick={() => handleDelete(c)}
                           disabled={deletingId === c.id}
                           className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-negative/10 hover:text-negative disabled:opacity-50"
-                          title="حذف"
+                          title={t("حذف")}
                         >
                           <Trash2 size={14} />
                         </button>
@@ -194,7 +195,7 @@ export default function CompaniesTab() {
                 totalCount={data?.totalCount || 0}
                 onPageChange={setPage}
                 onPageSizeChange={handlePageSizeChange}
-                label="شركة"
+                label={t("شركة")}
               />
             </div>
           )}

@@ -5,12 +5,13 @@ import Input from "../../../shared/components/ui/Input";
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import Button from "../../../shared/components/ui/Button";
 
+import { t } from "../../../i18n";
 const INVOICE_TYPE_OPTIONS = [
-  { value: "", label: "الكل" },
-  { value: "Sales", label: "مبيعات" },
-  { value: "Purchase", label: "مشتريات" },
-  { value: "SalesReturn", label: "مرتجع مبيعات" },
-  { value: "PurchaseReturn", label: "مرتجع مشتريات" },
+  { value: "", label: t("الكل") },
+  { value: "Sales", label: t("مبيعات") },
+  { value: "Purchase", label: t("مشتريات") },
+  { value: "SalesReturn", label: t("مرتجع مبيعات") },
+  { value: "PurchaseReturn", label: t("مرتجع مشتريات") },
 ];
 
 export default function InvoiceItemPricingFilters({
@@ -26,16 +27,16 @@ export default function InvoiceItemPricingFilters({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="lg:col-span-2">
           <Input
-            label="بحث"
+            label={t("بحث")}
             value={draft.search}
             onChange={(event) => setField("search", event.target.value)}
-            placeholder="بحث برقم الفاتورة أو الصنف..."
+            placeholder={t("بحث برقم الفاتورة أو الصنف...")}
           />
         </div>
 
         <div>
           <label className="block text-xs font-medium text-ink-400 mb-1">
-            نوع الفاتورة
+            {t("نوع الفاتورة")}
           </label>
 
           <CompactSelect
@@ -46,14 +47,14 @@ export default function InvoiceItemPricingFilters({
         </div>
 
         <Input
-          label="من تاريخ"
+          label={t("من تاريخ")}
           type="date"
           value={draft.fromDate}
           onChange={(event) => setField("fromDate", event.target.value)}
         />
 
         <Input
-          label="إلى تاريخ"
+          label={t("إلى تاريخ")}
           type="date"
           value={draft.toDate}
           onChange={(event) => setField("toDate", event.target.value)}
@@ -63,12 +64,12 @@ export default function InvoiceItemPricingFilters({
       <div className="flex justify-end gap-2 mt-3">
         <Button onClick={onSearch} className="h-9">
           <Search size={14} />
-          بحث
+          {t("بحث")}
         </Button>
 
         <Button variant="outline" onClick={onReset} className="h-9">
           <RotateCcw size={14} />
-          تصفير
+          {t("تصفير")}
         </Button>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { getLocale } from "../../i18n";
 export const stockTransferEmptyLine = {
   itemId: "",
   quantity: "",
@@ -17,12 +18,12 @@ export const stockTransferEmptyForm = {
 };
 
 export const formatQuantity = (value) =>
-  Number(value || 0).toLocaleString("ar-EG", {
+  Number(value || 0).toLocaleString(getLocale(), {
     maximumFractionDigits: 2,
   });
 
 export const formatMoney = (value) =>
-  Number(value || 0).toLocaleString("ar-EG", {
+  Number(value || 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });

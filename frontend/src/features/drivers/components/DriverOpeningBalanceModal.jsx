@@ -15,9 +15,10 @@ import {
   useUpdateDriverOpeningBalanceMutation,
 } from "../driverOpeningBalancesApi";
 
+import { t } from "../../../i18n";
 const balanceTypeOptions = [
-  { value: "Receivable", label: "مدين (مستحق للشركة)" },
-  { value: "Payable", label: "دائن (مستحق على الشركة)" },
+  { value: "Receivable", label: t("مدين (مستحق للشركة)") },
+  { value: "Payable", label: t("دائن (مستحق على الشركة)") },
 ];
 
 function emptyForm() {
@@ -31,25 +32,25 @@ function emptyForm() {
 
 const ERROR_MESSAGES = {
   "DriverOpeningBalances.Duplicate":
-    "يوجد رصيد افتتاحي لهذا السائق في السنة المالية المحددة بالفعل.",
+    t("يوجد رصيد افتتاحي لهذا السائق في السنة المالية المحددة بالفعل."),
   "DriverOpeningBalances.CarriedForwardExists":
-    "يوجد رصيد مرحّل لهذا السائق في السنة المالية المحددة.",
+    t("يوجد رصيد مرحّل لهذا السائق في السنة المالية المحددة."),
   "DriverOpeningBalances.LegacyOpeningExists":
-    "يوجد قيد افتتاحي سابق لهذا السائق في السنة المالية المحددة.",
+    t("يوجد قيد افتتاحي سابق لهذا السائق في السنة المالية المحددة."),
   "DriverOpeningBalances.InactiveDriver":
-    "لازم السائق يكون نشطًا لإضافة رصيد افتتاحي.",
-  "DriverOpeningBalances.FiscalYearClosed": "السنة المالية مغلقة.",
-  "DriverOpeningBalances.ReadOnly": "الرصيد المرحّل للقراءة فقط.",
+    t("لازم السائق يكون نشطًا لإضافة رصيد افتتاحي."),
+  "DriverOpeningBalances.FiscalYearClosed": t("السنة المالية مغلقة."),
+  "DriverOpeningBalances.ReadOnly": t("الرصيد المرحّل للقراءة فقط."),
   "DriverOpeningBalances.ScopeImmutable":
-    "لا يمكن تغيير السائق أو السنة المالية لمستند رصيد افتتاحي.",
+    t("لا يمكن تغيير السائق أو السنة المالية لمستند رصيد افتتاحي."),
   "DriverOpeningBalances.Concurrency":
-    "تغيّر الرصيد الافتتاحي من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى.",
+    t("تغيّر الرصيد الافتتاحي من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى."),
   "DriverOpeningBalances.RowVersionRequired":
-    "تعذر إرسال إصدار المستند الحالي. أعد تحميل الصفحة وحاول مرة أخرى.",
+    t("تعذر إرسال إصدار المستند الحالي. أعد تحميل الصفحة وحاول مرة أخرى."),
   "DriverOpeningBalances.InvalidAmount":
-    "أدخل مبلغًا موجبًا بحد أقصى 15 خانة صحيحة ومنزلتين عشريتين.",
+    t("أدخل مبلغًا موجبًا بحد أقصى 15 خانة صحيحة ومنزلتين عشريتين."),
   "DriverOpeningBalances.NotesTooLong":
-    "الملاحظات لازم تكون 1000 حرف أو أقل.",
+    t("الملاحظات لازم تكون 1000 حرف أو أقل."),
 };
 
 export default function DriverOpeningBalanceModal({
@@ -95,19 +96,19 @@ export default function DriverOpeningBalanceModal({
     event.preventDefault();
 
     if (!form.driverId) {
-      toast.error("اختر السائق");
+      toast.error(t("اختر السائق"));
       return;
     }
 
     if (!selectedFiscalYear?.id) {
-      toast.error("اختر السنة المالية أولًا");
+      toast.error(t("اختر السنة المالية أولًا"));
       return;
     }
 
     const amount = Number(form.amount);
 
     if (!Number.isFinite(amount) || amount <= 0) {
-      toast.error("أدخل مبلغًا أكبر من صفر");
+      toast.error(t("أدخل مبلغًا أكبر من صفر"));
       return;
     }
 
@@ -129,10 +130,10 @@ export default function DriverOpeningBalanceModal({
           rowVersion: editingItem.rowVersion,
         }).unwrap();
 
-        toast.success("تم تعديل الرصيد الافتتاحي بنجاح");
+        toast.success(t("تم تعديل الرصيد الافتتاحي بنجاح"));
       } else {
         await createBalance(payload).unwrap();
-        toast.success("تم إضافة الرصيد الافتتاحي بنجاح");
+        toast.success(t("تم إضافة الرصيد الافتتاحي بنجاح"));
       }
 
       onClose();
@@ -144,7 +145,7 @@ export default function DriverOpeningBalanceModal({
           error?.data?.detail ||
           error?.data?.message ||
           error?.data?.title ||
-          "تعذر حفظ الرصيد الافتتاحي",
+          t("تعذر حفظ الرصيد الافتتاحي"),
       );
     }
   };
@@ -153,21 +154,20 @@ export default function DriverOpeningBalanceModal({
     <Modal
       isOpen={isOpen}
       onClose={isSaving ? () => {} : onClose}
-      title={isEditing ? "تعديل رصيد افتتاحي للسائق" : "إضافة رصيد افتتاحي للسائق"}
+      title={isEditing ? t("تعديل رصيد افتتاحي للسائق") : t("إضافة رصيد افتتاحي للسائق")}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="rounded-xl border border-ink-400/10 bg-ink-400/5 px-4 py-3 text-xs leading-6 text-ink-500">
-          السنة المالية:{" "}
+          {t("السنة المالية:")}{" "}
           <strong className="text-ink-700">
             {selectedFiscalYear?.name || "—"}
           </strong>
-          . رقم المستند وتاريخه وعملته بيتحددوا تلقائيًا من السنة المالية
-          وإعدادات الشركة.
+          {t(". رقم المستند وتاريخه وعملته بيتحددوا تلقائيًا من السنة المالية وإعدادات الشركة.")}
         </div>
 
         <div>
           <label className="mb-1.5 block text-xs font-semibold text-ink-700">
-            السائق
+            {t("السائق")}
           </label>
 
           <CompactSelect
@@ -179,13 +179,13 @@ export default function DriverOpeningBalanceModal({
             }
             value={form.driverId}
             onChange={(value) => setField("driverId", value)}
-            placeholder="اختر السائق"
+            placeholder={t("اختر السائق")}
             isDisabled={isEditing || isSaving}
           />
 
           {isEditing && (
             <p className="mt-1 text-[11px] text-ink-400">
-              لا يمكن تغيير السائق أو السنة المالية بعد الإنشاء.
+              {t("لا يمكن تغيير السائق أو السنة المالية بعد الإنشاء.")}
             </p>
           )}
         </div>
@@ -193,21 +193,21 @@ export default function DriverOpeningBalanceModal({
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-ink-700">
-              نوع الرصيد
+              {t("نوع الرصيد")}
             </label>
 
             <CompactSelect
               options={balanceTypeOptions}
               value={form.balanceType}
               onChange={(value) => setField("balanceType", value)}
-              placeholder="اختر النوع"
+              placeholder={t("اختر النوع")}
               isDisabled={isSaving}
             />
           </div>
 
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-ink-700">
-              المبلغ
+              {t("المبلغ")}
             </label>
 
             <NumericInput
@@ -221,7 +221,7 @@ export default function DriverOpeningBalanceModal({
 
         <div>
           <label className="mb-1.5 block text-xs font-semibold text-ink-700">
-            ملاحظات
+            {t("ملاحظات")}
           </label>
 
           <textarea
@@ -229,7 +229,7 @@ export default function DriverOpeningBalanceModal({
             maxLength={1000}
             value={form.notes}
             onChange={(event) => setField("notes", event.target.value)}
-            placeholder="أضف ملاحظات اختيارية..."
+            placeholder={t("أضف ملاحظات اختيارية...")}
             className="w-full resize-none rounded-lg border border-ink-400/15 bg-white px-3 py-2 text-sm font-medium text-ink-800 outline-none transition-all duration-200 placeholder:text-ink-400 hover:border-ink-400/25 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
             disabled={isSaving}
           />
@@ -243,19 +243,19 @@ export default function DriverOpeningBalanceModal({
             disabled={isSaving}
             className="flex-1"
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isSaving} className="flex-1">
             {isSaving ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                جاري الحفظ...
+                {t("جاري الحفظ...")}
               </>
             ) : (
               <>
                 <Save size={16} />
-                حفظ
+                {t("حفظ")}
               </>
             )}
           </Button>

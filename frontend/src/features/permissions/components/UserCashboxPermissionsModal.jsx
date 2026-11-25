@@ -11,6 +11,7 @@ import {
   useReplaceUserCashboxPermissionsMutation,
 } from "../../cashboxes/cashboxPermissionsApi";
 
+import { t } from "../../../i18n";
 const emptyGrant = { canView: false, canExecute: false };
 
 /**
@@ -113,16 +114,16 @@ export default function UserCashboxPermissionsModal({ isOpen, onClose, user }) {
         permissions,
       }).unwrap();
 
-      toast.success("تم حفظ صلاحيات الخزائن");
+      toast.success(t("تم حفظ صلاحيات الخزائن"));
       onClose();
     } catch (err) {
       if (err?.status === 409) {
-        toast.error("حدّثت الصلاحيات من مكان تاني — أعدنا التحميل");
+        toast.error(t("حدّثت الصلاحيات من مكان تاني — أعدنا التحميل"));
         refetch();
       } else if (err?.status === 403) {
-        toast.error("مش مسموح لك بتعديل صلاحيات الخزائن");
+        toast.error(t("مش مسموح لك بتعديل صلاحيات الخزائن"));
       } else {
-        toast.error(err?.data?.detail || "تعذر حفظ الصلاحيات");
+        toast.error(err?.data?.detail || t("تعذر حفظ الصلاحيات"));
       }
     }
   };
@@ -131,7 +132,7 @@ export default function UserCashboxPermissionsModal({ isOpen, onClose, user }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`صلاحيات خزائن ${user?.userName || ""}`}
+      title={t("صلاحيات خزائن {0}", { 0: user?.userName || "" })}
     >
       {isLoading ? (
         <div className="space-y-2">
@@ -144,21 +145,19 @@ export default function UserCashboxPermissionsModal({ isOpen, onClose, user }) {
         </div>
       ) : isError ? (
         <div className="rounded-xl border border-negative/25 bg-negative/[0.02] px-4 py-6 text-center text-sm text-negative">
-          تعذر تحميل صلاحيات الخزائن.
+          {t("تعذر تحميل صلاحيات الخزائن.")}
           <button
             type="button"
             onClick={refetch}
             className="mr-2 font-medium underline"
           >
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : (
         <div className="space-y-4">
           <p className="text-xs leading-5 text-ink-400">
-            الصلاحيات على الشركة المختارة حاليًا، ومرتبطة بالمستخدم نفسه (مش
-            بالسنة المالية). «تنفيذ» بيشمل «عرض» تلقائيًا. من غير أي منح،
-            المستخدم مش هيشوف أي خزنة.
+            {t("الصلاحيات على الشركة المختارة حاليًا، ومرتبطة بالمستخدم نفسه (مش بالسنة المالية). «تنفيذ» بيشمل «عرض» تلقائيًا. من غير أي منح، المستخدم مش هيشوف أي خزنة.")}
           </p>
 
           <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-primary-400/20 bg-primary-400/5 p-3">
@@ -172,10 +171,10 @@ export default function UserCashboxPermissionsModal({ isOpen, onClose, user }) {
             <span className="flex-1">
               <span className="flex items-center gap-1.5 text-sm font-medium text-ink-900">
                 <ShieldCheck size={15} className="text-primary-500" />
-                كل الخزائن
+                {t("كل الخزائن")}
               </span>
               <span className="mt-0.5 block text-[11px] text-ink-400">
-                يمنح كل خزائن الشركة الحالية والمستقبلية (صلاحية عرض وتنفيذ).
+                {t("يمنح كل خزائن الشركة الحالية والمستقبلية (صلاحية عرض وتنفيذ).")}
               </span>
             </span>
           </label>
@@ -183,20 +182,20 @@ export default function UserCashboxPermissionsModal({ isOpen, onClose, user }) {
           {!allCashboxes && (
             <div className="overflow-hidden rounded-xl border border-ink-400/10">
               <div className="flex items-center justify-between border-b border-ink-400/10 bg-slate-50 px-3 py-2 text-xs font-semibold text-ink-500">
-                <span>الخزنة</span>
+                <span>{t("الخزنة")}</span>
                 <span className="flex gap-6">
-                  <span className="w-12 text-center">عرض</span>
-                  <span className="w-12 text-center">تنفيذ</span>
+                  <span className="w-12 text-center">{t("عرض")}</span>
+                  <span className="w-12 text-center">{t("تنفيذ")}</span>
                 </span>
               </div>
 
               {isLoadingCashboxes ? (
                 <div className="px-3 py-6 text-center text-sm text-ink-400">
-                  جاري تحميل الخزائن...
+                  {t("جاري تحميل الخزائن...")}
                 </div>
               ) : cashboxes.length === 0 ? (
                 <div className="px-3 py-6 text-center text-sm text-ink-400">
-                  لا توجد خزائن في هذه الشركة.
+                  {t("لا توجد خزائن في هذه الشركة.")}
                 </div>
               ) : (
                 <div className="max-h-72 overflow-y-auto custom-scroll">
@@ -254,8 +253,8 @@ export default function UserCashboxPermissionsModal({ isOpen, onClose, user }) {
           <div className="flex items-center justify-between gap-2 border-t border-ink-400/10 pt-4">
             <span className="text-xs text-ink-400">
               {allCashboxes
-                ? "كل الخزائن ممنوحة"
-                : `${grantedCount} خزنة ممنوحة عرض`}
+                ? t("كل الخزائن ممنوحة")
+                : t("{0} خزنة ممنوحة عرض", { 0: grantedCount })}
             </span>
 
             <div className="flex gap-2">
@@ -265,7 +264,7 @@ export default function UserCashboxPermissionsModal({ isOpen, onClose, user }) {
                 onClick={onClose}
                 disabled={isSaving}
               >
-                إلغاء
+                {t("إلغاء")}
               </Button>
 
               <Button
@@ -278,7 +277,7 @@ export default function UserCashboxPermissionsModal({ isOpen, onClose, user }) {
                 ) : (
                   <Save size={16} />
                 )}
-                حفظ
+                {t("حفظ")}
               </Button>
             </div>
           </div>

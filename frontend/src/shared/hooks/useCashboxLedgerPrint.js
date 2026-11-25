@@ -1,7 +1,8 @@
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
-export function useCashboxLedgerPrint({ title = "كشف حركة الخزنة" }) {
+import { t } from "../../i18n";
+export function useCashboxLedgerPrint({ title = t("كشف حركة الخزنة") }) {
   const printRef = useRef(null);
 
   const printList = useReactToPrint({

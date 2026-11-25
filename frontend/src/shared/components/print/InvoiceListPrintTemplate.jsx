@@ -2,29 +2,31 @@ import { Fragment } from "react";
 import { useSelector } from "react-redux";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const typeLabels = {
-  Sales: "بيع",
-  Purchase: "شراء",
-  SalesReturn: "مرتجع بيع",
-  PurchaseReturn: "مرتجع شراء",
+  Sales: t("بيع"),
+  Purchase: t("شراء"),
+  SalesReturn: t("مرتجع بيع"),
+  PurchaseReturn: t("مرتجع شراء"),
 };
 
 const paymentLabels = {
-  Cash: "نقدي",
-  Credit: "آجل",
+  Cash: t("نقدي"),
+  Credit: t("آجل"),
 };
 
-const fmt = (v) => Number(v || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+const fmt = (v) => Number(v || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 const ITEM_COLUMNS = [
-  "كود الصنف",
-  "اسم الصنف",
-  "الوحدة",
-  "العدد",
-  "الوزن",
-  "الكمية",
-  "السعر",
-  "الإجمالي",
+  t("كود الصنف"),
+  t("اسم الصنف"),
+  t("الوحدة"),
+  t("العدد"),
+  t("الوزن"),
+  t("الكمية"),
+  t("السعر"),
+  t("الإجمالي"),
 ];
 
 /**
@@ -45,7 +47,7 @@ export default function InvoiceListPrintTemplate({
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       style={{
         width: "297mm",
         minHeight: "210mm",
@@ -85,7 +87,7 @@ export default function InvoiceListPrintTemplate({
               margin: "4px 0 0",
             }}
           >
-            تقرير الفواتير التفصيلي
+            {t("تقرير الفواتير التفصيلي")}
           </p>
         </div>
 
@@ -95,9 +97,9 @@ export default function InvoiceListPrintTemplate({
             fontSize: "10px",
           }}
         >
-          <p style={{ margin: "2px 0" }}>تاريخ الطباعة: {today}</p>
+          <p style={{ margin: "2px 0" }}>{t("تاريخ الطباعة:")} {today}</p>
 
-          <p style={{ margin: "2px 0" }}>عدد الفواتير: {invoices.length}</p>
+          <p style={{ margin: "2px 0" }}>{t("عدد الفواتير:")} {invoices.length}</p>
         </div>
       </div>
 
@@ -113,13 +115,13 @@ export default function InvoiceListPrintTemplate({
             flexWrap: "wrap",
           }}
         >
-          {filters.fromDate && <span>من: {formatDate(filters.fromDate)}</span>}
+          {filters.fromDate && <span>{t("من:")} {formatDate(filters.fromDate)}</span>}
 
-          {filters.toDate && <span>إلى: {formatDate(filters.toDate)}</span>}
+          {filters.toDate && <span>{t("إلى:")} {formatDate(filters.toDate)}</span>}
 
           {filters.movementType && (
             <span>
-              النوع:
+              {t("النوع:")}
               {typeLabels[
                 {
                   sale: "Sales",
@@ -184,7 +186,7 @@ export default function InvoiceListPrintTemplate({
                     }}
                   >
                     <span>
-                      #{i + 1} — فاتورة {inv.invoiceNumber || "—"} —{" "}
+                      #{i + 1} {t("— فاتورة")} {inv.invoiceNumber || "—"} —{" "}
                       {typeLabels[inv.invoiceType] || inv.invoiceType || "—"}
                     </span>
                     <span style={{ fontWeight: 400, color: "#55635C" }}>
@@ -197,9 +199,9 @@ export default function InvoiceListPrintTemplate({
                       {paymentLabels[inv.paymentTerm] || "—"}
                     </span>
                     <span>
-                      إجمالي: {fmt(inv.total)}
-                      {" · "}مدفوع: {fmt(inv.paidAmount)}
-                      {" · "}متبقي: {fmt(inv.remainingAmount)}
+                      {t("إجمالي:")} {fmt(inv.total)}
+                      {" · "}{t("مدفوع:")} {fmt(inv.paidAmount)}
+                      {" · "}{t("متبقي:")} {fmt(inv.remainingAmount)}
                     </span>
                   </div>
                 </td>
@@ -230,7 +232,7 @@ export default function InvoiceListPrintTemplate({
                       textAlign: "center",
                     }}
                   >
-                    لا توجد أصناف مسجلة لهذه الفاتورة
+                    {t("لا توجد أصناف مسجلة لهذه الفاتورة")}
                   </td>
                 </tr>
               )}
@@ -257,24 +259,24 @@ export default function InvoiceListPrintTemplate({
           >
             <tbody>
               <tr>
-                <td style={summaryTitle}>إجمالي الكمية</td>
+                <td style={summaryTitle}>{t("إجمالي الكمية")}</td>
                 <td style={{ ...summaryValue, fontWeight: 700 }}>
                   {fmt(summary.totalQuantity)}
                 </td>
               </tr>
 
               <tr>
-                <td style={summaryTitle}>إجمالي قبل الخصم</td>
+                <td style={summaryTitle}>{t("إجمالي قبل الخصم")}</td>
                 <td style={summaryValue}>{fmt(summary.subtotal)}</td>
               </tr>
 
               <tr>
-                <td style={summaryTitle}>إجمالي الخصم</td>
+                <td style={summaryTitle}>{t("إجمالي الخصم")}</td>
                 <td style={summaryValue}>{fmt(summary.discountAmount)}</td>
               </tr>
 
               <tr>
-                <td style={summaryTitle}>الإجمالي النهائي</td>
+                <td style={summaryTitle}>{t("الإجمالي النهائي")}</td>
                 <td
                   style={{
                     ...summaryValue,
@@ -286,7 +288,7 @@ export default function InvoiceListPrintTemplate({
               </tr>
 
               <tr>
-                <td style={summaryTitle}>المدفوع</td>
+                <td style={summaryTitle}>{t("المدفوع")}</td>
                 <td
                   style={{
                     ...summaryValue,
@@ -299,7 +301,7 @@ export default function InvoiceListPrintTemplate({
               </tr>
 
               <tr>
-                <td style={summaryTitle}>المتبقي</td>
+                <td style={summaryTitle}>{t("المتبقي")}</td>
                 <td
                   style={{
                     ...summaryValue,
@@ -336,7 +338,7 @@ export default function InvoiceListPrintTemplate({
               paddingTop: "6px",
             }}
           >
-            توقيع المسؤول
+            {t("توقيع المسؤول")}
           </div>
         </div>
       </div>

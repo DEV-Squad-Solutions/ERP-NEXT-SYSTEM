@@ -7,6 +7,7 @@ import PageLoader from "./PageLoader";
 import UnauthorizedPage from "../UnauthorizedPage";
 import useHiddenScreens from "../../../features/screenAccess/useHiddenScreens";
 import { isPathHidden } from "../../../features/screenAccess/screenList";
+import { getDir } from "../../../i18n";
 
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -15,7 +16,7 @@ export default function DashboardLayout() {
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       className={[
         "h-screen",
         "w-full",

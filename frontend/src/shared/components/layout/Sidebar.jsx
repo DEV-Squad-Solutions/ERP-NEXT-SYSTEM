@@ -7,6 +7,7 @@ import { navigationItems } from "../../constants/navigation";
 import useHiddenScreens from "../../../features/screenAccess/useHiddenScreens";
 import CompanyDetailsModal from "../../../features/company/components/CompanyDetailsModal";
 
+import { t } from "../../../i18n";
 /* =========================================================
    ACCESS CONTROL
 ========================================================= */
@@ -695,7 +696,7 @@ function Sidebar({ isOpen, onClose }) {
       =================================================== */}
 
       <aside
-        aria-label="القائمة الرئيسية"
+        aria-label={t("القائمة الرئيسية")}
         className={[
           "fixed top-0 right-0 z-50",
           "h-screen w-[260px]",
@@ -757,7 +758,7 @@ function Sidebar({ isOpen, onClose }) {
 
                 <span className="min-w-0 flex-1">
                   <span className="mb-0.5 flex items-center gap-1 text-[9px] font-medium text-white/40">
-                    الشركة الحالية
+                    {t("الشركة الحالية")}
                     {company && canViewCompany && (
                       <Info
                         size={10}
@@ -776,7 +777,7 @@ function Sidebar({ isOpen, onClose }) {
                         : "",
                     ].join(" ")}
                   >
-                    {company?.name || "غير محدد"}
+                    {company?.name || t("غير محدد")}
                   </span>
                 </span>
               </div>
@@ -785,7 +786,7 @@ function Sidebar({ isOpen, onClose }) {
             <button
               type="button"
               onClick={handleClose}
-              aria-label="إغلاق القائمة"
+              aria-label={t("إغلاق القائمة")}
               className={[
                 "flex shrink-0 items-center justify-center",
                 "rounded-lg p-1.5",
@@ -809,7 +810,7 @@ function Sidebar({ isOpen, onClose }) {
         ================================================= */}
 
         <nav
-          aria-label="التنقل الرئيسي"
+          aria-label={t("التنقل الرئيسي")}
           className={[
             "custom-scroll",
             "flex-1 overflow-y-auto",
@@ -889,7 +890,7 @@ function Sidebar({ isOpen, onClose }) {
               </span>
 
               <span className="mt-0.5 block text-[8px] text-white/35">
-                © {new Date().getFullYear()} جميع الحقوق محفوظة
+                © {new Date().getFullYear()} {t("جميع الحقوق محفوظة")}
               </span>
             </span>
 

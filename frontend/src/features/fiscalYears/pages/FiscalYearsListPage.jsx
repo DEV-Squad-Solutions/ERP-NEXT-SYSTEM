@@ -37,6 +37,7 @@ import Modal from "../../../shared/components/ui/Modal";
 import Pagination from "../../../shared/components/ui/Pagination";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
 export default function FiscalYearsListPage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -100,13 +101,13 @@ export default function FiscalYearsListPage() {
 
     try {
       await deleteFiscalYear(deleteTarget.id).unwrap();
-      toast.success("تم الحذف بنجاح");
+      toast.success(t("تم الحذف بنجاح"));
       setDeleteTarget(null);
     } catch (error) {
       toast.error(
         error?.data?.detail ||
           error?.data?.title ||
-          "حصل خطأ أثناء الحذف، حاول تاني",
+          t("حصل خطأ أثناء الحذف، حاول تاني"),
       );
     } finally {
       setIsDeleting(false);
@@ -124,13 +125,13 @@ export default function FiscalYearsListPage() {
 
     try {
       await closeFiscalYear(closeTarget.id).unwrap();
-      toast.success("تم إغلاق السنة المالية بنجاح");
+      toast.success(t("تم إغلاق السنة المالية بنجاح"));
       setCloseTarget(null);
     } catch (error) {
       toast.error(
         error?.data?.detail ||
           error?.data?.title ||
-          "حدث خطأ أثناء إغلاق السنة المالية",
+          t("حدث خطأ أثناء إغلاق السنة المالية"),
       );
     } finally {
       setIsClosing(false);
@@ -148,13 +149,13 @@ export default function FiscalYearsListPage() {
 
     try {
       await reopenFiscalYear(reopenTarget.id).unwrap();
-      toast.success("تم إعادة فتح السنة المالية بنجاح");
+      toast.success(t("تم إعادة فتح السنة المالية بنجاح"));
       setReopenTarget(null);
     } catch (error) {
       toast.error(
         error?.data?.detail ||
           error?.data?.title ||
-          "حدث خطأ أثناء إعادة فتح السنة المالية",
+          t("حدث خطأ أثناء إعادة فتح السنة المالية"),
       );
     } finally {
       setIsReopening(false);
@@ -170,10 +171,10 @@ export default function FiscalYearsListPage() {
           </div>
           <div>
             <h2 className="font-display text-2xl font-bold text-ink-900">
-              السنوات المالية
+              {t("السنوات المالية")}
             </h2>
             <p className="text-sm text-ink-400 mt-0.5">
-              إدارة الفترات المالية المفتوحة والمغلقة للشركة
+              {t("إدارة الفترات المالية المفتوحة والمغلقة للشركة")}
             </p>
           </div>
         </div>
@@ -183,7 +184,7 @@ export default function FiscalYearsListPage() {
           className="transition-transform active:scale-[0.98]"
         >
           <Plus size={15} />
-          سنة مالية جديدة
+          {t("سنة مالية جديدة")}
         </Button>
       </div>
 
@@ -191,7 +192,7 @@ export default function FiscalYearsListPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="lg:col-span-2">
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              بحث
+              {t("بحث")}
             </label>
             <div className="relative">
               <Search
@@ -204,7 +205,7 @@ export default function FiscalYearsListPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="ابحث باسم السنة المالية..."
+                placeholder={t("ابحث باسم السنة المالية...")}
                 className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pr-9 pl-3 text-sm outline-none transition-colors focus:border-primary-500"
               />
             </div>
@@ -212,7 +213,7 @@ export default function FiscalYearsListPage() {
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              الحالة
+              {t("الحالة")}
             </label>
             <CompactSelect
               options={fiscalYearStatusOptions}
@@ -221,7 +222,7 @@ export default function FiscalYearsListPage() {
                 setStatus(v);
                 setPage(1);
               }}
-              placeholder="كل الحالات"
+              placeholder={t("كل الحالات")}
             />
           </div>
 
@@ -233,7 +234,7 @@ export default function FiscalYearsListPage() {
               disabled={!hasActiveFilters}
             >
               <RotateCcw size={14} />
-              تصفير الفلاتر
+              {t("تصفير الفلاتر")}
             </Button>
           </div>
         </div>
@@ -249,14 +250,14 @@ export default function FiscalYearsListPage() {
             strokeWidth={1.6}
           />
           <p className="mb-1 font-medium text-ink-900">
-            حدث خطأ في تحميل السنوات المالية
+            {t("حدث خطأ في تحميل السنوات المالية")}
           </p>
           <button
             onClick={refetch}
             className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
           >
             <RotateCcw size={15} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : !isFetching && items.length === 0 ? (
@@ -268,10 +269,10 @@ export default function FiscalYearsListPage() {
               strokeWidth={1.6}
             />
           </div>
-          <p className="font-medium text-ink-900">لا توجد سنوات مالية مطابقة</p>
+          <p className="font-medium text-ink-900">{t("لا توجد سنوات مالية مطابقة")}</p>
           {hasActiveFilters && (
             <p className="text-xs text-ink-400 mt-1">
-              جرّب تغيير البحث أو الفلتر
+              {t("جرّب تغيير البحث أو الفلتر")}
             </p>
           )}
         </div>
@@ -285,13 +286,13 @@ export default function FiscalYearsListPage() {
             <table className="min-w-full border-collapse text-sm">
               <thead className="bg-slate-50">
                 <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
-                  <th className="px-4 py-3 text-right">الاسم</th>
-                  <th className="px-4 py-3 text-center">تاريخ البداية</th>
-                  <th className="px-4 py-3 text-center">تاريخ النهاية</th>
-                  <th className="px-4 py-3 text-center">الحالة</th>
-                  <th className="px-4 py-3 text-center">الحالية</th>
-                  <th className="px-4 py-3 text-center">تاريخ الإغلاق</th>
-                  <th className="px-4 py-3 text-center">إجراءات</th>
+                  <th className="px-4 py-3 text-right">{t("الاسم")}</th>
+                  <th className="px-4 py-3 text-center">{t("تاريخ البداية")}</th>
+                  <th className="px-4 py-3 text-center">{t("تاريخ النهاية")}</th>
+                  <th className="px-4 py-3 text-center">{t("الحالة")}</th>
+                  <th className="px-4 py-3 text-center">{t("الحالية")}</th>
+                  <th className="px-4 py-3 text-center">{t("تاريخ الإغلاق")}</th>
+                  <th className="px-4 py-3 text-center">{t("إجراءات")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -346,7 +347,7 @@ export default function FiscalYearsListPage() {
                               size={11}
                               className="fill-primary-500 text-primary-500"
                             />
-                            الحالية
+                            {t("الحالية")}
                           </span>
                         )}
                       </td>
@@ -363,7 +364,7 @@ export default function FiscalYearsListPage() {
                             onClick={() => openEditForm(fy)}
                             disabled={isBusy}
                             className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-ink-400/5 hover:text-ink-700 disabled:opacity-40"
-                            title="تعديل"
+                            title={t("تعديل")}
                           >
                             <Pencil size={14} />
                           </button>
@@ -373,7 +374,7 @@ export default function FiscalYearsListPage() {
                               onClick={() => handleClose(fy)}
                               disabled={isBusy}
                               className="rounded-lg p-1.5 text-amber-600 transition-colors hover:bg-amber-50 disabled:opacity-40"
-                              title="إغلاق السنة المالية"
+                              title={t("إغلاق السنة المالية")}
                             >
                               {isBusy ? (
                                 <Loader2 size={14} className="animate-spin" />
@@ -386,7 +387,7 @@ export default function FiscalYearsListPage() {
                               onClick={() => handleReopen(fy)}
                               disabled={isBusy}
                               className="rounded-lg p-1.5 text-positive transition-colors hover:bg-positive/10 disabled:opacity-40"
-                              title="إعادة فتح السنة المالية"
+                              title={t("إعادة فتح السنة المالية")}
                             >
                               {isBusy ? (
                                 <Loader2 size={14} className="animate-spin" />
@@ -400,7 +401,7 @@ export default function FiscalYearsListPage() {
                             onClick={() => handleDelete(fy)}
                             disabled={isBusy}
                             className="rounded-lg p-1.5 text-negative transition-colors hover:bg-negative/10 disabled:opacity-40"
-                            title="حذف"
+                            title={t("حذف")}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -424,7 +425,7 @@ export default function FiscalYearsListPage() {
                   setPageSize(size);
                   setPage(1);
                 }}
-                label="سنة مالية"
+                label={t("سنة مالية")}
               />
             </div>
           )}
@@ -441,7 +442,7 @@ export default function FiscalYearsListPage() {
       <Modal
         isOpen={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
-        title="تأكيد الحذف"
+        title={t("تأكيد الحذف")}
       >
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-xl border border-negative/20 bg-negative/[0.03] px-4 py-3">
@@ -451,11 +452,11 @@ export default function FiscalYearsListPage() {
               strokeWidth={1.8}
             />
             <p className="text-sm leading-relaxed text-ink-700">
-              هل أنت متأكد من حذف السنة المالية{" "}
+              {t("هل أنت متأكد من حذف السنة المالية")}{" "}
               <span className="font-semibold text-ink-900">
                 "{deleteTarget?.name}"
               </span>
-              ؟ هذا الإجراء لا يمكن التراجع عنه.
+              {t("؟ هذا الإجراء لا يمكن التراجع عنه.")}
             </p>
           </div>
 
@@ -466,7 +467,7 @@ export default function FiscalYearsListPage() {
               onClick={() => setDeleteTarget(null)}
               disabled={isDeleting}
             >
-              إلغاء
+              {t("إلغاء")}
             </Button>
             <Button
               type="button"
@@ -477,10 +478,10 @@ export default function FiscalYearsListPage() {
               {isDeleting ? (
                 <span className="flex items-center gap-2">
                   <Loader2 size={14} className="animate-spin" />
-                  جارِ الحذف...
+                  {t("جارِ الحذف...")}
                 </span>
               ) : (
-                "تأكيد الحذف"
+                t("تأكيد الحذف")
               )}
             </Button>
           </div>
@@ -489,7 +490,7 @@ export default function FiscalYearsListPage() {
       <Modal
         isOpen={Boolean(closeTarget)}
         onClose={() => setCloseTarget(null)}
-        title="تأكيد إغلاق السنة المالية"
+        title={t("تأكيد إغلاق السنة المالية")}
       >
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] px-4 py-3">
@@ -499,11 +500,11 @@ export default function FiscalYearsListPage() {
               strokeWidth={1.8}
             />
             <p className="text-sm leading-relaxed text-ink-700">
-              هل أنت متأكد من إغلاق السنة المالية{" "}
+              {t("هل أنت متأكد من إغلاق السنة المالية")}{" "}
               <span className="font-semibold text-ink-900">
                 "{closeTarget?.name}"
               </span>
-              ؟ لن يمكن إضافة أو تعديل حركات في هذه السنة بعد الإغلاق.
+              {t("؟ لن يمكن إضافة أو تعديل حركات في هذه السنة بعد الإغلاق.")}
             </p>
           </div>
 
@@ -514,7 +515,7 @@ export default function FiscalYearsListPage() {
               onClick={() => setCloseTarget(null)}
               disabled={isClosing}
             >
-              إلغاء
+              {t("إلغاء")}
             </Button>
             <Button
               type="button"
@@ -525,10 +526,10 @@ export default function FiscalYearsListPage() {
               {isClosing ? (
                 <span className="flex items-center gap-2">
                   <Loader2 size={14} className="animate-spin" />
-                  جارِ الإغلاق...
+                  {t("جارِ الإغلاق...")}
                 </span>
               ) : (
-                "تأكيد الإغلاق"
+                t("تأكيد الإغلاق")
               )}
             </Button>
           </div>
@@ -538,7 +539,7 @@ export default function FiscalYearsListPage() {
       <Modal
         isOpen={Boolean(reopenTarget)}
         onClose={() => setReopenTarget(null)}
-        title="تأكيد إعادة فتح السنة المالية"
+        title={t("تأكيد إعادة فتح السنة المالية")}
       >
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-xl border border-positive/20 bg-positive/[0.04] px-4 py-3">
@@ -548,11 +549,11 @@ export default function FiscalYearsListPage() {
               strokeWidth={1.8}
             />
             <p className="text-sm leading-relaxed text-ink-700">
-              هل أنت متأكد من إعادة فتح السنة المالية{" "}
+              {t("هل أنت متأكد من إعادة فتح السنة المالية")}{" "}
               <span className="font-semibold text-ink-900">
                 "{reopenTarget?.name}"
               </span>
-              ؟ سيصبح بإمكان إضافة وتعديل حركات في هذه السنة مرة أخرى.
+              {t("؟ سيصبح بإمكان إضافة وتعديل حركات في هذه السنة مرة أخرى.")}
             </p>
           </div>
 
@@ -563,7 +564,7 @@ export default function FiscalYearsListPage() {
               onClick={() => setReopenTarget(null)}
               disabled={isReopening}
             >
-              إلغاء
+              {t("إلغاء")}
             </Button>
             <Button
               type="button"
@@ -573,10 +574,10 @@ export default function FiscalYearsListPage() {
               {isReopening ? (
                 <span className="flex items-center gap-2">
                   <Loader2 size={14} className="animate-spin" />
-                  جارِ إعادة الفتح...
+                  {t("جارِ إعادة الفتح...")}
                 </span>
               ) : (
-                "تأكيد إعادة الفتح"
+                t("تأكيد إعادة الفتح")
               )}
             </Button>
           </div>

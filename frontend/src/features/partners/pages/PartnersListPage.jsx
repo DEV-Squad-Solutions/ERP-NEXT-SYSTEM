@@ -20,6 +20,8 @@ import Pagination from "../../../shared/components/ui/Pagination";
 import { useInvoiceListPrint } from "../../../shared/hooks/useInvoiceListPrint";
 import PartyListPrintTemplate from "../../../shared/components/print/PartyListPrintTemplate";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const CURRENCIES = ["EGP", "USD", "EUR", "GBP", "SAR", "AED", "KWD"];
 
 export default function PartnersListPage() {
@@ -91,28 +93,28 @@ export default function PartnersListPage() {
   };
 
   const handleDelete = (party) => {
-    toast(`حذف "${party.name}"؟`, {
-      description: "الإجراء ده لا يمكن التراجع عنه",
+    toast(t("حذف \"{0}\"؟", { 0: party.name }), {
+      description: t("الإجراء ده لا يمكن التراجع عنه"),
       action: {
-        label: "تأكيد الحذف",
+        label: t("تأكيد الحذف"),
 
         onClick: async () => {
           try {
             await deleteParty(party.id).unwrap();
 
-            toast.success("تم الحذف بنجاح");
+            toast.success(t("تم الحذف بنجاح"));
           } catch (error) {
             toast.error(
               error?.data?.message ||
                 error?.data?.title ||
-                "حصل خطأ أثناء الحذف",
+                t("حصل خطأ أثناء الحذف"),
             );
           }
         },
       },
 
       cancel: {
-        label: "إلغاء",
+        label: t("إلغاء"),
       },
 
       duration: 6000,
@@ -120,7 +122,7 @@ export default function PartnersListPage() {
   };
 
   const { printList, printRef } = useInvoiceListPrint({
-    title: "تقرير العملاء والموردين",
+    title: t("تقرير العملاء والموردين"),
   });
 
   return (
@@ -129,7 +131,7 @@ export default function PartnersListPage() {
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <div>
           <p className="mt-1 text-sm text-gray-500">
-            إجمالي العملاء والموردين: {data?.totalCount ?? 0}
+            {t("إجمالي العملاء والموردين:")} {data?.totalCount ?? 0}
           </p>
         </div>
 
@@ -141,7 +143,7 @@ export default function PartnersListPage() {
               onClick={() => setShowFilters((prev) => !prev)}
             >
               <SlidersHorizontal size={16} />
-              فلاتر
+              {t("فلاتر")}
               {hasActiveFilters && (
                 <span className="mr-1 h-1.5 w-1.5 rounded-full bg-emerald-700" />
               )}
@@ -151,21 +153,21 @@ export default function PartnersListPage() {
               <div className="absolute left-0 z-20 mt-2 w-80 space-y-3 rounded-2xl border border-ink-400/10 bg-white p-4 shadow-lg">
                 <div>
                   <label className="mb-1.5 block text-xs text-ink-400">
-                    بحث
+                    {t("بحث")}
                   </label>
 
                   <input
                     type="text"
                     value={filters.search}
                     onChange={handleChange("search")}
-                    placeholder="ابحث بالاسم..."
+                    placeholder={t("ابحث بالاسم...")}
                     className="w-full rounded-xl border border-ink-400/15 px-3 py-2 text-sm focus:border-emerald-700/50 focus:outline-none focus:ring-2 focus:ring-emerald-700/10"
                   />
                 </div>
 
                 <div>
                   <label className="mb-1.5 block text-xs text-ink-400">
-                    الكود
+                    {t("الكود")}
                   </label>
 
                   <input
@@ -178,7 +180,7 @@ export default function PartnersListPage() {
 
                 <div>
                   <label className="mb-1.5 block text-xs text-ink-400">
-                    الرقم الضريبي
+                    {t("الرقم الضريبي")}
                   </label>
 
                   <input
@@ -191,7 +193,7 @@ export default function PartnersListPage() {
 
                 <div>
                   <label className="mb-1.5 block text-xs text-ink-400">
-                    العملة
+                    {t("العملة")}
                   </label>
 
                   <select
@@ -199,7 +201,7 @@ export default function PartnersListPage() {
                     onChange={handleChange("currency")}
                     className="w-full rounded-xl border border-ink-400/15 bg-white px-3 py-2 text-sm focus:border-emerald-700/50 focus:outline-none"
                   >
-                    <option value="">الكل</option>
+                    <option value="">{t("الكل")}</option>
 
                     {CURRENCIES.map((currency) => (
                       <option key={currency} value={currency}>
@@ -211,7 +213,7 @@ export default function PartnersListPage() {
 
                 <div>
                   <label className="mb-1.5 block text-xs text-ink-400">
-                    الحالة
+                    {t("الحالة")}
                   </label>
 
                   <select
@@ -219,15 +221,15 @@ export default function PartnersListPage() {
                     onChange={handleChange("isActive")}
                     className="w-full rounded-xl border border-ink-400/15 bg-white px-3 py-2 text-sm focus:border-emerald-700/50 focus:outline-none"
                   >
-                    <option value="">الكل</option>
-                    <option value="true">نشط</option>
-                    <option value="false">غير نشط</option>
+                    <option value="">{t("الكل")}</option>
+                    <option value="true">{t("نشط")}</option>
+                    <option value="false">{t("غير نشط")}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="mb-1.5 block text-xs text-ink-400">
-                    نوع الشريك
+                    {t("نوع الشريك")}
                   </label>
 
                   <select
@@ -235,9 +237,9 @@ export default function PartnersListPage() {
                     onChange={handleChange("special")}
                     className="w-full rounded-xl border border-ink-400/15 bg-white px-3 py-2 text-sm focus:border-emerald-700/50 focus:outline-none"
                   >
-                    <option value="">الكل</option>
-                    <option value="true">خاص</option>
-                    <option value="false">عادي</option>
+                    <option value="">{t("الكل")}</option>
+                    <option value="true">{t("خاص")}</option>
+                    <option value="false">{t("عادي")}</option>
                   </select>
                 </div>
 
@@ -248,7 +250,7 @@ export default function PartnersListPage() {
                     className="flex items-center gap-1.5 pt-1 text-xs text-ink-400 hover:text-emerald-700"
                   >
                     <RotateCcw size={12} />
-                    إعادة تعيين الفلاتر
+                    {t("إعادة تعيين الفلاتر")}
                   </button>
                 )}
               </div>
@@ -258,13 +260,13 @@ export default function PartnersListPage() {
           {/* Print */}
           <Button variant="outline" onClick={printList}>
             <Printer size={16} />
-            طباعة القائمة
+            {t("طباعة القائمة")}
           </Button>
 
           {/* Create */}
           <Button onClick={openCreate}>
             <Plus size={16} />
-            إنشاء شريك
+            {t("إنشاء شريك")}
           </Button>
         </div>
       </div>
@@ -284,21 +286,21 @@ export default function PartnersListPage() {
 
         {isError && (
           <div className="py-16 text-center">
-            <p className="mb-3 text-red-500">حدث خطأ أثناء تحميل البيانات</p>
+            <p className="mb-3 text-red-500">{t("حدث خطأ أثناء تحميل البيانات")}</p>
 
             <Button variant="outline" onClick={refetch}>
-              إعادة المحاولة
+              {t("إعادة المحاولة")}
             </Button>
           </div>
         )}
 
         {!isLoading && !isError && parties.length === 0 && (
           <div className="py-16 text-center">
-            <p className="mb-3 text-ink-400">لا يوجد عملاء أو موردين</p>
+            <p className="mb-3 text-ink-400">{t("لا يوجد عملاء أو موردين")}</p>
 
             <Button onClick={openCreate}>
               <Plus size={16} />
-              إنشاء شريك
+              {t("إنشاء شريك")}
             </Button>
           </div>
         )}
@@ -309,21 +311,21 @@ export default function PartnersListPage() {
               <table className="w-full text-right">
                 <thead>
                   <tr className="bg-ink-400/5 text-xs text-ink-400">
-                    <th className="px-4 py-3 font-medium">الكود</th>
+                    <th className="px-4 py-3 font-medium">{t("الكود")}</th>
 
-                    <th className="px-4 py-3 font-medium">الاسم</th>
+                    <th className="px-4 py-3 font-medium">{t("الاسم")}</th>
 
-                    <th className="px-4 py-3 font-medium">التليفون</th>
+                    <th className="px-4 py-3 font-medium">{t("التليفون")}</th>
 
-                    <th className="px-4 py-3 font-medium">العملة</th>
+                    <th className="px-4 py-3 font-medium">{t("العملة")}</th>
 
-                    <th className="px-4 py-3 font-medium">حد الائتمان</th>
+                    <th className="px-4 py-3 font-medium">{t("حد الائتمان")}</th>
 
-                    <th className="px-4 py-3 font-medium">النوع</th>
+                    <th className="px-4 py-3 font-medium">{t("النوع")}</th>
 
-                    <th className="px-4 py-3 font-medium">الحالة</th>
+                    <th className="px-4 py-3 font-medium">{t("الحالة")}</th>
 
-                    <th className="px-4 py-3 font-medium">إجراءات</th>
+                    <th className="px-4 py-3 font-medium">{t("إجراءات")}</th>
                   </tr>
                 </thead>
 
@@ -362,7 +364,7 @@ export default function PartnersListPage() {
 
                       <td className="whitespace-nowrap px-4 py-3 font-semibold text-ink-900">
                         {party.creditLimit != null
-                          ? party.creditLimit.toLocaleString("ar-EG", { maximumFractionDigits: 2 })
+                          ? party.creditLimit.toLocaleString(getLocale(), { maximumFractionDigits: 2 })
                           : "—"}
                       </td>
 
@@ -374,7 +376,7 @@ export default function PartnersListPage() {
                               : "rounded-full bg-ink-400/10 px-2 py-0.5 text-xs font-semibold text-ink-400"
                           }
                         >
-                          {party.special ? "خاص" : "عادي"}
+                          {party.special ? t("خاص") : t("عادي")}
                         </span>
                       </td>
 
@@ -386,7 +388,7 @@ export default function PartnersListPage() {
                               : "rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-500"
                           }
                         >
-                          {party.isActive ? "نشط" : "غير نشط"}
+                          {party.isActive ? t("نشط") : t("غير نشط")}
                         </span>
                       </td>
 
@@ -400,7 +402,7 @@ export default function PartnersListPage() {
                           className="h-8 px-2"
                         >
                           <Pencil size={15} />
-                          تعديل
+                          {t("تعديل")}
                         </Button>
                       </td>
                     </tr>

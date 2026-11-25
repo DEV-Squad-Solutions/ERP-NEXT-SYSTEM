@@ -16,11 +16,13 @@ import StoreTransfersTab from "../components/StoreTransfersTab";
 import { useStorePrint } from "../../../shared/hooks/useStorePrint";
 import StorePrintTemplate from "../../../shared/components/print/StorePrintTemplate";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const TABS = [
-  { key: "overview", label: "نظرة عامة" },
-  { key: "inventory", label: "الأصناف" },
-  { key: "movements", label: "الحركات" },
-  { key: "transfers", label: "التحويلات" },
+  { key: "overview", label: t("نظرة عامة") },
+  { key: "inventory", label: t("الأصناف") },
+  { key: "movements", label: t("الحركات") },
+  { key: "transfers", label: t("التحويلات") },
 ];
 const TAB_KEYS = TABS.map((t) => t.key);
 
@@ -55,19 +57,19 @@ export default function StoreDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("هل أنت متأكد من حذف هذا المخزن؟")) return;
+    if (!window.confirm(t("هل أنت متأكد من حذف هذا المخزن؟"))) return;
     try {
       await deleteStore(storeId).unwrap();
-      toast.success("تم حذف المخزن بنجاح");
+      toast.success(t("تم حذف المخزن بنجاح"));
       navigate("/dashboard/stores");
     } catch (err) {
-      toast.error(err?.data?.title || "حدث خطأ أثناء حذف المخزن");
+      toast.error(err?.data?.title || t("حدث خطأ أثناء حذف المخزن"));
     }
   };
 
   if (isLoading) {
     return (
-      <div className="p-6" dir="rtl">
+      <div className="p-6" dir={getDir()}>
         <StoreDetailSkeleton />
       </div>
     );
@@ -75,20 +77,20 @@ export default function StoreDetailPage() {
 
   if (isError || !store) {
     return (
-      <div className="p-6 text-center" dir="rtl">
-        <p className="text-ink-500">تعذر تحميل بيانات المخزن.</p>
+      <div className="p-6 text-center" dir={getDir()}>
+        <p className="text-ink-500">{t("تعذر تحميل بيانات المخزن.")}</p>
         <button
           onClick={() => navigate("/dashboard/stores")}
           className="mt-3 text-sm text-ink-600 underline"
         >
-          الرجوع لقائمة المخازن
+          {t("الرجوع لقائمة المخازن")}
         </button>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto" dir="rtl">
+    <div className="p-6 max-w-7xl mx-auto" dir={getDir()}>
       <StoreHeader
         store={store}
         onPrint={() => printStore({ ...store, ...stats })}

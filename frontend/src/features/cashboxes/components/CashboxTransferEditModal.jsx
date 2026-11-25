@@ -10,22 +10,24 @@ import Input from "../../../shared/components/ui/Input";
 import Button from "../../../shared/components/ui/Button";
 import { useUpdateCashboxTransferMutation } from "../cashboxTransfersApi";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const schema = z
   .object({
     fromCashboxId: z.coerce.number({
-      invalid_type_error: "اختر الخزنة المحوّل منها",
+      invalid_type_error: t("اختر الخزنة المحوّل منها"),
     }),
     toCashboxId: z.coerce.number({
-      invalid_type_error: "اختر الخزنة المحوّل إليها",
+      invalid_type_error: t("اختر الخزنة المحوّل إليها"),
     }),
     amount: z.coerce
-      .number({ invalid_type_error: "أدخل مبلغ صحيح" })
-      .positive("المبلغ لازم يكون أكبر من صفر"),
-    date: z.string().min(1, "التاريخ مطلوب"),
+      .number({ invalid_type_error: t("أدخل مبلغ صحيح") })
+      .positive(t("المبلغ لازم يكون أكبر من صفر")),
+    date: z.string().min(1, t("التاريخ مطلوب")),
     notes: z.string().optional(),
   })
   .refine((data) => data.fromCashboxId !== data.toCashboxId, {
-    message: "لا يمكن التحويل لنفس الخزنة",
+    message: t("لا يمكن التحويل لنفس الخزنة"),
     path: ["toCashboxId"],
   });
 
@@ -78,30 +80,30 @@ export default function CashboxTransferEditModal({
         rowVersion: transfer.rowVersion,
         ...values,
       }).unwrap();
-      toast.success("تم تعديل التحويل بنجاح");
+      toast.success(t("تم تعديل التحويل بنجاح"));
       onDone?.();
       onClose();
     } catch (err) {
       const message = err?.data?.message ?? err?.data?.detail;
-      toast.error(message ?? "تعذر تعديل التحويل");
+      toast.error(message ?? t("تعذر تعديل التحويل"));
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="تعديل تحويل">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("تعديل تحويل")}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Controller
           control={control}
           name="fromCashboxId"
           render={({ field }) => (
             <div>
-              <label className="mb-1 block text-sm font-medium">من خزنة</label>
+              <label className="mb-1 block text-sm font-medium">{t("من خزنة")}</label>
               <select {...field} className="w-full rounded-lg border px-3 py-2">
-                <option value="">اختر الخزنة</option>
+                <option value="">{t("اختر الخزنة")}</option>
                 {cashboxOptions.map((cb) => (
                   <option key={cb.id} value={cb.id}>
                     {cb.name} ({cb.code}) —{" "}
-                    {cb.currentBalance?.toLocaleString("ar-EG", { maximumFractionDigits: 2 })} {cb.currency}
+                    {cb.currentBalance?.toLocaleString(getLocale(), { maximumFractionDigits: 2 })} {cb.currency}
                   </option>
                 ))}
               </select>
@@ -119,13 +121,13 @@ export default function CashboxTransferEditModal({
           name="toCashboxId"
           render={({ field }) => (
             <div>
-              <label className="mb-1 block text-sm font-medium">إلى خزنة</label>
+              <label className="mb-1 block text-sm font-medium">{t("إلى خزنة")}</label>
               <select {...field} className="w-full rounded-lg border px-3 py-2">
-                <option value="">اختر الخزنة</option>
+                <option value="">{t("اختر الخزنة")}</option>
                 {cashboxOptions.map((cb) => (
                   <option key={cb.id} value={cb.id}>
                     {cb.name} ({cb.code}) —{" "}
-                    {cb.currentBalance?.toLocaleString("ar-EG", { maximumFractionDigits: 2 })} {cb.currency}
+                    {cb.currentBalance?.toLocaleString(getLocale(), { maximumFractionDigits: 2 })} {cb.currency}
                   </option>
                 ))}
               </select>
@@ -139,7 +141,7 @@ export default function CashboxTransferEditModal({
         />
 
         <Input
-          label="المبلغ"
+          label={t("المبلغ")}
           type="number"
           step="0.01"
           error={errors.amount?.message}
@@ -147,7 +149,7 @@ export default function CashboxTransferEditModal({
         />
 
         <Input
-          label="التاريخ"
+          label={t("التاريخ")}
           type="date"
           error={errors.date?.message}
           min={selectedFiscalYear?.startDate}
@@ -156,17 +158,17 @@ export default function CashboxTransferEditModal({
         />
 
         <Input
-          label="ملاحظات (اختياري)"
+          label={t("ملاحظات (اختياري)")}
           placeholder="..."
           {...register("notes")}
         />
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "جاري الحفظ..." : "حفظ التعديلات"}
+            {isLoading ? t("جاري الحفظ...") : t("حفظ التعديلات")}
           </Button>
         </div>
       </form>

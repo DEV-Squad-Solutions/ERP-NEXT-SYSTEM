@@ -20,15 +20,16 @@ import {
 
 import { attendanceStatusOptions, dayRatioOptions } from "../payroll.constants";
 
+import { t } from "../../../i18n";
 const schema = z
   .object({
-    employeeId: z.string().min(1, "الموظف مطلوب"),
+    employeeId: z.string().min(1, t("الموظف مطلوب")),
 
-    workDate: z.string().min(1, "التاريخ مطلوب"),
+    workDate: z.string().min(1, t("التاريخ مطلوب")),
 
     status: z.enum(["Present", "Absent"], {
       errorMap: () => ({
-        message: "الحالة غير صحيحة",
+        message: t("الحالة غير صحيحة"),
       }),
     }),
 
@@ -46,7 +47,7 @@ const schema = z
     if (data.status === "Present" && !data.checkIn) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "وقت الحضور مطلوب للحاضر",
+        message: t("وقت الحضور مطلوب للحاضر"),
         path: ["checkIn"],
       });
     }
@@ -54,7 +55,7 @@ const schema = z
     if (data.checkOut && !data.checkIn) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "يجب تحديد وقت الحضور أولاً",
+        message: t("يجب تحديد وقت الحضور أولاً"),
         path: ["checkIn"],
       });
     }
@@ -163,7 +164,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
       .filter((employee) => employee?.id != null)
       .map((employee) => ({
         id: Number(employee.id),
-        name: employee.name || `موظف #${employee.id}`,
+        name: employee.name || t("موظف #{0}", { 0: employee.id }),
       }));
   }, [employeesData]);
 
@@ -279,11 +280,11 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
           ...payload,
         }).unwrap();
 
-        toast.success("تم تحديث سجل الحضور بنجاح");
+        toast.success(t("تم تحديث سجل الحضور بنجاح"));
       } else {
         await createAttendance(payload).unwrap();
 
-        toast.success("تم تسجيل الحضور بنجاح");
+        toast.success(t("تم تسجيل الحضور بنجاح"));
       }
 
       onClose();
@@ -300,7 +301,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
         firstValidationError ||
           error?.data?.message ||
           error?.data?.title ||
-          "حصل خطأ أثناء حفظ سجل الحضور، حاول تاني",
+          t("حصل خطأ أثناء حفظ سجل الحضور، حاول تاني"),
       );
     }
   };
@@ -309,12 +310,12 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل سجل حضور" : "تسجيل حضور / غياب"}
+      title={isEdit ? t("تعديل سجل حضور") : t("تسجيل حضور / غياب")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="block text-xs font-medium text-ink-400 mb-1">
-            الموظف
+            {t("الموظف")}
           </label>
 
           <Controller
@@ -326,7 +327,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
                 value={field.value}
                 onChange={field.onChange}
                 placeholder={
-                  employeesLoading ? "جاري تحميل الموظفين..." : "اختر الموظف"
+                  employeesLoading ? t("جاري تحميل الموظفين...") : t("اختر الموظف")
                 }
                 isDisabled={isEdit || employeesLoading}
               />
@@ -342,7 +343,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
-            label="التاريخ"
+            label={t("التاريخ")}
             type="date"
             min={selectedFiscalYear?.startDate}
             max={selectedFiscalYear?.endDate}
@@ -352,7 +353,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              الحالة
+              {t("الحالة")}
             </label>
 
             <Controller
@@ -363,7 +364,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
                   options={attendanceStatusOptions}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="اختر الحالة"
+                  placeholder={t("اختر الحالة")}
                 />
               )}
             />
@@ -379,14 +380,14 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
         {needsTimes && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="وقت الحضور"
+              label={t("وقت الحضور")}
               type="time"
               {...register("checkIn")}
               error={errors.checkIn?.message}
             />
 
             <Input
-              label="وقت الانصراف"
+              label={t("وقت الانصراف")}
               type="time"
               {...register("checkOut")}
               error={errors.checkOut?.message}
@@ -397,18 +398,18 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
         <div className="rounded-xl border border-ink-400/10 bg-ink-900/[0.02] p-3">
           <div className="mb-3">
             <p className="text-sm font-semibold text-ink-900">
-              احتساب يوم العمل
+              {t("احتساب يوم العمل")}
             </p>
 
             <p className="text-[11px] text-ink-400 mt-0.5">
-              تحديد نسبة اليوم والإضافي والخصم
+              {t("تحديد نسبة اليوم والإضافي والخصم")}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-medium text-ink-400 mb-1">
-                نسبة اليوم
+                {t("نسبة اليوم")}
               </label>
 
               <Controller
@@ -419,7 +420,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
                     options={dayRatioOptions}
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="نسبة اليوم"
+                    placeholder={t("نسبة اليوم")}
                     isDisabled={status === "Absent"}
                   />
                 )}
@@ -428,7 +429,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
 
             <div>
               <label className="block text-xs font-medium text-ink-400 mb-1">
-                الإضافي
+                {t("الإضافي")}
               </label>
 
               <Controller
@@ -439,7 +440,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
                     options={dayRatioOptions}
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="بدون إضافي"
+                    placeholder={t("بدون إضافي")}
                   />
                 )}
               />
@@ -447,7 +448,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
 
             <div>
               <label className="block text-xs font-medium text-ink-400 mb-1">
-                الخصم
+                {t("الخصم")}
               </label>
 
               <Controller
@@ -458,7 +459,7 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
                     options={dayRatioOptions}
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="بدون خصم"
+                    placeholder={t("بدون خصم")}
                   />
                 )}
               />
@@ -467,15 +468,15 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
         </div>
 
         <Input
-          label="مكان العمل"
-          placeholder="مثال: المكتب الرئيسي"
+          label={t("مكان العمل")}
+          placeholder={t("مثال: المكتب الرئيسي")}
           {...register("workLocation")}
           error={errors.workLocation?.message}
         />
 
         <Input
-          label="ملاحظات"
-          placeholder="أضف ملاحظات على سجل الحضور..."
+          label={t("ملاحظات")}
+          placeholder={t("أضف ملاحظات على سجل الحضور...")}
           {...register("notes")}
           error={errors.notes?.message}
         />
@@ -487,15 +488,15 @@ export default function AttendanceFormModal({ isOpen, onClose, attendance }) {
             onClick={onClose}
             disabled={isSubmitting}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting
-              ? "جارِ الحفظ..."
+              ? t("جارِ الحفظ...")
               : isEdit
-                ? "حفظ التعديلات"
-                : "تسجيل الحضور"}
+                ? t("حفظ التعديلات")
+                : t("تسجيل الحضور")}
           </Button>
         </div>
       </form>

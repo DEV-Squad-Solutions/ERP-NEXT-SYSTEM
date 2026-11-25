@@ -15,6 +15,7 @@ import Modal from "../../../shared/components/ui/Modal";
 import Input from "../../../shared/components/ui/Input";
 import Button from "../../../shared/components/ui/Button";
 
+import { t } from "../../../i18n";
 const DEFAULT_BASE_CURRENCY = "EGP";
 
 function emptyForm() {
@@ -100,7 +101,7 @@ export default function CashVoucherFormModal({
     }
 
     if (!Number(form.amount) || Number(form.amount) <= 0) {
-      toast.error("أدخل مبلغ أكبر من صفر");
+      toast.error(t("أدخل مبلغ أكبر من صفر"));
       return;
     }
 
@@ -120,8 +121,8 @@ export default function CashVoucherFormModal({
 
       toast.success(
         form.direction === "Receipt"
-          ? "تم تسجيل سند القبض (مسودة) — أكمل التوصيف بعدين"
-          : "تم تسجيل سند الصرف (مسودة) — أكمل التوصيف بعدين",
+          ? t("تم تسجيل سند القبض (مسودة) — أكمل التوصيف بعدين")
+          : t("تم تسجيل سند الصرف (مسودة) — أكمل التوصيف بعدين"),
       );
 
       setForm(emptyForm());
@@ -129,12 +130,12 @@ export default function CashVoucherFormModal({
       onCreated?.();
       onClose();
     } catch (err) {
-      toast.error(err?.data?.detail || "حدث خطأ أثناء حفظ السند");
+      toast.error(err?.data?.detail || t("حدث خطأ أثناء حفظ السند"));
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="سند جديد">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("سند جديد")}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="inline-flex w-full rounded-xl bg-ink-400/5 p-1">
           <button
@@ -147,7 +148,7 @@ export default function CashVoucherFormModal({
             }`}
           >
             <ArrowDownCircle size={15} />
-            استلام (قبض)
+            {t("استلام (قبض)")}
           </button>
           <button
             type="button"
@@ -159,12 +160,12 @@ export default function CashVoucherFormModal({
             }`}
           >
             <ArrowUpCircle size={15} />
-            صرف (دفع)
+            {t("صرف (دفع)")}
           </button>
         </div>
 
         <Input
-          label="التاريخ"
+          label={t("التاريخ")}
           type="date"
           min={selectedFiscalYear?.startDate}
           max={selectedFiscalYear?.endDate}
@@ -178,7 +179,7 @@ export default function CashVoucherFormModal({
           }`}
         >
           <Input
-            label={currency ? `المبلغ (${currency})` : "المبلغ"}
+            label={currency ? t("المبلغ ({0})", { 0: currency }) : t("المبلغ")}
             type="number"
             min="0"
             step="0.01"
@@ -189,14 +190,14 @@ export default function CashVoucherFormModal({
           {isForeign && (
             <div>
               <Input
-                label={`سعر الصرف (${baseCurrency})`}
+                label={t("سعر الصرف ({0})", { 0: baseCurrency })}
                 type="number"
                 min="0"
                 step="0.01"
                 placeholder={
                   isResolvingRate
-                    ? "جاري تحميل السعر..."
-                    : "سعر يوم السند تلقائيًا إن ترك فارغًا"
+                    ? t("جاري تحميل السعر...")
+                    : t("سعر يوم السند تلقائيًا إن ترك فارغًا")
                 }
                 value={form.exchangeRate}
                 onChange={(e) => set("exchangeRate", e.target.value)}
@@ -205,7 +206,7 @@ export default function CashVoucherFormModal({
               {isResolvingRate && (
                 <p className="mt-1 flex items-center gap-1 text-[11px] text-ink-400">
                   <Loader2 size={11} className="animate-spin" />
-                  جاري جلب سعر {currency} بتاريخ السند...
+                  {t("جاري جلب سعر")} {currency} {t("بتاريخ السند...")}
                 </p>
               )}
             </div>
@@ -214,26 +215,24 @@ export default function CashVoucherFormModal({
 
         <div>
           <label className="mb-1.5 block text-sm font-medium text-ink-900">
-            البيان (اختياري)
+            {t("البيان (اختياري)")}
           </label>
           <textarea
             value={form.description}
             onChange={(e) => set("description", e.target.value)}
             rows={2}
-            placeholder="مثال: استلام دفعة تحت حساب"
+            placeholder={t("مثال: استلام دفعة تحت حساب")}
             className="w-full rounded-xl border border-ink-400/15 bg-white px-3.5 py-2.5 text-sm focus:border-primary-500 focus:outline-none"
           />
         </div>
 
         <p className="text-xs text-ink-400">
-          رقم السند بيتولد تلقائيًا من السيرفر. التوصيف (نوع الحركة والطرف)
-          بيتحدد لاحقًا من زر التعديل في الكشف. سعر الصرف بيتسجّل مع المسودة
-          لو اتحط هنا، وبيتحل تلقائيًا وقت التوصيف لو فاضي.
+          {t("رقم السند بيتولد تلقائيًا من السيرفر. التوصيف (نوع الحركة والطرف) بيتحدد لاحقًا من زر التعديل في الكشف. سعر الصرف بيتسجّل مع المسودة لو اتحط هنا، وبيتحل تلقائيًا وقت التوصيف لو فاضي.")}
         </p>
 
         <Button type="submit" disabled={isLoading} className="w-full">
           {isLoading ? <Loader2 size={16} className="animate-spin" /> : null}
-          حفظ السند
+          {t("حفظ السند")}
         </Button>
       </form>
     </Modal>

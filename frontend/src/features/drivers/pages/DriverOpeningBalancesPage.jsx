@@ -21,6 +21,7 @@ import {
 import DriverOpeningBalancesTable from "../components/DriverOpeningBalancesTable";
 import DriverOpeningBalanceModal from "../components/DriverOpeningBalanceModal";
 
+import { t } from "../../../i18n";
 const EMPTY_FILTERS = {
   driverId: "",
 };
@@ -94,14 +95,14 @@ export default function DriverOpeningBalancesPage() {
         rowVersion: itemToDelete.rowVersion,
       }).unwrap();
 
-      toast.success("تم حذف الرصيد الافتتاحي");
+      toast.success(t("تم حذف الرصيد الافتتاحي"));
       setItemToDelete(null);
     } catch (error) {
       const code = error?.data?.errorCode ?? error?.data?.code;
 
       if (code === "DriverOpeningBalances.Concurrency") {
         toast.error(
-          "تغيّر الرصيد الافتتاحي من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى.",
+          t("تغيّر الرصيد الافتتاحي من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى."),
         );
         setItemToDelete(null);
         refetch?.();
@@ -109,7 +110,7 @@ export default function DriverOpeningBalancesPage() {
       }
 
       if (code === "DriverOpeningBalances.ReadOnly") {
-        toast.error("الرصيد المرحّل للقراءة فقط ولا يمكن حذفه من هنا.");
+        toast.error(t("الرصيد المرحّل للقراءة فقط ولا يمكن حذفه من هنا."));
         setItemToDelete(null);
         refetch?.();
         return;
@@ -119,7 +120,7 @@ export default function DriverOpeningBalancesPage() {
         error?.data?.detail ||
           error?.data?.message ||
           error?.data?.title ||
-          "تعذر حذف الرصيد الافتتاحي",
+          t("تعذر حذف الرصيد الافتتاحي"),
       );
     }
   };
@@ -129,10 +130,10 @@ export default function DriverOpeningBalancesPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold text-ink-900">
-            الأرصدة الافتتاحية للسائقين
+            {t("الأرصدة الافتتاحية للسائقين")}
           </h2>
           <p className="mt-1 text-sm text-ink-400">
-            تسجيل وإدارة الأرصدة الافتتاحية المدينة والدائنة لكل سائق
+            {t("تسجيل وإدارة الأرصدة الافتتاحية المدينة والدائنة لكل سائق")}
           </p>
         </div>
 
@@ -143,7 +144,7 @@ export default function DriverOpeningBalancesPage() {
             disabled={isFiscalYearReadOnly || !selectedFiscalYearId}
           >
             <Plus size={14} />
-            إضافة رصيد افتتاحي
+            {t("إضافة رصيد افتتاحي")}
           </Button>
         )}
       </div>
@@ -154,8 +155,7 @@ export default function DriverOpeningBalancesPage() {
 
       {!isAdmin && (
         <div className="rounded-2xl border border-ink-400/10 bg-ink-400/5 px-4 py-3 text-xs leading-6 text-ink-500">
-          إضافة وتعديل وحذف أرصدة السائقين متاحة للمدير فقط. تقدر تشوف
-          الأرصدة وكشف الحساب من هنا.
+          {t("إضافة وتعديل وحذف أرصدة السائقين متاحة للمدير فقط. تقدر تشوف الأرصدة وكشف الحساب من هنا.")}
         </div>
       )}
 
@@ -163,7 +163,7 @@ export default function DriverOpeningBalancesPage() {
         <div className="grid grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              السائق
+              {t("السائق")}
             </label>
             <CompactSelect
               options={
@@ -174,7 +174,7 @@ export default function DriverOpeningBalancesPage() {
               }
               value={draft.driverId}
               onChange={(value) => setField("driverId", value)}
-              placeholder="كل السائقين"
+              placeholder={t("كل السائقين")}
             />
           </div>
         </div>
@@ -182,11 +182,11 @@ export default function DriverOpeningBalancesPage() {
         <div className="mt-3 flex justify-end gap-2">
           <Button variant="outline" onClick={handleReset} className="h-9">
             <RotateCcw size={14} />
-            إعادة تعيين
+            {t("إعادة تعيين")}
           </Button>
           <Button onClick={handleSearch} disabled={isFetching} className="h-9">
             <Search size={14} />
-            بحث
+            {t("بحث")}
           </Button>
         </div>
       </div>
@@ -220,9 +220,9 @@ export default function DriverOpeningBalancesPage() {
         isOpen={Boolean(itemToDelete)}
         onClose={() => setItemToDelete(null)}
         onConfirm={handleConfirmDelete}
-        title="حذف رصيد افتتاحي"
+        title={t("حذف رصيد افتتاحي")}
         itemName={itemToDelete?.documentNumber}
-        description="سيتم حذف الرصيد الافتتاحي وقيده المرتبط. لا يمكن التراجع عن هذا الإجراء."
+        description={t("سيتم حذف الرصيد الافتتاحي وقيده المرتبط. لا يمكن التراجع عن هذا الإجراء.")}
         isDeleting={isDeleting}
       />
     </div>

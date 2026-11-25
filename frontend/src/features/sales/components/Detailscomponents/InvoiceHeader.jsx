@@ -16,16 +16,17 @@ import { useInvoicePrint } from "../../../../shared/hooks/useInvoicePrint";
 import InvoicePrintTemplate from "../../../../shared/components/print/InvoicePrintTemplate";
 import { useNavigate } from "react-router-dom";
 
+import { t } from "../../../../i18n";
 const typeLabels = {
-  Sales: "بيع",
-  Purchase: "شراء",
-  SalesReturn: "مرتجع بيع",
-  PurchaseReturn: "مرتجع شراء",
+  Sales: t("بيع"),
+  Purchase: t("شراء"),
+  SalesReturn: t("مرتجع بيع"),
+  PurchaseReturn: t("مرتجع شراء"),
 };
 
 const contentTypeLabels = {
-  Items: "أصناف",
-  Containers: "عبوات",
+  Items: t("أصناف"),
+  Containers: t("عبوات"),
 };
 
 /**
@@ -48,7 +49,7 @@ export default function InvoiceHeader({ invoice, onAction, isFetching }) {
           <button
             onClick={() => navigate(-1)}
             className="text-ink-400 hover:text-ink-900 transition-colors"
-            title="رجوع"
+            title={t("رجوع")}
           >
             <ArrowRight size={18} />
           </button>
@@ -80,14 +81,14 @@ export default function InvoiceHeader({ invoice, onAction, isFetching }) {
           <button
             onClick={() => onAction("edit")}
             className="p-2 rounded-lg text-primary-500 hover:bg-primary-50 transition-colors"
-            title="تعديل"
+            title={t("تعديل")}
           >
             <Pencil size={16} />
           </button>
           <button
             onClick={() => printInvoice(invoice)}
             className="p-2 rounded-lg text-ink-400 hover:bg-ink-400/5 transition-colors"
-            title="طباعة"
+            title={t("طباعة")}
           >
             <Printer size={16} />
           </button>
@@ -99,7 +100,7 @@ export default function InvoiceHeader({ invoice, onAction, isFetching }) {
               )
             }
             className="p-2 rounded-lg text-gold-600 hover:bg-gold-50 transition-colors"
-            title="مخزن العبوات"
+            title={t("مخزن العبوات")}
           >
             <Boxes size={16} />
           </button>
@@ -108,7 +109,7 @@ export default function InvoiceHeader({ invoice, onAction, isFetching }) {
             <button
               onClick={() => setMenuOpen((s) => !s)}
               className="p-2 rounded-lg text-ink-400 hover:bg-ink-400/5 transition-colors"
-              title="المزيد"
+              title={t("المزيد")}
             >
               <MoreVertical size={16} />
             </button>
@@ -129,7 +130,7 @@ export default function InvoiceHeader({ invoice, onAction, isFetching }) {
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-negative hover:bg-negative/5 text-right"
                   >
                     <Trash2 size={14} />
-                    حذف الفاتورة
+                    {t("حذف الفاتورة")}
                   </button>
                 </div>
               </>

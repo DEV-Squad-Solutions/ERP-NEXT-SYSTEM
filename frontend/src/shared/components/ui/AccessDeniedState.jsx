@@ -1,5 +1,6 @@
 import { ShieldAlert } from "lucide-react";
 
+import { t } from "../../../i18n";
 /**
  * حالة "ممنوع الوصول" (HTTP 403).
  *
@@ -14,8 +15,8 @@ import { ShieldAlert } from "lucide-react";
  * }} props
  */
 export default function AccessDeniedState({
-  title = "غير مصرح بعرض التقرير",
-  message = "مش عندك صلاحية الوصول لكل البيانات المطلوبة لعرض التقرير ده. التقرير مش بيتم عرضه بشكل جزئي — تواصل مع مسؤول النظام لو محتاج الصلاحية.",
+  title = t("غير مصرح بعرض التقرير"),
+  message = t("مش عندك صلاحية الوصول لكل البيانات المطلوبة لعرض التقرير ده. التقرير مش بيتم عرضه بشكل جزئي — تواصل مع مسؤول النظام لو محتاج الصلاحية."),
   onRetry,
 }) {
   return (
@@ -39,7 +40,7 @@ export default function AccessDeniedState({
           onClick={onRetry}
           className="rounded-lg border border-amber-300 bg-white px-4 py-1.5 text-xs font-medium text-amber-700 transition hover:bg-amber-100"
         >
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       )}
     </div>

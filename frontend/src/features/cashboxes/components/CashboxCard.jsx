@@ -1,12 +1,14 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { formatDate as sharedFormatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const formatNumber = (value) => {
   if (value === null || value === undefined || value === "") {
     return "—";
   }
 
-  return Number(value).toLocaleString("ar-EG", {
+  return Number(value).toLocaleString(getLocale(), {
     maximumFractionDigits: 2,
   });
 };
@@ -27,7 +29,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
         <button onClick={onClick} className="min-w-0 text-right flex-1">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="font-display font-bold text-ink-900 truncate">
-              {cashbox.name || "بدون اسم"}
+              {cashbox.name || t("بدون اسم")}
             </h3>
 
             <span
@@ -37,7 +39,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
                   : "text-red-500 bg-red-500/10"
               }`}
             >
-              {cashbox.isActive ? "نشط" : "غير نشط"}
+              {cashbox.isActive ? t("نشط") : t("غير نشط")}
             </span>
           </div>
 
@@ -54,7 +56,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
               onEdit?.(cashbox);
             }}
             className="p-1.5 rounded-lg text-ink-400 hover:text-emerald-700 hover:bg-emerald-700/5 transition-colors"
-            title="تعديل"
+            title={t("تعديل")}
           >
             <Pencil size={14} />
           </button>
@@ -65,7 +67,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
               onDelete?.(cashbox);
             }}
             className="p-1.5 rounded-lg text-ink-400 hover:text-red-600 hover:bg-red-500/5 transition-colors"
-            title="حذف"
+            title={t("حذف")}
           >
             <Trash2 size={14} />
           </button>
@@ -75,7 +77,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
       {/* Current Balance */}
       <button onClick={onClick} className="w-full text-right mt-4">
         <div className="rounded-xl bg-emerald-700/[0.06] px-4 py-3">
-          <p className="text-[11px] text-ink-400 mb-1">الرصيد الحالي</p>
+          <p className="text-[11px] text-ink-400 mb-1">{t("الرصيد الحالي")}</p>
 
           <div className="flex items-end justify-between gap-2">
             <p className="text-xl font-bold text-emerald-700 leading-none">
@@ -91,7 +93,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
         {/* Summary */}
         <div className="grid grid-cols-3 divide-x divide-x-reverse divide-ink-400/10 mt-3">
           <div className="px-2 first:pr-0">
-            <p className="text-[10px] text-ink-400 mb-1">الافتتاحي</p>
+            <p className="text-[10px] text-ink-400 mb-1">{t("الافتتاحي")}</p>
 
             <p className="text-sm font-semibold text-ink-800 truncate">
               {formatNumber(cashbox.openingBalance)}
@@ -99,7 +101,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
           </div>
 
           <div className="px-3">
-            <p className="text-[10px] text-ink-400 mb-1">تاريخ الافتتاح</p>
+            <p className="text-[10px] text-ink-400 mb-1">{t("تاريخ الافتتاح")}</p>
 
             <p className="text-sm font-semibold text-ink-800 truncate">
               {formatDate(cashbox.openingBalanceDate)}
@@ -107,7 +109,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
           </div>
 
           <div className="px-3 last:pl-0">
-            <p className="text-[10px] text-ink-400 mb-1">العملة</p>
+            <p className="text-[10px] text-ink-400 mb-1">{t("العملة")}</p>
 
             <p className="text-sm font-semibold text-ink-800">
               {cashbox.currency || "—"}
@@ -118,7 +120,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
         {/* Exchange Rate */}
         {isForeignCurrency && (
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-ink-400/10 text-xs">
-            <span className="text-ink-400">سعر الصرف الافتتاحي</span>
+            <span className="text-ink-400">{t("سعر الصرف الافتتاحي")}</span>
 
             <span className="font-semibold text-ink-700">
               {formatNumber(cashbox.openingExchangeRate)}
@@ -130,7 +132,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
         {cashbox.notes && (
           <div className="mt-3 pt-3 border-t border-ink-400/10">
             <p className="text-xs text-ink-500 truncate">
-              <span className="text-ink-400">ملاحظة:</span> {cashbox.notes}
+              <span className="text-ink-400">{t("ملاحظة:")}</span> {cashbox.notes}
             </p>
           </div>
         )}

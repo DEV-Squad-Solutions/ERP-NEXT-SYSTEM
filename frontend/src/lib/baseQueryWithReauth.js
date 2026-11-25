@@ -1,5 +1,6 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { toast } from "sonner";
+import { getLang } from "../i18n";
 
 import { updateTokens, logout } from "../features/auth/authSlice";
 import {
@@ -14,6 +15,7 @@ import {
   getSentFiscalYearId,
 } from "./fiscalYearResponseGuard";
 
+import { t } from "../i18n";
 const baseQuery = fetchBaseQuery({
   baseUrl: import.meta.env.VITE_API_URL,
 
@@ -23,6 +25,8 @@ const baseQuery = fetchBaseQuery({
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     }
+
+    headers.set("Accept-Language", getLang());
 
     return headers;
   },
@@ -212,7 +216,7 @@ const requestWithReauth = async (argsWithFiscalYear, api, extraOptions) => {
 };
 
 const FISCAL_YEAR_MISMATCH_MESSAGE =
-  "تم تجاهل بيانات تخص سنة مالية مختلفة عن السنة المختارة.";
+  t("تم تجاهل بيانات تخص سنة مالية مختلفة عن السنة المختارة.");
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   const sentArgs = withFiscalYearId(args, api.getState);
@@ -238,7 +242,7 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         error: {
           status: "FISCAL_YEAR_MISMATCH",
           data: {
-            title: "سنة مالية غير متطابقة",
+            title: t("سنة مالية غير متطابقة"),
             detail: FISCAL_YEAR_MISMATCH_MESSAGE,
             errorCode: "Client.FiscalYearMismatch",
             expectedFiscalYearId: expectedId,

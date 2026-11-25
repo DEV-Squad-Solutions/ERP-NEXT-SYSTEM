@@ -12,29 +12,30 @@ import {
   useUpdateCompanyMutation,
 } from "../companiesApi";
 
+import { t } from "../../../i18n";
 const STOCK_MODES = [
-  { value: "None", label: "بدون فحص" },
-  { value: "DateCheck", label: "فحص بالتاريخ" },
-  { value: "FinalCheck", label: "فحص نهائي" },
-  { value: "Both", label: "الاثنين معًا" },
+  { value: "None", label: t("بدون فحص") },
+  { value: "DateCheck", label: t("فحص بالتاريخ") },
+  { value: "FinalCheck", label: t("فحص نهائي") },
+  { value: "Both", label: t("الاثنين معًا") },
 ];
 
 const CURRENCIES = [
-  { value: "EGP", label: "جنيه مصري" },
-  { value: "USD", label: "دولار أمريكي" },
-  { value: "EUR", label: "يورو" },
-  { value: "GBP", label: "جنيه إسترليني" },
-  { value: "SAR", label: "ريال سعودي" },
-  { value: "AED", label: "درهم إماراتي" },
-  { value: "KWD", label: "دينار كويتي" },
+  { value: "EGP", label: t("جنيه مصري") },
+  { value: "USD", label: t("دولار أمريكي") },
+  { value: "EUR", label: t("يورو") },
+  { value: "GBP", label: t("جنيه إسترليني") },
+  { value: "SAR", label: t("ريال سعودي") },
+  { value: "AED", label: t("درهم إماراتي") },
+  { value: "KWD", label: t("دينار كويتي") },
 ];
 
 const schema = z.object({
-  name: z.string().min(1, "اسم الشركة مطلوب").max(200),
-  address: z.string().min(1, "العنوان مطلوب").max(500),
-  commercialRegister: z.string().min(1, "السجل التجاري مطلوب").max(50),
-  taxNumber: z.string().min(1, "الرقم الضريبي مطلوب").max(50),
-  managerName: z.string().min(1, "اسم المدير مطلوب").max(200),
+  name: z.string().min(1, t("اسم الشركة مطلوب")).max(200),
+  address: z.string().min(1, t("العنوان مطلوب")).max(500),
+  commercialRegister: z.string().min(1, t("السجل التجاري مطلوب")).max(50),
+  taxNumber: z.string().min(1, t("الرقم الضريبي مطلوب")).max(50),
+  managerName: z.string().min(1, t("اسم المدير مطلوب")).max(200),
   stockBalanceCheckMode: z.enum(["None", "DateCheck", "FinalCheck", "Both"]),
   baseCurrency: z.enum(["EGP", "USD", "EUR", "GBP", "SAR", "AED", "KWD"]),
 });
@@ -106,7 +107,7 @@ export default function QuickAddCompanyModal({
         : await createCompany(data).unwrap();
 
       toast.success(
-        isEdit ? "تم تحديث بيانات الشركة" : "تم إضافة الشركة بنجاح",
+        isEdit ? t("تم تحديث بيانات الشركة") : t("تم إضافة الشركة بنجاح"),
       );
 
       const savedCompany = response?.data ?? response;
@@ -115,8 +116,8 @@ export default function QuickAddCompanyModal({
     } catch (err) {
       const message =
         err?.status === 409
-          ? "السجل التجاري أو الرقم الضريبي مستخدم بالفعل"
-          : "تعذر الحفظ، حاول مرة أخرى";
+          ? t("السجل التجاري أو الرقم الضريبي مستخدم بالفعل")
+          : t("تعذر الحفظ، حاول مرة أخرى");
       toast.error(message);
     }
   };
@@ -125,36 +126,36 @@ export default function QuickAddCompanyModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل بيانات الشركة" : "إضافة شركة جديدة"}
+      title={isEdit ? t("تعديل بيانات الشركة") : t("إضافة شركة جديدة")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input
-          label="اسم الشركة"
+          label={t("اسم الشركة")}
           {...register("name")}
           error={errors.name?.message}
         />
 
         <Input
-          label="العنوان"
+          label={t("العنوان")}
           {...register("address")}
           error={errors.address?.message}
         />
 
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="السجل التجاري"
+            label={t("السجل التجاري")}
             {...register("commercialRegister")}
             error={errors.commercialRegister?.message}
           />
           <Input
-            label="الرقم الضريبي"
+            label={t("الرقم الضريبي")}
             {...register("taxNumber")}
             error={errors.taxNumber?.message}
           />
         </div>
 
         <Input
-          label="اسم المدير المسؤول"
+          label={t("اسم المدير المسؤول")}
           {...register("managerName")}
           error={errors.managerName?.message}
         />
@@ -162,7 +163,7 @@ export default function QuickAddCompanyModal({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              نمط فحص رصيد المخزون
+              {t("نمط فحص رصيد المخزون")}
             </label>
             <select
               {...register("stockBalanceCheckMode")}
@@ -178,7 +179,7 @@ export default function QuickAddCompanyModal({
 
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              العملة الأساسية
+              {t("العملة الأساسية")}
             </label>
             <select
               {...register("baseCurrency")}
@@ -194,7 +195,7 @@ export default function QuickAddCompanyModal({
         </div>
 
         <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "جاري الحفظ..." : isEdit ? "حفظ التعديلات" : "إضافة"}
+          {isLoading ? t("جاري الحفظ...") : isEdit ? t("حفظ التعديلات") : t("إضافة")}
         </Button>
       </form>
     </Modal>

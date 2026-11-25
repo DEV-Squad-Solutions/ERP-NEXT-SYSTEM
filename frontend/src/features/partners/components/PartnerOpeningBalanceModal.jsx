@@ -19,28 +19,29 @@ import {
 import { useLazyResolveExchangeRateQuery } from "../../exchange-rates/exchangeRatesApi";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
 /* =========================================================
    OPTIONS
 ========================================================= */
 
 const currencyOptions = [
-  { value: "EGP", label: "جنيه مصري" },
-  { value: "USD", label: "دولار أمريكي" },
-  { value: "EUR", label: "يورو" },
-  { value: "GBP", label: "جنيه إسترليني" },
-  { value: "SAR", label: "ريال سعودي" },
-  { value: "AED", label: "درهم إماراتي" },
-  { value: "KWD", label: "دينار كويتي" },
+  { value: "EGP", label: t("جنيه مصري") },
+  { value: "USD", label: t("دولار أمريكي") },
+  { value: "EUR", label: t("يورو") },
+  { value: "GBP", label: t("جنيه إسترليني") },
+  { value: "SAR", label: t("ريال سعودي") },
+  { value: "AED", label: t("درهم إماراتي") },
+  { value: "KWD", label: t("دينار كويتي") },
 ];
 
 const balanceTypeOptions = [
   {
     value: "Receivable",
-    label: "مدين (مستحق للشركة)",
+    label: t("مدين (مستحق للشركة)"),
   },
   {
     value: "Payable",
-    label: "دائن (مستحق على الشركة)",
+    label: t("دائن (مستحق على الشركة)"),
   },
 ];
 
@@ -191,7 +192,7 @@ export default function PartnerOpeningBalanceModal({
 
         setRateManuallyEdited(false);
 
-        toast.warning("لم يتم العثور على سعر صرف لهذا التاريخ");
+        toast.warning(t("لم يتم العثور على سعر صرف لهذا التاريخ"));
 
         return;
       }
@@ -324,11 +325,11 @@ export default function PartnerOpeningBalanceModal({
           rowVersion: editingItem.rowVersion,
         }).unwrap();
 
-        toast.success("تم تعديل الرصيد الافتتاحي بنجاح");
+        toast.success(t("تم تعديل الرصيد الافتتاحي بنجاح"));
       } else {
         await createBalance(payload).unwrap();
 
-        toast.success("تم إضافة الرصيد الافتتاحي بنجاح");
+        toast.success(t("تم إضافة الرصيد الافتتاحي بنجاح"));
       }
 
       onClose();
@@ -337,7 +338,7 @@ export default function PartnerOpeningBalanceModal({
         err?.data?.detail ||
         err?.data?.message ||
         err?.data?.title ||
-        "تعذر حفظ الرصيد الافتتاحي";
+        t("تعذر حفظ الرصيد الافتتاحي");
 
       toast.error(serverMessage);
     }
@@ -351,7 +352,7 @@ export default function PartnerOpeningBalanceModal({
     <Modal
       isOpen={isOpen}
       onClose={isSaving ? () => {} : onClose}
-      title={isEditing ? "تعديل رصيد افتتاحي" : "إضافة رصيد افتتاحي"}
+      title={isEditing ? t("تعديل رصيد افتتاحي") : t("إضافة رصيد افتتاحي")}
       wide={false}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -368,7 +369,7 @@ export default function PartnerOpeningBalanceModal({
               "dark:text-ink-200",
             ].join(" ")}
           >
-            العميل / المورد
+            {t("العميل / المورد")}
           </label>
 
           <CompactSelect
@@ -380,7 +381,7 @@ export default function PartnerOpeningBalanceModal({
             }
             value={form.businessPartnerId}
             onChange={(value) => setField("businessPartnerId", value)}
-            placeholder="اختر العميل أو المورد"
+            placeholder={t("اختر العميل أو المورد")}
           />
         </div>
 
@@ -397,7 +398,7 @@ export default function PartnerOpeningBalanceModal({
               "dark:text-ink-200",
             ].join(" ")}
           >
-            التاريخ
+            {t("التاريخ")}
           </label>
 
           <DateInput
@@ -446,14 +447,14 @@ export default function PartnerOpeningBalanceModal({
                 "dark:text-ink-200",
               ].join(" ")}
             >
-              نوع الرصيد
+              {t("نوع الرصيد")}
             </label>
 
             <CompactSelect
               options={balanceTypeOptions}
               value={form.balanceType}
               onChange={(value) => setField("balanceType", value)}
-              placeholder="اختر النوع"
+              placeholder={t("اختر النوع")}
             />
           </div>
 
@@ -468,14 +469,14 @@ export default function PartnerOpeningBalanceModal({
                 "dark:text-ink-200",
               ].join(" ")}
             >
-              العملة
+              {t("العملة")}
             </label>
 
             <CompactSelect
               options={currencyOptions}
               value={form.currency}
               onChange={handleCurrencyChange}
-              placeholder="اختر العملة"
+              placeholder={t("اختر العملة")}
             />
           </div>
         </div>
@@ -502,7 +503,7 @@ export default function PartnerOpeningBalanceModal({
                 "dark:text-ink-200",
               ].join(" ")}
             >
-              المبلغ
+              {t("المبلغ")}
             </label>
 
             <NumericInput
@@ -524,7 +525,7 @@ export default function PartnerOpeningBalanceModal({
                   "dark:text-ink-200",
                 ].join(" ")}
               >
-                <span>سعر الصرف</span>
+                <span>{t("سعر الصرف")}</span>
 
                 {isExchangeRateLoading && (
                   <Loader2
@@ -546,19 +547,19 @@ export default function PartnerOpeningBalanceModal({
               <div className="mt-1.5 min-h-4 text-[10px] font-medium">
                 {isExchangeRateLoading ? (
                   <span className="text-primary-600 dark:text-primary-400">
-                    جاري تحميل سعر الصرف...
+                    {t("جاري تحميل سعر الصرف...")}
                   </span>
                 ) : rateManuallyEdited ? (
                   <span className="text-amber-600 dark:text-amber-400">
-                    تم تعديل السعر يدويًا
+                    {t("تم تعديل السعر يدويًا")}
                   </span>
                 ) : form.exchangeRate ? (
                   <span className="text-emerald-600 dark:text-emerald-400">
-                    تم تحميل السعر تلقائيًا
+                    {t("تم تحميل السعر تلقائيًا")}
                   </span>
                 ) : (
                   <span className="text-ink-500 dark:text-ink-300">
-                    يمكنك إدخال السعر يدويًا
+                    {t("يمكنك إدخال السعر يدويًا")}
                   </span>
                 )}
               </div>
@@ -579,7 +580,7 @@ export default function PartnerOpeningBalanceModal({
               "dark:text-ink-200",
             ].join(" ")}
           >
-            ملاحظات
+            {t("ملاحظات")}
           </label>
 
           <textarea
@@ -587,7 +588,7 @@ export default function PartnerOpeningBalanceModal({
             maxLength={1000}
             value={form.notes}
             onChange={(e) => setField("notes", e.target.value)}
-            placeholder="أضف ملاحظات اختيارية..."
+            placeholder={t("أضف ملاحظات اختيارية...")}
             className={[
               "w-full",
               "resize-none",
@@ -652,7 +653,7 @@ export default function PartnerOpeningBalanceModal({
               "dark:hover:bg-white/[0.05]",
             ].join(" ")}
           >
-            إلغاء
+            {t("إلغاء")}
           </button>
 
           {/* SAVE */}
@@ -680,12 +681,12 @@ export default function PartnerOpeningBalanceModal({
             {isSaving ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                جاري الحفظ...
+                {t("جاري الحفظ...")}
               </>
             ) : (
               <>
                 <Save size={16} strokeWidth={2} />
-                حفظ
+                {t("حفظ")}
               </>
             )}
           </button>

@@ -9,21 +9,22 @@ import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import Input from "../../../shared/components/ui/Input";
 import Button from "../../../shared/components/ui/Button";
 import { useGetItemsSelectQuery } from "../../inventory/inventoryApi";
+import { t } from "../../../i18n";
 const typeOptions = [
-  { value: "sale", label: "بيع" },
-  { value: "purchase", label: "شراء" },
-  { value: "sale_return", label: "مرتجع بيع" },
-  { value: "purchase_return", label: "مرتجع شراء" },
+  { value: "sale", label: t("بيع") },
+  { value: "purchase", label: t("شراء") },
+  { value: "sale_return", label: t("مرتجع بيع") },
+  { value: "purchase_return", label: t("مرتجع شراء") },
 ];
 
 const paymentOptions = [
-  { value: "1", label: "نقدي" },
-  { value: "2", label: "آجل" },
+  { value: "1", label: t("نقدي") },
+  { value: "2", label: t("آجل") },
 ];
 
 const statusOptions = [
-  { value: "1", label: "غير مسعرة" },
-  { value: "2", label: "متسعرة" },
+  { value: "1", label: t("غير مسعرة") },
+  { value: "2", label: t("متسعرة") },
 ];
 
 export default function SalesFiltersCard({
@@ -72,10 +73,10 @@ export default function SalesFiltersCard({
           </div>
 
           <div className="text-right">
-            <h3 className="font-semibold">فلاتر البحث</h3>
+            <h3 className="font-semibold">{t("فلاتر البحث")}</h3>
 
             <span className="text-xs text-gray-500">
-              {activeFilters} فلتر مفعل
+              {activeFilters} {t("فلتر مفعل")}
             </span>
           </div>
         </div>
@@ -115,27 +116,27 @@ export default function SalesFiltersCard({
             <div className="border-t p-5">
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                 <Input
-                  label="رقم الفاتورة"
+                  label={t("رقم الفاتورة")}
                   value={draft.invoiceNumber}
                   onChange={(e) => set("invoiceNumber", e.target.value)}
                 />
 
                 <div>
                   <label className="block mb-1.5 text-sm font-medium">
-                    نوع الفاتورة
+                    {t("نوع الفاتورة")}
                   </label>
 
                   <CompactSelect
                     options={typeOptions}
                     value={draft.movementType}
                     onChange={(v) => set("movementType", v)}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
 
                 <div>
                   <label className="block mb-1.5 text-sm font-medium">
-                    العميل / المورد
+                    {t("العميل / المورد")}
                   </label>
 
                   <CompactSelect
@@ -148,13 +149,13 @@ export default function SalesFiltersCard({
                     value={draft.partyId}
                     onChange={(v) => set("partyId", v)}
                     isLoading={isLoadingParties}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
 
                 <div>
                   <label className="block mb-1.5 text-sm font-medium">
-                    البلد
+                    {t("البلد")}
                   </label>
 
                   <CompactSelect
@@ -167,13 +168,13 @@ export default function SalesFiltersCard({
                     value={draft.country}
                     onChange={(v) => set("country", v)}
                     isLoading={isLoadingCountries}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
 
                 <div>
                   <label className="block mb-1.5 text-sm font-medium">
-                    المخزن
+                    {t("المخزن")}
                   </label>
 
                   <CompactSelect
@@ -186,13 +187,13 @@ export default function SalesFiltersCard({
                     value={draft.storeId}
                     onChange={(v) => set("storeId", v)}
                     isLoading={isLoadingStores}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
 
                 <div>
                   <label className="block mb-1.5 text-sm font-medium">
-                    السائق
+                    {t("السائق")}
                   </label>
 
                   <CompactSelect
@@ -205,12 +206,12 @@ export default function SalesFiltersCard({
                     value={draft.driverId}
                     onChange={(v) => set("driverId", v)}
                     isLoading={isLoadingDrivers}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
                 <div>
                   <label className="block mb-1.5 text-sm font-medium">
-                    الصنف
+                    {t("الصنف")}
                   </label>
 
                   <CompactSelect
@@ -223,45 +224,45 @@ export default function SalesFiltersCard({
                     value={draft.itemId}
                     onChange={(v) => set("itemId", v)}
                     isLoading={isLoadingItems}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
                 <div>
                   <label className="block mb-1.5 text-sm font-medium">
-                    طريقة الدفع
+                    {t("طريقة الدفع")}
                   </label>
 
                   <CompactSelect
                     options={paymentOptions}
                     value={draft.paymentMethod}
                     onChange={(v) => set("paymentMethod", v)}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
 
                 <div>
                   <label className="block mb-1.5 text-sm font-medium">
-                    الحالة
+                    {t("الحالة")}
                   </label>
 
                   <CompactSelect
                     options={statusOptions}
                     value={draft.status}
                     onChange={(v) => set("status", v)}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
 
                 <Input
                   type="date"
-                  label="من تاريخ"
+                  label={t("من تاريخ")}
                   value={draft.fromDate}
                   onChange={(e) => set("fromDate", e.target.value)}
                 />
 
                 <Input
                   type="date"
-                  label="إلى تاريخ"
+                  label={t("إلى تاريخ")}
                   value={draft.toDate}
                   onChange={(e) => set("toDate", e.target.value)}
                 />
@@ -270,12 +271,12 @@ export default function SalesFiltersCard({
               <div className="flex justify-end gap-3 mt-6 pt-5 border-t border-slate-200">
                 <Button type="button" variant="outline" onClick={onReset}>
                   <RotateCcw size={16} />
-                  إعادة تعيين
+                  {t("إعادة تعيين")}
                 </Button>
 
                 <Button type="submit">
                   <Search size={16} />
-                  بحث
+                  {t("بحث")}
                 </Button>
               </div>
             </div>

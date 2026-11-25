@@ -12,10 +12,11 @@ import Button from "../../../shared/components/ui/Button";
 
 import { useGetItemUnitsSelectQuery } from "../../units/itemUnitsApi";
 
+import { t } from "../../../i18n";
 const schema = z.object({
-  itemUnitId: z.coerce.number().min(1, "اختر الوحدة"),
+  itemUnitId: z.coerce.number().min(1, t("اختر الوحدة")),
 
-  name: z.string().min(2, "اسم الصنف مطلوب"),
+  name: z.string().min(2, t("اسم الصنف مطلوب")),
 
   description: z.string().optional(),
 
@@ -85,7 +86,7 @@ export default function QuickAddItemModal({
           ...data,
         }).unwrap();
 
-        toast.success("تم تحديث الصنف بنجاح");
+        toast.success(t("تم تحديث الصنف بنجاح"));
 
         onUpdated?.(updated);
 
@@ -99,7 +100,7 @@ export default function QuickAddItemModal({
       // =====================================================
       const created = await createItem(data).unwrap();
 
-      toast.success("تم إضافة الصنف بنجاح");
+      toast.success(t("تم إضافة الصنف بنجاح"));
 
       /*
        * مهم جدًا:
@@ -119,7 +120,7 @@ export default function QuickAddItemModal({
     } catch (error) {
       console.error("Item save error:", error);
 
-      toast.error(isEditMode ? "فشل تحديث الصنف" : "فشل إضافة الصنف");
+      toast.error(isEditMode ? t("فشل تحديث الصنف") : t("فشل إضافة الصنف"));
     }
   };
 
@@ -127,13 +128,13 @@ export default function QuickAddItemModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditMode ? "تعديل بيانات الصنف" : "إضافة صنف جديد"}
+      title={isEditMode ? t("تعديل بيانات الصنف") : t("إضافة صنف جديد")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* الوحدة */}
         <div>
           <label className="block mb-1.5 text-sm font-medium text-ink-900">
-            الوحدة
+            {t("الوحدة")}
           </label>
 
           <select
@@ -141,7 +142,7 @@ export default function QuickAddItemModal({
             disabled={isLoading}
             className="w-full rounded-xl border border-ink-400/15 px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:border-primary-500 disabled:opacity-60"
           >
-            <option value="">اختر الوحدة</option>
+            <option value="">{t("اختر الوحدة")}</option>
 
             {itemUnits?.map((unit) => (
               <option key={unit.id} value={unit.id}>
@@ -159,7 +160,7 @@ export default function QuickAddItemModal({
 
         {/* اسم الصنف */}
         <Input
-          label="اسم الصنف"
+          label={t("اسم الصنف")}
           disabled={isLoading}
           {...register("name")}
           error={errors.name?.message}
@@ -167,7 +168,7 @@ export default function QuickAddItemModal({
 
         {/* الوصف */}
         <Input
-          label="الوصف"
+          label={t("الوصف")}
           disabled={isLoading}
           {...register("description")}
           error={errors.description?.message}
@@ -180,18 +181,18 @@ export default function QuickAddItemModal({
             disabled={isLoading}
             {...register("isActive")}
           />
-          الصنف نشط
+          {t("الصنف نشط")}
         </label>
 
         {/* Submit */}
         <Button type="submit" disabled={isLoading} className="w-full">
           {isLoading
             ? isEditMode
-              ? "جاري الحفظ..."
-              : "جاري الإضافة..."
+              ? t("جاري الحفظ...")
+              : t("جاري الإضافة...")
             : isEditMode
-              ? "حفظ التعديلات"
-              : "إضافة الصنف"}
+              ? t("حفظ التعديلات")
+              : t("إضافة الصنف")}
         </Button>
       </form>
     </Modal>

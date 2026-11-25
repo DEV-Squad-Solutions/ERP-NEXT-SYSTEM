@@ -5,6 +5,8 @@ import LedgerPanel from "../../../../shared/components/ui/LedgerPanel";
 import useDebouncedValue from "../../../../shared/hooks/useDebouncedValue";
 import { formatDate } from "../../../../lib/date.js";
 
+import { t } from "../../../../i18n";
+import { getLocale } from "../../../../i18n";
 const RETURN_TYPE_MAP = {
   salesReturn: "SalesReturn",
   purchaseReturn: "PurchaseReturn",
@@ -68,7 +70,7 @@ function ReturnSourceInvoiceRow({
         </div>
         <div className="flex items-center gap-2">
           <span className="num text-sm font-semibold text-ink-900">
-            {invoice.originalTotal.toLocaleString("ar-EG", { maximumFractionDigits: 2 })} {invoice.currency}
+            {invoice.originalTotal.toLocaleString(getLocale(), { maximumFractionDigits: 2 })} {invoice.currency}
           </span>
           {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </div>
@@ -76,7 +78,7 @@ function ReturnSourceInvoiceRow({
 
       {isLockedByOtherInvoice && (
         <div className="px-3 pb-2 text-xs text-ink-400">
-          في أصناف مضافة بالفعل من فاتورة تانية — شيلها الأول عشان ترجع من هنا
+          {t("في أصناف مضافة بالفعل من فاتورة تانية — شيلها الأول عشان ترجع من هنا")}
         </div>
       )}
 
@@ -90,21 +92,20 @@ function ReturnSourceInvoiceRow({
               className="flex-1 rounded-lg border border-primary-200 bg-primary-50 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100 disabled:cursor-not-allowed disabled:opacity-40"
               title={
                 fullReturnEligible
-                  ? `هيتطبق خصم الفاتورة الأصلي (${invoice.originalDiscountAmount || 0})`
-                  : "الفاتورة اتعمللها مرتجع جزئي قبل كده - مينفعش ترجعها بالكامل"
+                  ? t("هيتطبق خصم الفاتورة الأصلي ({0})", { 0: invoice.originalDiscountAmount || 0 })
+                  : t("الفاتورة اتعمللها مرتجع جزئي قبل كده - مينفعش ترجعها بالكامل")
               }
             >
-              إرجاع الفاتورة بالكامل
+              {t("إرجاع الفاتورة بالكامل")}
             </button>
             <span className="flex items-center justify-center px-2 text-xs text-ink-400">
-              أو حدد أصناف بعينها تحت
+              {t("أو حدد أصناف بعينها تحت")}
             </span>
           </div>
 
           {!fullReturnEligible && (
             <p className="mb-2 text-xs text-gold-700">
-              الفاتورة دي اتعمللها مرتجع جزئي قبل كده، فمينفعش ترجعها بالكامل
-              والخصم مش هيتطبق
+              {t("الفاتورة دي اتعمللها مرتجع جزئي قبل كده، فمينفعش ترجعها بالكامل والخصم مش هيتطبق")}
             </p>
           )}
 
@@ -112,13 +113,13 @@ function ReturnSourceInvoiceRow({
             <table className="w-full min-w-[600px] border-collapse text-right text-sm">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
-                  <th className="p-2 font-medium">الصنف</th>
-                  <th className="p-2 font-medium">الوحدة</th>
-                  <th className="p-2 font-medium">الكمية الأصلية</th>
-                  <th className="p-2 font-medium">مرتجع سابقًا</th>
-                  <th className="p-2 font-medium">المتاح</th>
-                  <th className="p-2 font-medium">السعر</th>
-                  <th className="p-2 font-medium">كمية المرتجع</th>
+                  <th className="p-2 font-medium">{t("الصنف")}</th>
+                  <th className="p-2 font-medium">{t("الوحدة")}</th>
+                  <th className="p-2 font-medium">{t("الكمية الأصلية")}</th>
+                  <th className="p-2 font-medium">{t("مرتجع سابقًا")}</th>
+                  <th className="p-2 font-medium">{t("المتاح")}</th>
+                  <th className="p-2 font-medium">{t("السعر")}</th>
+                  <th className="p-2 font-medium">{t("كمية المرتجع")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -163,7 +164,7 @@ function ReturnSourceInvoiceRow({
             onClick={() => onAddSelected(invoice)}
             className="mt-2 w-full rounded-lg bg-primary-500 py-2 text-sm font-medium text-white transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            إضافة الأصناف المحددة (من غير خصم)
+            {t("إضافة الأصناف المحددة (من غير خصم)")}
           </button>
         </div>
       )}
@@ -265,7 +266,7 @@ function ReturnSourcePicker({
   if (!canQuery) {
     return (
       <div className="rounded-2xl border border-dashed border-gold-200 bg-gold-50/40 py-6 text-center text-sm text-gold-700">
-        اختر العميل/المورد والمخزن والتاريخ الأول عشان تظهر الفواتير الأصلية
+        {t("اختر العميل/المورد والمخزن والتاريخ الأول عشان تظهر الفواتير الأصلية")}
       </div>
     );
   }
@@ -275,7 +276,7 @@ function ReturnSourcePicker({
       title={
         <span className="flex items-center gap-2 pr-3">
           <FileSearch size={15} />
-          الفواتير الأصلية للمرتجع
+          {t("الفواتير الأصلية للمرتجع")}
         </span>
       }
     >
@@ -284,7 +285,7 @@ function ReturnSourcePicker({
           type="text"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          placeholder="ابحث برقم الفاتورة..."
+          placeholder={t("ابحث برقم الفاتورة...")}
           className="w-full rounded-lg border border-ink-400/15 px-3 py-2 text-sm outline-none focus:border-primary-500"
         />
       </div>
@@ -292,19 +293,19 @@ function ReturnSourcePicker({
       {isLoading && (
         <div className="flex items-center justify-center gap-2 py-6 text-sm text-ink-400">
           <Loader2 size={16} className="animate-spin" />
-          جاري التحميل...
+          {t("جاري التحميل...")}
         </div>
       )}
 
       {isError && (
         <div className="py-6 text-center text-sm text-negative">
-          حصل خطأ في تحميل الفواتير
+          {t("حصل خطأ في تحميل الفواتير")}
         </div>
       )}
 
       {!isLoading && !isError && invoices.length === 0 && (
         <div className="py-6 text-center text-sm text-ink-400">
-          مفيش فواتير عندها كمية متاحة للمرتجع
+          {t("مفيش فواتير عندها كمية متاحة للمرتجع")}
         </div>
       )}
 

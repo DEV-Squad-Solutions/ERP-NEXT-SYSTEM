@@ -2,13 +2,14 @@ import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import Modal from "./Modal";
 import Button from "./Button";
 
+import { t } from "../../../i18n";
 export default function DeleteConfirmModal({
   isOpen,
   onClose,
   onConfirm,
-  title = "تأكيد الحذف",
+  title = t("تأكيد الحذف"),
   itemName,
-  description = "هذا الإجراء لا يمكن التراجع عنه.",
+  description = t("هذا الإجراء لا يمكن التراجع عنه."),
   isDeleting = false,
 }) {
   const handleConfirm = async () => {
@@ -29,12 +30,12 @@ export default function DeleteConfirmModal({
           </div>
 
           <h4 className="mt-4 text-base font-bold text-ink-900">
-            هل أنت متأكد من الحذف؟
+            {t("هل أنت متأكد من الحذف؟")}
           </h4>
 
           {itemName && (
             <p className="mt-2 text-sm text-ink-700">
-              سيتم حذف{" "}
+              {t("سيتم حذف")}{" "}
               <span className="font-semibold text-ink-900">"{itemName}"</span>
             </p>
           )}
@@ -50,7 +51,7 @@ export default function DeleteConfirmModal({
             onClick={onClose}
             disabled={isDeleting}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button
@@ -62,12 +63,12 @@ export default function DeleteConfirmModal({
             {isDeleting ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                جاري الحذف...
+                {t("جاري الحذف...")}
               </>
             ) : (
               <>
                 <Trash2 size={16} />
-                تأكيد الحذف
+                {t("تأكيد الحذف")}
               </>
             )}
           </Button>

@@ -17,6 +17,7 @@ import { useInvoiceListPrint } from "../../../shared/hooks/useInvoiceListPrint";
 import InvoiceListPrintTemplate from "../../../shared/components/print/InvoiceListPrintTemplate";
 import { exportInvoicesToExcel } from "../../../shared/hooks/exportInvoicesToExcel";
 
+import { t } from "../../../i18n";
 const emptyFilters = {
   invoiceNumber: "",
   movementType: "",
@@ -60,23 +61,23 @@ export default function SalesPage() {
     if (triggerExport && exportData) {
       const fileName =
         appliedFilters.movementType === "purchase"
-          ? "فواتير-المشتريات"
-          : "فواتير-المبيعات";
+          ? t("فواتير-المشتريات")
+          : t("فواتير-المبيعات");
 
       exportInvoicesToExcel(exportData.items, fileName);
 
       setTriggerExport(false);
 
       if (exportData.items?.length) {
-        toast.success(`تم تصدير ${exportData.items.length} فاتورة`);
+        toast.success(t("تم تصدير {0} فاتورة", { 0: exportData.items.length }));
       } else {
-        toast.info("لا توجد فواتير مطابقة للتصدير");
+        toast.info(t("لا توجد فواتير مطابقة للتصدير"));
       }
     }
   }, [triggerExport, exportData, appliedFilters.movementType]);
 
   const handleExport = () => {
-    toast.info("جاري تجهيز ملف Excel...");
+    toast.info(t("جاري تجهيز ملف Excel..."));
     setTriggerExport(true);
   };
 
@@ -101,9 +102,7 @@ export default function SalesPage() {
   };
 
   const { printList, printRef } = useInvoiceListPrint({
-    title: `فواتير-${
-      appliedFilters.movementType === "purchase" ? "المشتريات" : "المبيعات"
-    }`,
+    title: t("فواتير-{0}", { 0: appliedFilters.movementType === "purchase" ? "المشتريات" : "المبيعات" }),
   });
 
   const [fetchInvoiceById] = useLazyGetInvoiceByIdQuery();
@@ -120,7 +119,7 @@ export default function SalesPage() {
     const items = data?.items || [];
 
     if (!items.length) {
-      toast.info("لا توجد فواتير للطباعة");
+      toast.info(t("لا توجد فواتير للطباعة"));
       return;
     }
 
@@ -144,8 +143,8 @@ export default function SalesPage() {
 
       setPrintInvoices(merged);
     } catch (error) {
-      console.error("فشل تجهيز بيانات الطباعة", error);
-      toast.error("حصلت مشكلة أثناء تجهيز الفواتير للطباعة");
+      console.error(t("فشل تجهيز بيانات الطباعة"), error);
+      toast.error(t("حصلت مشكلة أثناء تجهيز الفواتير للطباعة"));
     } finally {
       setIsPreparingPrint(false);
     }
@@ -158,17 +157,17 @@ export default function SalesPage() {
       <div className="flex flex-wrap items-center justify-end gap-2 mb-5">
         <Button onClick={() => navigate("/dashboard/sales/new")}>
           <Plus size={16} />
-          فاتورة جديدة
+          {t("فاتورة جديدة")}
         </Button>
 
         <Button variant="outline" onClick={refetch}>
           <RefreshCw size={16} className={isFetching ? "animate-spin" : ""} />
-          تحديث
+          {t("تحديث")}
         </Button>
 
         <Button variant="outline" onClick={handleExport} disabled={isExporting}>
           <FileSpreadsheet size={16} />
-          {isExporting ? "جاري التصدير..." : "تصدير Excel"}
+          {isExporting ? t("جاري التصدير...") : t("تصدير Excel")}
         </Button>
 
         <Button
@@ -180,7 +179,7 @@ export default function SalesPage() {
             size={16}
             className={isPreparingPrint ? "animate-pulse" : ""}
           />
-          {isPreparingPrint ? "جاري تجهيز الطباعة..." : "طباعة"}
+          {isPreparingPrint ? t("جاري تجهيز الطباعة...") : t("طباعة")}
         </Button>
       </div>
 

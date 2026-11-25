@@ -1,7 +1,9 @@
 import { useSelector } from "react-redux";
 import { formatDate } from "../../../lib/date.js";
 
-const fmt = (value) => Number(value || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
+const fmt = (value) => Number(value || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 export default function CashboxLedgerPrintTemplate({
   cashbox,
@@ -30,7 +32,7 @@ export default function CashboxLedgerPrintTemplate({
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       style={{
         width: "297mm",
         minHeight: "210mm",
@@ -63,9 +65,9 @@ export default function CashboxLedgerPrintTemplate({
             {company?.name || "—"}
           </h1>
 
-          <p>كشف حركة خزنة</p>
+          <p>{t("كشف حركة خزنة")}</p>
 
-          <p>الخزنة: {cashbox?.name || "—"}</p>
+          <p>{t("الخزنة:")} {cashbox?.name || "—"}</p>
         </div>
 
         <div
@@ -74,11 +76,11 @@ export default function CashboxLedgerPrintTemplate({
             fontSize: "10px",
           }}
         >
-          <p>تاريخ الطباعة: {formatDate(new Date())}</p>
+          <p>{t("تاريخ الطباعة:")} {formatDate(new Date())}</p>
 
-          {fromDate && <p>من: {formatDate(fromDate)}</p>}
+          {fromDate && <p>{t("من:")} {formatDate(fromDate)}</p>}
 
-          {toDate && <p>إلى: {formatDate(toDate)}</p>}
+          {toDate && <p>{t("إلى:")} {formatDate(toDate)}</p>}
         </div>
       </div>
 
@@ -97,13 +99,13 @@ export default function CashboxLedgerPrintTemplate({
             }}
           >
             {[
-              "التاريخ",
-              "رقم السند",
-              "مدين",
-              "دائن",
-              "الرصيد",
-              "البيان",
-              "الملاحظات",
+              t("التاريخ"),
+              t("رقم السند"),
+              t("مدين"),
+              t("دائن"),
+              t("الرصيد"),
+              t("البيان"),
+              t("الملاحظات"),
             ].map((h) => (
               <th key={h} style={th}>
                 {h}
@@ -176,7 +178,7 @@ export default function CashboxLedgerPrintTemplate({
               paddingTop: "6px",
             }}
           >
-            توقيع المسؤول
+            {t("توقيع المسؤول")}
           </div>
         </div>
       </div>

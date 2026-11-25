@@ -41,20 +41,22 @@ import { useJournalEntriesListPrint } from "../../../shared/hooks/useJournalEntr
 import JournalEntriesListPrintTemplate from "../../../shared/components/print/JournalEntriesListPrintTemplate";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 // =========================================================
 // Constants
 // =========================================================
 
 const ENTRY_TYPE_OPTIONS = [
-  { value: "Manual", label: "يدوي" },
-  { value: "Adjustment", label: "تسوية" },
-  { value: "Opening", label: "افتتاحي" },
-  { value: "Automatic", label: "تلقائي" },
+  { value: "Manual", label: t("يدوي") },
+  { value: "Adjustment", label: t("تسوية") },
+  { value: "Opening", label: t("افتتاحي") },
+  { value: "Automatic", label: t("تلقائي") },
 ];
 
 const STATUS_OPTIONS = [
-  { value: "Posted", label: "مرحّل" },
-  { value: "Reversed", label: "معكوس" },
+  { value: "Posted", label: t("مرحّل") },
+  { value: "Reversed", label: t("معكوس") },
 ];
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -64,7 +66,7 @@ const DEFAULT_PAGE_SIZE = 20;
 // =========================================================
 
 function money(value) {
-  return Number(value ?? 0).toLocaleString("ar-EG", {
+  return Number(value ?? 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -85,20 +87,20 @@ function getEntryTypeLabel(type) {
   if (typeof type === "number") {
     return (
       {
-        1: "يدوي",
-        2: "تسوية",
-        3: "افتتاحي",
-        4: "تلقائي",
+        1: t("يدوي"),
+        2: t("تسوية"),
+        3: t("افتتاحي"),
+        4: t("تلقائي"),
       }[type] ?? type
     );
   }
 
   return (
     {
-      Manual: "يدوي",
-      Adjustment: "تسوية",
-      Opening: "افتتاحي",
-      Automatic: "تلقائي",
+      Manual: t("يدوي"),
+      Adjustment: t("تسوية"),
+      Opening: t("افتتاحي"),
+      Automatic: t("تلقائي"),
     }[type] ??
     type ??
     "-"
@@ -109,16 +111,16 @@ function getStatusLabel(status) {
   if (typeof status === "number") {
     return (
       {
-        1: "مرحّل",
-        2: "معكوس",
+        1: t("مرحّل"),
+        2: t("معكوس"),
       }[status] ?? status
     );
   }
 
   return (
     {
-      Posted: "مرحّل",
-      Reversed: "معكوس",
+      Posted: t("مرحّل"),
+      Reversed: t("معكوس"),
     }[status] ??
     status ??
     "-"
@@ -128,11 +130,11 @@ function getStatusLabel(status) {
 function getSourceTypeLabel(sourceType) {
   return (
     {
-      Invoice: "فاتورة",
-      CashVoucher: "سند خزينة",
-      PartnerOpeningBalance: "رصيد افتتاحي طرف",
-      CashboxOpeningBalance: "رصيد افتتاحي خزينة",
-      StockOpeningBalance: "رصيد افتتاحي مخزون",
+      Invoice: t("فاتورة"),
+      CashVoucher: t("سند خزينة"),
+      PartnerOpeningBalance: t("رصيد افتتاحي طرف"),
+      CashboxOpeningBalance: t("رصيد افتتاحي خزينة"),
+      StockOpeningBalance: t("رصيد افتتاحي مخزون"),
     }[sourceType] ??
     sourceType ??
     ""
@@ -289,7 +291,7 @@ function CurrencyBadge({ currency, multi = false }) {
   if (multi) {
     return (
       <span
-        title="القيد يحتوي على أكثر من عملة"
+        title={t("القيد يحتوي على أكثر من عملة")}
         className="
           inline-flex
           items-center
@@ -306,14 +308,14 @@ function CurrencyBadge({ currency, multi = false }) {
         "
       >
         <Layers3 size={12} />
-        متعدد
+        {t("متعدد")}
       </span>
     );
   }
 
   return (
     <span
-      title={`عملة القيد: ${currency}`}
+      title={t("عملة القيد: {0}", { 0: currency })}
       className="
         inline-flex
         min-w-[48px]
@@ -419,7 +421,7 @@ export default function JournalEntriesListPage() {
   // -------------------------------------------------------
 
   const { printList, printRef } = useJournalEntriesListPrint({
-    title: "تقرير قيود اليومية",
+    title: t("تقرير قيود اليومية"),
   });
 
   // -------------------------------------------------------
@@ -497,7 +499,7 @@ export default function JournalEntriesListPage() {
         rowVersion: entry.rowVersion,
       }).unwrap();
     } catch (error) {
-      console.error("فشل حذف القيد", error);
+      console.error(t("فشل حذف القيد"), error);
     }
   };
 
@@ -508,7 +510,7 @@ export default function JournalEntriesListPage() {
   return (
     <>
       <motion.div
-        dir="rtl"
+        dir={getDir()}
         variants={pageVariants}
         initial="hidden"
         animate="visible"
@@ -551,7 +553,7 @@ export default function JournalEntriesListPage() {
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <h1 className="truncate text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
-                  قيود اليومية
+                  {t("قيود اليومية")}
                 </h1>
 
                 {data?.totalCount != null && (
@@ -568,13 +570,13 @@ export default function JournalEntriesListPage() {
                       sm:inline-flex
                     "
                   >
-                    {data.totalCount.toLocaleString("ar-EG", { maximumFractionDigits: 2 })} قيد
+                    {data.totalCount.toLocaleString(getLocale(), { maximumFractionDigits: 2 })} {t("قيد")}
                   </span>
                 )}
               </div>
 
               <p className="mt-0.5 text-xs text-gray-400 sm:text-sm">
-                إدارة ومراجعة القيود المحاسبية اليومية
+                {t("إدارة ومراجعة القيود المحاسبية اليومية")}
               </p>
             </div>
           </div>
@@ -582,14 +584,14 @@ export default function JournalEntriesListPage() {
           <div className="flex flex-wrap items-center gap-2">
             <ActionButton
               icon={RefreshCw}
-              label="تحديث"
+              label={t("تحديث")}
               onClick={refetch}
               disabled={isFetching}
             />
 
             <ActionButton
               icon={Printer}
-              label="طباعة"
+              label={t("طباعة")}
               onClick={printList}
               disabled={isLoading || entries.length === 0}
             />
@@ -597,7 +599,7 @@ export default function JournalEntriesListPage() {
             {!isFiscalYearReadOnly && (
               <ActionButton
                 icon={Plus}
-                label="قيد جديد"
+                label={t("قيد جديد")}
                 primary
                 onClick={() => navigate("/dashboard/journal-entries/new")}
               />
@@ -630,7 +632,7 @@ export default function JournalEntriesListPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-medium text-gray-400">
-                  إجمالي المدين
+                  {t("إجمالي المدين")}
                 </p>
 
                 <p className="mt-1 text-lg font-bold tabular-nums text-gray-800">
@@ -660,7 +662,7 @@ export default function JournalEntriesListPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-medium text-gray-400">
-                  إجمالي الدائن
+                  {t("إجمالي الدائن")}
                 </p>
 
                 <p className="mt-1 text-lg font-bold tabular-nums text-gray-800">
@@ -690,7 +692,7 @@ export default function JournalEntriesListPage() {
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[11px] font-medium text-gray-400">
-                  العملات المستخدمة
+                  {t("العملات المستخدمة")}
                 </p>
 
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
@@ -740,7 +742,7 @@ export default function JournalEntriesListPage() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-medium text-gray-400">الفرق</p>
+                <p className="text-[11px] font-medium text-gray-400">{t("الفرق")}</p>
 
                 <p
                   className={`
@@ -828,11 +830,11 @@ export default function JournalEntriesListPage() {
 
               <div>
                 <h2 className="text-sm font-semibold text-gray-800">
-                  تصفية القيود
+                  {t("تصفية القيود")}
                 </h2>
 
                 <p className="text-[11px] text-gray-400">
-                  البحث والتصفية حسب بيانات القيد
+                  {t("البحث والتصفية حسب بيانات القيد")}
                 </p>
               </div>
             </div>
@@ -861,7 +863,7 @@ export default function JournalEntriesListPage() {
                 "
               >
                 <RotateCcw size={13} />
-                إعادة ضبط
+                {t("إعادة ضبط")}
               </motion.button>
             )}
           </div>
@@ -881,7 +883,7 @@ export default function JournalEntriesListPage() {
 
               <div className="min-w-0 xl:col-span-2">
                 <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                  البحث
+                  {t("البحث")}
                 </label>
 
                 <div className="relative">
@@ -903,7 +905,7 @@ export default function JournalEntriesListPage() {
                     onChange={(event) =>
                       updateFilter("search", event.target.value)
                     }
-                    placeholder="رقم القيد، البيان، المصدر..."
+                    placeholder={t("رقم القيد، البيان، المصدر...")}
                     className="
                       h-10
                       w-full
@@ -958,14 +960,14 @@ export default function JournalEntriesListPage() {
 
               <div className="min-w-0">
                 <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                  السنة المالية
+                  {t("السنة المالية")}
                 </label>
 
                 <CompactSelect
                   value={filters.fiscalYearId}
                   onChange={(value) => updateFilter("fiscalYearId", value)}
                   options={fiscalYearOptions}
-                  placeholder="كل السنوات"
+                  placeholder={t("كل السنوات")}
                 />
               </div>
 
@@ -973,14 +975,14 @@ export default function JournalEntriesListPage() {
 
               <div className="min-w-0">
                 <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                  نوع القيد
+                  {t("نوع القيد")}
                 </label>
 
                 <CompactSelect
                   value={filters.entryType}
                   onChange={(value) => updateFilter("entryType", value)}
                   options={ENTRY_TYPE_OPTIONS}
-                  placeholder="كل الأنواع"
+                  placeholder={t("كل الأنواع")}
                 />
               </div>
 
@@ -988,14 +990,14 @@ export default function JournalEntriesListPage() {
 
               <div className="min-w-0">
                 <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                  الحالة
+                  {t("الحالة")}
                 </label>
 
                 <CompactSelect
                   value={filters.status}
                   onChange={(value) => updateFilter("status", value)}
                   options={STATUS_OPTIONS}
-                  placeholder="كل الحالات"
+                  placeholder={t("كل الحالات")}
                 />
               </div>
 
@@ -1003,7 +1005,7 @@ export default function JournalEntriesListPage() {
 
               <div className="min-w-0">
                 <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                  من تاريخ
+                  {t("من تاريخ")}
                 </label>
 
                 <div className="relative">
@@ -1053,7 +1055,7 @@ export default function JournalEntriesListPage() {
 
               <div className="min-w-0">
                 <label className="mb-1.5 block text-xs font-medium text-gray-500">
-                  إلى تاريخ
+                  {t("إلى تاريخ")}
                 </label>
 
                 <div className="relative">
@@ -1115,7 +1117,7 @@ export default function JournalEntriesListPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold text-gray-700">
-                  القيود اليومية
+                  {t("القيود اليومية")}
                 </span>
 
                 {data?.totalCount != null && (
@@ -1130,7 +1132,7 @@ export default function JournalEntriesListPage() {
                       text-emerald-700
                     "
                   >
-                    {data.totalCount.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                    {data.totalCount.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
                   </span>
                 )}
               </div>
@@ -1140,7 +1142,7 @@ export default function JournalEntriesListPage() {
           {isFetching && !isLoading && (
             <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
               <RefreshCw size={12} className="animate-spin" />
-              جاري التحديث...
+              {t("جاري التحديث...")}
             </div>
           )}
         </div>
@@ -1182,15 +1184,15 @@ export default function JournalEntriesListPage() {
                   sm:px-6
                 "
               >
-                <span>رقم القيد</span>
-                <span>التاريخ</span>
-                <span>البيان / المصدر</span>
-                <span>النوع</span>
-                <span>العملة</span>
-                <span className="text-left">مدين</span>
-                <span className="text-left">دائن</span>
-                <span>الحالة</span>
-                <span className="text-left">الإجراءات</span>
+                <span>{t("رقم القيد")}</span>
+                <span>{t("التاريخ")}</span>
+                <span>{t("البيان / المصدر")}</span>
+                <span>{t("النوع")}</span>
+                <span>{t("العملة")}</span>
+                <span className="text-left">{t("مدين")}</span>
+                <span className="text-left">{t("دائن")}</span>
+                <span>{t("الحالة")}</span>
+                <span className="text-left">{t("الإجراءات")}</span>
               </div>
 
               {/* Loading */}
@@ -1295,7 +1297,7 @@ export default function JournalEntriesListPage() {
                             transition
                             hover:bg-emerald-50
                           "
-                          title="عرض القيد"
+                          title={t("عرض القيد")}
                         >
                           {entry.entryNumber ?? "-"}
                         </button>
@@ -1342,7 +1344,7 @@ export default function JournalEntriesListPage() {
                                 group-hover:text-emerald-700
                               "
                             >
-                              {entry.description || "بدون بيان"}
+                              {entry.description || t("بدون بيان")}
                             </span>
 
                             <ChevronLeft
@@ -1498,7 +1500,7 @@ export default function JournalEntriesListPage() {
                                     `/dashboard/journal-entries/${entry.id}/edit`,
                                   )
                                 }
-                                title="تعديل"
+                                title={t("تعديل")}
                                 className="
                                   flex
                                   h-8
@@ -1522,7 +1524,7 @@ export default function JournalEntriesListPage() {
                                 }}
                                 disabled={isDeleting}
                                 onClick={() => handleDelete(entry)}
-                                title="حذف"
+                                title={t("حذف")}
                                 className="
                                   flex
                                   h-8
@@ -1558,7 +1560,7 @@ export default function JournalEntriesListPage() {
                                   `/dashboard/journal-entries/${entry.id}`,
                                 )
                               }
-                              title="عرض"
+                              title={t("عرض")}
                               className="
                                 flex
                                 h-8
@@ -1622,11 +1624,11 @@ export default function JournalEntriesListPage() {
                   </div>
 
                   <h3 className="mb-1 text-sm font-semibold text-gray-700">
-                    لا توجد قيود مطابقة
+                    {t("لا توجد قيود مطابقة")}
                   </h3>
 
                   <p className="max-w-sm text-xs leading-5 text-gray-400">
-                    لم يتم العثور على قيود تطابق معايير البحث والتصفية الحالية.
+                    {t("لم يتم العثور على قيود تطابق معايير البحث والتصفية الحالية.")}
                   </p>
 
                   {hasActiveFilters && (
@@ -1654,7 +1656,7 @@ export default function JournalEntriesListPage() {
                       "
                     >
                       <RotateCcw size={13} />
-                      إعادة ضبط الفلاتر
+                      {t("إعادة ضبط الفلاتر")}
                     </motion.button>
                   )}
                 </motion.div>
@@ -1679,7 +1681,7 @@ export default function JournalEntriesListPage() {
               setPageSize(size);
               setPage(1);
             }}
-            label="قيد"
+            label={t("قيد")}
           />
         )}
       </motion.div>

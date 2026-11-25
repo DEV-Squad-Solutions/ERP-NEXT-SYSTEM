@@ -14,6 +14,7 @@ import {
   useUpdateFiscalYearMutation,
 } from "../fiscalYearsApi";
 
+import { t } from "../../../i18n";
 const getDefaultDates = (year = new Date().getFullYear()) => ({
   startDate: `${year}-01-01`,
   endDate: `${year}-12-31`,
@@ -23,9 +24,9 @@ const currentYearDates = getDefaultDates();
 
 const schema = z
   .object({
-    name: z.string().min(1, "اسم السنة المالية مطلوب").max(200),
-    startDate: z.string().min(1, "تاريخ البداية مطلوب"),
-    endDate: z.string().min(1, "تاريخ النهاية مطلوب"),
+    name: z.string().min(1, t("اسم السنة المالية مطلوب")).max(200),
+    startDate: z.string().min(1, t("تاريخ البداية مطلوب")),
+    endDate: z.string().min(1, t("تاريخ النهاية مطلوب")),
     isCurrent: z.boolean().default(true),
     rowVersion: z.string().optional(),
   })
@@ -38,7 +39,7 @@ const schema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["endDate"],
-        message: "يجب أن يكون تاريخ النهاية بعد تاريخ البداية",
+        message: t("يجب أن يكون تاريخ النهاية بعد تاريخ البداية"),
       });
     }
   });
@@ -144,7 +145,7 @@ export default function FiscalYearFormModal({
       if (isEdit) {
         if (!data.rowVersion) {
           toast.error(
-            "تعذر التحقق من إصدار السجل، يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى",
+            t("تعذر التحقق من إصدار السجل، يرجى إعادة تحميل الصفحة والمحاولة مرة أخرى"),
           );
           return;
         }
@@ -158,7 +159,7 @@ export default function FiscalYearFormModal({
           rowVersion: data.rowVersion,
         }).unwrap();
 
-        toast.success("تم تحديث السنة المالية بنجاح");
+        toast.success(t("تم تحديث السنة المالية بنجاح"));
       } else {
         await createFiscalYear({
           name: data.name,
@@ -167,7 +168,7 @@ export default function FiscalYearFormModal({
           isCurrent: data.isCurrent,
         }).unwrap();
 
-        toast.success("تم إنشاء السنة المالية بنجاح");
+        toast.success(t("تم إنشاء السنة المالية بنجاح"));
       }
 
       onSaved?.();
@@ -181,7 +182,7 @@ export default function FiscalYearFormModal({
         rowVersionError ||
           error?.data?.detail ||
           error?.data?.title ||
-          "حدث خطأ أثناء حفظ السنة المالية",
+          t("حدث خطأ أثناء حفظ السنة المالية"),
       );
     }
   };
@@ -190,7 +191,7 @@ export default function FiscalYearFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل السنة المالية" : "إضافة سنة مالية جديدة"}
+      title={isEdit ? t("تعديل السنة المالية") : t("إضافة سنة مالية جديدة")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <input type="hidden" {...register("rowVersion")} />
@@ -201,28 +202,27 @@ export default function FiscalYearFormModal({
           </div>
 
           <p className="text-xs leading-relaxed text-ink-600">
-            حدد اسم السنة المالية وفترتها الزمنية. لن يمكن تعديل هذه البيانات
-            بعد إغلاق السنة.
+            {t("حدد اسم السنة المالية وفترتها الزمنية. لن يمكن تعديل هذه البيانات بعد إغلاق السنة.")}
           </p>
         </div>
 
         <Input
-          label="اسم السنة المالية"
-          placeholder="مثال: 2026"
+          label={t("اسم السنة المالية")}
+          placeholder={t("مثال: 2026")}
           {...register("name")}
           error={errors.name?.message}
         />
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Input
-            label="تاريخ البداية"
+            label={t("تاريخ البداية")}
             type="date"
             {...register("startDate")}
             error={errors.startDate?.message}
           />
 
           <Input
-            label="تاريخ النهاية"
+            label={t("تاريخ النهاية")}
             type="date"
             {...register("endDate")}
             error={errors.endDate?.message}
@@ -235,7 +235,7 @@ export default function FiscalYearFormModal({
             {...register("isCurrent")}
             className="h-4 w-4 rounded border-ink-400/30 accent-primary-500"
           />
-          جعلها السنة المالية الحالية
+          {t("جعلها السنة المالية الحالية")}
         </label>
 
         <div className="flex justify-end gap-2 border-t border-ink-400/10 pt-3">
@@ -245,11 +245,11 @@ export default function FiscalYearFormModal({
             onClick={onClose}
             disabled={isSubmitting}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "جارِ الحفظ..." : "حفظ"}
+            {isSubmitting ? t("جارِ الحفظ...") : t("حفظ")}
           </Button>
         </div>
       </form>

@@ -5,15 +5,17 @@ import Pagination from "../../../shared/components/ui/Pagination";
 import InvoiceNumberLink from "../../../shared/components/InvoiceNumberLink";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const INVOICE_TYPE_LABELS = {
-  Sales: "مبيعات",
-  Purchase: "مشتريات",
-  SalesReturn: "مرتجع مبيعات",
-  PurchaseReturn: "مرتجع مشتريات",
+  Sales: t("مبيعات"),
+  Purchase: t("مشتريات"),
+  SalesReturn: t("مرتجع مبيعات"),
+  PurchaseReturn: t("مرتجع مشتريات"),
 };
 
 function fmt(n) {
-  return new Intl.NumberFormat("ar-EG", {
+  return new Intl.NumberFormat(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(n || 0);
@@ -58,7 +60,7 @@ export default function InvoiceItemPricingTable({
         />
 
         <p className="text-ink-900 font-medium text-sm mb-1">
-          حدث خطأ في تحميل بيانات التكلفة
+          {t("حدث خطأ في تحميل بيانات التكلفة")}
         </p>
 
         <button
@@ -66,7 +68,7 @@ export default function InvoiceItemPricingTable({
           className="inline-flex items-center gap-2 text-xs font-medium text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-lg transition-colors mt-2"
         >
           <RefreshCw size={13} />
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
@@ -86,10 +88,10 @@ export default function InvoiceItemPricingTable({
         </div>
 
         <p className="text-ink-900 font-medium text-sm mb-1">
-          لا توجد بيانات تكلفة
+          {t("لا توجد بيانات تكلفة")}
         </p>
 
-        <p className="text-xs text-ink-400">جرّب تعديل الفلاتر</p>
+        <p className="text-xs text-ink-400">{t("جرّب تعديل الفلاتر")}</p>
       </div>
     );
   }
@@ -113,30 +115,30 @@ export default function InvoiceItemPricingTable({
           <thead>
             <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
               <th className="p-2.5 font-medium border-l border-ink-400/5">
-                الفاتورة
+                {t("الفاتورة")}
               </th>
               <th className="p-2.5 font-medium border-l border-ink-400/5">
-                النوع
+                {t("النوع")}
               </th>
               <th className="p-2.5 font-medium border-l border-ink-400/5">
-                الصنف
+                {t("الصنف")}
               </th>
               <th className="p-2.5 font-medium border-l border-ink-400/5">
-                الكمية
+                {t("الكمية")}
               </th>
               <th className="p-2.5 font-medium border-l border-ink-400/5">
-                سعر البيع
+                {t("سعر البيع")}
               </th>
               <th className="p-2.5 font-medium border-l border-ink-400/5">
-                متوسط التكلفة
+                {t("متوسط التكلفة")}
               </th>
               <th className="p-2.5 font-medium border-l border-ink-400/5">
-                إجمالي المصروفات
+                {t("إجمالي المصروفات")}
               </th>
               <th className="p-2.5 font-medium border-l border-ink-400/5">
-                التكلفة الإرشادية
+                {t("التكلفة الإرشادية")}
               </th>
-              <th className="p-2.5 font-medium">الإجراءات</th>
+              <th className="p-2.5 font-medium">{t("الإجراءات")}</th>
             </tr>
           </thead>
 
@@ -194,7 +196,7 @@ export default function InvoiceItemPricingTable({
                   </span>
                   {item.manualExpensesTotal > 0 && (
                     <p className="text-[10px] text-ink-400 num">
-                      {fmt(item.manualExpensesPerUnit)} / وحدة
+                      {fmt(item.manualExpensesPerUnit)} {t("/ وحدة")}
                     </p>
                   )}
                 </td>
@@ -210,7 +212,7 @@ export default function InvoiceItemPricingTable({
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 px-2.5 py-1.5 rounded-lg transition-colors"
                   >
                     <Wallet size={13} />
-                    المصروفات
+                    {t("المصروفات")}
                     {item.expenses?.length > 0 && (
                       <span className="text-[10px] bg-primary-500 text-white rounded-full px-1.5">
                         {item.expenses.length}

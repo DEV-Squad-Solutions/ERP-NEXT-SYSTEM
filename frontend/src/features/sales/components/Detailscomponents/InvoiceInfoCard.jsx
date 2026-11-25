@@ -1,43 +1,44 @@
-const paymentTermLabels = { Cash: "نقدي", Credit: "آجل" };
-const contentTypeLabels = { Items: "أصناف", Containers: "عبوات" };
+import { t } from "../../../../i18n";
+const paymentTermLabels = { Cash: t("نقدي"), Credit: t("آجل") };
+const contentTypeLabels = { Items: t("أصناف"), Containers: t("عبوات") };
 
 /**
  * @param {{ invoice: Object }} props
  */
 export default function InvoiceInfoCard({ invoice }) {
   const driverLine = invoice.usesExternalDriver
-    ? `${invoice.externalDriverName} (سائق خارجي)`
+    ? t("{0} (سائق خارجي)", { 0: invoice.externalDriverName })
     : invoice.driverName || "—";
 
   const rows = [
-    { label: "تاريخ الفاتورة", value: invoice.invoiceDate, num: true },
-    { label: "تاريخ الاستحقاق", value: invoice.dueDate, num: true },
-    { label: "العميل / المورد", value: invoice.businessPartnerName },
-    { label: "المخزن", value: invoice.storeName },
+    { label: t("تاريخ الفاتورة"), value: invoice.invoiceDate, num: true },
+    { label: t("تاريخ الاستحقاق"), value: invoice.dueDate, num: true },
+    { label: t("العميل / المورد"), value: invoice.businessPartnerName },
+    { label: t("المخزن"), value: invoice.storeName },
     ...(invoice.contentType === "Containers"
-      ? [{ label: "مخزن العبوات", value: invoice.containerStoreName }]
+      ? [{ label: t("مخزن العبوات"), value: invoice.containerStoreName }]
       : []),
-    { label: "الدولة", value: invoice.countryName },
-    { label: "السائق", value: driverLine },
+    { label: t("الدولة"), value: invoice.countryName },
+    { label: t("السائق"), value: driverLine },
     ...(invoice.actualDriverName && invoice.actualDriverId !== invoice.driverId
-      ? [{ label: "السائق الفعلي", value: invoice.actualDriverName }]
+      ? [{ label: t("السائق الفعلي"), value: invoice.actualDriverName }]
       : []),
-    { label: "رقم السيارة", value: invoice.vehicleNumber, num: true },
+    { label: t("رقم السيارة"), value: invoice.vehicleNumber, num: true },
     {
-      label: "طريقة الدفع",
+      label: t("طريقة الدفع"),
       value: paymentTermLabels[invoice.paymentTerm] || invoice.paymentTerm,
     },
     {
-      label: "محتوى الفاتورة",
+      label: t("محتوى الفاتورة"),
       value: contentTypeLabels[invoice.contentType] || invoice.contentType,
     },
     ...(invoice.itemsCategoryName
-      ? [{ label: "تصنيف الأصناف", value: invoice.itemsCategoryName }]
+      ? [{ label: t("تصنيف الأصناف"), value: invoice.itemsCategoryName }]
       : []),
     ...(invoice.partnerInvoiceNo
       ? [
           {
-            label: "رقم فاتورة الشريك",
+            label: t("رقم فاتورة الشريك"),
             value: invoice.partnerInvoiceNo,
             num: true,
           },
@@ -46,28 +47,28 @@ export default function InvoiceInfoCard({ invoice }) {
     ...(invoice.exportInvoiceCode
       ? [
           {
-            label: "كود فاتورة التصدير",
+            label: t("كود فاتورة التصدير"),
             value: invoice.exportInvoiceCode,
             num: true,
           },
         ]
       : []),
     {
-      label: "العملة",
+      label: t("العملة"),
       value:
         invoice.currency === invoice.baseCurrency
           ? invoice.currency
-          : `${invoice.currency} (أساسي: ${invoice.baseCurrency})`,
+          : t("{0} (أساسي: {1})", { 0: invoice.currency, 1: invoice.baseCurrency }),
     },
     ...(invoice.currency !== invoice.baseCurrency
-      ? [{ label: "سعر الصرف", value: invoice.exchangeRate, num: true }]
+      ? [{ label: t("سعر الصرف"), value: invoice.exchangeRate, num: true }]
       : []),
   ];
 
   return (
     <div className="bg-white rounded-2xl border border-ink-400/10 shadow-card p-5">
       <h3 className="font-display font-bold text-ink-900 mb-4">
-        بيانات الفاتورة
+        {t("بيانات الفاتورة")}
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 text-sm">
         {rows.map((row) => (
@@ -83,7 +84,7 @@ export default function InvoiceInfoCard({ invoice }) {
       </div>
       {invoice.notes && (
         <div className="mt-4 pt-4 border-t border-ink-400/10">
-          <p className="text-xs text-ink-400 mb-1">ملاحظات</p>
+          <p className="text-xs text-ink-400 mb-1">{t("ملاحظات")}</p>
           <p className="text-sm text-ink-700">{invoice.notes}</p>
         </div>
       )}

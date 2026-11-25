@@ -8,6 +8,7 @@ import InvoiceItemPricingFilters from "../components/InvoiceItemPricingFilters";
 import InvoiceItemPricingTable from "../components/InvoiceItemPricingTable";
 import InvoiceLineExpensesModal from "../components/InvoiceLineExpensesModal";
 
+import { t } from "../../../i18n";
 const EMPTY_FILTERS = {
   search: "",
   invoiceType: "",
@@ -78,11 +79,11 @@ export default function InvoiceItemPricingPage() {
     <div className="animate-fadeUp space-y-4">
       <div>
         <h2 className="font-display text-2xl font-bold text-ink-900">
-          تكلفة أصناف الفواتير
+          {t("تكلفة أصناف الفواتير")}
         </h2>
 
         <p className="text-sm text-ink-400 mt-1">
-          عرض وإدارة المصروفات المحمّلة على متوسط تكلفة الصنف في كل فاتورة
+          {t("عرض وإدارة المصروفات المحمّلة على متوسط تكلفة الصنف في كل فاتورة")}
         </p>
       </div>
 

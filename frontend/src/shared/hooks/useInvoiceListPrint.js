@@ -1,10 +1,11 @@
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
+import { t } from "../../i18n";
 /**
  * Hook لطباعة قائمة فواتير (تقرير) - مختلف عن طباعة فاتورة واحدة
  */
-export function useInvoiceListPrint({ title = "تقرير الفواتير" } = {}) {
+export function useInvoiceListPrint({ title = t("تقرير الفواتير") } = {}) {
   const printRef = useRef(null);
 
   const printList = useReactToPrint({

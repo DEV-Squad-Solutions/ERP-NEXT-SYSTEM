@@ -1,3 +1,4 @@
+import { t } from "../../../i18n";
 const variants = {
   primary:
     "bg-primary-500 text-white shadow-sm hover:bg-primary-600 hover:shadow-card focus-visible:ring-primary-500/30",
@@ -95,7 +96,7 @@ export default function Button({
             aria-hidden="true"
           />
 
-          <span>{loadingText || "جاري التنفيذ..."}</span>
+          <span>{loadingText || t("جاري التنفيذ...")}</span>
         </>
       ) : (
         children

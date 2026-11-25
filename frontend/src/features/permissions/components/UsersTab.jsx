@@ -19,6 +19,7 @@ import QuickAddUserModal from "../components/QuickAddUserModal";
 import UserCashboxPermissionsModal from "../components/UserCashboxPermissionsModal";
 import UserScreensModal from "../components/UserScreensModal";
 
+import { t } from "../../../i18n";
 export default function UsersTab() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -50,13 +51,13 @@ export default function UsersTab() {
   };
 
   const handleDelete = async (user) => {
-    if (!confirm(`متأكد من حذف المستخدم "${user.userName}"؟`)) return;
+    if (!confirm(t("متأكد من حذف المستخدم \"{0}\"؟", { 0: user.userName }))) return;
     setDeletingId(user.id);
     try {
       await deleteUser(user.id).unwrap();
-      toast.success("تم حذف المستخدم");
+      toast.success(t("تم حذف المستخدم"));
     } catch (err) {
-      toast.error(err?.data?.detail || "تعذر حذف المستخدم");
+      toast.error(err?.data?.detail || t("تعذر حذف المستخدم"));
     } finally {
       setDeletingId(null);
     }
@@ -71,9 +72,9 @@ export default function UsersTab() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <p className="text-sm text-ink-500">
-          المستخدمون المسجلون وأدوارهم والشركات المتاحة لكل واحد
+          {t("المستخدمون المسجلون وأدوارهم والشركات المتاحة لكل واحد")}
         </p>
-        <Button onClick={openCreate}>+ مستخدم جديد</Button>
+        <Button onClick={openCreate}>{t("+ مستخدم جديد")}</Button>
       </div>
 
       {isLoading ? (
@@ -93,14 +94,14 @@ export default function UsersTab() {
             strokeWidth={1.6}
           />
           <p className="mb-1 font-medium text-ink-900">
-            حدث خطأ في تحميل المستخدمين
+            {t("حدث خطأ في تحميل المستخدمين")}
           </p>
           <button
             onClick={refetch}
             className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
           >
             <RefreshCw size={15} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : !isFetching && items.length === 0 ? (
@@ -112,7 +113,7 @@ export default function UsersTab() {
               strokeWidth={1.6}
             />
           </div>
-          <p className="font-medium text-ink-900">لا يوجد مستخدمون مطابقون</p>
+          <p className="font-medium text-ink-900">{t("لا يوجد مستخدمون مطابقون")}</p>
         </div>
       ) : (
         <div
@@ -124,18 +125,18 @@ export default function UsersTab() {
             <table className="min-w-full border-collapse text-sm">
               <thead className="bg-ink-900/[0.03]">
                 <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-400">
-                  <th className="min-w-[160px] px-4 py-3 text-right">الاسم</th>
+                  <th className="min-w-[160px] px-4 py-3 text-right">{t("الاسم")}</th>
                   <th className="min-w-[140px] px-4 py-3 text-right">
-                    اسم المستخدم
+                    {t("اسم المستخدم")}
                   </th>
                   <th className="min-w-[180px] px-4 py-3 text-right">
-                    الإيميل
+                    {t("الإيميل")}
                   </th>
                   <th className="min-w-[160px] px-4 py-3 text-right">
-                    الأدوار
+                    {t("الأدوار")}
                   </th>
                   <th className="min-w-[180px] px-4 py-3 text-right">
-                    الشركات
+                    {t("الشركات")}
                   </th>
                   <th className="w-20 px-4 py-3"></th>
                 </tr>
@@ -178,7 +179,7 @@ export default function UsersTab() {
                             type="button"
                             onClick={() => setScreensUser(u)}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                            title="الشاشات الظاهرة"
+                            title={t("الشاشات الظاهرة")}
                           >
                             <LayoutList size={14} />
                           </button>
@@ -188,7 +189,7 @@ export default function UsersTab() {
                             type="button"
                             onClick={() => setCashboxUser(u)}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                            title="صلاحيات الخزائن"
+                            title={t("صلاحيات الخزائن")}
                           >
                             <ShieldCheck size={14} />
                           </button>
@@ -197,7 +198,7 @@ export default function UsersTab() {
                           type="button"
                           onClick={() => openEdit(u)}
                           className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                          title="تعديل"
+                          title={t("تعديل")}
                         >
                           <Pencil size={14} />
                         </button>
@@ -206,7 +207,7 @@ export default function UsersTab() {
                           onClick={() => handleDelete(u)}
                           disabled={deletingId === u.id}
                           className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-negative/10 hover:text-negative disabled:opacity-50"
-                          title="حذف"
+                          title={t("حذف")}
                         >
                           <Trash2 size={14} />
                         </button>
@@ -226,7 +227,7 @@ export default function UsersTab() {
                 totalCount={data?.totalCount || 0}
                 onPageChange={setPage}
                 onPageSizeChange={handlePageSizeChange}
-                label="مستخدم"
+                label={t("مستخدم")}
               />
             </div>
           )}

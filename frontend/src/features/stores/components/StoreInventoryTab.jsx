@@ -23,8 +23,10 @@ import Modal from "../../../shared/components/ui/Modal";
 import { useLazyGetItemBalanceQuery } from "../../invoices/invoicesApi";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const fmt = (v) =>
-  Number(v || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+  Number(v || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 export default function StoreInventoryTab({
   storeId,
@@ -68,7 +70,7 @@ export default function StoreInventoryTab({
         asOfDate: formatDateForApi(new Date()),
       }).unwrap();
     } catch {
-      toast.error("تعذر تحميل تفاصيل تكلفة الصنف");
+      toast.error(t("تعذر تحميل تفاصيل تكلفة الصنف"));
     }
   };
 
@@ -86,12 +88,12 @@ export default function StoreInventoryTab({
         asOfDate: formatDateForApi(new Date()),
       }).unwrap();
     } catch {
-      toast.error("تعذر تحديث تفاصيل تكلفة الصنف");
+      toast.error(t("تعذر تحديث تفاصيل تكلفة الصنف"));
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-card p-6" dir="rtl">
+    <div className="bg-white rounded-2xl shadow-card p-6" dir={getDir()}>
       <div className="flex items-center gap-3 flex-wrap mb-5">
         <div className="relative flex-1 min-w-[220px]">
           <Search className="w-4 h-4 text-ink-400 absolute right-3 top-1/2 -translate-y-1/2" />
@@ -102,16 +104,16 @@ export default function StoreInventoryTab({
               setSearch(e.target.value);
               setPageNumber(1);
             }}
-            placeholder="ابحث بكود أو اسم الصنف..."
+            placeholder={t("ابحث بكود أو اسم الصنف...")}
             className="w-full pr-9 pl-3 py-2 text-sm rounded-xl border border-ink-100 focus:outline-none focus:ring-2 focus:ring-ink-200"
           />
         </div>
 
         <div className="flex items-center gap-1 bg-ink-50 rounded-xl p-1">
           {[
-            { label: "الكل", value: undefined },
-            { label: "برصيد فقط", value: true },
-            { label: "بدون رصيد", value: false },
+            { label: t("الكل"), value: undefined },
+            { label: t("برصيد فقط"), value: true },
+            { label: t("بدون رصيد"), value: false },
           ].map((opt) => (
             <button
               key={opt.label}
@@ -137,24 +139,24 @@ export default function StoreInventoryTab({
           className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-white bg-ink-900 hover:bg-ink-800 transition-colors shrink-0"
         >
           <Plus className="w-4 h-4" />
-          إضافة صنف جديد
+          {t("إضافة صنف جديد")}
         </button>
       </div>
 
       {data?.summary && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
           <SummaryChip
-            label="إجمالي الأصناف"
+            label={t("إجمالي الأصناف")}
             value={fmt(data.summary.totalItemCount)}
           />
 
           <SummaryChip
-            label="أصناف برصيد"
+            label={t("أصناف برصيد")}
             value={fmt(data.summary.itemsWithStockCount)}
           />
 
           <SummaryChip
-            label="إجمالي قيمة المخزون"
+            label={t("إجمالي قيمة المخزون")}
             value={`${fmt(data.summary.totalInventoryValue)} ${
               data.baseCurrency || ""
             }`}
@@ -164,13 +166,13 @@ export default function StoreInventoryTab({
 
       {isFetching && (
         <div className="py-14 text-center text-sm text-ink-400">
-          جاري تحميل الأصناف...
+          {t("جاري تحميل الأصناف...")}
         </div>
       )}
 
       {isError && (
         <div className="py-14 text-center text-sm text-rose-500">
-          حدث خطأ أثناء تحميل أصناف المخزن.
+          {t("حدث خطأ أثناء تحميل أصناف المخزن.")}
         </div>
       )}
 
@@ -181,29 +183,29 @@ export default function StoreInventoryTab({
               <thead>
                 <tr className="text-ink-500 text-xs border-b border-ink-100">
                   <th className="py-2.5 px-3 text-right font-medium">
-                    كود الصنف
+                    {t("كود الصنف")}
                   </th>
 
                   <th className="py-2.5 px-3 text-right font-medium">
-                    اسم الصنف
+                    {t("اسم الصنف")}
                   </th>
 
-                  <th className="py-2.5 px-3 text-right font-medium">الوحدة</th>
+                  <th className="py-2.5 px-3 text-right font-medium">{t("الوحدة")}</th>
 
                   <th className="py-2.5 px-3 text-right font-medium">
-                    الكمية الحالية
-                  </th>
-
-                  <th className="py-2.5 px-3 text-right font-medium">
-                    متوسط التكلفة
+                    {t("الكمية الحالية")}
                   </th>
 
                   <th className="py-2.5 px-3 text-right font-medium">
-                    قيمة المخزون
+                    {t("متوسط التكلفة")}
+                  </th>
+
+                  <th className="py-2.5 px-3 text-right font-medium">
+                    {t("قيمة المخزون")}
                   </th>
 
                   <th className="py-2.5 px-3 text-center font-medium">
-                    التفاصيل
+                    {t("التفاصيل")}
                   </th>
                 </tr>
               </thead>
@@ -257,7 +259,7 @@ export default function StoreInventoryTab({
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-ink-700 bg-ink-50 hover:bg-ink-100 hover:text-ink-900 transition-colors"
                           >
                             <Eye className="w-3.5 h-3.5" />
-                            التفاصيل
+                            {t("التفاصيل")}
                           </button>
                         </div>
                       </td>
@@ -270,7 +272,7 @@ export default function StoreInventoryTab({
                         <PackageX className="w-8 h-8 text-ink-300 mb-2" />
 
                         <p className="text-ink-400 text-sm">
-                          لا توجد أصناف مطابقة داخل هذا المخزن.
+                          {t("لا توجد أصناف مطابقة داخل هذا المخزن.")}
                         </p>
                       </div>
                     </td>
@@ -290,7 +292,7 @@ export default function StoreInventoryTab({
                 setPageSize(size);
                 setPageNumber(1);
               }}
-              label="صنف"
+              label={t("صنف")}
             />
           )}
         </>
@@ -390,12 +392,12 @@ function ItemBalanceModal({
     const amount = Number(expenseForm.amount);
 
     if (!name) {
-      toast.error("اكتب اسم المصروف");
+      toast.error(t("اكتب اسم المصروف"));
       return;
     }
 
     if (!Number.isFinite(amount) || amount <= 0) {
-      toast.error("اكتب مبلغ المصروف بشكل صحيح");
+      toast.error(t("اكتب مبلغ المصروف بشكل صحيح"));
       return;
     }
 
@@ -447,7 +449,7 @@ function ItemBalanceModal({
 
   const handleSaveExpenses = async () => {
     if (!item?.itemId) {
-      toast.error("لم يتم تحديد الصنف");
+      toast.error(t("لم يتم تحديد الصنف"));
       return;
     }
 
@@ -461,7 +463,7 @@ function ItemBalanceModal({
         })),
       }).unwrap();
 
-      toast.success("تم حفظ مصروفات الصنف بنجاح");
+      toast.success(t("تم حفظ مصروفات الصنف بنجاح"));
 
       resetForm();
 
@@ -471,20 +473,20 @@ function ItemBalanceModal({
         error?.data?.message ||
           error?.data?.title ||
           error?.message ||
-          "تعذر حفظ مصروفات الصنف",
+          t("تعذر حفظ مصروفات الصنف"),
       );
     }
   };
 
   return (
-    <Modal isOpen={isOpen} wide onClose={onClose} title="تفاصيل تكلفة الصنف">
+    <Modal isOpen={isOpen} wide onClose={onClose} title={t("تفاصيل تكلفة الصنف")}>
       <div className="py-5 max-h-[70vh] overflow-y-auto">
         {isLoading && (
           <div className="py-14 flex flex-col items-center justify-center text-center">
             <Loader2 className="w-7 h-7 text-ink-400 animate-spin mb-3" />
 
             <p className="text-sm text-ink-500">
-              جاري تحميل تفاصيل تكلفة الصنف...
+              {t("جاري تحميل تفاصيل تكلفة الصنف...")}
             </p>
           </div>
         )}
@@ -496,11 +498,11 @@ function ItemBalanceModal({
             </div>
 
             <p className="text-sm font-medium text-rose-600">
-              تعذر تحميل تفاصيل الصنف
+              {t("تعذر تحميل تفاصيل الصنف")}
             </p>
 
             <p className="text-xs text-ink-400 mt-1">
-              حاول إغلاق النافذة وفتح التفاصيل مرة أخرى.
+              {t("حاول إغلاق النافذة وفتح التفاصيل مرة أخرى.")}
             </p>
           </div>
         )}
@@ -508,24 +510,24 @@ function ItemBalanceModal({
         {data && !isLoading && !isError && (
           <div className="space-y-5">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <DetailCard label="المخزن" value={data.storeName} />
+              <DetailCard label={t("المخزن")} value={data.storeName} />
 
-              <DetailCard label="الوحدة" value={data.itemUnitName} />
+              <DetailCard label={t("الوحدة")} value={data.itemUnitName} />
 
               <DetailCard
-                label="الكمية الحالية"
+                label={t("الكمية الحالية")}
                 value={fmt(data.currentQuantity)}
               />
 
               <DetailCard
-                label="تاريخ الرصيد"
+                label={t("تاريخ الرصيد")}
                 value={formatDisplayDate(data.asOfDate)}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded-xl border border-ink-100 bg-ink-50/60 p-4">
-                <p className="text-xs text-ink-500 mb-2">متوسط التكلفة</p>
+                <p className="text-xs text-ink-500 mb-2">{t("متوسط التكلفة")}</p>
 
                 <p className="text-lg font-bold text-ink-900">
                   {fmt(data.averageCost)}
@@ -533,7 +535,7 @@ function ItemBalanceModal({
               </div>
 
               <div className="rounded-xl border border-ink-100 bg-ink-50/60 p-4">
-                <p className="text-xs text-ink-500 mb-2">قيمة المخزون</p>
+                <p className="text-xs text-ink-500 mb-2">{t("قيمة المخزون")}</p>
 
                 <p className="text-lg font-bold text-ink-900">
                   {fmt(data.inventoryValue)}
@@ -542,7 +544,7 @@ function ItemBalanceModal({
 
               <div className="rounded-xl border border-primary-100 bg-primary-50/60 p-4">
                 <p className="text-xs text-primary-600 mb-2">
-                  التكلفة شاملة مصروفات التسعير
+                  {t("التكلفة شاملة مصروفات التسعير")}
                 </p>
 
                 <p className="text-lg font-bold text-primary-700">
@@ -556,11 +558,11 @@ function ItemBalanceModal({
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <h3 className="text-sm font-semibold text-ink-900">
-                      {editingId !== null ? "تعديل المصروف" : "إضافة مصروف"}
+                      {editingId !== null ? t("تعديل المصروف") : t("إضافة مصروف")}
                     </h3>
 
                     <p className="text-xs text-ink-400 mt-0.5">
-                      أضف المصروفات التي تدخل ضمن تكلفة تسعير الصنف
+                      {t("أضف المصروفات التي تدخل ضمن تكلفة تسعير الصنف")}
                     </p>
                   </div>
 
@@ -570,7 +572,7 @@ function ItemBalanceModal({
                       onClick={resetForm}
                       className="text-xs text-ink-500 hover:text-ink-900"
                     >
-                      إلغاء التعديل
+                      {t("إلغاء التعديل")}
                     </button>
                   )}
                 </div>
@@ -580,20 +582,20 @@ function ItemBalanceModal({
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-ink-600 mb-1.5">
-                      اسم المصروف
+                      {t("اسم المصروف")}
                     </label>
 
                     <input
                       value={expenseForm.name}
                       onChange={(e) => handleFormChange("name", e.target.value)}
-                      placeholder="مثال: شحن"
+                      placeholder={t("مثال: شحن")}
                       className="w-full px-3 py-2 rounded-xl border border-ink-100 text-sm focus:outline-none focus:ring-2 focus:ring-ink-200"
                     />
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium text-ink-600 mb-1.5">
-                      المبلغ
+                      {t("المبلغ")}
                     </label>
 
                     <input
@@ -611,7 +613,7 @@ function ItemBalanceModal({
 
                   <div>
                     <label className="block text-xs font-medium text-ink-600 mb-1.5">
-                      ملاحظات
+                      {t("ملاحظات")}
                     </label>
 
                     <input
@@ -619,7 +621,7 @@ function ItemBalanceModal({
                       onChange={(e) =>
                         handleFormChange("notes", e.target.value)
                       }
-                      placeholder="ملاحظات اختيارية"
+                      placeholder={t("ملاحظات اختيارية")}
                       className="w-full px-3 py-2 rounded-xl border border-ink-100 text-sm focus:outline-none focus:ring-2 focus:ring-ink-200"
                     />
                   </div>
@@ -634,12 +636,12 @@ function ItemBalanceModal({
                     {editingId !== null ? (
                       <>
                         <Pencil className="w-4 h-4" />
-                        تحديث المصروف
+                        {t("تحديث المصروف")}
                       </>
                     ) : (
                       <>
                         <Plus className="w-4 h-4" />
-                        إضافة المصروف
+                        {t("إضافة المصروف")}
                       </>
                     )}
                   </button>
@@ -651,16 +653,16 @@ function ItemBalanceModal({
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <h3 className="text-sm font-semibold text-ink-900">
-                    مصروفات التسعير
+                    {t("مصروفات التسعير")}
                   </h3>
 
                   <p className="text-xs text-ink-400 mt-0.5">
-                    المصروفات المرتبطة بهذا الصنف
+                    {t("المصروفات المرتبطة بهذا الصنف")}
                   </p>
                 </div>
 
                 <span className="text-xs font-medium px-2.5 py-1 rounded-lg bg-ink-50 text-ink-600">
-                  {fmt(expenses.length)} مصروف
+                  {fmt(expenses.length)} {t("مصروف")}
                 </span>
               </div>
 
@@ -671,19 +673,19 @@ function ItemBalanceModal({
                       <thead>
                         <tr className="bg-ink-50 text-xs text-ink-500">
                           <th className="py-2.5 px-3 text-right font-medium">
-                            المصروف
+                            {t("المصروف")}
                           </th>
 
                           <th className="py-2.5 px-3 text-right font-medium">
-                            المبلغ
+                            {t("المبلغ")}
                           </th>
 
                           <th className="py-2.5 px-3 text-right font-medium">
-                            ملاحظات
+                            {t("ملاحظات")}
                           </th>
 
                           <th className="py-2.5 px-3 text-center font-medium">
-                            الإجراءات
+                            {t("الإجراءات")}
                           </th>
                         </tr>
                       </thead>
@@ -712,7 +714,7 @@ function ItemBalanceModal({
                                   type="button"
                                   onClick={() => handleEditExpense(expense)}
                                   className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-500 hover:bg-ink-50 hover:text-ink-900 transition-colors"
-                                  title="تعديل"
+                                  title={t("تعديل")}
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
                                 </button>
@@ -723,7 +725,7 @@ function ItemBalanceModal({
                                     handleDeleteExpense(expense.id)
                                   }
                                   className="w-8 h-8 rounded-lg flex items-center justify-center text-rose-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
-                                  title="حذف"
+                                  title={t("حذف")}
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -736,7 +738,7 @@ function ItemBalanceModal({
                       <tfoot>
                         <tr className="border-t border-ink-100 bg-ink-50/60">
                           <td className="py-3 px-3 font-semibold text-ink-800">
-                            إجمالي المصروفات
+                            {t("إجمالي المصروفات")}
                           </td>
 
                           <td className="py-3 px-3 font-bold text-ink-900">
@@ -756,7 +758,7 @@ function ItemBalanceModal({
                   <ReceiptText className="w-7 h-7 text-ink-300 mx-auto mb-2" />
 
                   <p className="text-sm text-ink-400">
-                    لا توجد مصروفات تسعير لهذا الصنف.
+                    {t("لا توجد مصروفات تسعير لهذا الصنف.")}
                   </p>
                 </div>
               )}
@@ -764,7 +766,7 @@ function ItemBalanceModal({
 
             <div className="rounded-xl bg-ink-900 text-white p-4 flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs text-white/60">إجمالي مصروفات التسعير</p>
+                <p className="text-xs text-white/60">{t("إجمالي مصروفات التسعير")}</p>
 
                 <p className="text-xl font-bold mt-1">{fmt(totalExpenses)}</p>
               </div>
@@ -778,12 +780,12 @@ function ItemBalanceModal({
                 {isSaving ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    جاري الحفظ...
+                    {t("جاري الحفظ...")}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    حفظ المصروفات
+                    {t("حفظ المصروفات")}
                   </>
                 )}
               </button>

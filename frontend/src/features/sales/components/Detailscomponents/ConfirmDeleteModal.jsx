@@ -2,6 +2,7 @@ import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import Modal from "../../../../shared/components/ui/Modal";
 import Button from "../../../../shared/components/ui/Button";
 
+import { t } from "../../../../i18n";
 /**
  * @param {{ open: boolean, onClose: () => void, invoiceNumber: string, isDeleting: boolean, onConfirm: () => void }} props
  */
@@ -13,7 +14,7 @@ export default function ConfirmDeleteModal({
   onConfirm,
 }) {
   return (
-    <Modal isOpen={open} onClose={onClose} title="تأكيد الحذف">
+    <Modal isOpen={open} onClose={onClose} title={t("تأكيد الحذف")}>
       <div className="text-center py-2">
         <div className="w-14 h-14 rounded-full bg-negative/10 flex items-center justify-center mx-auto mb-3">
           <AlertTriangle
@@ -23,11 +24,11 @@ export default function ConfirmDeleteModal({
           />
         </div>
         <p className="text-ink-900 font-medium mb-1">
-          متأكد إنك عايز تحذف الفاتورة{" "}
-          <span className="num">{invoiceNumber}</span>؟
+          {t("متأكد إنك عايز تحذف الفاتورة")}{" "}
+          <span className="num">{invoiceNumber}</span>{t("؟")}
         </p>
         <p className="text-sm text-ink-400 mb-5">
-          هذا الإجراء لا يمكن التراجع عنه
+          {t("هذا الإجراء لا يمكن التراجع عنه")}
         </p>
 
         <div className="flex gap-2">
@@ -37,7 +38,7 @@ export default function ConfirmDeleteModal({
             className="flex-1"
             disabled={isDeleting}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
           <Button
             variant="danger"
@@ -50,7 +51,7 @@ export default function ConfirmDeleteModal({
             ) : (
               <Trash2 size={16} />
             )}
-            حذف نهائيًا
+            {t("حذف نهائيًا")}
           </Button>
         </div>
       </div>

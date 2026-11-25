@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useReactToPrint } from "react-to-print";
 
+import { t } from "../../i18n";
 /**
  * Hook موحّد لطباعة فاتورة واحدة من أي مكان (جدول أو صفحة تفاصيل)
  * بيرجع: printRef (يترّبط بالـ template المخفي)، invoiceToPrint (البيانات الحالية)، printInvoice (function تستدعيها بالفاتورة)
@@ -12,8 +13,8 @@ export function useInvoicePrint() {
   const reactToPrintFn = useReactToPrint({
     contentRef: printRef,
     documentTitle: invoiceToPrint
-      ? `فاتورة-${invoiceToPrint.invoiceNumber}`
-      : "فاتورة",
+      ? t("فاتورة-{0}", { 0: invoiceToPrint.invoiceNumber })
+      : t("فاتورة"),
     onAfterPrint: () => setInvoiceToPrint(null),
   });
 

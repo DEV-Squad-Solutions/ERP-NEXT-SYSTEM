@@ -17,6 +17,8 @@ import {
   useGetEmployeesSelectQuery,
 } from "../payrollApi";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const defaultValues = {
   startDate: "",
   endDate: "",
@@ -65,7 +67,7 @@ export default function PayrollEntryFormModal({ isOpen, onClose }) {
     }
 
     if (!data.employeeId) {
-      toast.error("الموظف مطلوب");
+      toast.error(t("الموظف مطلوب"));
       return;
     }
 
@@ -85,24 +87,24 @@ export default function PayrollEntryFormModal({ isOpen, onClose }) {
         cashMovementTypeId: Number(data.cashMovementTypeId),
       }).unwrap();
 
-      toast.success("تم إنشاء قيد المرتب بنجاح");
+      toast.success(t("تم إنشاء قيد المرتب بنجاح"));
 
       onClose();
     } catch (error) {
-      toast.error(error?.data?.message || "حصل خطأ أثناء إنشاء المرتب");
+      toast.error(error?.data?.message || t("حصل خطأ أثناء إنشاء المرتب"));
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="إنشاء مرتب">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" dir="rtl">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("إنشاء مرتب")}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" dir={getDir()}>
         <Controller
           name="employeeId"
           control={control}
           render={({ field }) => (
             <div>
               <label className="block text-xs font-medium text-ink-400 mb-1">
-                الموظف
+                {t("الموظف")}
               </label>
 
               <CompactSelect
@@ -114,11 +116,11 @@ export default function PayrollEntryFormModal({ isOpen, onClose }) {
                 }
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="اختر الموظف"
+                placeholder={t("اختر الموظف")}
               />
 
               {errors.employeeId && (
-                <p className="text-xs text-negative mt-1">الموظف مطلوب</p>
+                <p className="text-xs text-negative mt-1">{t("الموظف مطلوب")}</p>
               )}
             </div>
           )}
@@ -126,23 +128,23 @@ export default function PayrollEntryFormModal({ isOpen, onClose }) {
 
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="من تاريخ"
+            label={t("من تاريخ")}
             type="date"
             min={selectedFiscalYear?.startDate}
             max={selectedFiscalYear?.endDate}
             {...register("startDate", {
-              required: "التاريخ مطلوب",
+              required: t("التاريخ مطلوب"),
             })}
             error={errors.startDate?.message}
           />
 
           <Input
-            label="إلى تاريخ"
+            label={t("إلى تاريخ")}
             type="date"
             min={selectedFiscalYear?.startDate}
             max={selectedFiscalYear?.endDate}
             {...register("endDate", {
-              required: "التاريخ مطلوب",
+              required: t("التاريخ مطلوب"),
             })}
             error={errors.endDate?.message}
           />
@@ -150,7 +152,7 @@ export default function PayrollEntryFormModal({ isOpen, onClose }) {
 
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="الإضافات"
+            label={t("الإضافات")}
             type="number"
             min="0"
             step="0.01"
@@ -158,7 +160,7 @@ export default function PayrollEntryFormModal({ isOpen, onClose }) {
           />
 
           <Input
-            label="الخصومات"
+            label={t("الخصومات")}
             type="number"
             min="0"
             step="0.01"
@@ -167,7 +169,7 @@ export default function PayrollEntryFormModal({ isOpen, onClose }) {
         </div>
 
         <Input
-          label="وحدة الإضافي باليوم"
+          label={t("وحدة الإضافي باليوم")}
           type="number"
           min="0"
           step="0.01"
@@ -175,30 +177,30 @@ export default function PayrollEntryFormModal({ isOpen, onClose }) {
         />
 
         <Input
-          label="رقم الخزنة"
+          label={t("رقم الخزنة")}
           type="number"
           min="1"
           {...register("cashboxId", {
-            required: "الخزنة مطلوبة",
+            required: t("الخزنة مطلوبة"),
           })}
         />
 
         <Input
-          label="نوع حركة الخزنة"
+          label={t("نوع حركة الخزنة")}
           type="number"
           min="1"
           {...register("cashMovementTypeId", {
-            required: "نوع حركة الخزنة مطلوب",
+            required: t("نوع حركة الخزنة مطلوب"),
           })}
         />
 
         <div className="flex justify-end gap-2 pt-3 border-t border-ink-400/10">
           <Button type="button" variant="outline" onClick={onClose}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "جارِ الإنشاء..." : "إنشاء المرتب"}
+            {isLoading ? t("جارِ الإنشاء...") : t("إنشاء المرتب")}
           </Button>
         </div>
       </form>

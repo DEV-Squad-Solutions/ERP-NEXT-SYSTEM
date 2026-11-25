@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronDown, ChevronLeft, Loader2, Search } from "lucide-react";
 
+import { t } from "../../../i18n";
 /**
  * Select متداخل (Nested / Accordion) لتوصيف حركة الخزنة.
  *
@@ -21,7 +22,7 @@ export default function DescriptionCascadeSelect({
   onChange,
   isLoading = false,
   isDisabled = false,
-  placeholder = "اختر الحساب أو التوصيف",
+  placeholder = t("اختر الحساب أو التوصيف"),
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -135,7 +136,7 @@ export default function DescriptionCascadeSelect({
                 type="text"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="بحث..."
+                placeholder={t("بحث...")}
                 className="w-full bg-transparent text-[11px] outline-none placeholder:text-ink-300"
               />
             </div>
@@ -144,7 +145,7 @@ export default function DescriptionCascadeSelect({
           <div className="max-h-64 overflow-y-auto py-1">
             {visibleGroups.length === 0 && (
               <p className="px-3 py-4 text-center text-[11px] text-ink-300">
-                لا توجد نتائج
+                {t("لا توجد نتائج")}
               </p>
             )}
 

@@ -15,6 +15,8 @@ import { useGetPartyByIdQuery, useDeletePartyMutation } from "../partiesApi";
 import Button from "../../../shared/components/ui/Button";
 import EditPartyModal from "../components/EditPartyModal";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 export default function PartnerDetailPage() {
   const { partnerId } = useParams();
   const navigate = useNavigate();
@@ -28,27 +30,27 @@ export default function PartnerDetailPage() {
   const handleDelete = () => {
     if (!party) return;
 
-    toast(`حذف "${party.name}"؟`, {
-      description: "الإجراء ده لا يمكن التراجع عنه",
+    toast(t("حذف \"{0}\"؟", { 0: party.name }), {
+      description: t("الإجراء ده لا يمكن التراجع عنه"),
 
       action: {
-        label: "تأكيد الحذف",
+        label: t("تأكيد الحذف"),
 
         onClick: async () => {
           try {
             await deleteParty(party.id).unwrap();
 
-            toast.success("تم الحذف بنجاح");
+            toast.success(t("تم الحذف بنجاح"));
 
             navigate("/dashboard/partners");
           } catch {
-            toast.error("حصل خطأ أثناء الحذف، حاول تاني");
+            toast.error(t("حصل خطأ أثناء الحذف، حاول تاني"));
           }
         },
       },
 
       cancel: {
-        label: "إلغاء",
+        label: t("إلغاء"),
       },
 
       duration: 6000,
@@ -69,7 +71,7 @@ export default function PartnerDetailPage() {
    */
   const openContainerStore = () => {
     if (!party?.id) {
-      toast.error("تعذر تحديد الشريك");
+      toast.error(t("تعذر تحديد الشريك"));
       return;
     }
 
@@ -77,12 +79,12 @@ export default function PartnerDetailPage() {
   };
 
   if (isLoading) {
-    return <div className="p-6 text-ink-400">جاري التحميل...</div>;
+    return <div className="p-6 text-ink-400">{t("جاري التحميل...")}</div>;
   }
 
   if (isError || !party) {
     return (
-      <div className="p-6 text-red-500">تعذر تحميل بيانات العميل/المورد</div>
+      <div className="p-6 text-red-500">{t("تعذر تحميل بيانات العميل/المورد")}</div>
     );
   }
 
@@ -94,7 +96,7 @@ export default function PartnerDetailPage() {
         className="flex items-center gap-1.5 text-sm text-emerald-700 hover:underline"
       >
         <ArrowRight size={14} />
-        رجوع للقائمة
+        {t("رجوع للقائمة")}
       </button>
 
       {/* =========================
@@ -124,7 +126,7 @@ export default function PartnerDetailPage() {
                     : "inline-block text-red-500 text-xs font-semibold bg-red-500/10 px-2 py-0.5 rounded-full"
                 }
               >
-                {party.isActive ? "نشط" : "غير نشط"}
+                {party.isActive ? t("نشط") : t("غير نشط")}
               </span>
 
               <span
@@ -134,7 +136,7 @@ export default function PartnerDetailPage() {
                     : "inline-block text-ink-400 text-xs font-semibold bg-ink-400/10 px-2 py-0.5 rounded-full"
                 }
               >
-                {party.special ? "شريك خاص" : "شريك عادي"}
+                {party.special ? t("شريك خاص") : t("شريك عادي")}
               </span>
             </div>
           </div>
@@ -144,12 +146,12 @@ export default function PartnerDetailPage() {
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => setEditingParty(party)}>
               <Pencil size={14} />
-              تعديل
+              {t("تعديل")}
             </Button>
 
             <Button variant="outline" onClick={handleDelete}>
               <Trash2 size={14} className="text-red-600" />
-              حذف
+              {t("حذف")}
             </Button>
           </div>
         </div>
@@ -157,21 +159,21 @@ export default function PartnerDetailPage() {
         {/* Partner Data */}
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          <Field label="رقم الهاتف" value={party.phoneNumber} />
+          <Field label={t("رقم الهاتف")} value={party.phoneNumber} />
 
-          <Field label="الإيميل" value={party.email} />
+          <Field label={t("الإيميل")} value={party.email} />
 
-          <Field label="العنوان" value={party.address} />
+          <Field label={t("العنوان")} value={party.address} />
 
-          <Field label="الرقم الضريبي" value={party.taxNumber} />
+          <Field label={t("الرقم الضريبي")} value={party.taxNumber} />
 
-          <Field label="العملة" value={party.currency} />
+          <Field label={t("العملة")} value={party.currency} />
 
           <Field
-            label="حد الائتمان"
+            label={t("حد الائتمان")}
             value={
               party.creditLimit != null
-                ? party.creditLimit.toLocaleString("ar-EG", { maximumFractionDigits: 2 })
+                ? party.creditLimit.toLocaleString(getLocale(), { maximumFractionDigits: 2 })
                 : null
             }
           />
@@ -190,7 +192,7 @@ export default function PartnerDetailPage() {
             </div>
 
             <div>
-              <h3 className="text-sm font-bold text-ink-900">مخزن العبوات</h3>
+              <h3 className="text-sm font-bold text-ink-900">{t("مخزن العبوات")}</h3>
 
               {party.containerStore ? (
                 <>
@@ -207,11 +209,11 @@ export default function PartnerDetailPage() {
               ) : (
                 <>
                   <p className="text-sm text-ink-500 mt-1">
-                    لا يوجد مخزن عبوات مرتبط حاليًا.
+                    {t("لا يوجد مخزن عبوات مرتبط حاليًا.")}
                   </p>
 
                   <p className="text-xs text-ink-400 mt-1">
-                    يمكنك إنشاء المخزن وربط الحاويات من صفحة المخزن.
+                    {t("يمكنك إنشاء المخزن وربط الحاويات من صفحة المخزن.")}
                   </p>
                 </>
               )}
@@ -223,7 +225,7 @@ export default function PartnerDetailPage() {
           <Button variant="outline" onClick={openContainerStore}>
             <Warehouse size={14} />
 
-            {party.containerStore ? "تفاصيل المخزن" : "إدارة مخزن العبوات"}
+            {party.containerStore ? t("تفاصيل المخزن") : t("إدارة مخزن العبوات")}
           </Button>
         </div>
       </div>
@@ -239,7 +241,7 @@ export default function PartnerDetailPage() {
               <Package size={16} className="text-emerald-700" />
 
               <h3 className="text-sm font-bold text-ink-900">
-                الحاويات المخصصة
+                {t("الحاويات المخصصة")}
               </h3>
 
               <span className="text-xs text-ink-400">
@@ -252,18 +254,18 @@ export default function PartnerDetailPage() {
               onClick={openContainerStore}
               className="text-xs"
             >
-              إدارة الحاويات
+              {t("إدارة الحاويات")}
             </Button>
           </div>
 
           <table className="w-full text-right">
             <thead>
               <tr className="bg-ink-400/5 text-xs text-ink-400">
-                <th className="py-2 px-4 font-medium">الكود</th>
+                <th className="py-2 px-4 font-medium">{t("الكود")}</th>
 
-                <th className="py-2 px-4 font-medium">الاسم</th>
+                <th className="py-2 px-4 font-medium">{t("الاسم")}</th>
 
-                <th className="py-2 px-4 font-medium">الحالة</th>
+                <th className="py-2 px-4 font-medium">{t("الحالة")}</th>
               </tr>
             </thead>
 
@@ -284,7 +286,7 @@ export default function PartnerDetailPage() {
                           : "text-red-500 text-xs font-semibold"
                       }
                     >
-                      {container.isActive ? "نشط" : "غير نشط"}
+                      {container.isActive ? t("نشط") : t("غير نشط")}
                     </span>
                   </td>
                 </tr>

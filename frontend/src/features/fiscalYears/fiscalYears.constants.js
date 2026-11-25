@@ -1,8 +1,9 @@
+import { t } from "../../i18n";
 // features/fiscalYears/fiscalYears.constants.js
 
 export const FISCAL_YEAR_STATUS_LABELS = {
-  Open: "مفتوحة",
-  Closed: "مغلقة",
+  Open: t("مفتوحة"),
+  Closed: t("مغلقة"),
 };
 
 export const fiscalYearStatusOptions = Object.entries(

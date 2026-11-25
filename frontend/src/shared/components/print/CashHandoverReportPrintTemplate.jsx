@@ -1,17 +1,19 @@
 import { formatDateTime } from "../../../lib/date.js";
 import { formatDate } from "../../../lib/date.js";
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const currencySymbols = {
-  EGP: "ج.م",
+  EGP: t("ج.م"),
   USD: "$",
   EUR: "€",
   GBP: "£",
   SAR: "﷼",
-  AED: "د.إ",
-  KWD: "د.ك",
+  AED: t("د.إ"),
+  KWD: t("د.ك"),
 };
 
 const fmt = (n) =>
-  Number(n ?? 0).toLocaleString("ar-EG", {
+  Number(n ?? 0).toLocaleString(getLocale(), {
     maximumFractionDigits: 2,
   });
 
@@ -27,35 +29,35 @@ export default function CashHandoverReportPrintTemplate({
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       className="p-8 font-sans text-ink-900"
       style={{ width: "210mm" }}
     >
       <div className="mb-6 flex items-center justify-between border-b border-ink-200 pb-4">
         <div>
-          <h1 className="text-xl font-bold">تقرير تسليم العهدة</h1>
+          <h1 className="text-xl font-bold">{t("تقرير تسليم العهدة")}</h1>
 
-          <p className="mt-1 text-sm text-ink-500">{cashboxName || "الخزنة"}</p>
+          <p className="mt-1 text-sm text-ink-500">{cashboxName || t("الخزنة")}</p>
         </div>
 
         <div className="text-left text-xs text-ink-400">
-          <p>تاريخ الطباعة</p>
+          <p>{t("تاريخ الطباعة")}</p>
           <p>{printedAt}</p>
         </div>
       </div>
 
       {(fromDate || toDate) && (
         <div className="mb-6 rounded-lg border border-ink-200 p-3 text-sm">
-          <span className="text-ink-500">الفترة: </span>
+          <span className="text-ink-500">{t("الفترة:")} </span>
           <span className="font-medium">
-            {fromDate ? formatDate(fromDate) : "—"} إلى {toDate ? formatDate(toDate) : "—"}
+            {fromDate ? formatDate(fromDate) : "—"} {t("إلى")} {toDate ? formatDate(toDate) : "—"}
           </span>
         </div>
       )}
 
       {cashboxBalances.length > 0 && (
         <div className="mb-6">
-          <h2 className="mb-3 text-sm font-bold">أرصدة الخزنة</h2>
+          <h2 className="mb-3 text-sm font-bold">{t("أرصدة الخزنة")}</h2>
 
           <div className="grid grid-cols-2 gap-4">
             {cashboxBalances.map((balance) => (
@@ -69,22 +71,22 @@ export default function CashHandoverReportPrintTemplate({
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <PrintField
-                    label="الرصيد الحالي"
+                    label={t("الرصيد الحالي")}
                     value={fmt(balance.currentBalance)}
                   />
 
                   <PrintField
-                    label="الرصيد المتوقع بعد الترحيل"
+                    label={t("الرصيد المتوقع بعد الترحيل")}
                     value={fmt(balance.expectedBalance)}
                   />
 
                   <PrintField
-                    label="مسودات وارد"
+                    label={t("مسودات وارد")}
                     value={fmt(balance.draftReceipt)}
                   />
 
                   <PrintField
-                    label="مسودات صادر"
+                    label={t("مسودات صادر")}
                     value={fmt(balance.draftPayment)}
                   />
                 </div>
@@ -96,7 +98,7 @@ export default function CashHandoverReportPrintTemplate({
 
       {summaries.length > 0 && (
         <div className="mb-6">
-          <h2 className="mb-3 text-sm font-bold">ملخص التقرير</h2>
+          <h2 className="mb-3 text-sm font-bold">{t("ملخص التقرير")}</h2>
 
           <div className="grid grid-cols-2 gap-4">
             {summaries.map((summary) => (
@@ -106,15 +108,15 @@ export default function CashHandoverReportPrintTemplate({
               >
                 <p className="mb-3 text-sm font-bold">
                   {currencySymbols[summary.currency] || ""} {summary.currency} —{" "}
-                  {summary.count} سند
+                  {summary.count} {t("سند")}
                 </p>
 
                 <div className="grid grid-cols-3 gap-3 text-center">
-                  <PrintField label="وارد" value={fmt(summary.receipt)} />
+                  <PrintField label={t("وارد")} value={fmt(summary.receipt)} />
 
-                  <PrintField label="صادر" value={fmt(summary.payment)} />
+                  <PrintField label={t("صادر")} value={fmt(summary.payment)} />
 
-                  <PrintField label="الصافي" value={fmt(summary.net)} />
+                  <PrintField label={t("الصافي")} value={fmt(summary.net)} />
                 </div>
               </div>
             ))}
@@ -123,20 +125,20 @@ export default function CashHandoverReportPrintTemplate({
       )}
 
       <div>
-        <h2 className="mb-3 text-sm font-bold">السندات</h2>
+        <h2 className="mb-3 text-sm font-bold">{t("السندات")}</h2>
 
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-ink-200">
-              <th className="px-3 py-2 text-right font-semibold">رقم السند</th>
+              <th className="px-3 py-2 text-right font-semibold">{t("رقم السند")}</th>
 
-              <th className="px-3 py-2 text-right font-semibold">التاريخ</th>
+              <th className="px-3 py-2 text-right font-semibold">{t("التاريخ")}</th>
 
-              <th className="px-3 py-2 text-right font-semibold">الاتجاه</th>
+              <th className="px-3 py-2 text-right font-semibold">{t("الاتجاه")}</th>
 
-              <th className="px-3 py-2 text-right font-semibold">البيان</th>
+              <th className="px-3 py-2 text-right font-semibold">{t("البيان")}</th>
 
-              <th className="px-3 py-2 text-left font-semibold">المبلغ</th>
+              <th className="px-3 py-2 text-left font-semibold">{t("المبلغ")}</th>
             </tr>
           </thead>
 
@@ -148,7 +150,7 @@ export default function CashHandoverReportPrintTemplate({
                 <td className="px-3 py-2 text-ink-500">{formatDate(item.voucherDate)}</td>
 
                 <td className="px-3 py-2">
-                  {item.direction === "Receipt" ? "وارد" : "صادر"}
+                  {item.direction === "Receipt" ? t("وارد") : t("صادر")}
                 </td>
 
                 <td className="px-3 py-2 text-ink-500">

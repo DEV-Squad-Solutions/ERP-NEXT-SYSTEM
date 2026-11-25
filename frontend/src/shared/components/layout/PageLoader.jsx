@@ -1,3 +1,4 @@
+import { t } from "../../../i18n";
 export default function PageLoader() {
   return (
     <div
@@ -21,7 +22,7 @@ export default function PageLoader() {
       />
 
       <span className="text-sm text-gray-400 dark:text-gray-500">
-        جاري تحميل الصفحة...
+        {t("جاري تحميل الصفحة...")}
       </span>
     </div>
   );

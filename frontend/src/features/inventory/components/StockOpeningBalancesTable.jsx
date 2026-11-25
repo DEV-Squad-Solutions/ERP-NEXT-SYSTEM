@@ -11,6 +11,8 @@ import Pagination from "../../../shared/components/ui/Pagination";
 import { useFiscalYearGuard } from "../../../lib/useFiscalYearGuard";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 function lineTotal(line) {
   return Number(line.total ?? line.quantity * line.price ?? 0);
 }
@@ -49,7 +51,7 @@ function StockOpeningBalanceRow({ item, onEdit, onDelete, deletingId }) {
           {item.lineCount ?? item.lines?.length ?? 0}
         </td>
         <td className="num px-4 py-3 text-center text-sm font-semibold text-ink-900">
-          {documentTotal.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+          {documentTotal.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
         </td>
         <td
           className="max-w-[200px] truncate px-4 py-3 text-sm text-ink-500"
@@ -64,7 +66,7 @@ function StockOpeningBalanceRow({ item, onEdit, onDelete, deletingId }) {
                 type="button"
                 onClick={() => onEdit?.(item)}
                 className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                title="تعديل"
+                title={t("تعديل")}
               >
                 <Pencil size={14} />
               </button>
@@ -73,7 +75,7 @@ function StockOpeningBalanceRow({ item, onEdit, onDelete, deletingId }) {
                 onClick={() => onDelete?.(item)}
                 disabled={deletingId === item.id}
                 className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-negative/10 hover:text-negative disabled:opacity-50"
-                title="حذف"
+                title={t("حذف")}
               >
                 <Trash2 size={14} />
               </button>
@@ -88,14 +90,14 @@ function StockOpeningBalanceRow({ item, onEdit, onDelete, deletingId }) {
             <table className="w-full border-collapse text-xs">
               <thead>
                 <tr className="text-ink-400">
-                  <th className="p-2 text-right font-medium">الصنف</th>
-                  <th className="p-2 text-center font-medium">الوحدة</th>
-                  <th className="p-2 text-center font-medium">العدد</th>
-                  <th className="p-2 text-center font-medium">الوزن</th>
-                  <th className="p-2 text-center font-medium">الكمية</th>
-                  <th className="p-2 text-center font-medium">السعر</th>
-                  <th className="p-2 text-center font-medium">الإجمالي</th>
-                  <th className="p-2 text-right font-medium">ملاحظات</th>
+                  <th className="p-2 text-right font-medium">{t("الصنف")}</th>
+                  <th className="p-2 text-center font-medium">{t("الوحدة")}</th>
+                  <th className="p-2 text-center font-medium">{t("العدد")}</th>
+                  <th className="p-2 text-center font-medium">{t("الوزن")}</th>
+                  <th className="p-2 text-center font-medium">{t("الكمية")}</th>
+                  <th className="p-2 text-center font-medium">{t("السعر")}</th>
+                  <th className="p-2 text-center font-medium">{t("الإجمالي")}</th>
+                  <th className="p-2 text-right font-medium">{t("ملاحظات")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -118,10 +120,10 @@ function StockOpeningBalanceRow({ item, onEdit, onDelete, deletingId }) {
                       {line.quantity}
                     </td>
                     <td className="num p-2 text-center text-ink-600">
-                      {Number(line.price).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                      {Number(line.price).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
                     </td>
                     <td className="num p-2 text-center font-medium text-ink-900">
-                      {lineTotal(line).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                      {lineTotal(line).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
                     </td>
                     <td className="p-2 text-ink-500">{line.notes || "—"}</td>
                   </tr>
@@ -168,14 +170,14 @@ export default function StockOpeningBalancesTable({
           strokeWidth={1.6}
         />
         <p className="mb-1 font-medium text-ink-900">
-          حدث خطأ في تحميل الأرصدة الافتتاحية المخزنية
+          {t("حدث خطأ في تحميل الأرصدة الافتتاحية المخزنية")}
         </p>
         <button
           onClick={refetch}
           className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
         >
           <RefreshCw size={15} />
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
@@ -190,7 +192,7 @@ export default function StockOpeningBalancesTable({
           <FileSearch size={26} className="text-ink-400/50" strokeWidth={1.6} />
         </div>
         <p className="font-medium text-ink-900">
-          لا توجد أرصدة افتتاحية مطابقة
+          {t("لا توجد أرصدة افتتاحية مطابقة")}
         </p>
       </div>
     );
@@ -207,12 +209,12 @@ export default function StockOpeningBalancesTable({
           <thead className="bg-ink-900/[0.03]">
             <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-400">
               <th className="w-8 px-4 py-3"></th>
-              <th className="px-4 py-3 text-right">رقم المستند</th>
-              <th className="w-36 px-4 py-3 text-center">التاريخ</th>
-              <th className="min-w-[180px] px-4 py-3 text-right">المخزن</th>
-              <th className="w-28 px-4 py-3 text-center">عدد الأصناف</th>
-              <th className="w-36 px-4 py-3 text-center">الإجمالي</th>
-              <th className="min-w-[180px] px-4 py-3 text-right">ملاحظات</th>
+              <th className="px-4 py-3 text-right">{t("رقم المستند")}</th>
+              <th className="w-36 px-4 py-3 text-center">{t("التاريخ")}</th>
+              <th className="min-w-[180px] px-4 py-3 text-right">{t("المخزن")}</th>
+              <th className="w-28 px-4 py-3 text-center">{t("عدد الأصناف")}</th>
+              <th className="w-36 px-4 py-3 text-center">{t("الإجمالي")}</th>
+              <th className="min-w-[180px] px-4 py-3 text-right">{t("ملاحظات")}</th>
               <th className="w-20 px-4 py-3"></th>
             </tr>
           </thead>
@@ -239,7 +241,7 @@ export default function StockOpeningBalancesTable({
             totalCount={data?.totalCount || 0}
             onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}
-            label="سند"
+            label={t("سند")}
           />
         </div>
       )}

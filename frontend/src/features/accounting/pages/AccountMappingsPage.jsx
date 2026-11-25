@@ -17,41 +17,43 @@ import { useGetFiscalYearsSelectQuery } from "../../fiscalYears/fiscalYearsApi";
 import { useSelector } from "react-redux";
 import { selectSelectedFiscalYearId } from "../../fiscalYears/fiscalYearSlice";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 // تسميات الأنواع اللي مفردة (بدون مصدر)
 const SINGLE_TYPE_LABELS = {
-  [AccountingMappingType.Sales]: "المبيعات",
-  [AccountingMappingType.Purchase]: "المشتريات",
-  [AccountingMappingType.SalesReturn]: "مرتجع المبيعات",
-  [AccountingMappingType.PurchaseReturn]: "مرتجع المشتريات",
-  [AccountingMappingType.Inventory]: "المخزون",
-  [AccountingMappingType.CostOfGoodsSold]: "تكلفة البضاعة المباعة",
-  [AccountingMappingType.CustomerControl]: "حساب العملاء الإجمالي",
-  [AccountingMappingType.SupplierControl]: "حساب الموردين الإجمالي",
-  [AccountingMappingType.EmployeeControl]: "حساب الموظفين الإجمالي",
-  [AccountingMappingType.DriverControl]: "حساب السائقين الإجمالي",
-  [AccountingMappingType.ExchangeGain]: "أرباح فروق العملة",
-  [AccountingMappingType.ExchangeLoss]: "خسائر فروق العملة",
-  [AccountingMappingType.InventoryAdjustmentGain]: "أرباح تسوية المخزون",
-  [AccountingMappingType.InventoryAdjustmentLoss]: "خسائر تسوية المخزون",
-  [AccountingMappingType.OpeningBalanceEquity]: "حقوق ملكية الرصيد الافتتاحي",
-  [AccountingMappingType.EmployeeReceivable]: "مديونية الموظفين",
-  [AccountingMappingType.DriverTripExpense]: "مصروفات رحلات السائقين",
+  [AccountingMappingType.Sales]: t("المبيعات"),
+  [AccountingMappingType.Purchase]: t("المشتريات"),
+  [AccountingMappingType.SalesReturn]: t("مرتجع المبيعات"),
+  [AccountingMappingType.PurchaseReturn]: t("مرتجع المشتريات"),
+  [AccountingMappingType.Inventory]: t("المخزون"),
+  [AccountingMappingType.CostOfGoodsSold]: t("تكلفة البضاعة المباعة"),
+  [AccountingMappingType.CustomerControl]: t("حساب العملاء الإجمالي"),
+  [AccountingMappingType.SupplierControl]: t("حساب الموردين الإجمالي"),
+  [AccountingMappingType.EmployeeControl]: t("حساب الموظفين الإجمالي"),
+  [AccountingMappingType.DriverControl]: t("حساب السائقين الإجمالي"),
+  [AccountingMappingType.ExchangeGain]: t("أرباح فروق العملة"),
+  [AccountingMappingType.ExchangeLoss]: t("خسائر فروق العملة"),
+  [AccountingMappingType.InventoryAdjustmentGain]: t("أرباح تسوية المخزون"),
+  [AccountingMappingType.InventoryAdjustmentLoss]: t("خسائر تسوية المخزون"),
+  [AccountingMappingType.OpeningBalanceEquity]: t("حقوق ملكية الرصيد الافتتاحي"),
+  [AccountingMappingType.EmployeeReceivable]: t("مديونية الموظفين"),
+  [AccountingMappingType.DriverTripExpense]: t("مصروفات رحلات السائقين"),
 };
 
 const BADGE_LABELS = {
-  [AccountingMappingType.Cashbox]: "الخزائن",
-  [AccountingMappingType.CashMovementType]: "أنواع الحركات",
-  DEFAULT: "ربط عام",
+  [AccountingMappingType.Cashbox]: t("الخزائن"),
+  [AccountingMappingType.CashMovementType]: t("أنواع الحركات"),
+  DEFAULT: t("ربط عام"),
 };
 
-const CASHBOX_ICON_LABEL = "خزينة";
+const CASHBOX_ICON_LABEL = t("خزينة");
 const MOVEMENT_TYPE_CLASSIFICATION_LABEL = {
-  Revenue: "قبض",
-  Expense: "صرف",
-  Partner: "قبض",
-  Driver: "قبض",
-  Employee: "قبض",
-  Personal: "صرف",
+  Revenue: t("قبض"),
+  Expense: t("صرف"),
+  Partner: t("قبض"),
+  Driver: t("قبض"),
+  Employee: t("قبض"),
+  Personal: t("صرف"),
 };
 
 function buildSourceRows({ cashboxes, cashMovementTypes }) {
@@ -155,7 +157,7 @@ export default function AccountMappingsPage() {
     () =>
       (fiscalYears ?? []).map((fy) => ({
         value: fy.id,
-        label: `${fy.name} · ${fy.status === "Open" ? "مفتوحة" : "مغلقة"}`,
+        label: `${fy.name} · ${fy.status === "Open" ? t("مفتوحة") : t("مغلقة")}`,
       })),
     [fiscalYears],
   );
@@ -199,18 +201,18 @@ export default function AccountMappingsPage() {
       setEdits({});
     } catch (err) {
       // اعرض رسالة الخطأ من err.data.errors هنا حسب الـ toast/notification system بتاعك
-      console.error("فشل حفظ الربط المحاسبي", err);
+      console.error(t("فشل حفظ الربط المحاسبي"), err);
     }
   };
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50 px-8 py-6">
+    <div dir={getDir()} className="min-h-screen bg-gray-50 px-8 py-6">
       {/* breadcrumb */}
-      <div className="text-xs text-gray-400 mb-2">المحاسبة {">"} إعدادات</div>
+      <div className="text-xs text-gray-400 mb-2">{t("المحاسبة")} {">"} {t("إعدادات")}</div>
 
       <div className="flex items-start justify-between mb-1">
         <h1 className="text-2xl font-bold text-gray-900">
-          إعدادات الربط المحاسبي
+          {t("إعدادات الربط المحاسبي")}
         </h1>
         <button
           type="button"
@@ -220,12 +222,11 @@ export default function AccountMappingsPage() {
                      text-white text-sm font-medium px-5 py-2.5 rounded-lg
                      hover:bg-emerald-900 transition-colors"
         >
-          {isSaving ? "جارِ الحفظ..." : "حفظ الربط"}
+          {isSaving ? t("جارِ الحفظ...") : t("حفظ الربط")}
         </button>
       </div>
       <p className="text-sm text-gray-500 mb-6">
-        اربط الخزائن وأنواع الحركات والفواتير بالحسابات الافتراضية لكل سنة
-        مالية.
+        {t("اربط الخزائن وأنواع الحركات والفواتير بالحسابات الافتراضية لكل سنة مالية.")}
       </p>
 
       <div className="bg-white border border-gray-200 rounded-xl mb-4">
@@ -238,23 +239,23 @@ export default function AccountMappingsPage() {
             />
             <div>
               <div className="text-sm font-semibold text-gray-900">
-                {canEdit ? "السنة مفتوحة" : "السنة مغلقة"}
+                {canEdit ? t("السنة مفتوحة") : t("السنة مغلقة")}
               </div>
               <div className="text-xs text-gray-400">
-                {canEdit ? "يمكن تعديل الربط" : "لا يمكن تعديل الربط"}
+                {canEdit ? t("يمكن تعديل الربط") : t("لا يمكن تعديل الربط")}
               </div>
             </div>
           </div>
 
           <div className="flex-1">
             <label className="block text-xs text-gray-500 mb-1">
-              بحث في عناصر الربط
+              {t("بحث في عناصر الربط")}
             </label>
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="خزينة، نوع حركة، فاتورة..."
+              placeholder={t("خزينة، نوع حركة، فاتورة...")}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm
                          outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
             />
@@ -262,13 +263,13 @@ export default function AccountMappingsPage() {
 
           <div className="w-56">
             <label className="block text-xs text-gray-500 mb-1">
-              السنة المالية
+              {t("السنة المالية")}
             </label>
             <CompactSelect
               value={fiscalYearId}
               onChange={setFiscalYearId}
               options={fiscalYearOptions}
-              placeholder="اختر السنة المالية..."
+              placeholder={t("اختر السنة المالية...")}
             />
           </div>
         </div>
@@ -277,21 +278,20 @@ export default function AccountMappingsPage() {
       <div className="flex items-start gap-2 bg-gray-50 border border-gray-100 rounded-lg px-4 py-3 mb-4 text-xs text-gray-500">
         <span className="mt-0.5">ⓘ</span>
         <p>
-          الربط الافتراضي يحدد الحساب الذي تستخدمه التقارير لاحقًا. لا يغيّر
-          قيمة الفاتورة أو السند. ويمكن حذف أي ربط بتركه بدون حساب ثم الحفظ.
+          {t("الربط الافتراضي يحدد الحساب الذي تستخدمه التقارير لاحقًا. لا يغيّر قيمة الفاتورة أو السند. ويمكن حذف أي ربط بتركه بدون حساب ثم الحفظ.")}
         </p>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl overflow-visible">
         <div className="grid grid-cols-[1fr_140px_1fr] gap-4 px-6 py-3 text-xs text-gray-400 border-b border-gray-100">
-          <span>المصدر</span>
-          <span className="text-center">نوع الربط</span>
-          <span>الحساب الافتراضي</span>
+          <span>{t("المصدر")}</span>
+          <span className="text-center">{t("نوع الربط")}</span>
+          <span>{t("الحساب الافتراضي")}</span>
         </div>
 
         {(isLoading || isFetching) && (
           <div className="px-6 py-10 text-center text-sm text-gray-400">
-            جارِ التحميل...
+            {t("جارِ التحميل...")}
           </div>
         )}
 
@@ -323,7 +323,7 @@ export default function AccountMappingsPage() {
                 value={row.accountId}
                 onChange={(accountId) => handleAccountChange(row, accountId)}
                 options={accountOptions}
-                placeholder="اختر الحساب..."
+                placeholder={t("اختر الحساب...")}
                 isDisabled={!canEdit}
               />
             </div>
@@ -331,7 +331,7 @@ export default function AccountMappingsPage() {
 
         {!isLoading && rows.length === 0 && (
           <div className="px-6 py-10 text-center text-sm text-gray-400">
-            لا توجد نتائج مطابقة
+            {t("لا توجد نتائج مطابقة")}
           </div>
         )}
       </div>

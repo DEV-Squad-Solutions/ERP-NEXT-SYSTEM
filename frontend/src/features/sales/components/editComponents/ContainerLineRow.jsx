@@ -3,6 +3,7 @@ import { Trash2 } from "lucide-react";
 import { useGetContainersSelectQuery } from "../../../containers/containersApi";
 import CompactSelect from "../../../../shared/components/ui/CompactSelect";
 
+import { t } from "../../../../i18n";
 /**
  * @param {{ line: Object, onChange: (line: Object) => void, onRemove: () => void, index: number }} props
  */
@@ -38,7 +39,7 @@ function ContainerLineRow({ line, onChange, onRemove, index }) {
           value={line.containerId}
           onChange={handleContainerChange}
           isLoading={isLoading}
-          placeholder="اختر العبوة"
+          placeholder={t("اختر العبوة")}
         />
       </td>
       <td className="p-2 w-28">
@@ -64,7 +65,7 @@ function ContainerLineRow({ line, onChange, onRemove, index }) {
           type="button"
           onClick={onRemove}
           className="p-2 rounded-lg text-ink-400 opacity-60 group-hover:opacity-100 hover:text-negative hover:bg-negative/10 transition-all"
-          title="حذف العبوة"
+          title={t("حذف العبوة")}
         >
           <Trash2 size={15} />
         </button>

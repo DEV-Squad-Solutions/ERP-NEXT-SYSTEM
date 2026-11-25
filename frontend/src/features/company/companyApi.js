@@ -1,21 +1,22 @@
 import { baseApi } from "../../lib/baseApi";
 import { tagsFor } from "../../lib/invalidation";
 
+import { t } from "../../i18n";
 export const STOCK_BALANCE_CHECK_MODES = [
-  { value: "None", label: "بدون فحص" },
-  { value: "DateCheck", label: "فحص بالتاريخ" },
-  { value: "FinalCheck", label: "فحص نهائي" },
-  { value: "Both", label: "الاثنين معًا" },
+  { value: "None", label: t("بدون فحص") },
+  { value: "DateCheck", label: t("فحص بالتاريخ") },
+  { value: "FinalCheck", label: t("فحص نهائي") },
+  { value: "Both", label: t("الاثنين معًا") },
 ];
 
 export const CURRENCY_CODES = [
-  { value: "EGP", label: "جنيه مصري (EGP)" },
-  { value: "USD", label: "دولار أمريكي (USD)" },
-  { value: "EUR", label: "يورو (EUR)" },
-  { value: "GBP", label: "جنيه إسترليني (GBP)" },
-  { value: "SAR", label: "ريال سعودي (SAR)" },
-  { value: "AED", label: "درهم إماراتي (AED)" },
-  { value: "KWD", label: "دينار كويتي (KWD)" },
+  { value: "EGP", label: t("جنيه مصري (EGP)") },
+  { value: "USD", label: t("دولار أمريكي (USD)") },
+  { value: "EUR", label: t("يورو (EUR)") },
+  { value: "GBP", label: t("جنيه إسترليني (GBP)") },
+  { value: "SAR", label: t("ريال سعودي (SAR)") },
+  { value: "AED", label: t("درهم إماراتي (AED)") },
+  { value: "KWD", label: t("دينار كويتي (KWD)") },
 ];
 
 export const companiesApi = baseApi.injectEndpoints({

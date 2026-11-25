@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 /**
  * @param {{ filters: Object }} props
  */
@@ -32,7 +34,7 @@ export default function StockLedgerTable({ filters }) {
   if (isError)
     return (
       <p className="p-6 text-center text-negative text-sm">
-        حدث خطأ في تحميل البيانات
+        {t("حدث خطأ في تحميل البيانات")}
       </p>
     );
 
@@ -40,7 +42,7 @@ export default function StockLedgerTable({ filters }) {
     return (
       <div className="text-center py-14 border border-dashed border-ink-400/20 rounded-2xl">
         <Boxes size={32} className="mx-auto text-ink-400/40 mb-2" />
-        <p className="text-ink-400 text-sm">لا توجد حركات مطابقة لهذا الفلتر</p>
+        <p className="text-ink-400 text-sm">{t("لا توجد حركات مطابقة لهذا الفلتر")}</p>
       </div>
     );
   }
@@ -61,83 +63,83 @@ export default function StockLedgerTable({ filters }) {
               className="p-3 font-medium border-b border-ink-400/10"
               rowSpan={2}
             >
-              رقم الفاتورة
+              {t("رقم الفاتورة")}
             </th>
             <th
               className="p-3 font-medium border-b border-ink-400/10"
               rowSpan={2}
             >
-              التاريخ
+              {t("التاريخ")}
             </th>
             <th
               className="p-3 font-medium border-b border-ink-400/10"
               rowSpan={2}
             >
-              النوع
+              {t("النوع")}
             </th>
 
             <th
               className="p-3 font-medium border-b border-ink-400/10"
               rowSpan={2}
             >
-              العميل / المورد
+              {t("العميل / المورد")}
             </th>
             <th
               className="p-3 font-medium border-b border-ink-400/10"
               rowSpan={2}
             >
-              بيان الصنف
+              {t("بيان الصنف")}
             </th>
             <th
               className="p-2 font-medium border-b border-x border-ink-400/10 text-center"
               colSpan={2}
             >
-              الكمية
+              {t("الكمية")}
             </th>
             <th
               className="p-2 font-medium border-b border-x border-ink-400/10 text-center"
               colSpan={2}
             >
-              الوزن
+              {t("الوزن")}
             </th>
             <th
               className="p-3 font-medium border-b border-ink-400/10"
               rowSpan={2}
             >
-              سعر
+              {t("سعر")}
             </th>
             <th
               className="p-3 font-medium border-b border-ink-400/10"
               rowSpan={2}
             >
-              ربح
+              {t("ربح")}
             </th>
             <th
               className="p-3 font-medium border-b border-ink-400/10"
               rowSpan={2}
             >
-              الإجمالي
+              {t("الإجمالي")}
             </th>
             <th
               className="p-3 font-medium border-b border-ink-400/10"
               rowSpan={2}
             >
-              إجراءات
+              {t("إجراءات")}
             </th>
           </tr>
           {/* الصف الثاني: وارد/صادر تحت كل مجموعة */}
           <tr className="bg-ink-900/[0.02] text-ink-400 text-[11px]">
             <th className="p-2 font-medium border-b border-x border-ink-400/10 text-positive">
-              وارد
+              {t("وارد")}
             </th>
             <th className="p-2 font-medium border-b border-x border-ink-400/10 text-negative">
-              صادر
+              {t("صادر")}
             </th>
             <th className="p-2 font-medium border-b border-x border-ink-400/10 text-positive">
-              وارد
+              {t("وارد")}
             </th>
             <th className="p-2 font-medium border-b border-x border-ink-400/10 text-negative">
-              صادر
+              {t("صادر")}
             </th>
           </tr>
         </thead>
@@ -154,12 +156,12 @@ export default function StockLedgerTable({ filters }) {
                 {row.movementType === "purchase" ? (
                   <span className="inline-flex items-center gap-1.5 bg-positive/10 text-positive text-xs font-medium px-2.5 py-1 rounded-full">
                     <ArrowDownCircle size={13} />
-                    شراء
+                    {t("شراء")}
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-1.5 bg-negative/10 text-negative text-xs font-medium px-2.5 py-1 rounded-full">
                     <ArrowUpCircle size={13} />
-                    بيع
+                    {t("بيع")}
                   </span>
                 )}
               </td>
@@ -168,30 +170,30 @@ export default function StockLedgerTable({ filters }) {
               <td className="p-3.5 font-medium text-ink-900">{row.itemName}</td>
               <td className="p-3.5 num text-positive border-x border-ink-400/5 text-center">
                 {row.quantityIn > 0
-                  ? row.quantityIn.toLocaleString("ar-EG", { maximumFractionDigits: 2 })
+                  ? row.quantityIn.toLocaleString(getLocale(), { maximumFractionDigits: 2 })
                   : "—"}
               </td>
               <td className="p-3.5 num text-negative border-l border-ink-400/5 text-center">
                 {row.quantityOut > 0
-                  ? row.quantityOut.toLocaleString("ar-EG", { maximumFractionDigits: 2 })
+                  ? row.quantityOut.toLocaleString(getLocale(), { maximumFractionDigits: 2 })
                   : "—"}
               </td>
               <td className="p-3.5 num text-positive border-x border-ink-400/5 text-center">
-                {row.weightIn > 0 ? row.weightIn.toLocaleString("ar-EG", { maximumFractionDigits: 2 }) : "—"}
+                {row.weightIn > 0 ? row.weightIn.toLocaleString(getLocale(), { maximumFractionDigits: 2 }) : "—"}
               </td>
               <td className="p-3.5 num text-negative border-l border-ink-400/5 text-center">
                 {row.weightOut > 0
-                  ? row.weightOut.toLocaleString("ar-EG", { maximumFractionDigits: 2 })
+                  ? row.weightOut.toLocaleString(getLocale(), { maximumFractionDigits: 2 })
                   : "—"}
               </td>
               <td className="p-3.5 num text-ink-600">
-                {row.price.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                {row.price.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
               </td>
               <td className="p-3.5 num text-gold-600">
-                {row.profit > 0 ? row.profit.toLocaleString("ar-EG", { maximumFractionDigits: 2 }) : "—"}
+                {row.profit > 0 ? row.profit.toLocaleString(getLocale(), { maximumFractionDigits: 2 }) : "—"}
               </td>
               <td className="p-3.5 num font-medium text-ink-900">
-                {row.total.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                {row.total.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
               </td>
               <td className="p-3.5">
                 <div className="flex gap-1">
@@ -216,23 +218,23 @@ export default function StockLedgerTable({ filters }) {
         <tfoot>
           <tr className="bg-primary-50/50 border-t-2 border-primary-100 font-semibold text-ink-900">
             <td className="p-3.5" colSpan={5}>
-              الرصيد الإجمالي
+              {t("الرصيد الإجمالي")}
             </td>
             <td className="p-3.5 num text-positive text-center">
-              {totalQtyIn.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+              {totalQtyIn.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
             </td>
             <td className="p-3.5 num text-negative text-center">
-              {totalQtyOut.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+              {totalQtyOut.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
             </td>
             <td className="p-3.5 num text-positive text-center">
-              {totalWeightIn.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+              {totalWeightIn.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
             </td>
             <td className="p-3.5 num text-negative text-center">
-              {totalWeightOut.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+              {totalWeightOut.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
             </td>
             <td className="p-3.5" colSpan={2}></td>
             <td className="p-3.5 num">
-              {totalValue.toLocaleString("ar-EG", { maximumFractionDigits: 2 })} ج.م
+              {totalValue.toLocaleString(getLocale(), { maximumFractionDigits: 2 })} {t("ج.م")}
             </td>
             <td className="p-3.5"></td>
           </tr>

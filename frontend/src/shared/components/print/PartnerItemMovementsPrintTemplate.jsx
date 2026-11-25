@@ -1,4 +1,6 @@
 import { formatDate } from "../../../lib/date.js";
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 export default function PartnerItemMovementsPrintTemplate({ data, filters }) {
   const rows = data?.movements ?? [];
 
@@ -10,18 +12,18 @@ export default function PartnerItemMovementsPrintTemplate({ data, filters }) {
   };
 
   const fmt = (v) =>
-    Number(v ?? 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+    Number(v ?? 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
   const movementLabel = (type) => {
     switch (type?.toLowerCase()) {
       case "sale":
-        return "بيع";
+        return t("بيع");
       case "purchase":
-        return "شراء";
+        return t("شراء");
       case "sale_return":
-        return "مرتجع بيع";
+        return t("مرتجع بيع");
       case "purchase_return":
-        return "مرتجع شراء";
+        return t("مرتجع شراء");
       default:
         return type || "-";
     }
@@ -32,16 +34,16 @@ export default function PartnerItemMovementsPrintTemplate({ data, filters }) {
       style={{ padding: 24, fontFamily: "Cairo, sans-serif", direction: "rtl" }}
     >
       <h2 style={{ textAlign: "center", marginBottom: 4 }}>
-        حركة صنف: {data?.itemName || "-"}
+        {t("حركة صنف:")} {data?.itemName || "-"}
       </h2>
 
       <p style={{ textAlign: "center", marginBottom: 16, color: "#55635C" }}>
-        العميل / المورد: {data?.businessPartnerName || "-"}
+        {t("العميل / المورد:")} {data?.businessPartnerName || "-"}
       </p>
 
       {(filters?.fromDate || filters?.toDate) && (
         <p style={{ textAlign: "center", marginBottom: 16, fontSize: 12 }}>
-          الفترة من {filters?.fromDate ? formatDate(filters?.fromDate) : "—"} إلى {filters?.toDate ? formatDate(filters?.toDate) : "—"}
+          {t("الفترة من")} {filters?.fromDate ? formatDate(filters?.fromDate) : "—"} {t("إلى")} {filters?.toDate ? formatDate(filters?.toDate) : "—"}
         </p>
       )}
 
@@ -56,15 +58,15 @@ export default function PartnerItemMovementsPrintTemplate({ data, filters }) {
       >
         <tbody>
           <tr>
-            <td style={cellStyle}>إجمالي كمية المبيعات</td>
+            <td style={cellStyle}>{t("إجمالي كمية المبيعات")}</td>
             <td style={cellStyle}>{fmt(summary.totalSalesQuantity)}</td>
-            <td style={cellStyle}>إجمالي كمية المشتريات</td>
+            <td style={cellStyle}>{t("إجمالي كمية المشتريات")}</td>
             <td style={cellStyle}>{fmt(summary.totalPurchaseQuantity)}</td>
           </tr>
           <tr>
-            <td style={cellStyle}>إجمالي وزن المبيعات</td>
+            <td style={cellStyle}>{t("إجمالي وزن المبيعات")}</td>
             <td style={cellStyle}>{fmt(summary.totalSalesWeight)}</td>
-            <td style={cellStyle}>إجمالي وزن المشتريات</td>
+            <td style={cellStyle}>{t("إجمالي وزن المشتريات")}</td>
             <td style={cellStyle}>{fmt(summary.totalPurchaseWeight)}</td>
           </tr>
         </tbody>
@@ -76,14 +78,14 @@ export default function PartnerItemMovementsPrintTemplate({ data, filters }) {
       >
         <thead>
           <tr>
-            <th style={headStyle}>رقم الفاتورة</th>
-            <th style={headStyle}>التاريخ</th>
-            <th style={headStyle}>الحركة</th>
-            <th style={headStyle}>العدد</th>
-            <th style={headStyle}>الوزن</th>
-            <th style={headStyle}>الكمية</th>
-            <th style={headStyle}>السعر</th>
-            <th style={headStyle}>الإجمالي</th>
+            <th style={headStyle}>{t("رقم الفاتورة")}</th>
+            <th style={headStyle}>{t("التاريخ")}</th>
+            <th style={headStyle}>{t("الحركة")}</th>
+            <th style={headStyle}>{t("العدد")}</th>
+            <th style={headStyle}>{t("الوزن")}</th>
+            <th style={headStyle}>{t("الكمية")}</th>
+            <th style={headStyle}>{t("السعر")}</th>
+            <th style={headStyle}>{t("الإجمالي")}</th>
           </tr>
         </thead>
 
@@ -105,7 +107,7 @@ export default function PartnerItemMovementsPrintTemplate({ data, filters }) {
         <tfoot>
           <tr style={{ fontWeight: "bold" }}>
             <td style={cellStyle} colSpan={3}>
-              إجمالي النتائج
+              {t("إجمالي النتائج")}
             </td>
             <td style={cellStyle}>
               {fmt(rows.reduce((s, r) => s + (Number(r.count) || 0), 0))}

@@ -1,5 +1,7 @@
 import { formatDateTime } from "../../../lib/date.js";
 import { formatDate } from "../../../lib/date.js";
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function DriverListPrintTemplate({
   drivers = [],
   filters = {},
@@ -8,30 +10,30 @@ export default function DriverListPrintTemplate({
   const hasActiveFilters = Object.values(filters || {}).some((v) => v);
 
   return (
-    <div className="p-8 text-ink-900" dir="rtl">
+    <div className="p-8 text-ink-900" dir={getDir()}>
       <div className="flex items-center justify-between border-b border-ink-900/20 pb-4 mb-6">
         <div>
-          <h1 className="text-xl font-bold">تقرير السائقين</h1>
+          <h1 className="text-xl font-bold">{t("تقرير السائقين")}</h1>
           <p className="text-xs text-ink-400 mt-1">
-            تاريخ الطباعة: {printedAt}
+            {t("تاريخ الطباعة:")} {printedAt}
           </p>
         </div>
         <div className="text-sm text-ink-400">
-          إجمالي السائقين: {drivers.length}
+          {t("إجمالي السائقين:")} {drivers.length}
         </div>
       </div>
 
       {hasActiveFilters && (
         <div className="mb-4 text-xs text-ink-400 space-x-3 space-x-reverse">
-          {filters.search && <span>بحث: {filters.search}</span>}
-          {filters.code && <span> | كود: {filters.code}</span>}
+          {filters.search && <span>{t("بحث:")} {filters.search}</span>}
+          {filters.code && <span> {t("| كود:")} {filters.code}</span>}
           {filters.licenseNumber && (
-            <span> | رقم رخصة: {filters.licenseNumber}</span>
+            <span> {t("| رقم رخصة:")} {filters.licenseNumber}</span>
           )}
           {filters.isActive !== "" && (
             <span>
               {" "}
-              | الحالة: {filters.isActive === "true" ? "نشط" : "غير نشط"}
+              {t("| الحالة:")} {filters.isActive === "true" ? t("نشط") : t("غير نشط")}
             </span>
           )}
         </div>
@@ -40,12 +42,12 @@ export default function DriverListPrintTemplate({
       <table className="w-full text-right text-sm border-collapse">
         <thead>
           <tr className="border-b-2 border-ink-900">
-            <th className="py-2 px-2">الكود</th>
-            <th className="py-2 px-2">الاسم</th>
-            <th className="py-2 px-2">التليفون</th>
-            <th className="py-2 px-2">رقم الرخصة</th>
-            <th className="py-2 px-2">انتهاء الرخصة</th>
-            <th className="py-2 px-2">الحالة</th>
+            <th className="py-2 px-2">{t("الكود")}</th>
+            <th className="py-2 px-2">{t("الاسم")}</th>
+            <th className="py-2 px-2">{t("التليفون")}</th>
+            <th className="py-2 px-2">{t("رقم الرخصة")}</th>
+            <th className="py-2 px-2">{t("انتهاء الرخصة")}</th>
+            <th className="py-2 px-2">{t("الحالة")}</th>
           </tr>
         </thead>
         <tbody>
@@ -59,7 +61,7 @@ export default function DriverListPrintTemplate({
               </td>
               <td className="py-2 px-2">{driver.licenseExpiryDate ? formatDate(driver.licenseExpiryDate) : "—"}</td>
               <td className="py-2 px-2">
-                {driver.isActive ? "نشط" : "غير نشط"}
+                {driver.isActive ? t("نشط") : t("غير نشط")}
               </td>
             </tr>
           ))}
@@ -67,7 +69,7 @@ export default function DriverListPrintTemplate({
       </table>
 
       {drivers.length === 0 && (
-        <p className="text-center text-ink-400 py-10">لا توجد بيانات للطباعة</p>
+        <p className="text-center text-ink-400 py-10">{t("لا توجد بيانات للطباعة")}</p>
       )}
     </div>
   );

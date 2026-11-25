@@ -15,6 +15,8 @@ import Pagination from "../../../shared/components/ui/Pagination";
 import InvoiceNumberLink from "../../../shared/components/InvoiceNumberLink";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const emptyFilters = {
   search: "",
   voucherNumber: "",
@@ -28,7 +30,7 @@ const emptyFilters = {
 };
 
 function fmtAmount(n, currency) {
-  return `${new Intl.NumberFormat("ar-EG", {
+  return `${new Intl.NumberFormat(getLocale(), {
     maximumFractionDigits: 2,
   }).format(n ?? 0)} ${currency ?? ""}`;
 }
@@ -46,7 +48,7 @@ function partyLabel(v) {
 
     case "Driver":
       return v.driverTripInvoiceNumber
-        ? `${v.driverName ?? "—"} (رحلة ${v.driverTripInvoiceNumber})`
+        ? t("{0} (رحلة {1})", { 0: v.driverName ?? "—", 1: v.driverTripInvoiceNumber })
         : (v.driverName ?? "—");
 
     case "Employee":
@@ -147,11 +149,11 @@ export default function ExpensesPage() {
         <div>
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-ink-900">
             <Receipt size={20} className="text-primary-500" />
-            المصاريف
+            {t("المصاريف")}
           </h2>
 
           <p className="mt-1 text-sm text-ink-400">
-            جميع سندات الصرف المصنّفة كمصروفات
+            {t("جميع سندات الصرف المصنّفة كمصروفات")}
           </p>
         </div>
       </div>
@@ -173,20 +175,20 @@ export default function ExpensesPage() {
 
       {isLoading && (
         <div className="rounded-2xl border border-dashed border-ink-400/20 py-16 text-center text-ink-400">
-          جاري تحميل المصاريف...
+          {t("جاري تحميل المصاريف...")}
         </div>
       )}
 
       {isError && (
         <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
-          <span>حدث خطأ أثناء تحميل المصاريف.</span>
+          <span>{t("حدث خطأ أثناء تحميل المصاريف.")}</span>
 
           <button
             type="button"
             onClick={refetch}
             className="rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs font-medium transition hover:bg-rose-100"
           >
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       )}
@@ -200,7 +202,7 @@ export default function ExpensesPage() {
           <div className="overflow-x-auto">
             <table
               className="w-full min-w-[1150px] table-fixed text-sm"
-              dir="rtl"
+              dir={getDir()}
             >
               <colgroup>
                 <col className="w-[9%]" />
@@ -218,35 +220,35 @@ export default function ExpensesPage() {
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
                   <th className="px-3 py-2.5 text-right font-medium">
-                    رقم السند
+                    {t("رقم السند")}
                   </th>
 
                   <th className="px-3 py-2.5 text-right font-medium">
-                    التاريخ
+                    {t("التاريخ")}
                   </th>
 
                   <th className="px-3 py-2.5 text-right font-medium">
-                    الخزينة
+                    {t("الخزينة")}
                   </th>
 
                   <th className="px-3 py-2.5 text-right font-medium">
-                    نوع الحركة
+                    {t("نوع الحركة")}
                   </th>
 
                   <th className="px-3 py-2.5 text-right font-medium">
-                    حساب المصروف
+                    {t("حساب المصروف")}
                   </th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">الجهة</th>
+                  <th className="px-3 py-2.5 text-right font-medium">{t("الجهة")}</th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">المبلغ</th>
+                  <th className="px-3 py-2.5 text-right font-medium">{t("المبلغ")}</th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">الوصف</th>
+                  <th className="px-3 py-2.5 text-right font-medium">{t("الوصف")}</th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">الحالة</th>
+                  <th className="px-3 py-2.5 text-right font-medium">{t("الحالة")}</th>
 
                   <th className="px-3 py-2.5 text-right font-medium">
-                    إجراءات
+                    {t("إجراءات")}
                   </th>
                 </tr>
               </thead>
@@ -258,7 +260,7 @@ export default function ExpensesPage() {
                       colSpan={10}
                       className="px-3 py-14 text-center text-ink-400"
                     >
-                      لا توجد مصاريف مطابقة
+                      {t("لا توجد مصاريف مطابقة")}
                     </td>
                   </tr>
                 ) : (
@@ -272,7 +274,7 @@ export default function ExpensesPage() {
                           type="button"
                           onClick={() => openVoucher(v)}
                           className="group flex max-w-full items-center gap-1.5 text-right"
-                          title="فتح السند داخل الخزنة"
+                          title={t("فتح السند داخل الخزنة")}
                         >
                           <span className="truncate font-semibold text-primary-600 transition-colors group-hover:text-primary-800 group-hover:underline">
                             {v.voucherNumber || `#${v.id}`}
@@ -287,9 +289,9 @@ export default function ExpensesPage() {
                         {v.invoiceNumber && (
                           <div
                             className="mt-0.5 truncate text-[11px]"
-                            title={`فاتورة: ${v.invoiceNumber}`}
+                            title={t("فاتورة: {0}", { 0: v.invoiceNumber })}
                           >
-                            <span className="text-ink-400">فاتورة: </span>
+                            <span className="text-ink-400">{t("فاتورة:")} </span>
                             <InvoiceNumberLink
                               invoiceId={v.invoiceId}
                               invoiceType={v.invoiceType}
@@ -375,11 +377,11 @@ export default function ExpensesPage() {
                         {v.isDraft ? (
                           <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-md bg-amber-500/10 px-2 py-1 text-[11px] text-amber-600">
                             <FileWarning size={12} />
-                            مسودة
+                            {t("مسودة")}
                           </span>
                         ) : (
                           <span className="inline-flex whitespace-nowrap rounded-md bg-primary-500/10 px-2 py-1 text-[11px] text-primary-500">
-                            معتمد
+                            {t("معتمد")}
                           </span>
                         )}
                       </td>
@@ -389,7 +391,7 @@ export default function ExpensesPage() {
                           <button
                             type="button"
                             onClick={() => setViewingVoucher(v)}
-                            title="عرض التفاصيل"
+                            title={t("عرض التفاصيل")}
                             className="rounded-lg p-1.5 text-ink-400 transition hover:bg-ink-400/10 hover:text-ink-700"
                           >
                             <Eye size={15} />
@@ -413,7 +415,7 @@ export default function ExpensesPage() {
                 setPageSize(size);
                 setPage(1);
               }}
-              label="مصروف"
+              label={t("مصروف")}
             />
           )}
         </div>

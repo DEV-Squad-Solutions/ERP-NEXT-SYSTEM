@@ -3,6 +3,7 @@ import Modal from "../../../shared/components/ui/Modal";
 import Button from "../../../shared/components/ui/Button";
 import { useCreateStoreMutation, useUpdateStoreMutation } from "../storesApi";
 
+import { t } from "../../../i18n";
 const emptyForm = {
   name: "",
   address: "",
@@ -44,7 +45,7 @@ export default function StoreFormModal({ isOpen, onClose, store, onSaved }) {
       onSaved?.(result);
       onClose();
     } catch (err) {
-      console.error("فشل حفظ المخزن", err);
+      console.error(t("فشل حفظ المخزن"), err);
     }
   };
 
@@ -52,12 +53,12 @@ export default function StoreFormModal({ isOpen, onClose, store, onSaved }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل المخزن" : "مخزن جديد"}
+      title={isEdit ? t("تعديل المخزن") : t("مخزن جديد")}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-xs text-ink-400 mb-1.5">
-            اسم المخزن
+            {t("اسم المخزن")}
           </label>
           <input
             required
@@ -68,7 +69,7 @@ export default function StoreFormModal({ isOpen, onClose, store, onSaved }) {
         </div>
 
         <div>
-          <label className="block text-xs text-ink-400 mb-1.5">العنوان</label>
+          <label className="block text-xs text-ink-400 mb-1.5">{t("العنوان")}</label>
           <input
             value={form.address}
             onChange={handleChange("address")}
@@ -83,19 +84,19 @@ export default function StoreFormModal({ isOpen, onClose, store, onSaved }) {
             onChange={handleChange("isActive")}
             className="rounded border-ink-400/30"
           />
-          مخزن نشط
+          {t("مخزن نشط")}
         </label>
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
           <Button type="submit" disabled={isSaving}>
             {isSaving
-              ? "جاري الحفظ..."
+              ? t("جاري الحفظ...")
               : isEdit
-                ? "حفظ التعديلات"
-                : "إنشاء المخزن"}
+                ? t("حفظ التعديلات")
+                : t("إنشاء المخزن")}
           </Button>
         </div>
       </form>

@@ -11,6 +11,7 @@ import StoreFormModal from "../components/StoreFormModal";
 import Button from "../../../shared/components/ui/Button";
 import DeleteConfirmModal from "../../../shared/components/ui/DeleteConfirmModal";
 
+import { t } from "../../../i18n";
 export default function StoresListPage() {
   const navigate = useNavigate();
 
@@ -59,7 +60,7 @@ export default function StoresListPage() {
     try {
       await deleteStore(storeToDelete.id).unwrap();
 
-      toast.success("تم حذف المخزن بنجاح");
+      toast.success(t("تم حذف المخزن بنجاح"));
 
       setStoreToDelete(null);
     } catch (err) {
@@ -68,7 +69,7 @@ export default function StoresListPage() {
       toast.error(
         err?.data?.message ||
           err?.data?.title ||
-          "حصل خطأ أثناء حذف المخزن، حاول تاني",
+          t("حصل خطأ أثناء حذف المخزن، حاول تاني"),
       );
     }
   };
@@ -121,11 +122,11 @@ export default function StoresListPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="font-display text-2xl font-bold text-ink-900">
-            المخازن
+            {t("المخازن")}
           </h2>
 
           <p className="text-sm text-ink-400 mt-1">
-            اختر مخزن للدخول على بياناته وسجل حركته
+            {t("اختر مخزن للدخول على بياناته وسجل حركته")}
           </p>
         </div>
 
@@ -140,7 +141,7 @@ export default function StoresListPage() {
               onClick={() => setShowFilters((state) => !state)}
             >
               <SlidersHorizontal size={16} />
-              فلاتر
+              {t("فلاتر")}
               {hasActiveFilters && (
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 mr-1" />
               )}
@@ -162,14 +163,14 @@ export default function StoresListPage() {
 
                   <div>
                     <label className="block text-xs text-ink-400 mb-1.5">
-                      بحث
+                      {t("بحث")}
                     </label>
 
                     <input
                       type="text"
                       value={filters.search}
                       onChange={handleChange("search")}
-                      placeholder="ابحث بالاسم..."
+                      placeholder={t("ابحث بالاسم...")}
                       className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
                     />
                   </div>
@@ -178,14 +179,14 @@ export default function StoresListPage() {
 
                   <div>
                     <label className="block text-xs text-ink-400 mb-1.5">
-                      الكود
+                      {t("الكود")}
                     </label>
 
                     <input
                       type="text"
                       value={filters.code}
                       onChange={handleChange("code")}
-                      placeholder="مثال: MAIN"
+                      placeholder={t("مثال: MAIN")}
                       className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
                     />
                   </div>
@@ -194,7 +195,7 @@ export default function StoresListPage() {
 
                   <div>
                     <label className="block text-xs text-ink-400 mb-1.5">
-                      الحالة
+                      {t("الحالة")}
                     </label>
 
                     <select
@@ -202,11 +203,11 @@ export default function StoresListPage() {
                       onChange={handleChange("isActive")}
                       className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
                     >
-                      <option value="">الكل</option>
+                      <option value="">{t("الكل")}</option>
 
-                      <option value="true">نشط</option>
+                      <option value="true">{t("نشط")}</option>
 
-                      <option value="false">غير نشط</option>
+                      <option value="false">{t("غير نشط")}</option>
                     </select>
                   </div>
 
@@ -219,7 +220,7 @@ export default function StoresListPage() {
                       className="flex items-center gap-1.5 text-xs text-ink-400 hover:text-emerald-700 pt-1"
                     >
                       <RotateCcw size={12} />
-                      إعادة تعيين الفلاتر
+                      {t("إعادة تعيين الفلاتر")}
                     </button>
                   )}
                 </div>
@@ -231,7 +232,7 @@ export default function StoresListPage() {
 
           <Button onClick={openCreate}>
             <Plus size={16} />
-            مخزن جديد
+            {t("مخزن جديد")}
           </Button>
         </div>
       </div>
@@ -257,10 +258,10 @@ export default function StoresListPage() {
 
       {isError && (
         <div className="text-center py-20 border border-dashed border-red-200 rounded-2xl">
-          <p className="text-red-500 mb-3">حدث خطأ أثناء تحميل المخازن</p>
+          <p className="text-red-500 mb-3">{t("حدث خطأ أثناء تحميل المخازن")}</p>
 
           <Button variant="outline" onClick={refetch}>
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </Button>
         </div>
       )}
@@ -271,11 +272,11 @@ export default function StoresListPage() {
 
       {!isLoading && !isError && stores.length === 0 && (
         <div className="text-center py-20 border border-dashed border-ink-400/20 rounded-2xl">
-          <p className="text-ink-400 mb-3">لا توجد مخازن مطابقة</p>
+          <p className="text-ink-400 mb-3">{t("لا توجد مخازن مطابقة")}</p>
 
           <Button onClick={openCreate}>
             <Plus size={16} />
-            إضافة أول مخزن
+            {t("إضافة أول مخزن")}
           </Button>
         </div>
       )}
@@ -317,8 +318,8 @@ export default function StoresListPage() {
         onClose={() => setStoreToDelete(null)}
         onConfirm={confirmDelete}
         itemName={storeToDelete?.name}
-        title="حذف المخزن"
-        description="سيتم حذف المخزن نهائيًا. هذا الإجراء لا يمكن التراجع عنه."
+        title={t("حذف المخزن")}
+        description={t("سيتم حذف المخزن نهائيًا. هذا الإجراء لا يمكن التراجع عنه.")}
         isDeleting={isDeleting}
       />
     </div>

@@ -10,18 +10,20 @@ import {
   useUpdateCountryMutation,
 } from "../countriesApi";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const countrySchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, "الاسم بالعربي مطلوب")
-    .max(200, "الاسم بالعربي يجب ألا يتجاوز 200 حرف"),
+    .min(1, t("الاسم بالعربي مطلوب"))
+    .max(200, t("الاسم بالعربي يجب ألا يتجاوز 200 حرف")),
 
   englishName: z
     .string()
     .trim()
-    .min(1, "الاسم بالإنجليزي مطلوب")
-    .max(200, "الاسم بالإنجليزي يجب ألا يتجاوز 200 حرف"),
+    .min(1, t("الاسم بالإنجليزي مطلوب"))
+    .max(200, t("الاسم بالإنجليزي يجب ألا يتجاوز 200 حرف")),
 
   isActive: z.preprocess((value) => {
     if (value === "true") return true;
@@ -100,11 +102,11 @@ export default function CountryFormModal({
           ...payload,
         }).unwrap();
 
-        toast.success("تم تحديث الدولة بنجاح");
+        toast.success(t("تم تحديث الدولة بنجاح"));
       } else {
         savedCountry = await createCountry(payload).unwrap();
 
-        toast.success("تم إضافة الدولة بنجاح");
+        toast.success(t("تم إضافة الدولة بنجاح"));
       }
 
       // مهم جدًا:
@@ -116,9 +118,9 @@ export default function CountryFormModal({
       const message = err?.data?.message || err?.data?.title || err?.message;
 
       if (err?.status === 409) {
-        toast.error("كود الدولة مستخدم بالفعل");
+        toast.error(t("كود الدولة مستخدم بالفعل"));
       } else {
-        toast.error(message || "حدث خطأ أثناء حفظ الدولة");
+        toast.error(message || t("حدث خطأ أثناء حفظ الدولة"));
       }
     }
   }
@@ -127,18 +129,18 @@ export default function CountryFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? "تعديل دولة" : "دولة جديدة"}
+      title={isEditing ? t("تعديل دولة") : t("دولة جديدة")}
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" dir="rtl">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" dir={getDir()}>
         {/* الاسم بالعربي */}
         <div>
           <label className="mb-1.5 block text-xs text-ink-400">
-            الاسم بالعربي
+            {t("الاسم بالعربي")}
           </label>
 
           <input
             type="text"
-            placeholder="مثال: مصر"
+            placeholder={t("مثال: مصر")}
             className="w-full rounded-xl border border-ink-400/15 px-3 py-2 text-sm focus:border-emerald-700/50 focus:outline-none focus:ring-2 focus:ring-emerald-700/10"
             {...register("name")}
           />
@@ -151,7 +153,7 @@ export default function CountryFormModal({
         {/* الاسم بالإنجليزي */}
         <div>
           <label className="mb-1.5 block text-xs text-ink-400">
-            الاسم بالإنجليزي
+            {t("الاسم بالإنجليزي")}
           </label>
 
           <input
@@ -171,14 +173,14 @@ export default function CountryFormModal({
 
         {/* الحالة */}
         <div>
-          <label className="mb-1.5 block text-xs text-ink-400">الحالة</label>
+          <label className="mb-1.5 block text-xs text-ink-400">{t("الحالة")}</label>
 
           <select
             className="w-full rounded-xl border border-ink-400/15 px-3 py-2 text-sm focus:border-emerald-700/50 focus:outline-none focus:ring-2 focus:ring-emerald-700/10"
             {...register("isActive")}
           >
-            <option value="true">نشطة</option>
-            <option value="false">غير نشطة</option>
+            <option value="true">{t("نشطة")}</option>
+            <option value="false">{t("غير نشطة")}</option>
           </select>
         </div>
 
@@ -190,15 +192,15 @@ export default function CountryFormModal({
             onClick={onClose}
             disabled={isLoading}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isLoading}>
             {isLoading
-              ? "جاري الحفظ..."
+              ? t("جاري الحفظ...")
               : isEditing
-                ? "حفظ التعديلات"
-                : "إضافة"}
+                ? t("حفظ التعديلات")
+                : t("إضافة")}
           </Button>
         </div>
       </form>

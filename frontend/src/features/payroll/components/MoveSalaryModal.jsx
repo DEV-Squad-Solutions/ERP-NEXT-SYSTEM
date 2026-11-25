@@ -15,8 +15,9 @@ import Button from "../../../shared/components/ui/Button";
 
 import { useMoveSalaryMutation } from "../payrollApi";
 
+import { t } from "../../../i18n";
 const schema = z.object({
-  postingDate: z.string().min(1, "التاريخ مطلوب"),
+  postingDate: z.string().min(1, t("التاريخ مطلوب")),
   notes: z.string().optional(),
 });
 
@@ -71,10 +72,10 @@ export default function MoveSalaryModal({
 
     try {
       await moveSalary({ id: row.id, ...data }).unwrap();
-      toast.success("تم ترحيل الراتب بنجاح");
+      toast.success(t("تم ترحيل الراتب بنجاح"));
       onSaved();
     } catch {
-      toast.error("حصل خطأ أثناء الترحيل، حاول تاني");
+      toast.error(t("حصل خطأ أثناء الترحيل، حاول تاني"));
     }
   };
 
@@ -82,11 +83,11 @@ export default function MoveSalaryModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`ترحيل راتب ${row.employeeName}`}
+      title={t("ترحيل راتب {0}", { 0: row.employeeName })}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input
-          label="تاريخ الترحيل"
+          label={t("تاريخ الترحيل")}
           type="date"
           min={selectedFiscalYear?.startDate}
           max={selectedFiscalYear?.endDate}
@@ -95,17 +96,17 @@ export default function MoveSalaryModal({
         />
 
         <Input
-          label="ملاحظات"
+          label={t("ملاحظات")}
           {...register("notes")}
           error={errors.notes?.message}
         />
 
         <div className="flex justify-end gap-2 pt-2 border-t border-ink-400/10">
           <Button type="button" variant="outline" onClick={onClose}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "جارِ الترحيل..." : "ترحيل"}
+            {isLoading ? t("جارِ الترحيل...") : t("ترحيل")}
           </Button>
         </div>
       </form>

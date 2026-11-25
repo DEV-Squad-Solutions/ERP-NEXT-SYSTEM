@@ -13,22 +13,24 @@ import {
   useUpdateCashboxMutation,
 } from "../cashboxesApi";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const schema = z.object({
-  name: z.string().min(2, "اسم الخزنة مطلوب"),
+  name: z.string().min(2, t("اسم الخزنة مطلوب")),
 
   currency: z.enum(["EGP", "USD", "EUR", "GBP", "SAR", "AED", "KWD"]),
 
   openingBalance: z
     .number({
-      invalid_type_error: "أدخل رقم صحيح",
+      invalid_type_error: t("أدخل رقم صحيح"),
     })
     .min(0),
 
-  openingBalanceDate: z.string().min(1, "التاريخ مطلوب"),
+  openingBalanceDate: z.string().min(1, t("التاريخ مطلوب")),
 
   openingExchangeRate: z
     .number({
-      invalid_type_error: "أدخل رقم صحيح",
+      invalid_type_error: t("أدخل رقم صحيح"),
     })
     .min(0)
     .optional(),
@@ -116,7 +118,7 @@ export default function CashboxFormModal({
           }).unwrap()
         : await createCashbox(values).unwrap();
 
-      toast.success(isEdit ? "تم تحديث الخزنة بنجاح" : "تم إنشاء الخزنة بنجاح");
+      toast.success(isEdit ? t("تم تحديث الخزنة بنجاح") : t("تم إنشاء الخزنة بنجاح"));
 
       onSaved?.(saved);
       onClose();
@@ -126,13 +128,13 @@ export default function CashboxFormModal({
       if (code === "Cashboxes.NonZeroBalance") {
         toast.error(
           err?.data?.detail ||
-            "لا يمكن تعطيل الخزنة لأن رصيدها الحالي غير صفري. سوّي الرصيد للصفر الأول.",
+            t("لا يمكن تعطيل الخزنة لأن رصيدها الحالي غير صفري. سوّي الرصيد للصفر الأول."),
         );
         return;
       }
 
       if (code === "Cashboxes.Concurrency") {
-        toast.error("تم تعديل الخزنة من مكان آخر، حدّث الصفحة وحاول تاني");
+        toast.error(t("تم تعديل الخزنة من مكان آخر، حدّث الصفحة وحاول تاني"));
         return;
       }
 
@@ -141,7 +143,7 @@ export default function CashboxFormModal({
         return;
       }
 
-      toast.error(isEdit ? "تعذر تحديث الخزنة" : "تعذر إنشاء الخزنة");
+      toast.error(isEdit ? t("تعذر تحديث الخزنة") : t("تعذر إنشاء الخزنة"));
     }
   };
 
@@ -149,13 +151,13 @@ export default function CashboxFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل بيانات الخزنة" : "إضافة خزنة جديدة"}
+      title={isEdit ? t("تعديل بيانات الخزنة") : t("إضافة خزنة جديدة")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* اسم الخزنة */}
         <Input
-          label="اسم الخزنة"
-          placeholder="مثال: خزنة الفرع الرئيسي"
+          label={t("اسم الخزنة")}
+          placeholder={t("مثال: خزنة الفرع الرئيسي")}
           error={errors.name?.message}
           {...register("name")}
         />
@@ -164,12 +166,12 @@ export default function CashboxFormModal({
         {isEdit && (
           <div className="rounded-lg border bg-ink-400/5 p-3">
             <p className="text-xs text-ink-400 mb-1">
-              الرصيد الحالي (محسوب من الحركة)
+              {t("الرصيد الحالي (محسوب من الحركة)")}
             </p>
 
             <p className="text-sm font-semibold text-ink-900">
               {cashbox.currentBalance != null
-                ? cashbox.currentBalance.toLocaleString("ar-EG", { maximumFractionDigits: 2 })
+                ? cashbox.currentBalance.toLocaleString(getLocale(), { maximumFractionDigits: 2 })
                 : "—"}{" "}
               {cashbox.currency}
             </p>
@@ -178,7 +180,7 @@ export default function CashboxFormModal({
 
         {/* الرصيد الافتتاحي */}
         <Input
-          label="الرصيد الافتتاحي"
+          label={t("الرصيد الافتتاحي")}
           type="number"
           step="0.01"
           error={errors.openingBalance?.message}
@@ -189,7 +191,7 @@ export default function CashboxFormModal({
 
         {/* تاريخ الرصيد الافتتاحي */}
         <Input
-          label="تاريخ الرصيد الافتتاحي"
+          label={t("تاريخ الرصيد الافتتاحي")}
           type="date"
           error={errors.openingBalanceDate?.message}
           {...register("openingBalanceDate")}
@@ -201,22 +203,22 @@ export default function CashboxFormModal({
           name="currency"
           render={({ field }) => (
             <div>
-              <label className="mb-1 block text-sm font-medium">العملة</label>
+              <label className="mb-1 block text-sm font-medium">{t("العملة")}</label>
 
               <select {...field} className="w-full rounded-lg border px-3 py-2">
-                <option value="EGP">الجنيه المصري</option>
+                <option value="EGP">{t("الجنيه المصري")}</option>
 
-                <option value="USD">الدولار الأمريكي</option>
+                <option value="USD">{t("الدولار الأمريكي")}</option>
 
-                <option value="EUR">اليورو</option>
+                <option value="EUR">{t("اليورو")}</option>
 
-                <option value="GBP">الجنيه الإسترليني</option>
+                <option value="GBP">{t("الجنيه الإسترليني")}</option>
 
-                <option value="SAR">الريال السعودي</option>
+                <option value="SAR">{t("الريال السعودي")}</option>
 
-                <option value="AED">الدرهم الإماراتي</option>
+                <option value="AED">{t("الدرهم الإماراتي")}</option>
 
-                <option value="KWD">الدينار الكويتي</option>
+                <option value="KWD">{t("الدينار الكويتي")}</option>
               </select>
 
               {errors.currency && (
@@ -230,7 +232,7 @@ export default function CashboxFormModal({
 
         {/* سعر الصرف */}
         <Input
-          label="سعر الصرف الافتتاحي"
+          label={t("سعر الصرف الافتتاحي")}
           type="number"
           step="0.01"
           error={errors.openingExchangeRate?.message}
@@ -246,7 +248,7 @@ export default function CashboxFormModal({
           render={({ field }) => (
             <div>
               <label className="flex items-center justify-between rounded-lg border p-3">
-                <span className="font-medium">تفعيل الخزنة</span>
+                <span className="font-medium">{t("تفعيل الخزنة")}</span>
 
                 <input
                   type="checkbox"
@@ -267,8 +269,8 @@ export default function CashboxFormModal({
                 >
                   {cashbox?.currentBalance &&
                   Number(cashbox.currentBalance) !== 0
-                    ? "الخزنة عليها رصيد حالي غير صفري. السيرفر هيرفض تعطيلها — لازم الرصيد يوصل صفر الأول."
-                    : "التعطيل متاح فقط لو الرصيد الحالي للخزنة صفر. إعادة التفعيل متاحة في أي وقت."}
+                    ? t("الخزنة عليها رصيد حالي غير صفري. السيرفر هيرفض تعطيلها — لازم الرصيد يوصل صفر الأول.")
+                    : t("التعطيل متاح فقط لو الرصيد الحالي للخزنة صفر. إعادة التفعيل متاحة في أي وقت.")}
                 </p>
               )}
             </div>
@@ -277,7 +279,7 @@ export default function CashboxFormModal({
 
         {/* الملاحظات */}
         <Input
-          label="ملاحظات (اختياري)"
+          label={t("ملاحظات (اختياري)")}
           placeholder="..."
           {...register("notes")}
         />
@@ -285,23 +287,22 @@ export default function CashboxFormModal({
         {/* تنبيه التعديل */}
         {isEdit && (
           <p className="text-xs text-ink-400">
-            تنبيه: الرصيد الافتتاحي والعملة مينفعش يتغيروا لو فيه سندات مسجلة
-            على الخزنة دي — السيرفر هيرفض الحفظ ويوضح السبب.
+            {t("تنبيه: الرصيد الافتتاحي والعملة مينفعش يتغيروا لو فيه سندات مسجلة على الخزنة دي — السيرفر هيرفض الحفظ ويوضح السبب.")}
           </p>
         )}
 
         {/* Actions */}
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isLoading}>
             {isLoading
-              ? "جاري الحفظ..."
+              ? t("جاري الحفظ...")
               : isEdit
-                ? "حفظ التعديلات"
-                : "حفظ الخزنة"}
+                ? t("حفظ التعديلات")
+                : t("حفظ الخزنة")}
           </Button>
         </div>
       </form>

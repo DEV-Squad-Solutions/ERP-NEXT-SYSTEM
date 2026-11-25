@@ -18,6 +18,8 @@ import { useGetItemBalanceQuery } from "../../../invoices/invoicesApi";
 
 import { useGetItemByIdQuery } from "../../../inventory/inventoryApi";
 
+import { t } from "../../../../i18n";
+import { getLocale } from "../../../../i18n";
 /* =========================================================
    Helpers
 ========================================================= */
@@ -47,7 +49,7 @@ const toNumber = (value) => {
 };
 
 const fmtNumber = (value) =>
-  (round2(value) ?? 0).toLocaleString("ar-EG", {
+  (round2(value) ?? 0).toLocaleString(getLocale(), {
     maximumFractionDigits: 2,
   });
 
@@ -639,8 +641,8 @@ function InvoiceLineRow({
         if (maxReturnQuantity !== null && qty > maxReturnQuantity) {
           const limitedQuantity = round2(maxReturnQuantity);
 
-          toast.warning("الكمية محدودة بالمتاح للإرجاع", {
-            description: `أقصى كمية: ${limitedQuantity}`,
+          toast.warning(t("الكمية محدودة بالمتاح للإرجاع"), {
+            description: t("أقصى كمية: {0}", { 0: limitedQuantity }),
           });
 
           const countNumber = toNumber(line.count);
@@ -752,7 +754,7 @@ function InvoiceLineRow({
   const handleItemCreated = useCallback(
     (newItem) => {
       if (!newItem?.id) {
-        toast.error("تم إنشاء الصنف ولكن لم يتم استلام بياناته");
+        toast.error(t("تم إنشاء الصنف ولكن لم يتم استلام بياناته"));
 
         return;
       }
@@ -779,7 +781,7 @@ function InvoiceLineRow({
 
       setShowAddItem(false);
 
-      toast.success(`تم إضافة الصنف "${newItem.name}" واختياره`);
+      toast.success(t("تم إضافة الصنف \"{0}\" واختياره", { 0: newItem.name }));
     },
     [line, onChange],
   );
@@ -791,8 +793,8 @@ function InvoiceLineRow({
   const handleRemove = useCallback(() => {
     onRemove();
 
-    toast.success("تم حذف الصنف من الفاتورة", {
-      description: line.itemName || "صنف بدون اسم",
+    toast.success(t("تم حذف الصنف من الفاتورة"), {
+      description: line.itemName || t("صنف بدون اسم"),
     });
   }, [line.itemName, onRemove]);
 
@@ -870,7 +872,7 @@ function InvoiceLineRow({
 
             {line.sourceInvoiceNumber && (
               <span className="mr-auto shrink-0 text-[11px] text-ink-400">
-                من {line.sourceInvoiceNumber}
+                {t("من")} {line.sourceInvoiceNumber}
               </span>
             )}
           </div>
@@ -881,13 +883,13 @@ function InvoiceLineRow({
                 type="text"
                 value={line.itemName ?? ""}
                 onChange={(e) => set("itemName", e.target.value)}
-                placeholder="اكتب اسم الصنف"
+                placeholder={t("اكتب اسم الصنف")}
                 className="flex-1 min-w-0 rounded-lg border border-ink-400/15 px-2.5 py-2 text-sm outline-none transition-colors focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
               />
             ) : isItemsError ? (
               <div className="flex-1 flex items-center gap-1.5 text-xs text-negative px-2 py-2 bg-negative/5 rounded-lg">
                 <AlertCircle size={13} />
-                تعذر تحميل الأصناف
+                {t("تعذر تحميل الأصناف")}
               </div>
             ) : (
               <div className="flex-1 min-w-[180px]">
@@ -896,7 +898,7 @@ function InvoiceLineRow({
                   value={line.itemId}
                   onChange={(value) => set("itemId", value)}
                   isLoading={isLoadingItems}
-                  placeholder="اختر الصنف"
+                  placeholder={t("اختر الصنف")}
                 />
               </div>
             )}
@@ -909,7 +911,7 @@ function InvoiceLineRow({
                   ? "bg-primary-100 text-primary-600 hover:bg-primary-200"
                   : "text-ink-400 hover:text-primary-500 hover:bg-primary-50 hover:scale-105"
               }`}
-              title="صنف مش موجود بالمخزن - اكتب اسمه يدويًا"
+              title={t("صنف مش موجود بالمخزن - اكتب اسمه يدويًا")}
             >
               <PenLine size={15} />
             </button>
@@ -918,7 +920,7 @@ function InvoiceLineRow({
               type="button"
               onClick={() => setShowAddItem(true)}
               className={`${iconButtonCls} text-ink-400 hover:text-primary-500 hover:bg-primary-50 hover:scale-105`}
-              title="إضافة صنف جديد للمخزون"
+              title={t("إضافة صنف جديد للمخزون")}
             >
               <Plus size={15} />
             </button>
@@ -947,7 +949,7 @@ function InvoiceLineRow({
         <div className="rounded-lg border border-ink-400/10 bg-ink-400/5 px-2.5 py-1.5 text-right transition-colors">
           {isReturnLine ? (
             <span className="text-sm font-medium text-ink-700">
-              متاح: {round2(line.maxReturnQuantity) ?? "-"}
+              {t("متاح:")} {round2(line.maxReturnQuantity) ?? "-"}
             </span>
           ) : line.isTemporaryItem || !line.itemId ? (
             <span className="text-sm text-ink-300">—</span>
@@ -963,7 +965,7 @@ function InvoiceLineRow({
               </span>
 
               <span className="num block text-[10px] text-ink-400">
-                إجمالي التكلفة:
+                {t("إجمالي التكلفة:")}
                 {fmtNumber(balanceData?.totalCostWithPricingExpenses)}
               </span>
             </div>
@@ -987,10 +989,10 @@ function InvoiceLineRow({
             isDisabled={!line.itemId || line.isTemporaryItem}
             placeholder={
               line.isTemporaryItem
-                ? "غير متاح للصنف اليدوي"
+                ? t("غير متاح للصنف اليدوي")
                 : line.itemId
-                  ? "الوحدة"
-                  : "اختر الصنف أولاً"
+                  ? t("الوحدة")
+                  : t("اختر الصنف أولاً")
             }
           />
         )}
@@ -1008,7 +1010,7 @@ function InvoiceLineRow({
             value={line.count ?? ""}
             decimals
             maxDecimals={2}
-            placeholder="العدد"
+            placeholder={t("العدد")}
             onChange={handleCountChange}
           />
         )}
@@ -1026,7 +1028,7 @@ function InvoiceLineRow({
             value={line.weight ?? ""}
             decimals
             maxDecimals={2}
-            placeholder="الوزن"
+            placeholder={t("الوزن")}
             onChange={handleWeightChange}
           />
         )}
@@ -1041,7 +1043,7 @@ function InvoiceLineRow({
           value={line.quantity ?? ""}
           decimals
           maxDecimals={2}
-          placeholder="الكمية"
+          placeholder={t("الكمية")}
           onChange={handleQuantityChange}
         />
       </td>
@@ -1060,7 +1062,7 @@ function InvoiceLineRow({
           value={line.price ?? ""}
           decimals
           maxDecimals={2}
-          placeholder="السعر"
+          placeholder={t("السعر")}
           onChange={(value) => set("price", value === "" ? null : value)}
         />
 
@@ -1073,14 +1075,14 @@ function InvoiceLineRow({
                 onChange={(e) =>
                   set("returnPriceDifferenceReason", e.target.value)
                 }
-                placeholder="سبب اختلاف السعر"
+                placeholder={t("سبب اختلاف السعر")}
                 className="min-w-0 flex-1 rounded-lg border border-gold-300 bg-gold-50/50 px-2 py-1 text-[11px] outline-none transition-colors focus:border-gold-500 focus:ring-2 focus:ring-gold-100"
               />
 
               <button
                 type="button"
                 onClick={handleResetReturnPrice}
-                title="استرجاع السعر الأصلي"
+                title={t("استرجاع السعر الأصلي")}
                 className="shrink-0 rounded-md p-1 text-ink-400 transition-colors hover:bg-gold-100 hover:text-gold-700"
               >
                 <Undo2 size={12} />
@@ -1088,7 +1090,7 @@ function InvoiceLineRow({
             </div>
 
             <p className="text-[10px] text-ink-400">
-              السعر الأصلي: {fmtNumber(line.originalPrice)}
+              {t("السعر الأصلي:")} {fmtNumber(line.originalPrice)}
             </p>
           </div>
         )}
@@ -1100,7 +1102,7 @@ function InvoiceLineRow({
 
       <td className="p-2 min-w-[140px] text-center">
         <span className="num inline-block w-full rounded-lg bg-ink-900/[0.03] px-2.5 py-1.5 text-center text-sm font-semibold text-ink-900 transition-colors">
-          {total.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+          {total.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
         </span>
       </td>
 
@@ -1113,7 +1115,7 @@ function InvoiceLineRow({
           value={line.notes ?? ""}
           onChange={(e) => set("notes", e.target.value)}
           className="w-full rounded-lg border border-ink-400/15 px-2.5 py-2 text-sm bg-white transition-colors focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
-          placeholder="ملاحظات"
+          placeholder={t("ملاحظات")}
         />
       </td>
 
@@ -1126,7 +1128,7 @@ function InvoiceLineRow({
           type="button"
           onClick={handleRemove}
           className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-ink-300 opacity-0 transition-all duration-150 group-hover:opacity-100 hover:bg-negative/10 hover:text-negative hover:scale-105 active:scale-90"
-          title="حذف الصنف"
+          title={t("حذف الصنف")}
         >
           <Trash2 size={15} />
         </button>

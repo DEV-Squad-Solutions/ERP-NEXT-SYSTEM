@@ -1,11 +1,12 @@
 import { useGetCompanyByIdQuery } from "../companyApi";
 import Modal from "../../../shared/components/ui/Modal";
 import LedgerPanel from "../../../shared/components/ui/LedgerPanel";
+import { t } from "../../../i18n";
 const detailRows = [
-  { key: "address", label: "العنوان" },
-  { key: "commercialRegister", label: "السجل التجاري" },
-  { key: "taxNumber", label: "الرقم الضريبي" },
-  { key: "managerName", label: "مدير الشركة" },
+  { key: "address", label: t("العنوان") },
+  { key: "commercialRegister", label: t("السجل التجاري") },
+  { key: "taxNumber", label: t("الرقم الضريبي") },
+  { key: "managerName", label: t("مدير الشركة") },
 ];
 
 /**
@@ -21,7 +22,7 @@ export default function CompanyDetailsModal({ companyId, isOpen, onClose }) {
   });
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="بيانات الشركة الحالية">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("بيانات الشركة الحالية")}>
       {isLoading && (
         <div className="space-y-2">
           {[1, 2, 3, 4].map((i) => (
@@ -35,7 +36,7 @@ export default function CompanyDetailsModal({ companyId, isOpen, onClose }) {
 
       {isError && (
         <p className="text-center text-negative text-sm py-4">
-          تعذر تحميل بيانات الشركة
+          {t("تعذر تحميل بيانات الشركة")}
         </p>
       )}
 

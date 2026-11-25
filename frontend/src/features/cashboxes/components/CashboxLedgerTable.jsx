@@ -32,8 +32,10 @@ import {
 } from "../utils/descriptionGroups";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const fmt = (value) =>
-  Number(value ?? 0).toLocaleString("ar-EG", {
+  Number(value ?? 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
@@ -313,7 +315,7 @@ export default function CashboxLedgerTable({
       // أول ما تتوصّف (يتحدد لها حساب/طرف) يتقفل التوصيف والتعديل عليه،
       // ويسيبها للأدمن أو المحاسب. كمان ممنوع يغيّر توصيف موصوف أصلًا.
       if (!isAdminOrAccountant && row.isDescribed) {
-        toast.error("الحركة موصّفة بالفعل — التعديل للأدمن أو المحاسب فقط");
+        toast.error(t("الحركة موصّفة بالفعل — التعديل للأدمن أو المحاسب فقط"));
         return;
       }
 
@@ -363,20 +365,20 @@ export default function CashboxLedgerTable({
           ...payload,
         });
 
-        toast.success("تم تحديث توصيف الحركة بنجاح");
+        toast.success(t("تم تحديث توصيف الحركة بنجاح"));
       } catch (error) {
         const code = error?.data?.errorCode;
 
         if (code === "CashVouchers.Concurrency") {
-          toast.error("السند تم تعديله من مستخدم آخر. أعد تحميل البيانات.");
+          toast.error(t("السند تم تعديله من مستخدم آخر. أعد تحميل البيانات."));
         } else if (code === "CashVouchers.InvoiceGeneratedReadOnly") {
-          toast.error("هذا السند مولد من فاتورة ولا يمكن تعديله من هنا.");
+          toast.error(t("هذا السند مولد من فاتورة ولا يمكن تعديله من هنا."));
         } else {
           toast.error(
             error?.data?.detail ||
               error?.data?.title ||
               error?.error ||
-              "تعذر تحديث توصيف الحركة",
+              t("تعذر تحديث توصيف الحركة"),
           );
         }
       } finally {
@@ -454,7 +456,7 @@ export default function CashboxLedgerTable({
     const description = draft.description.trim();
 
     if (receipt <= 0 && payment <= 0) {
-      toast.error("أدخل قيمة الوارد أو الصادر");
+      toast.error(t("أدخل قيمة الوارد أو الصادر"));
       return;
     }
 
@@ -479,7 +481,7 @@ export default function CashboxLedgerTable({
             : undefined,
       });
 
-      toast.success("تم تسجيل الحركة بنجاح");
+      toast.success(t("تم تسجيل الحركة بنجاح"));
 
       setDraft({
         ...emptyDraft(),
@@ -490,7 +492,7 @@ export default function CashboxLedgerTable({
         error?.data?.detail ||
           error?.data?.title ||
           error?.error ||
-          "حدث خطأ أثناء حفظ الحركة",
+          t("حدث خطأ أثناء حفظ الحركة"),
       );
     } finally {
       setSaving(false);
@@ -522,24 +524,24 @@ export default function CashboxLedgerTable({
       // السندات المستقلة بعد الترحيل مسموحة للأدمن والمحاسب (تعديل/حذف
       // مع مزامنة القيد المحاسبي)، ومقفولة على المستخدم العادي بعد التوصيف.
       if (!editingRow.isDraft && !isAdminOrAccountant) {
-        toast.error("السند مرحّل بالفعل — التعديل للأدمن أو المحاسب فقط.");
+        toast.error(t("السند مرحّل بالفعل — التعديل للأدمن أو المحاسب فقط."));
         return;
       }
 
       // المسودة بتتحفظ من مسار /draft؛ أي تعديل لسند مرحّل لازم يمر على
       // مسار التوصيف/الترحيل عشان يعيد مزامنة القيد والحركات المرتبطة.
       if (mode === "draft" && !editingRow.isDraft) {
-        toast.error("السند مرحّل — استخدم \"حفظ التعديلات\" بدل حفظ كمسودة.");
+        toast.error(t("السند مرحّل — استخدم \"حفظ التعديلات\" بدل حفظ كمسودة."));
         return;
       }
 
       if (mode === "draft" && !onUpdateDraftVoucher) {
-        toast.error("خدمة حفظ المسودة غير متاحة");
+        toast.error(t("خدمة حفظ المسودة غير متاحة"));
         return;
       }
 
       if (mode !== "draft" && !onUpdateVoucher) {
-        toast.error("خدمة ترحيل السند غير متاحة");
+        toast.error(t("خدمة ترحيل السند غير متاحة"));
         return;
       }
 
@@ -569,7 +571,7 @@ export default function CashboxLedgerTable({
             exchangeRate: updatePayload.exchangeRate ?? undefined,
           });
 
-          toast.success("تم تحديث المسودة بنجاح");
+          toast.success(t("تم تحديث المسودة بنجاح"));
         } else {
           // التوصيف والترحيل أو تعديل سند مرحّل — الباك بيعيد مزامنة
           // القيد المحاسبي والحركات المرتبطة.
@@ -580,8 +582,8 @@ export default function CashboxLedgerTable({
 
           toast.success(
             editingRow.isDraft
-              ? "تم توصيف السند وترحيله بنجاح"
-              : "تم حفظ تعديلات السند بنجاح",
+              ? t("تم توصيف السند وترحيله بنجاح")
+              : t("تم حفظ تعديلات السند بنجاح"),
           );
         }
 
@@ -591,16 +593,16 @@ export default function CashboxLedgerTable({
 
         if (code === "CashVouchers.Concurrency") {
           toast.error(
-            "السند تم تعديله من مستخدم آخر. أعد تحميل البيانات ثم حاول مرة أخرى.",
+            t("السند تم تعديله من مستخدم آخر. أعد تحميل البيانات ثم حاول مرة أخرى."),
           );
           setEditingRow(null);
           refetch?.();
         } else if (code === "CashVouchers.InvoiceGeneratedReadOnly") {
-          toast.error("هذا السند مولد من فاتورة ولا يمكن تعديله من هنا.");
+          toast.error(t("هذا السند مولد من فاتورة ولا يمكن تعديله من هنا."));
         } else if (code === "CashVouchers.PostedReadOnly") {
           toast.error(
             error?.data?.detail ||
-              "السند مرحّل وبياناته للقراءة فقط. أعد تحميل الكشف للاطلاع على أحدث نسخة.",
+              t("السند مرحّل وبياناته للقراءة فقط. أعد تحميل الكشف للاطلاع على أحدث نسخة."),
           );
           setEditingRow(null);
           refetch?.();
@@ -610,7 +612,7 @@ export default function CashboxLedgerTable({
               error?.data?.title ||
               error?.data?.message ||
               error?.error ||
-              "تعذر تحديث السند",
+              t("تعذر تحديث السند"),
           );
         }
       } finally {
@@ -642,7 +644,7 @@ export default function CashboxLedgerTable({
       try {
         await onDeleteOpeningBalance();
 
-        toast.success("تم حذف الرصيد الافتتاحي بنجاح");
+        toast.success(t("تم حذف الرصيد الافتتاحي بنجاح"));
 
         refetch?.();
       } catch (error) {
@@ -650,7 +652,7 @@ export default function CashboxLedgerTable({
 
         if (code === "Cashboxes.OpeningOrCurrencyChangeNotAllowed") {
           toast.error(
-            "لا يمكن حذف الرصيد الافتتاحي بعد إنشاء سندات على الخزنة.",
+            t("لا يمكن حذف الرصيد الافتتاحي بعد إنشاء سندات على الخزنة."),
           );
         } else {
           toast.error(
@@ -658,7 +660,7 @@ export default function CashboxLedgerTable({
               error?.data?.title ||
               error?.data?.message ||
               error?.error ||
-              "تعذر حذف الرصيد الافتتاحي",
+              t("تعذر حذف الرصيد الافتتاحي"),
           );
         }
       } finally {
@@ -671,25 +673,25 @@ export default function CashboxLedgerTable({
   const handleDeleteOpeningBalance = useCallback(
     (row) => {
       if (!isAdmin) {
-        toast.error("ليس لديك صلاحية حذف الرصيد الافتتاحي");
+        toast.error(t("ليس لديك صلاحية حذف الرصيد الافتتاحي"));
         return;
       }
 
       if (!onDeleteOpeningBalance) {
-        toast.error("خدمة حذف الرصيد الافتتاحي غير متاحة");
+        toast.error(t("خدمة حذف الرصيد الافتتاحي غير متاحة"));
         return;
       }
 
       toast.warning(
-        "هل أنت متأكد من حذف الرصيد الافتتاحي اليدوي للخزنة؟ لا يمكن التراجع.",
+        t("هل أنت متأكد من حذف الرصيد الافتتاحي اليدوي للخزنة؟ لا يمكن التراجع."),
         {
           duration: 8000,
           action: {
-            label: "حذف",
+            label: t("حذف"),
             onClick: () => executeDeleteOpeningBalance(row),
           },
           cancel: {
-            label: "إلغاء",
+            label: t("إلغاء"),
           },
         },
       );
@@ -713,27 +715,27 @@ export default function CashboxLedgerTable({
           rowVersion: row.rowVersion,
         });
 
-        toast.success("تم حذف الحركة بنجاح");
+        toast.success(t("تم حذف الحركة بنجاح"));
         refetch?.();
       } catch (error) {
         const code = error?.data?.errorCode ?? error?.data?.code;
 
         if (code === "CashVouchers.Concurrency") {
           toast.error(
-            "السند تم تعديله من مستخدم آخر. أعد تحميل الكشف ثم حاول مرة أخرى.",
+            t("السند تم تعديله من مستخدم آخر. أعد تحميل الكشف ثم حاول مرة أخرى."),
           );
           refetch?.();
         } else if (code === "CashVouchers.InvoiceGeneratedReadOnly") {
-          toast.error("هذا السند مولد من فاتورة ولا يمكن حذفه من هنا.");
+          toast.error(t("هذا السند مولد من فاتورة ولا يمكن حذفه من هنا."));
         } else if (code === "CashVouchers.TransferGeneratedReadOnly") {
-          toast.error("هذا السند مولد من تحويل بين الخزائن ولا يمكن حذفه من هنا.");
+          toast.error(t("هذا السند مولد من تحويل بين الخزائن ولا يمكن حذفه من هنا."));
         } else {
           toast.error(
             error?.data?.detail ||
               error?.data?.title ||
               error?.data?.message ||
               error?.error ||
-              "تعذر حذف الحركة",
+              t("تعذر حذف الحركة"),
           );
         }
       } finally {
@@ -746,25 +748,25 @@ export default function CashboxLedgerTable({
   const handleDeleteVoucher = useCallback(
     (row) => {
       if (!isAdminOrAccountant) {
-        toast.error("ليس لديك صلاحية حذف الحركة");
+        toast.error(t("ليس لديك صلاحية حذف الحركة"));
         return;
       }
 
       if (!onDeleteVoucher) {
-        toast.error("خدمة حذف الحركة غير متاحة");
+        toast.error(t("خدمة حذف الحركة غير متاحة"));
         return;
       }
 
       toast.warning(
-        "هل أنت متأكد من حذف الحركة؟ سيتم عكس القيد المحاسبي المرتبط بها ولا يمكن التراجع.",
+        t("هل أنت متأكد من حذف الحركة؟ سيتم عكس القيد المحاسبي المرتبط بها ولا يمكن التراجع."),
         {
           duration: 8000,
           action: {
-            label: "حذف",
+            label: t("حذف"),
             onClick: () => executeDeleteVoucher(row),
           },
           cancel: {
-            label: "إلغاء",
+            label: t("إلغاء"),
           },
         },
       );
@@ -965,7 +967,7 @@ export default function CashboxLedgerTable({
         />
 
         <p className="mb-1 text-sm font-medium text-ink-900">
-          حدث خطأ في تحميل حركة الخزنة
+          {t("حدث خطأ في تحميل حركة الخزنة")}
         </p>
 
         <button
@@ -974,7 +976,7 @@ export default function CashboxLedgerTable({
           className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-500 transition-all hover:bg-primary-100 active:scale-95"
         >
           <RefreshCw size={13} />
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
@@ -986,14 +988,14 @@ export default function CashboxLedgerTable({
         <div className="mb-2 rounded-xl border border-primary-100 bg-primary-50/50 px-3 py-2">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-primary-600">
             <span>
-              خزنة <strong>{currency}</strong>
+              {t("خزنة")} <strong>{currency}</strong>
             </span>
 
             <span>
-              المقابل <strong>{baseCurrency}</strong>
+              {t("المقابل")} <strong>{baseCurrency}</strong>
             </span>
 
-            <span>لكل حركة سعر صرف مستقل</span>
+            <span>{t("لكل حركة سعر صرف مستقل")}</span>
           </div>
         </div>
       )}
@@ -1009,21 +1011,20 @@ export default function CashboxLedgerTable({
               size={13}
               className="transition-transform duration-200 group-hover:rotate-90"
             />
-            إضافة حركة جديدة
+            {t("إضافة حركة جديدة")}
           </button>
         </div>
       )}
 
       {isFiscalYearReadOnly && (
         <div className="mb-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
-          السنة المالية "{fiscalYear?.name}" مغلقة أو ليست السنة الحالية — الشاشة للعرض فقط ولا
-          يمكن إضافة أو تعديل حركات عليها.
+          {t("السنة المالية \"")}{fiscalYear?.name}{t("\" مغلقة أو ليست السنة الحالية — الشاشة للعرض فقط ولا يمكن إضافة أو تعديل حركات عليها.")}
         </div>
       )}
 
       {!isFiscalYearReadOnly && !canExecute && (
         <div className="mb-2 rounded-xl border border-ink-400/15 bg-ink-400/[0.04] px-3 py-2 text-xs font-medium text-ink-500">
-          عندك صلاحية عرض بس على الخزنة دي — إضافة وتعديل وحذف الحركات غير متاحة.
+          {t("عندك صلاحية عرض بس على الخزنة دي — إضافة وتعديل وحذف الحركات غير متاحة.")}
         </div>
       )}
 
@@ -1035,7 +1036,7 @@ export default function CashboxLedgerTable({
         <div className="overflow-x-auto">
           <table
             className="w-full min-w-[1180px] border-collapse text-right"
-            dir="rtl"
+            dir={getDir()}
           >
             <colgroup>
               <col className="w-[12%]" />
@@ -1053,38 +1054,38 @@ export default function CashboxLedgerTable({
             <thead>
               <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
                 <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
-                  الرصيد
+                  {t("الرصيد")}
                 </th>
 
                 <th className="border-l border-ink-400/5 px-2 py-2 font-medium text-positive">
-                  صادر
+                  {t("صادر")}
                   {isForeign && ` (${currency})`}
                 </th>
 
                 <th className="border-l border-ink-400/5 px-2 py-2 font-medium text-negative">
-                  وارد
+                  {t("وارد")}
                   {isForeign && ` (${currency})`}
                 </th>
 
                 {isForeign && (
                   <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
-                    سعر الصرف
+                    {t("سعر الصرف")}
                   </th>
                 )}
 
                 <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
-                  التوصيف
+                  {t("التوصيف")}
                 </th>
 
                 <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
-                  البيان
+                  {t("البيان")}
                 </th>
 
                 <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
-                  التاريخ
+                  {t("التاريخ")}
                 </th>
 
-                <th className="px-2 py-2 font-medium">السند</th>
+                <th className="px-2 py-2 font-medium">{t("السند")}</th>
               </tr>
             </thead>
 
@@ -1098,11 +1099,11 @@ export default function CashboxLedgerTable({
                       </div>
 
                       <p className="mb-1 text-sm font-medium text-ink-900">
-                        لا توجد حركات
+                        {t("لا توجد حركات")}
                       </p>
 
                       <p className="text-xs text-ink-400">
-                        ابدأ بتسجيل أول حركة
+                        {t("ابدأ بتسجيل أول حركة")}
                       </p>
                     </div>
                   </td>
@@ -1117,7 +1118,7 @@ export default function CashboxLedgerTable({
                         type="button"
                         onClick={handleSave}
                         disabled={saving}
-                        title="حفظ الحركة - Enter"
+                        title={t("حفظ الحركة - Enter")}
                         className="flex h-7 w-7 items-center justify-center rounded-md bg-positive/15 text-positive transition-all hover:bg-positive/25 active:scale-90 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {saving ? (
@@ -1131,7 +1132,7 @@ export default function CashboxLedgerTable({
                         type="button"
                         onClick={closeAddRow}
                         disabled={saving}
-                        title="إلغاء - Escape"
+                        title={t("إلغاء - Escape")}
                         className="flex h-7 w-7 items-center justify-center rounded-md bg-ink-900/[0.05] text-ink-400 transition-all hover:bg-ink-900/10 active:scale-90 disabled:opacity-50"
                       >
                         <X size={12} />
@@ -1139,7 +1140,7 @@ export default function CashboxLedgerTable({
                     </div>
 
                     <div className="mt-1 text-[10px] text-ink-300">
-                      Enter حفظ
+                      {t("Enter حفظ")}
                     </div>
                   </td>
 
@@ -1148,7 +1149,7 @@ export default function CashboxLedgerTable({
                       type="number"
                       min="0"
                       step="0.01"
-                      placeholder="صادر"
+                      placeholder={t("صادر")}
                       value={draft.paymentAmount}
                       onChange={handlePaymentChange}
                       onKeyDown={handleAddKeyDown}
@@ -1163,7 +1164,7 @@ export default function CashboxLedgerTable({
                       type="number"
                       min="0"
                       step="0.01"
-                      placeholder="وارد"
+                      placeholder={t("وارد")}
                       value={draft.receiptAmount}
                       onChange={handleReceiptChange}
                       onKeyDown={handleAddKeyDown}
@@ -1180,7 +1181,7 @@ export default function CashboxLedgerTable({
                         min="0"
                         step="0.01"
                         placeholder={
-                          isResolvingRate ? "جاري تحميل السعر..." : "سعر الصرف"
+                          isResolvingRate ? t("جاري تحميل السعر...") : t("سعر الصرف")
                         }
                         value={draft.exchangeRate}
                         onChange={handleDraftExchangeRateChange}
@@ -1189,8 +1190,8 @@ export default function CashboxLedgerTable({
                         autoComplete="off"
                         title={
                           isResolvingRate
-                            ? "جاري جلب السعر من أسعار الصرف..."
-                            : "يُحمَّل تلقائيًا من أسعار الصرف حسب تاريخ السند"
+                            ? t("جاري جلب السعر من أسعار الصرف...")
+                            : t("يُحمَّل تلقائيًا من أسعار الصرف حسب تاريخ السند")
                         }
                         className="num w-full rounded-md border border-ink-400/15 bg-white px-2 py-1.5 text-xs outline-none transition-all placeholder:text-ink-300 focus:border-primary-400 focus:ring-2 focus:ring-primary-100 disabled:cursor-not-allowed disabled:bg-ink-50"
                       />
@@ -1200,14 +1201,14 @@ export default function CashboxLedgerTable({
                   <td className="border-l border-ink-400/5 p-1.5">
                     <span className="flex items-center justify-center gap-1 text-xs text-ink-300">
                       <PenLine size={12} className="shrink-0" />
-                      بيتكتب من عمود البيان
+                      {t("بيتكتب من عمود البيان")}
                     </span>
                   </td>
 
                   <td className="border-l border-ink-400/5 p-1.5">
                     <input
                       type="text"
-                      placeholder="بيان الحركة (اختياري)"
+                      placeholder={t("بيان الحركة (اختياري)")}
                       value={draft.description}
                       onChange={handleDraftDescriptionChange}
                       onKeyDown={handleAddKeyDown}
@@ -1217,7 +1218,7 @@ export default function CashboxLedgerTable({
                     />
 
                     <div className="mt-1 text-[10px] text-ink-300">
-                      Enter للحفظ
+                      {t("Enter للحفظ")}
                     </div>
                   </td>
 
@@ -1235,7 +1236,7 @@ export default function CashboxLedgerTable({
                   <td className="p-1.5 text-center">
                     <span className="inline-flex items-center gap-1 rounded-full bg-gold-50 px-2 py-1 text-[11px] font-medium text-gold-700">
                       {saving && <Loader2 size={9} className="animate-spin" />}
-                      مسودة جديدة
+                      {t("مسودة جديدة")}
                     </span>
                   </td>
                 </tr>
@@ -1381,8 +1382,8 @@ export default function CashboxLedgerTable({
 
                             <span className="truncate">
                               {isOpeningBalanceRow
-                                ? "رصيد افتتاحي — لا يحتاج توصيف"
-                                : "تحويل بين الخزائن — لا يحتاج توصيف"}
+                                ? t("رصيد افتتاحي — لا يحتاج توصيف")
+                                : t("تحويل بين الخزائن — لا يحتاج توصيف")}
                             </span>
                           </div>
                         ) : (
@@ -1402,8 +1403,8 @@ export default function CashboxLedgerTable({
                             }
                             placeholder={
                               row.isDescribed
-                                ? "تغيير الحساب / التوصيف"
-                                : "اختر الحساب أو التوصيف"
+                                ? t("تغيير الحساب / التوصيف")
+                                : t("اختر الحساب أو التوصيف")
                             }
                           />
                         )}
@@ -1411,8 +1412,8 @@ export default function CashboxLedgerTable({
                         {!isAdminOrAccountant && (
                           <div className="mt-1 text-right text-[11px] text-ink-300">
                             {isDescribeLocked
-                              ? "الحركة موصّفة — التعديل للأدمن أو المحاسب فقط"
-                              : "توصّف الحركة مرة واحدة، وبعدها يتقفل التعديل"}
+                              ? t("الحركة موصّفة — التعديل للأدمن أو المحاسب فقط")
+                              : t("توصّف الحركة مرة واحدة، وبعدها يتقفل التعديل")}
                           </div>
                         )}
 
@@ -1470,7 +1471,7 @@ export default function CashboxLedgerTable({
                         <div className="min-w-0">
                           <button
                             type="button"
-                            title="إبراز الحركة في الكشف"
+                            title={t("إبراز الحركة في الكشف")}
                             onClick={() => {
                               const url = new URL(window.location.href);
                               url.searchParams.set("voucherId", row.id);
@@ -1490,7 +1491,7 @@ export default function CashboxLedgerTable({
                                 : "bg-positive/10 text-positive"
                             }`}
                           >
-                            {row.isDraft ? "مسودة" : "مرحّل"}
+                            {row.isDraft ? t("مسودة") : t("مرحّل")}
                           </span>
                         </div>
 
@@ -1498,7 +1499,7 @@ export default function CashboxLedgerTable({
                           {isRowEditable && (
                             <button
                               type="button"
-                              title="تعديل كامل"
+                              title={t("تعديل كامل")}
                               disabled={isUpdating || isDeleting}
                               onClick={() => setEditingRow(row)}
                               className="rounded-md p-1 text-ink-300 transition-all duration-150 hover:bg-primary-50 hover:text-primary-600 active:scale-90 disabled:cursor-not-allowed disabled:opacity-40"
@@ -1514,7 +1515,7 @@ export default function CashboxLedgerTable({
                           {isVoucherDeletable && (
                             <button
                               type="button"
-                              title="حذف الحركة"
+                              title={t("حذف الحركة")}
                               disabled={isDeleting || isUpdating}
                               onClick={(event) => {
                                 event.stopPropagation();
@@ -1533,7 +1534,7 @@ export default function CashboxLedgerTable({
                           {isOpeningBalanceDeletable && (
                             <button
                               type="button"
-                              title="حذف الرصيد الافتتاحي اليدوي"
+                              title={t("حذف الرصيد الافتتاحي اليدوي")}
                               disabled={isDeleting || isUpdating}
                               onClick={(event) => {
                                 event.stopPropagation();
@@ -1580,7 +1581,7 @@ export default function CashboxLedgerTable({
             totalCount={totalCount}
             onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}
-            label="حركة"
+            label={t("حركة")}
           />
         )}
       </div>

@@ -18,6 +18,7 @@ import EmployeeStatementTable from "../components/EmployeeStatementTable";
 import EmployeeStatementPrintTemplate from "../../../shared/components/print/EmployeeStatementPrintTemplate";
 import useEmployeeStatementPrint from "../../../shared/hooks/useEmployeeStatementPrint";
 
+import { t } from "../../../i18n";
 const EMPTY_FILTERS = {
   Search: "",
   FromDate: "",
@@ -67,7 +68,7 @@ export default function EmployeeAccountPage() {
     });
 
   const { printStatement, printRef } = useEmployeeStatementPrint({
-    title: `كشف حساب - ${data?.employeeName || "الموظف"}`,
+    title: t("كشف حساب - {0}", { 0: data?.employeeName || "الموظف" }),
   });
 
   const handleEmployeeChange = useCallback(
@@ -130,11 +131,11 @@ export default function EmployeeAccountPage() {
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <h2 className="font-display text-xl font-bold text-ink-900 sm:text-2xl">
-            كشف حساب موظف
+            {t("كشف حساب موظف")}
           </h2>
 
           <p className="mt-0.5 text-xs text-ink-400 sm:text-sm">
-            كشف حساب متكامل بالسلف والخصومات والمكافآت وتحويلات الراتب
+            {t("كشف حساب متكامل بالسلف والخصومات والمكافآت وتحويلات الراتب")}
           </p>
         </div>
 
@@ -168,7 +169,7 @@ export default function EmployeeAccountPage() {
                 className="transition-transform duration-200 group-hover:scale-110"
               />
 
-              <span>طباعة</span>
+              <span>{t("طباعة")}</span>
             </button>
           )}
         </div>
@@ -182,9 +183,9 @@ export default function EmployeeAccountPage() {
               <Wallet size={20} className="text-primary-500" />
             </div>
 
-            <p className="text-sm font-medium text-ink-700">اختر موظف</p>
+            <p className="text-sm font-medium text-ink-700">{t("اختر موظف")}</p>
 
-            <p className="mt-1 text-xs text-ink-400">لعرض كشف حسابه المالي</p>
+            <p className="mt-1 text-xs text-ink-400">{t("لعرض كشف حسابه المالي")}</p>
           </div>
         </div>
       ) : (

@@ -20,6 +20,7 @@ import { usePersistentTab } from "../../../shared/hooks/usePersistentTab";
 import PartnerStatementPrintTemplate from "../../../shared/components/print/PartnerStatementPrintTemplate";
 import usePartnerStatementPrint from "../../../shared/hooks/usePartnerStatementPrint";
 
+import { t } from "../../../i18n";
 // =========================================================
 // Constants
 // =========================================================
@@ -137,7 +138,7 @@ export default function PartnerAccountPage() {
     skip: !partnerId,
   });
   const { printStatement, printRef } = usePartnerStatementPrint({
-    title: `كشف حساب-${partner?.name || partner?.Name || "العميل"}`,
+    title: t("كشف حساب-{0}", { 0: partner?.name || partner?.Name || "العميل" }),
   });
   // =======================================================
   // Handlers
@@ -229,17 +230,17 @@ export default function PartnerAccountPage() {
     () => [
       {
         id: "statement",
-        label: "كشف الحساب",
+        label: t("كشف الحساب"),
         icon: Receipt,
       },
       {
         id: "invoices",
-        label: "الفواتير",
+        label: t("الفواتير"),
         icon: FileText,
       },
       {
         id: "items",
-        label: "الأصناف",
+        label: t("الأصناف"),
         icon: StoreIcon,
       },
     ],
@@ -279,11 +280,11 @@ export default function PartnerAccountPage() {
             </div>
 
             <p className="text-sm font-medium text-ink-700">
-              اختر عميل أو مورد
+              {t("اختر عميل أو مورد")}
             </p>
 
             <p className="mt-1 text-xs text-ink-400">
-              لعرض كشف الحساب والفواتير والأصناف
+              {t("لعرض كشف الحساب والفواتير والأصناف")}
             </p>
           </div>
         </div>

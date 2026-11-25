@@ -5,6 +5,8 @@ import AccessDeniedState from "../../../shared/components/ui/AccessDeniedState";
 import CashVoucherNumberLink from "../../../shared/components/CashVoucherNumberLink";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 /**
  * @param {{
  * data: Object,
@@ -40,8 +42,8 @@ export default function StatementTable({
     if (error?.status === 403) {
       return (
         <AccessDeniedState
-          title="غير مصرح بعرض كشف الحساب"
-          message="مش عندك صلاحية عرض كشف الحساب ده. تواصل مع مسؤول النظام لو محتاج الصلاحية."
+          title={t("غير مصرح بعرض كشف الحساب")}
+          message={t("مش عندك صلاحية عرض كشف الحساب ده. تواصل مع مسؤول النظام لو محتاج الصلاحية.")}
           onRetry={refetch}
         />
       );
@@ -56,7 +58,7 @@ export default function StatementTable({
         />
 
         <p className="mb-1 font-medium text-ink-900">
-          حدث خطأ في تحميل كشف الحساب
+          {t("حدث خطأ في تحميل كشف الحساب")}
         </p>
 
         <button
@@ -64,7 +66,7 @@ export default function StatementTable({
           className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
         >
           <RefreshCw size={15} />
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
@@ -82,12 +84,12 @@ export default function StatementTable({
           <FileSearch size={26} className="text-ink-400/50" strokeWidth={1.6} />
         </div>
 
-        <p className="font-medium text-ink-900">لا توجد حركات مطابقة</p>
+        <p className="font-medium text-ink-900">{t("لا توجد حركات مطابقة")}</p>
       </div>
     );
   }
 
-  const fmt = (n) => (n ?? 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+  const fmt = (n) => (n ?? 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
   return (
     <div
@@ -98,8 +100,7 @@ export default function StatementTable({
       {isForeign && (
         <div className="flex items-center gap-2 border-b border-ink-400/10 bg-primary-50/40 px-5 py-2.5 text-xs font-medium text-primary-600">
           <span>
-            عميل بعملة أجنبية — المبالغ معروضة بعملة الحساب ({currency}) وما
-            يقابلها بالمصري ({baseCurrency})
+            {t("عميل بعملة أجنبية — المبالغ معروضة بعملة الحساب (")}{currency}{t(") وما يقابلها بالمصري (")}{baseCurrency})
           </span>
         </div>
       )}
@@ -108,29 +109,29 @@ export default function StatementTable({
         <table className="min-w-full border-collapse text-sm">
           <thead className="bg-slate-50">
             <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
-              <th className="w-48 px-4 py-3 text-center">الرصيد</th>
+              <th className="w-48 px-4 py-3 text-center">{t("الرصيد")}</th>
 
               <th className="w-32 px-4 py-3 text-center text-positive">
-                مدين{" "}
+                {t("مدين")}{" "}
                 {isForeign && (
                   <span className="text-[10px] text-ink-400">({currency})</span>
                 )}
               </th>
 
               <th className="w-32 px-4 py-3 text-center text-negative">
-                دائن{" "}
+                {t("دائن")}{" "}
                 {isForeign && (
                   <span className="text-[10px] text-ink-400">({currency})</span>
                 )}
               </th>
 
-              <th className="min-w-[320px] px-4 py-3 text-right">البيان</th>
+              <th className="min-w-[320px] px-4 py-3 text-right">{t("البيان")}</th>
 
-              <th className="w-36 px-4 py-3 text-center">التاريخ</th>
+              <th className="w-36 px-4 py-3 text-center">{t("التاريخ")}</th>
 
-              <th className="w-44 px-4 py-3 text-right">رقم المستند</th>
+              <th className="w-44 px-4 py-3 text-right">{t("رقم المستند")}</th>
 
-              <th className="min-w-[220px] px-4 py-3 text-right">الملاحظات</th>
+              <th className="min-w-[220px] px-4 py-3 text-right">{t("الملاحظات")}</th>
             </tr>
           </thead>
 
@@ -183,7 +184,7 @@ export default function StatementTable({
                   <div className="flex items-center justify-end gap-2">
                     {item.isOpeningBalance && (
                       <span className="rounded-md bg-ink-400/10 px-1.5 py-0.5 text-[10px] font-medium text-ink-500">
-                        رصيد افتتاحي
+                        {t("رصيد افتتاحي")}
                       </span>
                     )}
 
@@ -225,7 +226,7 @@ export default function StatementTable({
         <div className="border-t border-ink-400/10 bg-slate-50 px-5 py-4">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-ink-500">رصيد أول المدة</span>
+              <span className="text-sm text-ink-500">{t("رصيد أول المدة")}</span>
 
               <div className="flex flex-col items-start">
                 <BalanceBadge
@@ -243,7 +244,7 @@ export default function StatementTable({
 
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-ink-900">
-                رصيد آخر المدة
+                {t("رصيد آخر المدة")}
               </span>
 
               <div className="flex flex-col items-start">
@@ -270,7 +271,7 @@ export default function StatementTable({
             totalCount={data?.totalCount || 0}
             onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}
-            label="حركة"
+            label={t("حركة")}
           />
         </div>
       )}

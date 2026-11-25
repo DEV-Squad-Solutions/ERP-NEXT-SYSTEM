@@ -5,23 +5,25 @@ import { Scale, RefreshCw } from "lucide-react";
 import { useGetOperationalTrialBalanceQuery } from "../../statements/statementsApi";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const CATEGORY_LABELS = {
-  Cashbox: "خزينة",
-  Partner: "عميل / مورد",
-  Driver: "سائق",
-  Employee: "موظف",
-  Revenue: "إيراد",
-  Expense: "مصروف",
+  Cashbox: t("خزينة"),
+  Partner: t("عميل / مورد"),
+  Driver: t("سائق"),
+  Employee: t("موظف"),
+  Revenue: t("إيراد"),
+  Expense: t("مصروف"),
 };
 
 const CATEGORY_OPTIONS = [
-  { value: "", label: "كل التصنيفات" },
-  { value: "Cashbox", label: "خزائن" },
-  { value: "Partner", label: "عملاء وموردين" },
-  { value: "Driver", label: "سائقين" },
-  { value: "Employee", label: "موظفين" },
-  { value: "Revenue", label: "إيرادات" },
-  { value: "Expense", label: "مصروفات" },
+  { value: "", label: t("كل التصنيفات") },
+  { value: "Cashbox", label: t("خزائن") },
+  { value: "Partner", label: t("عملاء وموردين") },
+  { value: "Driver", label: t("سائقين") },
+  { value: "Employee", label: t("موظفين") },
+  { value: "Revenue", label: t("إيرادات") },
+  { value: "Expense", label: t("مصروفات") },
 ];
 
 function todayISO() {
@@ -40,7 +42,7 @@ function firstOfMonthISO() {
 }
 
 function fmt(n) {
-  return new Intl.NumberFormat("ar-EG", {
+  return new Intl.NumberFormat(getLocale(), {
     maximumFractionDigits: 2,
   }).format(n ?? 0);
 }
@@ -82,11 +84,11 @@ export default function BeforeAdjustmentTrialBalancePage() {
         <div>
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-ink-900">
             <Scale size={20} className="text-primary-500" />
-            ميزان المراجعة قبل التسوية
+            {t("ميزان المراجعة قبل التسوية")}
           </h2>
 
           <p className="mt-1 text-sm text-ink-400">
-            حركات الحسابات خلال الفترة قبل قيود التسوية
+            {t("حركات الحسابات خلال الفترة قبل قيود التسوية")}
           </p>
         </div>
 
@@ -99,13 +101,13 @@ export default function BeforeAdjustmentTrialBalancePage() {
             size={16}
             className={isFetching ? "animate-spin" : ""}
           />
-          تحديث
+          {t("تحديث")}
         </button>
       </div>
 
       <div className="mb-5 flex flex-wrap items-end gap-3 rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">من تاريخ</label>
+          <label className="text-xs text-ink-400">{t("من تاريخ")}</label>
 
           <DateInput
             type="date"
@@ -121,7 +123,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">إلى تاريخ</label>
+          <label className="text-xs text-ink-400">{t("إلى تاريخ")}</label>
 
           <DateInput
             type="date"
@@ -137,7 +139,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">التصنيف</label>
+          <label className="text-xs text-ink-400">{t("التصنيف")}</label>
 
           <select
             value={draft.category}
@@ -158,7 +160,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">طريقة العرض</label>
+          <label className="text-xs text-ink-400">{t("طريقة العرض")}</label>
 
           <div className="flex overflow-hidden rounded-xl border border-ink-400/20">
             {["Summary", "Detailed"].map((mode) => (
@@ -177,7 +179,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
                     : "bg-white text-ink-600 hover:bg-ink-400/5"
                 }`}
               >
-                {mode === "Summary" ? "إجمالي" : "تفصيلي"}
+                {mode === "Summary" ? t("إجمالي") : t("تفصيلي")}
               </button>
             ))}
           </div>
@@ -195,7 +197,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
             }
             className="rounded border-ink-400/30"
           />
-          إظهار الحسابات الصفرية
+          {t("إظهار الحسابات الصفرية")}
         </label>
 
         <button
@@ -203,26 +205,26 @@ export default function BeforeAdjustmentTrialBalancePage() {
           onClick={handleShow}
           className="mb-0 rounded-xl bg-primary-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-primary-600"
         >
-          عرض
+          {t("عرض")}
         </button>
       </div>
 
       {isLoading && (
         <div className="rounded-2xl border border-dashed border-ink-400/20 py-16 text-center text-ink-400">
-          جاري تحميل ميزان المراجعة...
+          {t("جاري تحميل ميزان المراجعة...")}
         </div>
       )}
 
       {isError && (
         <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
-          <span>حدث خطأ أثناء تحميل ميزان المراجعة.</span>
+          <span>{t("حدث خطأ أثناء تحميل ميزان المراجعة.")}</span>
 
           <button
             type="button"
             onClick={refetch}
             className="rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs font-medium transition hover:bg-rose-100"
           >
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       )}
@@ -234,23 +236,23 @@ export default function BeforeAdjustmentTrialBalancePage() {
           }`}
         >
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-sm" dir="rtl">
+            <table className="w-full min-w-[700px] text-sm" dir={getDir()}>
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
                   <th className="px-3 py-2.5 text-right font-medium">
-                    التصنيف
+                    {t("التصنيف")}
                   </th>
 
                   <th className="px-3 py-2.5 text-right font-medium">
-                    الحساب
+                    {t("الحساب")}
                   </th>
 
                   <th className="px-3 py-2.5 text-right font-medium">
-                    مدين الفترة
+                    {t("مدين الفترة")}
                   </th>
 
                   <th className="px-3 py-2.5 text-right font-medium">
-                    دائن الفترة
+                    {t("دائن الفترة")}
                   </th>
                 </tr>
               </thead>
@@ -262,7 +264,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
                       colSpan={4}
                       className="px-3 py-14 text-center text-ink-400"
                     >
-                      لا توجد بيانات لهذه الفترة
+                      {t("لا توجد بيانات لهذه الفترة")}
                     </td>
                   </tr>
                 ) : (
@@ -307,7 +309,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
                 <tfoot>
                   <tr className="border-t-2 border-ink-400/20 bg-ink-400/5 font-bold text-ink-900">
                     <td className="px-3 py-3" colSpan={2}>
-                      الإجمالي
+                      {t("الإجمالي")}
                     </td>
 
                     <td className="whitespace-nowrap px-3 py-3 text-primary-700">

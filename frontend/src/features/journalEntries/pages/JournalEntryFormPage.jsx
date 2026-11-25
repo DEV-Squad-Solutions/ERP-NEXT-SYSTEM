@@ -18,11 +18,13 @@ import {
 } from "../journalEntriesApi";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const ENTRY_TYPE_LABELS = {
-  [JournalEntryType.Manual]: "يدوي",
-  [JournalEntryType.Adjustment]: "تسوية",
-  [JournalEntryType.Opening]: "افتتاحي",
-  Automatic: "تلقائي",
+  [JournalEntryType.Manual]: t("يدوي"),
+  [JournalEntryType.Adjustment]: t("تسوية"),
+  [JournalEntryType.Opening]: t("افتتاحي"),
+  Automatic: t("تلقائي"),
 };
 
 const ENTRY_TYPE_OPTIONS = MANUAL_ENTRY_TYPES.map((value) => ({
@@ -31,20 +33,20 @@ const ENTRY_TYPE_OPTIONS = MANUAL_ENTRY_TYPES.map((value) => ({
 }));
 
 const STATUS_LABELS = {
-  Posted: "مرحّل",
-  Reversed: "معكوس",
-  1: "مرحّل",
-  2: "معكوس",
+  Posted: t("مرحّل"),
+  Reversed: t("معكوس"),
+  1: t("مرحّل"),
+  2: t("معكوس"),
 };
 
 const CURRENCY_OPTIONS = [
-  { value: "EGP", label: "جنيه مصري (EGP)" },
-  { value: "USD", label: "دولار أمريكي (USD)" },
-  { value: "EUR", label: "يورو (EUR)" },
-  { value: "GBP", label: "جنيه إسترليني (GBP)" },
-  { value: "SAR", label: "ريال سعودي (SAR)" },
-  { value: "AED", label: "درهم إماراتي (AED)" },
-  { value: "KWD", label: "دينار كويتي (KWD)" },
+  { value: "EGP", label: t("جنيه مصري (EGP)") },
+  { value: "USD", label: t("دولار أمريكي (USD)") },
+  { value: "EUR", label: t("يورو (EUR)") },
+  { value: "GBP", label: t("جنيه إسترليني (GBP)") },
+  { value: "SAR", label: t("ريال سعودي (SAR)") },
+  { value: "AED", label: t("درهم إماراتي (AED)") },
+  { value: "KWD", label: t("دينار كويتي (KWD)") },
 ];
 
 let nextLineId = 1;
@@ -810,12 +812,12 @@ export default function JournalEntryFormPage() {
 
       navigate("/dashboard/journal-entries");
     } catch (error) {
-      console.error("فشل حفظ القيد", error);
+      console.error(t("فشل حفظ القيد"), error);
 
       setFormError(
         error?.data?.message ||
           error?.data?.title ||
-          "حصلت مشكلة أثناء حفظ القيد. تأكد من البيانات وحاول مرة أخرى.",
+          t("حصلت مشكلة أثناء حفظ القيد. تأكد من البيانات وحاول مرة أخرى."),
       );
     }
   };
@@ -823,7 +825,7 @@ export default function JournalEntryFormPage() {
   if (isEdit && isLoadingEntry) {
     return (
       <div
-        dir="rtl"
+        dir={getDir()}
         className="min-h-screen w-full overflow-x-hidden bg-slate-50 px-3 py-5 sm:px-5 lg:px-8 lg:py-7"
       >
         <div className="mx-auto w-full max-w-[1600px] animate-pulse">
@@ -880,7 +882,7 @@ export default function JournalEntryFormPage() {
   if (isEdit && isEntryError) {
     return (
       <div
-        dir="rtl"
+        dir={getDir()}
         className="flex min-h-screen w-full items-center justify-center bg-slate-50 px-4"
       >
         <div className="w-full max-w-lg animate-[fadeIn_.35s_ease-out] rounded-3xl border border-red-100 bg-white p-7 text-center shadow-xl shadow-red-100/40">
@@ -889,11 +891,11 @@ export default function JournalEntryFormPage() {
           </div>
 
           <h2 className="mb-2 text-xl font-bold text-slate-900">
-            تعذر تحميل القيد
+            {t("تعذر تحميل القيد")}
           </h2>
 
           <p className="mb-6 text-sm leading-6 text-slate-500">
-            حصلت مشكلة أثناء تحميل بيانات القيد. حاول مرة أخرى.
+            {t("حصلت مشكلة أثناء تحميل بيانات القيد. حاول مرة أخرى.")}
           </p>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
@@ -902,7 +904,7 @@ export default function JournalEntryFormPage() {
               onClick={() => refetchEntry()}
               className="rounded-xl bg-emerald-700 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-700/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-800 active:translate-y-0"
             >
-              إعادة المحاولة
+              {t("إعادة المحاولة")}
             </button>
 
             <button
@@ -910,7 +912,7 @@ export default function JournalEntryFormPage() {
               onClick={() => navigate("/dashboard/journal-entries")}
               className="rounded-xl border border-slate-200 bg-white px-6 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:border-slate-300 hover:bg-slate-50"
             >
-              العودة للقيود
+              {t("العودة للقيود")}
             </button>
           </div>
         </div>
@@ -920,7 +922,7 @@ export default function JournalEntryFormPage() {
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 px-3 py-4 sm:px-5 sm:py-6 lg:px-8 lg:py-7"
     >
       <div className="mx-auto w-full max-w-[1600px]">
@@ -930,7 +932,7 @@ export default function JournalEntryFormPage() {
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
 
               <span className="text-xs font-semibold text-emerald-700">
-                المحاسبة
+                {t("المحاسبة")}
               </span>
 
               {isEdit && existingEntry?.entryNumber && (
@@ -953,17 +955,17 @@ export default function JournalEntryFormPage() {
 
               {isAutomaticEntry && (
                 <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-bold text-blue-700">
-                  تلقائي
+                  {t("تلقائي")}
                 </span>
               )}
             </div>
 
             <h1 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-              {isEdit ? "تعديل القيد" : "قيد يدوي جديد"}
+              {isEdit ? t("تعديل القيد") : t("قيد يدوي جديد")}
             </h1>
 
             <p className="mt-1.5 text-sm text-slate-500">
-              أدخل تفاصيل القيد والحسابات المرتبطة به بطريقة سريعة وواضحة.
+              {t("أدخل تفاصيل القيد والحسابات المرتبطة به بطريقة سريعة وواضحة.")}
             </p>
           </div>
 
@@ -974,7 +976,7 @@ export default function JournalEntryFormPage() {
                 onClick={() => navigate("/dashboard/journal-entries")}
                 className="group w-full rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md sm:w-auto"
               >
-                إلغاء
+                {t("إلغاء")}
               </button>
 
               <button
@@ -989,10 +991,10 @@ export default function JournalEntryFormPage() {
                   )}
 
                   {isSaving
-                    ? "جارِ الحفظ..."
+                    ? t("جارِ الحفظ...")
                     : isEdit
-                      ? "حفظ التعديلات"
-                      : "حفظ القيد"}
+                      ? t("حفظ التعديلات")
+                      : t("حفظ القيد")}
                 </span>
 
                 {!isSaving && (
@@ -1008,7 +1010,7 @@ export default function JournalEntryFormPage() {
               onClick={() => navigate("/dashboard/journal-entries")}
               className="w-full rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:bg-slate-50 sm:w-auto"
             >
-              العودة للقيود
+              {t("العودة للقيود")}
             </button>
           )}
         </div>
@@ -1019,18 +1021,18 @@ export default function JournalEntryFormPage() {
 
             <div>
               <p className="font-bold">
-                {isAutomaticEntry ? "قيد تلقائي" : "قيد معكوس"}
+                {isAutomaticEntry ? t("قيد تلقائي") : t("قيد معكوس")}
               </p>
 
               <p className="mt-0.5 text-xs leading-5 text-amber-700">
                 {isAutomaticEntry
-                  ? "هذا القيد اتولّد من مستند مصدره (فاتورة، سند، إلخ) وبيتحدث تلقائيًا من هناك، مينفعش يتعدل من هنا."
-                  : "هذا القيد معكوس بالفعل ومقفول، مينفعش يتعدل."}
+                  ? t("هذا القيد اتولّد من مستند مصدره (فاتورة، سند، إلخ) وبيتحدث تلقائيًا من هناك، مينفعش يتعدل من هنا.")
+                  : t("هذا القيد معكوس بالفعل ومقفول، مينفعش يتعدل.")}
               </p>
 
               {existingEntry?.sourceType && (
                 <p className="mt-1 text-xs text-amber-700">
-                  المصدر: {existingEntry.sourceType}
+                  {t("المصدر:")} {existingEntry.sourceType}
                   {existingEntry.sourceNumber
                     ? ` #${existingEntry.sourceNumber}`
                     : ""}
@@ -1042,7 +1044,7 @@ export default function JournalEntryFormPage() {
 
         {existingEntry?.reversalOfEntryNumber && (
           <div className="mb-5 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
-            هذا القيد ناتج عن عكس القيد رقم{" "}
+            {t("هذا القيد ناتج عن عكس القيد رقم")}{" "}
             <span className="font-bold">
               #{existingEntry.reversalOfEntryNumber}
             </span>
@@ -1051,7 +1053,7 @@ export default function JournalEntryFormPage() {
 
         {existingEntry?.reversedByEntryNumber && (
           <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-xs text-red-700">
-            تم عكس هذا القيد بواسطة القيد رقم{" "}
+            {t("تم عكس هذا القيد بواسطة القيد رقم")}{" "}
             <span className="font-bold">
               #{existingEntry.reversedByEntryNumber}
             </span>
@@ -1072,10 +1074,10 @@ export default function JournalEntryFormPage() {
             </div>
 
             <div>
-              <h2 className="text-sm font-bold text-slate-900">بيانات القيد</h2>
+              <h2 className="text-sm font-bold text-slate-900">{t("بيانات القيد")}</h2>
 
               <p className="text-xs text-slate-400">
-                البيانات الأساسية للقيد المحاسبي
+                {t("البيانات الأساسية للقيد المحاسبي")}
               </p>
             </div>
           </div>
@@ -1083,7 +1085,7 @@ export default function JournalEntryFormPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="group min-w-0">
               <label className="mb-1.5 block text-xs font-semibold text-slate-500">
-                السنة المالية
+                {t("السنة المالية")}
               </label>
 
               <div className="transition-transform duration-200 group-focus-within:-translate-y-0.5">
@@ -1093,8 +1095,8 @@ export default function JournalEntryFormPage() {
                   options={fiscalYearOptions}
                   placeholder={
                     isLoadingFiscalYears
-                      ? "جارِ تحميل السنوات..."
-                      : "اختر السنة..."
+                      ? t("جارِ تحميل السنوات...")
+                      : t("اختر السنة...")
                   }
                   isDisabled={isLoadingFiscalYears || isReadOnly}
                 />
@@ -1103,7 +1105,7 @@ export default function JournalEntryFormPage() {
 
             <div className="group min-w-0">
               <label className="mb-1.5 block text-xs font-semibold text-slate-500">
-                تاريخ القيد
+                {t("تاريخ القيد")}
               </label>
 
               <DateInput
@@ -1117,7 +1119,7 @@ export default function JournalEntryFormPage() {
 
             <div className="group min-w-0">
               <label className="mb-1.5 block text-xs font-semibold text-slate-500">
-                نوع القيد
+                {t("نوع القيد")}
               </label>
 
               {isEdit ? (
@@ -1131,7 +1133,7 @@ export default function JournalEntryFormPage() {
                     value={entryType}
                     onChange={setEntryType}
                     options={ENTRY_TYPE_OPTIONS}
-                    placeholder="اختر نوع القيد..."
+                    placeholder={t("اختر نوع القيد...")}
                   />
                 </div>
               )}
@@ -1139,7 +1141,7 @@ export default function JournalEntryFormPage() {
 
             <div className="group min-w-0 sm:col-span-2 xl:col-span-1">
               <label className="mb-1.5 block text-xs font-semibold text-slate-500">
-                البيان
+                {t("البيان")}
               </label>
 
               <input
@@ -1147,7 +1149,7 @@ export default function JournalEntryFormPage() {
                 value={description}
                 disabled={isReadOnly}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="وصف القيد..."
+                placeholder={t("وصف القيد...")}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition-all duration-200 placeholder:text-slate-300 hover:border-slate-300 focus:-translate-y-0.5 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
               />
             </div>
@@ -1163,11 +1165,11 @@ export default function JournalEntryFormPage() {
 
               <div>
                 <h2 className="text-sm font-bold text-slate-900">
-                  تفاصيل القيد
+                  {t("تفاصيل القيد")}
                 </h2>
 
                 <p className="mt-0.5 text-xs text-slate-400">
-                  اختر الحساب أو الطرف ثم أدخل القيمة المدينة أو الدائنة.
+                  {t("اختر الحساب أو الطرف ثم أدخل القيمة المدينة أو الدائنة.")}
                 </p>
               </div>
             </div>
@@ -1175,7 +1177,7 @@ export default function JournalEntryFormPage() {
             {fiscalYearId && (isLoadingAccounts || isFetchingAccounts) && (
               <div className="flex w-fit items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 animate-[fadeIn_.25s_ease-out]">
                 <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-emerald-200 border-t-emerald-700" />
-                جارِ تحميل الحسابات...
+                {t("جارِ تحميل الحسابات...")}
               </div>
             )}
           </div>
@@ -1183,13 +1185,13 @@ export default function JournalEntryFormPage() {
           <div className="w-full overflow-x-auto">
             <div className="min-w-[960px]">
               <div className="grid grid-cols-[minmax(220px,1fr)_minmax(200px,1fr)_130px_130px_84px] items-center gap-2 border-b border-slate-100 bg-slate-50/80 px-4 py-3 text-[11px] font-bold text-slate-400 sm:px-6">
-                <span>الحساب / الطرف</span>
+                <span>{t("الحساب / الطرف")}</span>
 
-                <span>البيان</span>
+                <span>{t("البيان")}</span>
 
-                <span className="text-left">مدين</span>
+                <span className="text-left">{t("مدين")}</span>
 
-                <span className="text-left">دائن</span>
+                <span className="text-left">{t("دائن")}</span>
 
                 <span />
               </div>
@@ -1221,8 +1223,8 @@ export default function JournalEntryFormPage() {
                           options={accountOptions}
                           placeholder={
                             fiscalYearId
-                              ? "اختر الحساب أو الطرف..."
-                              : "اختر السنة المالية أولاً"
+                              ? t("اختر الحساب أو الطرف...")
+                              : t("اختر السنة المالية أولاً")
                           }
                           isDisabled={
                             isReadOnly ||
@@ -1243,7 +1245,7 @@ export default function JournalEntryFormPage() {
                               description: event.target.value,
                             })
                           }
-                          placeholder="بيان السطر (اختياري)"
+                          placeholder={t("بيان السطر (اختياري)")}
                           className="w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none transition-all duration-200 placeholder:text-slate-300 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
                         />
                       </div>
@@ -1286,7 +1288,7 @@ export default function JournalEntryFormPage() {
                               !line.useForeignCurrency,
                             )
                           }
-                          title="عملة أجنبية"
+                          title={t("عملة أجنبية")}
                           className={`flex h-8 w-8 items-center justify-center rounded-xl text-sm transition-all duration-200 disabled:pointer-events-none disabled:opacity-30 ${
                             line.useForeignCurrency
                               ? "bg-emerald-100 text-emerald-700"
@@ -1301,7 +1303,7 @@ export default function JournalEntryFormPage() {
                           disabled={lines.length <= 2 || isReadOnly}
                           onClick={() => removeLine(line.key)}
                           className="flex h-8 w-8 items-center justify-center rounded-xl text-lg font-light text-slate-300 opacity-0 transition-all duration-200 hover:bg-red-50 hover:text-red-500 group-hover:opacity-100 disabled:pointer-events-none disabled:opacity-0"
-                          title="حذف السطر"
+                          title={t("حذف السطر")}
                         >
                           ×
                         </button>
@@ -1312,7 +1314,7 @@ export default function JournalEntryFormPage() {
                       <div className="grid grid-cols-2 gap-2 border-b border-slate-50 bg-slate-50/60 px-4 py-3 sm:grid-cols-4 sm:px-6">
                         <div className="min-w-0">
                           <label className="mb-1 block text-[10px] font-semibold text-slate-400">
-                            العملة
+                            {t("العملة")}
                           </label>
 
                           <select
@@ -1337,7 +1339,7 @@ export default function JournalEntryFormPage() {
 
                         <div className="min-w-0">
                           <label className="mb-1 block text-[10px] font-semibold text-slate-400">
-                            سعر الصرف
+                            {t("سعر الصرف")}
                           </label>
 
                           <input
@@ -1359,7 +1361,7 @@ export default function JournalEntryFormPage() {
 
                         <div className="min-w-0">
                           <label className="mb-1 block text-[10px] font-semibold text-slate-400">
-                            مدين بالعملة
+                            {t("مدين بالعملة")}
                           </label>
 
                           <input
@@ -1386,7 +1388,7 @@ export default function JournalEntryFormPage() {
 
                         <div className="min-w-0">
                           <label className="mb-1 block text-[10px] font-semibold text-slate-400">
-                            دائن بالعملة
+                            {t("دائن بالعملة")}
                           </label>
 
                           <input
@@ -1412,8 +1414,7 @@ export default function JournalEntryFormPage() {
                         </div>
 
                         <p className="col-span-2 text-[10px] text-slate-400 sm:col-span-4">
-                          المبلغ بعملة الشركة الأساسية بيتحسب تلقائيًا = القيمة
-                          بالعملة × سعر الصرف.
+                          {t("المبلغ بعملة الشركة الأساسية بيتحسب تلقائيًا = القيمة بالعملة × سعر الصرف.")}
                         </p>
                       </div>
                     )}
@@ -1433,7 +1434,7 @@ export default function JournalEntryFormPage() {
                 <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-emerald-50 text-base transition-transform duration-200 group-hover:rotate-90 group-hover:bg-emerald-100">
                   +
                 </span>
-                إضافة سطر
+                {t("إضافة سطر")}
               </button>
             </div>
           )}
@@ -1453,7 +1454,7 @@ export default function JournalEntryFormPage() {
 
                 <div>
                   <p className="text-xs font-semibold text-slate-400">
-                    إجمالي القيد
+                    {t("إجمالي القيد")}
                   </p>
 
                   <p
@@ -1462,10 +1463,10 @@ export default function JournalEntryFormPage() {
                     }`}
                   >
                     {isBalanced
-                      ? "القيد متزن ✓"
+                      ? t("القيد متزن ✓")
                       : difference === 0
-                        ? "أدخل قيم القيد"
-                        : `غير متزن — الفرق ${Math.abs(difference).toFixed(2)}`}
+                        ? t("أدخل قيم القيد")
+                        : t("غير متزن — الفرق {0}", { 0: Math.abs(difference).toFixed(2) })}
                   </p>
                 </div>
               </div>
@@ -1473,7 +1474,7 @@ export default function JournalEntryFormPage() {
               <div className="group rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div className="mb-1 flex items-center justify-between">
                   <span className="text-xs font-medium text-slate-400">
-                    مدين
+                    {t("مدين")}
                   </span>
 
                   <span className="h-2 w-2 rounded-full bg-emerald-500 transition-transform duration-200 group-hover:scale-125" />
@@ -1487,7 +1488,7 @@ export default function JournalEntryFormPage() {
               <div className="group rounded-2xl border border-slate-100 bg-white px-4 py-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div className="mb-1 flex items-center justify-between">
                   <span className="text-xs font-medium text-slate-400">
-                    دائن
+                    {t("دائن")}
                   </span>
 
                   <span className="h-2 w-2 rounded-full bg-blue-500 transition-transform duration-200 group-hover:scale-125" />
@@ -1508,7 +1509,7 @@ export default function JournalEntryFormPage() {
               onClick={() => navigate("/dashboard/journal-entries")}
               className="w-full rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-600 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-50 hover:shadow-md sm:w-auto"
             >
-              إلغاء
+              {t("إلغاء")}
             </button>
 
             <button
@@ -1523,10 +1524,10 @@ export default function JournalEntryFormPage() {
                 )}
 
                 {isSaving
-                  ? "جارِ الحفظ..."
+                  ? t("جارِ الحفظ...")
                   : isEdit
-                    ? "حفظ التعديلات"
-                    : "حفظ القيد"}
+                    ? t("حفظ التعديلات")
+                    : t("حفظ القيد")}
               </span>
 
               {!isSaving && (
@@ -1540,7 +1541,7 @@ export default function JournalEntryFormPage() {
           <div className="pointer-events-none fixed bottom-5 left-1/2 z-50 -translate-x-1/2 animate-[slideUp_.25s_ease-out]">
             <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-500 shadow-xl shadow-slate-900/10">
               <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-slate-200 border-t-emerald-700" />
-              تحديث البيانات...
+              {t("تحديث البيانات...")}
             </div>
           </div>
         )}

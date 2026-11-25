@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import { useCashboxScope } from "../../features/cashboxes/hooks/useCashboxScope";
 
+import { t } from "../../i18n";
 // اتجاه السند بييجي من الـAPI كنص ("Receipt"/"Payment") أو رقم (1/2)
 // حسب إعدادات السيريالايزر.
 function normalizeDirection(direction) {
@@ -20,11 +21,11 @@ function normalizeDirection(direction) {
 
 function directionLabel(direction) {
   if (direction === "Receipt") {
-    return "إلى خزنة";
+    return t("إلى خزنة");
   }
 
   if (direction === "Payment") {
-    return "من خزنة";
+    return t("من خزنة");
   }
 
   return null;
@@ -84,7 +85,7 @@ export default function CashVoucherNumberLink({
     <span className="inline-flex flex-col items-start gap-0.5">
       <Link
         to={href}
-        title={`عرض السند ${number} في كشف الخزنة`}
+        title={t("عرض السند {0} في كشف الخزنة", { 0: number })}
         className={`num font-medium text-primary-600 underline-offset-2 transition-colors hover:text-primary-700 hover:underline ${className}`}
       >
         {number}

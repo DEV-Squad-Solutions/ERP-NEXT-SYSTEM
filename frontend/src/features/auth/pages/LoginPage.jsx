@@ -12,10 +12,12 @@ import {
 import CompanySelect from "../components/CompanySelect";
 import LoginForm from "../components/LoginForm";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const features = [
-  { icon: Building2, text: "إدارة عدد غير محدود من الشركات من حساب واحد" },
-  { icon: TrendingUp, text: "تقارير مالية دقيقة ولحظية لكل شركة" },
-  { icon: Shield, text: "بياناتك محمية ومعزولة بالكامل بين الشركات" },
+  { icon: Building2, text: t("إدارة عدد غير محدود من الشركات من حساب واحد") },
+  { icon: TrendingUp, text: t("تقارير مالية دقيقة ولحظية لكل شركة") },
+  { icon: Shield, text: t("بياناتك محمية ومعزولة بالكامل بين الشركات") },
 ];
 
 const HOME_ROLES = ["Admin", "Accountant"];
@@ -52,7 +54,7 @@ export default function LoginPage() {
 
   return (
     <main
-      dir="rtl"
+      dir={getDir()}
       className="relative isolate h-[100dvh] w-full overflow-hidden bg-paper text-ink-900"
     >
       <div className="flex h-full w-full overflow-hidden lg:flex-row">
@@ -82,30 +84,29 @@ export default function LoginPage() {
           <div className="relative z-10 flex h-full w-full flex-col justify-between overflow-hidden px-8 py-6 xl:px-12 xl:py-8">
             <div className="motion-safe:animate-[fadeDown_0.6s_ease-out_both]">
               <span className="font-display text-lg font-bold text-white">
-                نظام الدفتر
+                {t("نظام الدفتر")}
               </span>
               <p className="mt-1 text-[10px] font-medium text-white/40">
-                الإدارة المالية الذكية
+                {t("الإدارة المالية الذكية")}
               </p>
             </div>
 
             <div className="my-auto min-h-0 max-w-xl py-5 xl:py-7">
               <div className="mb-3.5 inline-flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[10px] font-medium text-white/70 backdrop-blur-sm motion-safe:animate-[fadeUp_0.55s_ease-out_100ms_both]">
                 <Sparkles size={12} className="text-gold-400" strokeWidth={2} />
-                <span>منصة محاسبية متكاملة</span>
+                <span>{t("منصة محاسبية متكاملة")}</span>
               </div>
 
               <h1 className="font-display text-3xl font-bold leading-[1.55] tracking-tight text-white motion-safe:animate-[fadeUp_0.65s_ease-out_160ms_both] xl:text-4xl">
-                حساباتك،
+                {t("حساباتك،")}
                 <br />
-                <span className="text-white/90">كل شركاتك، </span>
+                <span className="text-white/90">{t("كل شركاتك،")} </span>
                 <br />
-                <span className="text-gold-400">في مكان واحد.</span>
+                <span className="text-gold-400">{t("في مكان واحد.")}</span>
               </h1>
 
               <p className="mt-3.5 max-w-lg text-sm leading-6 text-white/55 motion-safe:animate-[fadeUp_0.7s_ease-out_220ms_both]">
-                إدارة محاسبية متكاملة تساعدك على متابعة أعمالك، شركاتك، وتقاريرك
-                المالية من مكان واحد بكل وضوح وثقة.
+                {t("إدارة محاسبية متكاملة تساعدك على متابعة أعمالك، شركاتك، وتقاريرك المالية من مكان واحد بكل وضوح وثقة.")}
               </p>
 
               <div className="mt-6 space-y-2">
@@ -134,7 +135,7 @@ export default function LoginPage() {
               <div className="flex min-w-0 items-center gap-2 text-[10px] text-white/40">
                 <CheckCircle2 size={13} className="shrink-0 text-gold-400" />
                 <span className="truncate">
-                  متوافق مع المعايير المحاسبية المصرية
+                  {t("متوافق مع المعايير المحاسبية المصرية")}
                 </span>
               </div>
 
@@ -166,7 +167,7 @@ export default function LoginPage() {
                       Dev Squad Solutions
                     </span>
                     <span className="mt-0.5 block text-[8px] text-white/35">
-                      © {new Date().getFullYear()} جميع الحقوق محفوظة
+                      © {new Date().getFullYear()} {t("جميع الحقوق محفوظة")}
                     </span>
                   </span>
 
@@ -193,10 +194,10 @@ export default function LoginPage() {
           <div className="relative z-10 flex max-h-full w-full min-w-0 max-w-[500px] flex-col justify-center">
             <div className="mb-4 shrink-0 text-center motion-safe:animate-[fadeDown_0.5s_ease-out_both] lg:hidden">
               <h1 className="font-display text-2xl font-bold text-primary-500">
-                نظام الدفتر
+                {t("نظام الدفتر")}
               </h1>
               <p className="mt-1 text-[10px] text-ink-400">
-                الإدارة المالية الذكية
+                {t("الإدارة المالية الذكية")}
               </p>
             </div>
 
@@ -206,21 +207,21 @@ export default function LoginPage() {
                   <span className="h-1.5 w-1.5 rounded-full bg-primary-500" />
                   <span className="text-[10px] font-medium text-ink-400">
                     {requiresCompanySelection
-                      ? "اختيار الشركة"
-                      : "تسجيل الدخول"}
+                      ? t("اختيار الشركة")
+                      : t("تسجيل الدخول")}
                   </span>
                 </div>
 
                 <h2 className="font-display text-lg font-bold tracking-tight text-ink-900">
                   {requiresCompanySelection
-                    ? "اختر الشركة"
-                    : "مرحبًا بك مجددًا"}
+                    ? t("اختر الشركة")
+                    : t("مرحبًا بك مجددًا")}
                 </h2>
 
                 <p className="mt-1 text-[10px] leading-5 text-ink-400">
                   {requiresCompanySelection
-                    ? "اختر الشركة التي تريد العمل عليها"
-                    : "سجّل دخولك للوصول إلى لوحة التحكم"}
+                    ? t("اختر الشركة التي تريد العمل عليها")
+                    : t("سجّل دخولك للوصول إلى لوحة التحكم")}
                 </p>
               </div>
 
@@ -230,13 +231,13 @@ export default function LoginPage() {
 
               <div className="mt-4 flex items-center justify-center gap-1.5 text-[9px] text-ink-300">
                 <Shield size={11} className="shrink-0" />
-                <span>بياناتك محمية وآمنة</span>
+                <span>{t("بياناتك محمية وآمنة")}</span>
               </div>
             </div>
 
             <div className="mt-3 flex shrink-0 items-center justify-center gap-1 text-[9px] text-ink-300 motion-safe:animate-[fadeUp_0.5s_ease-out_300ms_both]">
               <span>© {new Date().getFullYear()}</span>
-              <span>نظام الدفتر</span>
+              <span>{t("نظام الدفتر")}</span>
               <span>•</span>
               <span>DEV Squad Solutions</span>
             </div>

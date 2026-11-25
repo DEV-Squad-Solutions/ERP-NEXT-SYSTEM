@@ -12,21 +12,22 @@ import {
   useUpdateContainerMovementMutation,
 } from "../storeContainersApi";
 
+import { t } from "../../../i18n";
 const fieldCls =
   "w-full min-h-10 rounded-xl border border-ink-400/15 bg-white px-3.5 py-2.5 text-sm font-medium text-ink-900 outline-none transition hover:border-ink-400/25 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 disabled:cursor-not-allowed disabled:bg-ink-400/[0.04] disabled:text-ink-400";
 
 const directionOptions = [
   {
     value: "Outgoing",
-    label: "صادر",
-    hint: "خروج عبوات للعميل",
+    label: t("صادر"),
+    hint: t("خروج عبوات للعميل"),
     icon: ArrowUpRight,
     activeClass: "border-rose-500 bg-rose-500/10 text-rose-700",
   },
   {
     value: "Incoming",
-    label: "وارد",
-    hint: "عودة عبوات من العميل",
+    label: t("وارد"),
+    hint: t("عودة عبوات من العميل"),
     icon: ArrowDownLeft,
     activeClass:
       "border-emerald-500 bg-emerald-500/10 text-emerald-700",
@@ -127,17 +128,17 @@ export default function ManualMovementModal({
     const numericUnits = Number(units);
 
     if (!containerId) {
-      toast.error("اختر العبوة أولًا");
+      toast.error(t("اختر العبوة أولًا"));
       return;
     }
 
     if (!Number.isInteger(numericUnits) || numericUnits <= 0) {
-      toast.error("العدد يجب أن يكون رقمًا صحيحًا أكبر من صفر");
+      toast.error(t("العدد يجب أن يكون رقمًا صحيحًا أكبر من صفر"));
       return;
     }
 
     if (!movementDate) {
-      toast.error("تاريخ الحركة مطلوب");
+      toast.error(t("تاريخ الحركة مطلوب"));
       return;
     }
 
@@ -170,8 +171,8 @@ export default function ManualMovementModal({
 
       toast.success(
         edit
-          ? "تم تعديل الحركة اليدوية بنجاح"
-          : "تمت إضافة الحركة اليدوية بنجاح",
+          ? t("تم تعديل الحركة اليدوية بنجاح")
+          : t("تمت إضافة الحركة اليدوية بنجاح"),
       );
 
       onClose();
@@ -179,7 +180,7 @@ export default function ManualMovementModal({
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "تعذر حفظ الحركة اليدوية",
+          t("تعذر حفظ الحركة اليدوية"),
       );
     }
   };
@@ -188,23 +189,22 @@ export default function ManualMovementModal({
     <Modal
       isOpen={open}
       onClose={onClose}
-      title={edit ? "تعديل حركة يدوية" : "إضافة حركة يدوية"}
+      title={edit ? t("تعديل حركة يدوية") : t("إضافة حركة يدوية")}
     >
       <form onSubmit={save} className="space-y-4">
         <div className="rounded-xl border border-ink-400/10 bg-ink-400/[0.03] px-3.5 py-2.5 text-xs leading-6 text-ink-500">
-          الحركة اليدوية تؤثر على أعداد العبوات فقط، ولا تُنشئ أي قيد محاسبي
-          أو حركة خزنة أو رصيد عميل.
+          {t("الحركة اليدوية تؤثر على أعداد العبوات فقط، ولا تُنشئ أي قيد محاسبي أو حركة خزنة أو رصيد عميل.")}
         </div>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-semibold text-ink-800">العبوة</span>
+          <span className="font-semibold text-ink-800">{t("العبوة")}</span>
 
           <select
             className={fieldCls}
             value={containerId}
             onChange={(event) => setContainerId(event.target.value)}
           >
-            <option value="">اختر العبوة</option>
+            <option value="">{t("اختر العبوة")}</option>
 
             {containerOptions.map((container) => (
               <option
@@ -222,14 +222,14 @@ export default function ManualMovementModal({
           {containerOptions.length === 0 && (
             <span className="flex items-center gap-1.5 text-xs text-amber-600">
               <Boxes size={13} />
-              لا توجد عبوات مخصصة لهذا المخزن. أضفها من «إدارة الحاويات».
+              {t("لا توجد عبوات مخصصة لهذا المخزن. أضفها من «إدارة الحاويات».")}
             </span>
           )}
         </label>
 
         <div className="space-y-1.5">
           <span className="text-sm font-semibold text-ink-800">
-            نوع الحركة
+            {t("نوع الحركة")}
           </span>
 
           <div className="grid grid-cols-2 gap-2">
@@ -265,18 +265,18 @@ export default function ManualMovementModal({
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Input
-            label="العدد"
+            label={t("العدد")}
             type="number"
             min="1"
             step="1"
             inputMode="numeric"
             value={units}
             onChange={(event) => setUnits(event.target.value)}
-            placeholder="مثال: 50"
+            placeholder={t("مثال: 50")}
           />
 
           <Input
-            label="تاريخ الحركة"
+            label={t("تاريخ الحركة")}
             type="date"
             value={movementDate}
             onChange={(event) => setMovementDate(event.target.value)}
@@ -284,10 +284,10 @@ export default function ManualMovementModal({
         </div>
 
         <Input
-          label="البيان (اختياري)"
+          label={t("البيان (اختياري)")}
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          placeholder="مثال: جرد يدوي أو تسوية عدد"
+          placeholder={t("مثال: جرد يدوي أو تسوية عدد")}
           maxLength={1000}
         />
 
@@ -298,7 +298,7 @@ export default function ManualMovementModal({
             onClick={onClose}
             className="flex-1"
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button
@@ -307,10 +307,10 @@ export default function ManualMovementModal({
             className="flex-1"
           >
             {saving
-              ? "جاري الحفظ..."
+              ? t("جاري الحفظ...")
               : edit
-                ? "حفظ التعديلات"
-                : "إضافة الحركة"}
+                ? t("حفظ التعديلات")
+                : t("إضافة الحركة")}
           </Button>
         </div>
       </form>

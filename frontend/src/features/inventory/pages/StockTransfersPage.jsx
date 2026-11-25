@@ -35,6 +35,8 @@ import { useFiscalYearGuard } from "../../../lib/useFiscalYearGuard";
 import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFiscalYearBanner";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const emptyFilters = {
   search: "",
   sourceStoreId: "",
@@ -140,29 +142,29 @@ export default function StockTransfersPage() {
   };
 
   const handleDelete = (row) => {
-    toast(`حذف التحويل "${row.documentNumber}"؟`, {
-      description: "سيتم حذف التحويل وحركات المخزون المرتبطة به.",
+    toast(t("حذف التحويل \"{0}\"؟", { 0: row.documentNumber }), {
+      description: t("سيتم حذف التحويل وحركات المخزون المرتبطة به."),
 
       action: {
-        label: "تأكيد الحذف",
+        label: t("تأكيد الحذف"),
 
         onClick: async () => {
           try {
             await deleteTransfer(row.id).unwrap();
 
-            toast.success("تم حذف التحويل المخزني بنجاح");
+            toast.success(t("تم حذف التحويل المخزني بنجاح"));
 
             refetch();
           } catch (error) {
             console.error("Delete stock transfer error:", error);
 
-            toast.error(error?.data?.message || "تعذر حذف التحويل المخزني");
+            toast.error(error?.data?.message || t("تعذر حذف التحويل المخزني"));
           }
         },
       },
 
       cancel: {
-        label: "إلغاء",
+        label: t("إلغاء"),
       },
 
       duration: 6000,
@@ -186,18 +188,18 @@ export default function StockTransfersPage() {
             </div>
 
             <h2 className="font-display text-2xl font-bold text-ink-900">
-              التحويلات المخزنية
+              {t("التحويلات المخزنية")}
             </h2>
           </div>
 
           <p className="text-sm text-ink-400 mt-1">
-            تحويل الأصناف بين مخازن الشركة ومتابعة حركات التحويل
+            {t("تحويل الأصناف بين مخازن الشركة ومتابعة حركات التحويل")}
           </p>
         </div>
 
         <Button onClick={openCreate} disabled={isFiscalYearReadOnly}>
           <Plus size={16} />
-          تحويل مخزني
+          {t("تحويل مخزني")}
         </Button>
       </div>
 
@@ -210,19 +212,19 @@ export default function StockTransfersPage() {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <SummaryCard
           icon={<ArrowLeftRight size={16} />}
-          label="عدد التحويلات"
+          label={t("عدد التحويلات")}
           value={data?.totalCount || 0}
         />
 
         <SummaryCard
           icon={<Package size={16} />}
-          label="عدد الأصناف في الصفحة"
+          label={t("عدد الأصناف في الصفحة")}
           value={rows.reduce((sum, row) => sum + Number(row.lineCount || 0), 0)}
         />
 
         <SummaryCard
           icon={<Warehouse size={16} />}
-          label="إجمالي الكميات في الصفحة"
+          label={t("إجمالي الكميات في الصفحة")}
           value={totalQuantity}
         />
       </div>
@@ -232,47 +234,47 @@ export default function StockTransfersPage() {
       <div className="bg-white rounded-2xl border border-ink-400/10 shadow-card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <Input
-            label="بحث"
-            placeholder="رقم المستند أو اسم المخزن..."
+            label={t("بحث")}
+            placeholder={t("رقم المستند أو اسم المخزن...")}
             value={draft.search}
             onChange={(event) => setField("search", event.target.value)}
           />
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              المخزن المصدر
+              {t("المخزن المصدر")}
             </label>
 
             <CompactSelect
               options={storeOptions}
               value={draft.sourceStoreId}
               onChange={(value) => setField("sourceStoreId", value)}
-              placeholder="كل المخازن"
+              placeholder={t("كل المخازن")}
             />
           </div>
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              المخزن المستلم
+              {t("المخزن المستلم")}
             </label>
 
             <CompactSelect
               options={storeOptions}
               value={draft.destinationStoreId}
               onChange={(value) => setField("destinationStoreId", value)}
-              placeholder="كل المخازن"
+              placeholder={t("كل المخازن")}
             />
           </div>
 
           <Input
-            label="من تاريخ"
+            label={t("من تاريخ")}
             type="date"
             value={draft.fromDate}
             onChange={(event) => setField("fromDate", event.target.value)}
           />
 
           <Input
-            label="إلى تاريخ"
+            label={t("إلى تاريخ")}
             type="date"
             value={draft.toDate}
             onChange={(event) => setField("toDate", event.target.value)}
@@ -282,12 +284,12 @@ export default function StockTransfersPage() {
         <div className="flex justify-end gap-2 mt-3">
           <Button onClick={handleSearch} className="h-9">
             <Search size={14} />
-            بحث
+            {t("بحث")}
           </Button>
 
           <Button variant="outline" onClick={handleReset} className="h-9">
             <RotateCcw size={14} />
-            تصفير
+            {t("تصفير")}
           </Button>
         </div>
       </div>
@@ -305,7 +307,7 @@ export default function StockTransfersPage() {
           />
 
           <p className="text-ink-900 font-medium text-sm mb-1">
-            حدث خطأ في تحميل التحويلات
+            {t("حدث خطأ في تحميل التحويلات")}
           </p>
 
           <button
@@ -313,7 +315,7 @@ export default function StockTransfersPage() {
             className="inline-flex items-center gap-2 text-xs font-medium text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-lg transition-colors mt-2"
           >
             <RefreshCw size={13} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : rows.length === 0 ? (
@@ -327,11 +329,11 @@ export default function StockTransfersPage() {
           </div>
 
           <p className="text-ink-900 font-medium text-sm mb-1">
-            لا توجد تحويلات مخزنية
+            {t("لا توجد تحويلات مخزنية")}
           </p>
 
           <p className="text-xs text-ink-400">
-            جرّب تعديل الفلاتر أو أنشئ تحويلًا جديدًا
+            {t("جرّب تعديل الفلاتر أو أنشئ تحويلًا جديدًا")}
           </p>
         </div>
       ) : (
@@ -355,34 +357,34 @@ export default function StockTransfersPage() {
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    المستند
+                    {t("المستند")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    التاريخ
+                    {t("التاريخ")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    من مخزن
+                    {t("من مخزن")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    إلى مخزن
+                    {t("إلى مخزن")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الأصناف
+                    {t("الأصناف")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الكمية
+                    {t("الكمية")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    ملاحظات
+                    {t("ملاحظات")}
                   </th>
 
-                  <th className="p-2.5 font-medium">الإجراءات</th>
+                  <th className="p-2.5 font-medium">{t("الإجراءات")}</th>
                 </tr>
               </thead>
 
@@ -429,7 +431,7 @@ export default function StockTransfersPage() {
                     </td>
 
                     <td className="p-2.5 text-sm num border-l border-ink-400/5">
-                      {Number(row.totalQuantity || 0).toLocaleString("ar-EG", {
+                      {Number(row.totalQuantity || 0).toLocaleString(getLocale(), {
                         maximumFractionDigits: 2,
                       })}
                     </td>
@@ -441,7 +443,7 @@ export default function StockTransfersPage() {
                     <td className="p-2.5">
                       <div className="flex items-center gap-1">
                         <ActionButton
-                          title="عرض التفاصيل"
+                          title={t("عرض التفاصيل")}
                           onClick={() => openDetails(row.id)}
                         >
                           <Eye size={15} />
@@ -450,7 +452,7 @@ export default function StockTransfersPage() {
                         {!isFiscalYearReadOnly && (
                           <>
                             <ActionButton
-                              title="تعديل"
+                              title={t("تعديل")}
                               onClick={() => openEdit(row)}
                             >
                               <Pencil size={15} />
@@ -458,7 +460,7 @@ export default function StockTransfersPage() {
 
                             <ActionButton
                               danger
-                              title="حذف"
+                              title={t("حذف")}
                               onClick={() => handleDelete(row)}
                             >
                               <Trash2 size={15} />
@@ -523,7 +525,7 @@ function SummaryCard({ icon, label, value }) {
       </div>
 
       <p className="text-lg font-bold num text-ink-900">
-        {Number(value || 0).toLocaleString("ar-EG", {
+        {Number(value || 0).toLocaleString(getLocale(), {
           maximumFractionDigits: 2,
         })}
       </p>

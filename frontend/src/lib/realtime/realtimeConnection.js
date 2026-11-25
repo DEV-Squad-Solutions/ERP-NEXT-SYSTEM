@@ -5,6 +5,7 @@ import {
 } from "@microsoft/signalr";
 import { toast } from "sonner";
 
+import { t } from "../../i18n";
 let connectionInstance = null;
 let startPromise = null;
 
@@ -42,7 +43,7 @@ function attachConnectionEvents(connection) {
 
     notifyConnectionStatus("reconnecting", error);
 
-    toast.warning("جاري إعادة الاتصال بالتحديثات...", {
+    toast.warning(t("جاري إعادة الاتصال بالتحديثات..."), {
       id: "signalr-status",
     });
   });
@@ -52,7 +53,7 @@ function attachConnectionEvents(connection) {
 
     notifyConnectionStatus("connected");
 
-    toast.success("تمت إعادة الاتصال بالتحديثات", {
+    toast.success(t("تمت إعادة الاتصال بالتحديثات"), {
       id: "signalr-status",
     });
   });
@@ -63,7 +64,7 @@ function attachConnectionEvents(connection) {
 
       notifyConnectionStatus("disconnected", error);
 
-      toast.error("تم فقد الاتصال بالتحديثات", {
+      toast.error(t("تم فقد الاتصال بالتحديثات"), {
         id: "signalr-status",
       });
     } else {
@@ -141,7 +142,7 @@ export async function startConnection(getAccessToken) {
   }
 
   startPromise = (async () => {
-    toast.loading("جاري الاتصال بالتحديثات...", {
+    toast.loading(t("جاري الاتصال بالتحديثات..."), {
       id: "signalr-status",
     });
 
@@ -156,7 +157,7 @@ export async function startConnection(getAccessToken) {
         if (connection.state === HubConnectionState.Connected) {
           notifyConnectionStatus("connected");
 
-          toast.success("تم الاتصال بالتحديثات بنجاح", {
+          toast.success(t("تم الاتصال بالتحديثات بنجاح"), {
             id: "signalr-status",
           });
 
@@ -179,7 +180,7 @@ export async function startConnection(getAccessToken) {
 
         notifyConnectionStatus("connected");
 
-        toast.success("تم الاتصال بالتحديثات بنجاح", {
+        toast.success(t("تم الاتصال بالتحديثات بنجاح"), {
           id: "signalr-status",
         });
 
@@ -193,10 +194,10 @@ export async function startConnection(getAccessToken) {
         if (attempt === RETRY_DELAYS.length - 1) {
           notifyConnectionStatus("failed", error);
 
-          toast.error("تعذر الاتصال بالتحديثات", {
+          toast.error(t("تعذر الاتصال بالتحديثات"), {
             id: "signalr-status",
             description:
-              "سيستمر النظام في العمل، وسيتم إعادة المحاولة عند الحاجة.",
+              t("سيستمر النظام في العمل، وسيتم إعادة المحاولة عند الحاجة."),
           });
 
           return false;

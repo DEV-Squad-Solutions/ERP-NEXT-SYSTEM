@@ -13,6 +13,7 @@ import {
 } from "../../../features/auth/authSlice";
 import { getApiErrors } from "../../../utils/getApiErrors";
 
+import { t } from "../../../i18n";
 /**
  * زر تبديل الشركة في الـ Navbar. بيظهر بس لو المستخدم عنده أكتر
  * من شركة واحدة (companies.length > 1) — مطابق لما هو موضّح في
@@ -40,7 +41,7 @@ export default function CompanySwitcher() {
     try {
       await switchCompany({ companyId, refreshToken }).unwrap();
       setIsOpen(false);
-      toast.success("تم التبديل للشركة بنجاح");
+      toast.success(t("تم التبديل للشركة بنجاح"));
     } catch (error) {
       getApiErrors(error).forEach((message) => toast.error(message));
     }
@@ -51,7 +52,7 @@ export default function CompanySwitcher() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        aria-label="تغيير الشركة"
+        aria-label={t("تغيير الشركة")}
         className={[
           "flex items-center gap-1.5",
           "rounded-lg",
@@ -81,7 +82,7 @@ export default function CompanySwitcher() {
         </span>
       </button>
 
-      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title="الشركة">
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} title={t("الشركة")}>
         <div className="space-y-2">
           {companies.map((company) => {
             const isSelected = company.id === selectedCompany?.id;

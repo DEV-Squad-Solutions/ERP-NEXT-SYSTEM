@@ -1,3 +1,4 @@
+import { t } from "../../../i18n";
 /**
  * نفس شكل LedgerField بس select بدل input
  * @param {{ label: string, options: {value: string, label: string}[], error?: string }} props
@@ -18,7 +19,7 @@ export default function LedgerSelect({
           className="flex-1 px-3 py-2.5 text-sm bg-white focus:outline-none focus:bg-primary-50/30  transition-colors"
           {...selectProps}
         >
-          <option value="">— اختر —</option>
+          <option value="">{t("— اختر —")}</option>
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}

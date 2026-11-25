@@ -12,6 +12,7 @@ import {
 import { useGetUserByIdQuery } from "../../../features/users/usersApi";
 import { selectIsAdmin, selectUserId } from "../../auth/authSlice";
 
+import { t } from "../../../i18n";
 export default function ProfilePage() {
   const navigate = useNavigate();
   const userId = useSelector(selectUserId);
@@ -31,7 +32,7 @@ export default function ProfilePage() {
       <div className="p-4 lg:p-6">
         <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-center dark:border-red-500/10 dark:bg-red-500/5">
           <p className="text-sm font-semibold text-red-600 dark:text-red-400">
-            لا تملك صلاحية عرض تفاصيل المستخدم
+            {t("لا تملك صلاحية عرض تفاصيل المستخدم")}
           </p>
         </div>
       </div>
@@ -47,7 +48,7 @@ export default function ProfilePage() {
       <div className="p-4 lg:p-6">
         <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-center dark:border-red-500/10 dark:bg-red-500/5">
           <p className="text-sm font-semibold text-red-600 dark:text-red-400">
-            تعذر تحميل بيانات المستخدم
+            {t("تعذر تحميل بيانات المستخدم")}
           </p>
         </div>
       </div>
@@ -60,7 +61,7 @@ export default function ProfilePage() {
   const fullName =
     `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
     user.userName ||
-    "المستخدم";
+    t("المستخدم");
 
   return (
     <div className="relative space-y-4 p-4 lg:p-6">
@@ -76,17 +77,17 @@ export default function ProfilePage() {
             type="button"
             onClick={() => navigate("/dashboard")}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-ink-200/70 bg-white text-ink-500 transition-all hover:border-primary-200 hover:bg-primary-50 hover:text-primary-500 active:scale-95 dark:border-white/[0.07] dark:bg-ink-900 dark:text-ink-400 dark:hover:border-primary-500/20 dark:hover:bg-primary-500/10 dark:hover:text-primary-400"
-            title="العودة"
+            title={t("العودة")}
           >
             <ArrowRight size={16} />
           </button>
 
           <div className="min-w-0">
             <h2 className="font-display text-lg font-bold text-ink-900 dark:text-white">
-              الملف الشخصي
+              {t("الملف الشخصي")}
             </h2>
             <p className="mt-0.5 text-xs text-ink-400 dark:text-ink-500">
-              تفاصيل حساب المستخدم
+              {t("تفاصيل حساب المستخدم")}
             </p>
           </div>
         </div>
@@ -97,7 +98,7 @@ export default function ProfilePage() {
           className="flex shrink-0 items-center gap-2 rounded-xl bg-primary-500 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-all hover:bg-primary-600 hover:shadow-md active:scale-95"
         >
           <UserCog size={15} />
-          <span className="hidden sm:inline">تعديل</span>
+          <span className="hidden sm:inline">{t("تعديل")}</span>
         </button>
       </div>
 
@@ -135,20 +136,20 @@ export default function ProfilePage() {
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
-        <InfoCard icon={User} label="اسم المستخدم" value={user.userName} />
+        <InfoCard icon={User} label={t("اسم المستخدم")} value={user.userName} />
 
-        <InfoCard icon={Mail} label="البريد الإلكتروني" value={user.email} />
+        <InfoCard icon={Mail} label={t("البريد الإلكتروني")} value={user.email} />
 
         <InfoCard
           icon={Phone}
-          label="رقم الهاتف"
-          value={user.phoneNumber || "غير مسجل"}
+          label={t("رقم الهاتف")}
+          value={user.phoneNumber || t("غير مسجل")}
         />
 
         <InfoCard
           icon={Building2}
-          label="عدد الشركات"
-          value={`${user.companies?.length || 0} شركة`}
+          label={t("عدد الشركات")}
+          value={t("{0} شركة", { 0: user.companies?.length || 0 })}
         />
       </div>
 
@@ -157,7 +158,7 @@ export default function ProfilePage() {
           <Building2 size={17} className="text-primary-500" />
 
           <h3 className="text-sm font-bold text-ink-800 dark:text-white">
-            الشركات المرتبطة
+            {t("الشركات المرتبطة")}
           </h3>
         </div>
 
@@ -179,7 +180,7 @@ export default function ProfilePage() {
             ))
           ) : (
             <div className="col-span-full rounded-xl bg-ink-50 p-4 text-center text-xs text-ink-400 dark:bg-white/[0.03] dark:text-ink-500">
-              لا توجد شركات مرتبطة
+              {t("لا توجد شركات مرتبطة")}
             </div>
           )}
         </div>
@@ -276,7 +277,7 @@ function InfoCard({ icon: Icon, label, value }) {
         <p className="text-[10px] text-ink-400 dark:text-ink-500">{label}</p>
 
         <p className="mt-0.5 truncate text-xs font-semibold text-ink-700 dark:text-ink-200">
-          {value || "غير متوفر"}
+          {value || t("غير متوفر")}
         </p>
       </div>
     </div>

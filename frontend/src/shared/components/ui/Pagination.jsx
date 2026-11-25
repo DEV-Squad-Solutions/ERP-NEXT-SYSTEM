@@ -6,6 +6,8 @@ import {
   ChevronsLeft,
 } from "lucide-react";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const pageSizeOptions = [25, 50, 75, 100];
 
 /**
@@ -25,7 +27,7 @@ export default function Pagination({
   totalCount,
   onPageChange,
   onPageSizeChange,
-  label = "عنصر",
+  label = t("عنصر"),
 }) {
   const safePageSize = Math.max(1, Number(pageSize) || 25);
   const safeTotalCount = Math.max(0, Number(totalCount) || 0);
@@ -93,8 +95,8 @@ export default function Pagination({
 
   return (
     <nav
-      aria-label="التنقل بين الصفحات"
-      dir="rtl"
+      aria-label={t("التنقل بين الصفحات")}
+      dir={getDir()}
       className="
         mt-4
         rounded-2xl
@@ -134,17 +136,17 @@ export default function Pagination({
           "
         >
           <span className="whitespace-nowrap">
-            عرض{" "}
+            {t("عرض")}{" "}
             <strong className="font-semibold text-ink-800">
-              {from.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+              {from.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
             </strong>{" "}
             -{" "}
             <strong className="font-semibold text-ink-800">
-              {to.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+              {to.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
             </strong>{" "}
-            من أصل{" "}
+            {t("من أصل")}{" "}
             <strong className="font-semibold text-ink-800">
-              {safeTotalCount.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+              {safeTotalCount.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
             </strong>{" "}
             {label}
           </span>
@@ -161,13 +163,13 @@ export default function Pagination({
               text-ink-500
             "
           >
-            <span>عرض</span>
+            <span>{t("عرض")}</span>
 
             <span className="relative">
               <select
                 value={safePageSize}
                 onChange={handlePageSizeChange}
-                aria-label="عدد العناصر في الصفحة"
+                aria-label={t("عدد العناصر في الصفحة")}
                 className="
                   h-9
                   cursor-pointer
@@ -222,7 +224,7 @@ export default function Pagination({
               />
             </span>
 
-            <span>لكل صفحة</span>
+            <span>{t("لكل صفحة")}</span>
           </label>
         </div>
 
@@ -237,7 +239,7 @@ export default function Pagination({
         >
           {/* First page */}
           <PaginationButton
-            label="الصفحة الأولى"
+            label={t("الصفحة الأولى")}
             disabled={isFirstPage}
             onClick={() => goToPage(1)}
           >
@@ -246,7 +248,7 @@ export default function Pagination({
 
           {/* Previous */}
           <PaginationButton
-            label="الصفحة السابقة"
+            label={t("الصفحة السابقة")}
             disabled={isFirstPage}
             onClick={() => goToPage(currentPage - 1)}
           >
@@ -284,7 +286,7 @@ export default function Pagination({
                   key={item}
                   type="button"
                   onClick={() => goToPage(item)}
-                  aria-label={`الانتقال إلى الصفحة ${item}`}
+                  aria-label={t("الانتقال إلى الصفحة {0}", { 0: item })}
                   aria-current={active ? "page" : undefined}
                   className={`
                     flex
@@ -322,7 +324,7 @@ export default function Pagination({
                     }
                   `}
                 >
-                  {item.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                  {item.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
                 </button>
               );
             })}
@@ -330,7 +332,7 @@ export default function Pagination({
 
           {/* Next */}
           <PaginationButton
-            label="الصفحة التالية"
+            label={t("الصفحة التالية")}
             disabled={isLastPage}
             onClick={() => goToPage(currentPage + 1)}
           >
@@ -339,7 +341,7 @@ export default function Pagination({
 
           {/* Last page */}
           <PaginationButton
-            label="الصفحة الأخيرة"
+            label={t("الصفحة الأخيرة")}
             disabled={isLastPage}
             onClick={() => goToPage(totalPages)}
           >
@@ -364,13 +366,13 @@ export default function Pagination({
             sm:hidden
           "
         >
-          صفحة{" "}
+          {t("صفحة")}{" "}
           <strong className="mx-1 font-bold text-ink-700">
-            {currentPage.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+            {currentPage.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
           </strong>{" "}
-          من{" "}
+          {t("من")}{" "}
           <strong className="mx-1 font-bold text-ink-700">
-            {totalPages.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+            {totalPages.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
           </strong>
         </div>
       )}

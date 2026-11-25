@@ -3,21 +3,23 @@ import { useState } from "react";
 import CompaniesTab from "../components/CompaniesTab";
 import UsersTab from "../components/UsersTab";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const TABS = [
-  { key: "companies", label: "الشركات" },
-  { key: "users", label: "المستخدمون والصلاحيات" },
+  { key: "companies", label: t("الشركات") },
+  { key: "users", label: t("المستخدمون والصلاحيات") },
 ];
 
 export default function PermissionsPage() {
   const [activeTab, setActiveTab] = useState("companies");
 
   return (
-    <div dir="rtl" className="p-6 max-w-6xl mx-auto">
+    <div dir={getDir()} className="p-6 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold text-emerald-900 mb-1">
-        الشركات والمستخدمون
+        {t("الشركات والمستخدمون")}
       </h1>
       <p className="text-ink-500 mb-6">
-        إدارة الشركات المسجلة والمستخدمين وصلاحياتهم من مكان واحد
+        {t("إدارة الشركات المسجلة والمستخدمين وصلاحياتهم من مكان واحد")}
       </p>
 
       <div className="flex border-b border-emerald-800/20 mb-6">

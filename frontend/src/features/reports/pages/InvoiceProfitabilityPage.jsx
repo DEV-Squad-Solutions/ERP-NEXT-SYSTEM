@@ -36,6 +36,8 @@ import { useGetItemsCategoriesSelectQuery } from "../../itemsCategories/itemsCat
 import { toast } from "sonner";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const today = new Date().toISOString().slice(0, 10);
 
 const initialFilters = {
@@ -48,7 +50,7 @@ const initialFilters = {
   search: "",
 };
 
-const numberFormatter = new Intl.NumberFormat("ar-EG", {
+const numberFormatter = new Intl.NumberFormat(getLocale(), {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
@@ -160,7 +162,7 @@ function CostStatusBadge({ status }) {
   if (normalized === "final") {
     return (
       <span className="inline-flex whitespace-nowrap rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
-        مكتملة التكلفة
+        {t("مكتملة التكلفة")}
       </span>
     );
   }
@@ -169,7 +171,7 @@ function CostStatusBadge({ status }) {
     return (
       <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">
         <AlertCircle size={12} />
-        تكلفة معلقة
+        {t("تكلفة معلقة")}
       </span>
     );
   }
@@ -178,7 +180,7 @@ function CostStatusBadge({ status }) {
     return (
       <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-medium text-orange-700">
         <AlertCircle size={12} />
-        تكلفة جزئية
+        {t("تكلفة جزئية")}
       </span>
     );
   }
@@ -200,7 +202,7 @@ function InvoiceProfitabilityPrint({ data, filters }) {
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       className="hidden bg-white p-8 text-black print:block"
       style={{
         fontFamily: "Arial, sans-serif",
@@ -209,30 +211,30 @@ function InvoiceProfitabilityPrint({ data, filters }) {
       <div className="mb-6 border-b-2 border-black pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">تقرير ربحية الفواتير</h1>
+            <h1 className="text-2xl font-bold">{t("تقرير ربحية الفواتير")}</h1>
 
             <p className="mt-1 text-sm text-gray-600">
-              تحليل ربحية فواتير البيع بعد خصم المرتجعات
+              {t("تحليل ربحية فواتير البيع بعد خصم المرتجعات")}
             </p>
           </div>
 
           <div className="text-left text-sm">
             <p>
-              من:{" "}
+              {t("من:")}{" "}
               <strong>
                 {filters.fromDate ? formatDate(filters.fromDate) : "—"}
               </strong>
             </p>
 
             <p>
-              إلى:{" "}
+              {t("إلى:")}{" "}
               <strong>
                 {filters.toDate ? formatDate(filters.toDate) : "—"}
               </strong>
             </p>
 
             <p className="mt-1">
-              تاريخ الطباعة: <strong>{formatDate(new Date())}</strong>
+              {t("تاريخ الطباعة:")} <strong>{formatDate(new Date())}</strong>
             </p>
           </div>
         </div>
@@ -242,35 +244,35 @@ function InvoiceProfitabilityPrint({ data, filters }) {
 
       <div className="mb-6 grid grid-cols-5 gap-3">
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">صافي المبيعات</div>
+          <div className="text-xs text-gray-500">{t("صافي المبيعات")}</div>
           <div className="mt-1 font-bold">
             {formatNumber(summary.netRevenue)}
           </div>
         </div>
 
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">التكلفة</div>
+          <div className="text-xs text-gray-500">{t("التكلفة")}</div>
           <div className="mt-1 font-bold">
             {formatNumber(summary.recognizedCost)}
           </div>
         </div>
 
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">مجمل الربح</div>
+          <div className="text-xs text-gray-500">{t("مجمل الربح")}</div>
           <div className="mt-1 font-bold">
             {formatNumber(summary.grossProfit)}
           </div>
         </div>
 
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">هامش الربح</div>
+          <div className="text-xs text-gray-500">{t("هامش الربح")}</div>
           <div className="mt-1 font-bold">
             {formatPercentage(summary.grossMarginPercentage)}
           </div>
         </div>
 
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">عدد الفواتير</div>
+          <div className="text-xs text-gray-500">{t("عدد الفواتير")}</div>
           <div className="mt-1 font-bold">
             {formatNumber(summary.invoiceCount)}
           </div>
@@ -282,17 +284,17 @@ function InvoiceProfitabilityPrint({ data, filters }) {
       <table className="w-full border-collapse text-xs">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border p-2">الفاتورة</th>
-            <th className="border p-2">التاريخ</th>
-            <th className="border p-2">العميل</th>
-            <th className="border p-2">المخزن</th>
-            <th className="border p-2">الإيراد</th>
-            <th className="border p-2">الخصم</th>
-            <th className="border p-2">صافي الإيراد</th>
-            <th className="border p-2">التكلفة</th>
-            <th className="border p-2">الربح</th>
-            <th className="border p-2">الهامش</th>
-            <th className="border p-2">الحالة</th>
+            <th className="border p-2">{t("الفاتورة")}</th>
+            <th className="border p-2">{t("التاريخ")}</th>
+            <th className="border p-2">{t("العميل")}</th>
+            <th className="border p-2">{t("المخزن")}</th>
+            <th className="border p-2">{t("الإيراد")}</th>
+            <th className="border p-2">{t("الخصم")}</th>
+            <th className="border p-2">{t("صافي الإيراد")}</th>
+            <th className="border p-2">{t("التكلفة")}</th>
+            <th className="border p-2">{t("الربح")}</th>
+            <th className="border p-2">{t("الهامش")}</th>
+            <th className="border p-2">{t("الحالة")}</th>
           </tr>
         </thead>
 
@@ -336,7 +338,7 @@ function InvoiceProfitabilityPrint({ data, filters }) {
                 <td className="border p-2 font-semibold">
                   {profitAvailable
                     ? formatNumber(invoice.grossProfit)
-                    : "غير مكتمل"}
+                    : t("غير مكتمل")}
                 </td>
 
                 <td className="border p-2">
@@ -354,7 +356,7 @@ function InvoiceProfitabilityPrint({ data, filters }) {
 
       {summary.pendingInvoiceCount > 0 && (
         <div className="mt-5 rounded border border-amber-400 p-3 text-sm">
-          توجد {summary.pendingInvoiceCount} فاتورة بتكلفة معلقة.
+          {t("توجد")} {summary.pendingInvoiceCount} {t("فاتورة بتكلفة معلقة.")}
         </div>
       )}
     </div>
@@ -412,7 +414,7 @@ export default function InvoiceProfitabilityPage() {
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `تقرير-ربحية-الفواتير-${filters.fromDate}-${filters.toDate}`,
+    documentTitle: t("تقرير-ربحية-الفواتير-{0}-{1}", { 0: filters.fromDate, 1: filters.toDate }),
   });
 
   /* ------------------------------------------------------------------------ */
@@ -421,7 +423,7 @@ export default function InvoiceProfitabilityPage() {
 
   const partyOptions = useMemo(
     () => [
-      { value: "", label: "كل العملاء" },
+      { value: "", label: t("كل العملاء") },
       ...(parties?.items ?? parties ?? []).map((item) => ({
         value: String(item.id),
         label: item.name,
@@ -432,7 +434,7 @@ export default function InvoiceProfitabilityPage() {
 
   const storeOptions = useMemo(
     () => [
-      { value: "", label: "كل المخازن" },
+      { value: "", label: t("كل المخازن") },
       ...(stores?.items ?? stores ?? []).map((item) => ({
         value: String(item.id),
         label: item.name,
@@ -443,7 +445,7 @@ export default function InvoiceProfitabilityPage() {
 
   const itemOptions = useMemo(
     () => [
-      { value: "", label: "كل الأصناف" },
+      { value: "", label: t("كل الأصناف") },
       ...(items?.items ?? items ?? []).map((item) => ({
         value: String(item.id),
         label: item.name || item.itemName,
@@ -454,7 +456,7 @@ export default function InvoiceProfitabilityPage() {
 
   const categoryOptions = useMemo(
     () => [
-      { value: "", label: "كل التصنيفات" },
+      { value: "", label: t("كل التصنيفات") },
       ...(categories?.items ?? categories ?? []).map((item) => ({
         value: String(item.id),
         label: item.name,
@@ -480,7 +482,7 @@ export default function InvoiceProfitabilityPage() {
       filters.toDate &&
       filters.fromDate > filters.toDate
     ) {
-      toast.error("تاريخ البداية يجب أن يكون قبل تاريخ النهاية");
+      toast.error(t("تاريخ البداية يجب أن يكون قبل تاريخ النهاية"));
       return;
     }
 
@@ -509,7 +511,7 @@ export default function InvoiceProfitabilityPage() {
 
   return (
     <>
-      <div dir="rtl" className="min-h-full space-y-5 bg-slate-50/50 p-4 md:p-6">
+      <div dir={getDir()} className="min-h-full space-y-5 bg-slate-50/50 p-4 md:p-6">
         {/* ------------------------------------------------------------------ */}
         {/* Header                                                             */}
         {/* ------------------------------------------------------------------ */}
@@ -528,11 +530,11 @@ export default function InvoiceProfitabilityPage() {
 
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-slate-900 md:text-2xl">
-                  ربحية الفواتير
+                  {t("ربحية الفواتير")}
                 </h1>
 
                 <p className="mt-1 text-xs text-slate-500 md:text-sm">
-                  تحليل ربحية فواتير البيع بعد خصم المرتجعات
+                  {t("تحليل ربحية فواتير البيع بعد خصم المرتجعات")}
                 </p>
               </div>
             </div>
@@ -550,7 +552,7 @@ export default function InvoiceProfitabilityPage() {
                 size={16}
                 className={isFetching ? "animate-spin" : ""}
               />
-              تحديث
+              {t("تحديث")}
             </Button>
 
             <Button
@@ -561,7 +563,7 @@ export default function InvoiceProfitabilityPage() {
               className="gap-2"
             >
               <Printer size={16} />
-              طباعة
+              {t("طباعة")}
             </Button>
           </div>
         </motion.div>
@@ -589,18 +591,18 @@ export default function InvoiceProfitabilityPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-semibold text-slate-800">
-                    فلاتر التقرير
+                    {t("فلاتر التقرير")}
                   </h2>
 
                   {hasActiveFilters && (
                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
-                      فلاتر مفعلة
+                      {t("فلاتر مفعلة")}
                     </span>
                   )}
                 </div>
 
                 <p className="mt-0.5 text-[11px] text-slate-400">
-                  حدد الفترة والعميل والمخزن والصنف
+                  {t("حدد الفترة والعميل والمخزن والصنف")}
                 </p>
               </div>
             </div>
@@ -638,7 +640,7 @@ export default function InvoiceProfitabilityPage() {
                 <div className="border-t border-slate-100 px-4 pb-4 pt-4 md:px-5">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                     <Input
-                      label="من تاريخ"
+                      label={t("من تاريخ")}
                       type="date"
                       value={filters.fromDate}
                       onChange={(event) =>
@@ -647,7 +649,7 @@ export default function InvoiceProfitabilityPage() {
                     />
 
                     <Input
-                      label="إلى تاريخ"
+                      label={t("إلى تاريخ")}
                       type="date"
                       value={filters.toDate}
                       onChange={(event) =>
@@ -656,7 +658,7 @@ export default function InvoiceProfitabilityPage() {
                     />
 
                     <CompactSelect
-                      label="العميل"
+                      label={t("العميل")}
                       options={partyOptions}
                       value={filters.businessPartnerId}
                       onChange={(value) =>
@@ -666,7 +668,7 @@ export default function InvoiceProfitabilityPage() {
                     />
 
                     <CompactSelect
-                      label="المخزن"
+                      label={t("المخزن")}
                       options={storeOptions}
                       value={filters.storeId}
                       onChange={(value) => updateFilter("storeId", value)}
@@ -674,7 +676,7 @@ export default function InvoiceProfitabilityPage() {
                     />
 
                     <CompactSelect
-                      label="الصنف"
+                      label={t("الصنف")}
                       options={itemOptions}
                       value={filters.itemId}
                       onChange={(value) => updateFilter("itemId", value)}
@@ -682,7 +684,7 @@ export default function InvoiceProfitabilityPage() {
                     />
 
                     <CompactSelect
-                      label="التصنيف"
+                      label={t("التصنيف")}
                       options={categoryOptions}
                       value={filters.itemsCategoryId}
                       onChange={(value) =>
@@ -696,7 +698,7 @@ export default function InvoiceProfitabilityPage() {
 
                   <div className="mt-3">
                     <Input
-                      placeholder="رقم الفاتورة أو اسم العميل..."
+                      placeholder={t("رقم الفاتورة أو اسم العميل...")}
                       value={filters.search}
                       onChange={(event) =>
                         updateFilter("search", event.target.value)
@@ -718,7 +720,7 @@ export default function InvoiceProfitabilityPage() {
                       className="gap-2"
                     >
                       <Search size={15} />
-                      تطبيق
+                      {t("تطبيق")}
                     </Button>
 
                     <Button
@@ -728,7 +730,7 @@ export default function InvoiceProfitabilityPage() {
                       className="gap-2"
                     >
                       <X size={15} />
-                      إعادة ضبط
+                      {t("إعادة ضبط")}
                     </Button>
 
                     <div className="mr-auto flex items-center gap-1.5 text-xs text-slate-400">
@@ -754,21 +756,21 @@ export default function InvoiceProfitabilityPage() {
           className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6"
         >
           <SummaryCard
-            title="صافي المبيعات"
+            title={t("صافي المبيعات")}
             value={formatNumber(summary.netRevenue)}
             icon={Receipt}
             description={data?.baseCurrency || "EGP"}
           />
 
           <SummaryCard
-            title="التكلفة"
+            title={t("التكلفة")}
             value={formatNumber(summary.recognizedCost)}
             icon={Wallet}
             description={data?.baseCurrency || "EGP"}
           />
 
           <SummaryCard
-            title="مجمل الربح"
+            title={t("مجمل الربح")}
             value={formatNumber(summary.grossProfit)}
             icon={TrendingUp}
             description={data?.baseCurrency || "EGP"}
@@ -776,24 +778,24 @@ export default function InvoiceProfitabilityPage() {
           />
 
           <SummaryCard
-            title="هامش الربح"
+            title={t("هامش الربح")}
             value={formatPercentage(summary.grossMarginPercentage)}
             icon={Percent}
           />
 
           <SummaryCard
-            title="عدد الفواتير"
+            title={t("عدد الفواتير")}
             value={formatNumber(summary.invoiceCount)}
             icon={Receipt}
           />
 
           <SummaryCard
-            title="عدد الأصناف"
+            title={t("عدد الأصناف")}
             value={formatNumber(summary.itemCount)}
             icon={Package}
             description={
               summary.pendingInvoiceCount
-                ? `${summary.pendingInvoiceCount} فاتورة بتكلفة معلقة`
+                ? t("{0} فاتورة بتكلفة معلقة", { 0: summary.pendingInvoiceCount })
                 : undefined
             }
             danger={summary.pendingInvoiceCount > 0}
@@ -830,17 +832,16 @@ export default function InvoiceProfitabilityPage() {
 
               <div>
                 <p className="text-sm font-semibold">
-                  توجد فواتير لم تكتمل تكلفتها
+                  {t("توجد فواتير لم تكتمل تكلفتها")}
                 </p>
 
                 <p className="mt-1 text-xs">
-                  عدد الفواتير ذات التكلفة المعلقة:{" "}
+                  {t("عدد الفواتير ذات التكلفة المعلقة:")}{" "}
                   <strong>{summary.pendingInvoiceCount}</strong>
                 </p>
 
                 <p className="mt-1 text-[11px] text-amber-700">
-                  الربح المعروض لهذه الفواتير لا يعتبر ربحًا نهائيًا حتى تكتمل
-                  التكلفة.
+                  {t("الربح المعروض لهذه الفواتير لا يعتبر ربحًا نهائيًا حتى تكتمل التكلفة.")}
                 </p>
               </div>
             </motion.div>
@@ -869,11 +870,11 @@ export default function InvoiceProfitabilityPage() {
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3.5 md:px-5">
             <div>
               <h2 className="text-sm font-semibold text-slate-800">
-                فواتير البيع
+                {t("فواتير البيع")}
               </h2>
 
               <p className="mt-1 text-[11px] text-slate-400">
-                إجمالي النتائج: {data?.totalCount ?? 0}
+                {t("إجمالي النتائج:")} {data?.totalCount ?? 0}
               </p>
             </div>
 
@@ -892,18 +893,18 @@ export default function InvoiceProfitabilityPage() {
             <table className="min-w-[1200px] w-full text-xs">
               <thead className="bg-slate-50/80">
                 <tr className="border-b border-slate-200 text-right text-slate-600">
-                  <th className="px-4 py-3 font-semibold">الفاتورة</th>
-                  <th className="px-4 py-3 font-semibold">التاريخ</th>
-                  <th className="px-4 py-3 font-semibold">العميل</th>
-                  <th className="px-4 py-3 font-semibold">المخزن</th>
-                  <th className="px-4 py-3 font-semibold">الإيراد</th>
-                  <th className="px-4 py-3 font-semibold">الخصم</th>
-                  <th className="px-4 py-3 font-semibold">صافي الإيراد</th>
-                  <th className="px-4 py-3 font-semibold">التكلفة</th>
-                  <th className="px-4 py-3 font-semibold">الربح</th>
-                  <th className="px-4 py-3 font-semibold">الهامش</th>
-                  <th className="px-4 py-3 font-semibold">حالة التكلفة</th>
-                  <th className="px-4 py-3 text-center font-semibold">إجراء</th>
+                  <th className="px-4 py-3 font-semibold">{t("الفاتورة")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("التاريخ")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("العميل")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("المخزن")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("الإيراد")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("الخصم")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("صافي الإيراد")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("التكلفة")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("الربح")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("الهامش")}</th>
+                  <th className="px-4 py-3 font-semibold">{t("حالة التكلفة")}</th>
+                  <th className="px-4 py-3 text-center font-semibold">{t("إجراء")}</th>
                 </tr>
               </thead>
 
@@ -924,7 +925,7 @@ export default function InvoiceProfitabilityPage() {
                       colSpan={12}
                       className="px-4 py-12 text-center text-sm text-red-500"
                     >
-                      حدث خطأ أثناء تحميل التقرير
+                      {t("حدث خطأ أثناء تحميل التقرير")}
                     </td>
                   </tr>
                 ) : invoices.length === 0 ? (
@@ -933,7 +934,7 @@ export default function InvoiceProfitabilityPage() {
                       colSpan={12}
                       className="px-4 py-12 text-center text-sm text-slate-500"
                     >
-                      لا توجد بيانات مطابقة للفلاتر
+                      {t("لا توجد بيانات مطابقة للفلاتر")}
                     </td>
                   </tr>
                 ) : (
@@ -1004,7 +1005,7 @@ export default function InvoiceProfitabilityPage() {
                         >
                           {profitAvailable
                             ? formatNumber(invoice.grossProfit)
-                            : "غير مكتمل"}
+                            : t("غير مكتمل")}
                         </td>
 
                         <td className="px-4 py-3">
@@ -1021,7 +1022,7 @@ export default function InvoiceProfitabilityPage() {
                           <Link
                             to={`/dashboard/reports/profitability/invoices/${invoice.invoiceId}`}
                             className="inline-flex rounded-xl p-2 text-slate-400 transition hover:bg-primary/10 hover:text-primary"
-                            title="عرض التفاصيل"
+                            title={t("عرض التفاصيل")}
                           >
                             <Eye size={17} />
                           </Link>

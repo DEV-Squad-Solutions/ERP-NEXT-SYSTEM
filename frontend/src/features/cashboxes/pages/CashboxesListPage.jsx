@@ -20,6 +20,8 @@ import Pagination from "../../../shared/components/ui/Pagination";
 import Button from "../../../shared/components/ui/Button";
 import DeleteConfirmModal from "../../../shared/components/ui/DeleteConfirmModal";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function CashboxesListPage() {
   const navigate = useNavigate();
 
@@ -91,7 +93,7 @@ export default function CashboxesListPage() {
 
     try {
       await deleteCashbox(cashboxToDelete.id).unwrap();
-      toast.success("تم حذف الخزنة بنجاح");
+      toast.success(t("تم حذف الخزنة بنجاح"));
       setCashboxToDelete(null);
     } catch (err) {
       const code = err?.data?.code ?? err?.data?.errorCode;
@@ -99,7 +101,7 @@ export default function CashboxesListPage() {
       if (code === "Cashboxes.HasVouchers") {
         toast.error(
           err?.data?.detail ||
-            "لا يمكن حذف الخزنة لوجود سندات غير محذوفة عليها (حتى المسودات) في سنة مالية. احذف السندات أو رحّلها أولًا.",
+            t("لا يمكن حذف الخزنة لوجود سندات غير محذوفة عليها (حتى المسودات) في سنة مالية. احذف السندات أو رحّلها أولًا."),
         );
         return;
       }
@@ -107,13 +109,13 @@ export default function CashboxesListPage() {
       if (code === "Cashboxes.HasMovements") {
         toast.error(
           err?.data?.detail ||
-            "لا يمكن حذف الخزنة لوجود تحويل نشط أو قيد يومية خزنة قائم. أنهِ الحركات المرتبطة أولًا.",
+            t("لا يمكن حذف الخزنة لوجود تحويل نشط أو قيد يومية خزنة قائم. أنهِ الحركات المرتبطة أولًا."),
         );
         return;
       }
 
       if (code === "Cashboxes.Concurrency") {
-        toast.error("تم تعديل الخزنة من مكان آخر، حدّث الصفحة وحاول تاني");
+        toast.error(t("تم تعديل الخزنة من مكان آخر، حدّث الصفحة وحاول تاني"));
         return;
       }
 
@@ -121,7 +123,7 @@ export default function CashboxesListPage() {
         err?.data?.message ||
           err?.data?.title ||
           err?.data?.detail ||
-          "حصل خطأ أثناء حذف الخزنة، حاول تاني",
+          t("حصل خطأ أثناء حذف الخزنة، حاول تاني"),
       );
     }
   };
@@ -151,13 +153,13 @@ export default function CashboxesListPage() {
   );
 
   return (
-    <div dir="rtl" className="animate-fadeUp space-y-4 p-6">
+    <div dir={getDir()} className="animate-fadeUp space-y-4 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/20 bg-white p-5 shadow-sm">
         <div>
-          <h1 className="text-xl font-bold text-ink">الخزائن</h1>
+          <h1 className="text-xl font-bold text-ink">{t("الخزائن")}</h1>
 
           <p className="mt-1 text-sm text-ink/60">
-            إدارة الخزائن النقدية والحسابات البنكية
+            {t("إدارة الخزائن النقدية والحسابات البنكية")}
           </p>
         </div>
 
@@ -173,7 +175,7 @@ export default function CashboxesListPage() {
               }`}
             >
               <SlidersHorizontal className="h-4 w-4" />
-              فلاتر
+              {t("فلاتر")}
               {hasActiveFilters && (
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
               )}
@@ -189,7 +191,7 @@ export default function CashboxesListPage() {
                 <div className="absolute left-0 z-20 mt-2 w-80 animate-fadeUp space-y-3 rounded-2xl border border-gold/20 bg-white p-4 shadow-lg">
                   <div>
                     <label className="mb-1.5 block text-xs text-ink/50">
-                      بحث
+                      {t("بحث")}
                     </label>
 
                     <div className="relative">
@@ -198,7 +200,7 @@ export default function CashboxesListPage() {
                       <input
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
-                        placeholder="ابحث بالكود أو الاسم..."
+                        placeholder={t("ابحث بالكود أو الاسم...")}
                         className="w-full rounded-xl border border-gold/30 bg-white py-2 pe-9 ps-3 text-sm outline-none transition-colors focus:border-emerald-600"
                       />
                     </div>
@@ -206,7 +208,7 @@ export default function CashboxesListPage() {
 
                   <div>
                     <label className="mb-1.5 block text-xs text-ink/50">
-                      الكود
+                      {t("الكود")}
                     </label>
 
                     <input
@@ -215,14 +217,14 @@ export default function CashboxesListPage() {
                         setCode(e.target.value);
                         setPageNumber(1);
                       }}
-                      placeholder="كود الخزنة..."
+                      placeholder={t("كود الخزنة...")}
                       className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
                     />
                   </div>
 
                   <div>
                     <label className="mb-1.5 block text-xs text-ink/50">
-                      اسم الخزنة
+                      {t("اسم الخزنة")}
                     </label>
 
                     <input
@@ -231,14 +233,14 @@ export default function CashboxesListPage() {
                         setName(e.target.value);
                         setPageNumber(1);
                       }}
-                      placeholder="اسم الخزنة..."
+                      placeholder={t("اسم الخزنة...")}
                       className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
                     />
                   </div>
 
                   <div>
                     <label className="mb-1.5 block text-xs text-ink/50">
-                      العملة
+                      {t("العملة")}
                     </label>
 
                     <select
@@ -249,7 +251,7 @@ export default function CashboxesListPage() {
                       }}
                       className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
                     >
-                      <option value="">كل العملات</option>
+                      <option value="">{t("كل العملات")}</option>
                       <option value="EGP">EGP</option>
                       <option value="USD">USD</option>
                       <option value="EUR">EUR</option>
@@ -262,7 +264,7 @@ export default function CashboxesListPage() {
 
                   <div>
                     <label className="mb-1.5 block text-xs text-ink/50">
-                      الحالة
+                      {t("الحالة")}
                     </label>
 
                     <select
@@ -273,9 +275,9 @@ export default function CashboxesListPage() {
                       }}
                       className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
                     >
-                      <option value="">كل الحالات</option>
-                      <option value="true">نشطة فقط</option>
-                      <option value="false">غير نشطة فقط</option>
+                      <option value="">{t("كل الحالات")}</option>
+                      <option value="true">{t("نشطة فقط")}</option>
+                      <option value="false">{t("غير نشطة فقط")}</option>
                     </select>
                   </div>
 
@@ -286,7 +288,7 @@ export default function CashboxesListPage() {
                       className="flex items-center gap-1.5 pt-1 text-xs text-ink/50 transition-colors hover:text-emerald-700"
                     >
                       <RotateCcw className="h-3 w-3" />
-                      إعادة تعيين الفلاتر
+                      {t("إعادة تعيين الفلاتر")}
                     </button>
                   )}
                 </div>
@@ -300,14 +302,14 @@ export default function CashboxesListPage() {
               onClick={() => setShowTransferModal(true)}
             >
               <ArrowLeftRight size={16} />
-              تحويل بين الخزائن
+              {t("تحويل بين الخزائن")}
             </Button>
           )}
 
           {canManageCashboxes && (
             <Button onClick={openCreate}>
               <Plus size={16} />
-              خزنة جديدة
+              {t("خزنة جديدة")}
             </Button>
           )}
         </div>
@@ -326,10 +328,10 @@ export default function CashboxesListPage() {
 
       {isError && !isLoading && (
         <div className="rounded-2xl border border-dashed border-red-200 bg-white py-20 text-center">
-          <p className="mb-3 text-red-500">حدث خطأ أثناء تحميل الخزائن</p>
+          <p className="mb-3 text-red-500">{t("حدث خطأ أثناء تحميل الخزائن")}</p>
 
           <Button variant="outline" onClick={refetch}>
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </Button>
         </div>
       )}
@@ -337,7 +339,7 @@ export default function CashboxesListPage() {
       {!isLoading && !isError && items.length === 0 && (
         <div className="rounded-2xl border border-dashed border-ink-400/20 bg-white py-20 text-center">
           <p className="mb-3 text-ink-400">
-            {hasActiveFilters ? "مفيش خزائن مطابقة للفلاتر" : "مفيش خزائن لسه"}
+            {hasActiveFilters ? t("مفيش خزائن مطابقة للفلاتر") : t("مفيش خزائن لسه")}
           </p>
 
           {hasActiveFilters ? (
@@ -347,7 +349,7 @@ export default function CashboxesListPage() {
               className="inline-flex items-center gap-1.5 rounded-xl border border-gold/30 px-4 py-2 text-sm text-ink transition-colors hover:bg-ink/5"
             >
               <RotateCcw className="h-4 w-4" />
-              إعادة تعيين الفلاتر
+              {t("إعادة تعيين الفلاتر")}
             </button>
           ) : canManageCashboxes ? (
             <button
@@ -356,7 +358,7 @@ export default function CashboxesListPage() {
               className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-800"
             >
               <Plus className="h-4 w-4" />
-              إضافة خزنة جديدة
+              {t("إضافة خزنة جديدة")}
             </button>
           ) : null}
         </div>
@@ -392,7 +394,7 @@ export default function CashboxesListPage() {
             setPageSize(size);
             setPageNumber(1);
           }}
-          label="خزنة"
+          label={t("خزنة")}
         />
       )}
 
@@ -412,8 +414,8 @@ export default function CashboxesListPage() {
         onClose={() => setCashboxToDelete(null)}
         onConfirm={confirmDelete}
         itemName={cashboxToDelete?.name}
-        title="حذف الخزنة"
-        description="الحذف بيشيل الخزنة من القوائم والاختيارات، لكن السجلات التاريخية بتفضل محفوظة. لازم تكون كل السندات والحركات المرتبطة اتحذفت الأول — لو لسه فيه سندات أو حركات، السيرفر هيرفض الحذف ويوضح السبب."
+        title={t("حذف الخزنة")}
+        description={t("الحذف بيشيل الخزنة من القوائم والاختيارات، لكن السجلات التاريخية بتفضل محفوظة. لازم تكون كل السندات والحركات المرتبطة اتحذفت الأول — لو لسه فيه سندات أو حركات، السيرفر هيرفض الحذف ويوضح السبب.")}
         isDeleting={isDeleting}
       />
 

@@ -38,15 +38,17 @@ import Button from "../../../shared/components/ui/Button";
 import Pagination from "../../../shared/components/ui/Pagination";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const directionOptions = [
-  { value: "Receipt", label: "وارد" },
-  { value: "Payment", label: "صادر" },
+  { value: "Receipt", label: t("وارد") },
+  { value: "Payment", label: t("صادر") },
 ];
 
 const hasCostOptions = [
-  { value: "", label: "الكل" },
-  { value: "true", label: "بها تكلفة" },
-  { value: "false", label: "بدون تكلفة" },
+  { value: "", label: t("الكل") },
+  { value: "true", label: t("بها تكلفة") },
+  { value: "false", label: t("بدون تكلفة") },
 ];
 
 const emptyFilters = {
@@ -61,7 +63,7 @@ const emptyFilters = {
   hasCost: "",
 };
 
-const fmt = (v) => Number(v || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+const fmt = (v) => Number(v || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 function BalanceBadge({ description }) {
   const isOwedByDriver = description?.includes("مطلوب من السائق");
@@ -244,7 +246,7 @@ export default function DriverStatementPage() {
   const selectedDriverName =
     drivers?.find((d) => d.id === driverId)?.name || "";
   const { printStatement, printRef } = useDriverStatementPrint({
-    title: `كشف حساب - ${selectedDriverName || "السائق"}`,
+    title: t("كشف حساب - {0}", { 0: selectedDriverName || "السائق" }),
   });
   return (
     <div className="animate-fadeUp space-y-3">
@@ -258,11 +260,11 @@ export default function DriverStatementPage() {
 
           <div className="min-w-0">
             <h2 className="font-display text-xl font-bold text-ink-900 leading-6">
-              كشف حساب السائقين
+              {t("كشف حساب السائقين")}
             </h2>
 
             <p className="text-[11px] text-ink-400 mt-0.5 truncate">
-              المدفوع والمستلم وتكاليف الرحلات
+              {t("المدفوع والمستلم وتكاليف الرحلات")}
             </p>
           </div>
         </div>
@@ -272,7 +274,7 @@ export default function DriverStatementPage() {
         <div className="flex items-center gap-2 flex-1 xl:max-w-[420px]">
           <div className="flex-1 min-w-0">
             <CompactSelect
-              label="السائق"
+              label={t("السائق")}
               options={
                 drivers?.map((d) => ({
                   value: d.id,
@@ -285,10 +287,10 @@ export default function DriverStatementPage() {
               isDisabled={isDriversError}
               placeholder={
                 isDriversError
-                  ? "تعذر تحميل السائقين"
+                  ? t("تعذر تحميل السائقين")
                   : isLoadingDrivers
-                    ? "جارِ التحميل..."
-                    : "اختر السائق"
+                    ? t("جارِ التحميل...")
+                    : t("اختر السائق")
               }
             />
           </div>
@@ -297,7 +299,7 @@ export default function DriverStatementPage() {
             type="button"
             onClick={() => setShowAddDriver(true)}
             className="shrink-0 w-9 h-9 rounded-lg text-primary-500 hover:bg-primary-50 transition-colors flex items-center justify-center"
-            title="إضافة سائق جديد"
+            title={t("إضافة سائق جديد")}
           >
             <UserPlus size={17} />
           </button>
@@ -313,7 +315,7 @@ export default function DriverStatementPage() {
             className="h-9 px-3"
           >
             <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
-            تحديث
+            {t("تحديث")}
           </Button>
 
           <Button
@@ -323,7 +325,7 @@ export default function DriverStatementPage() {
             className="h-9 px-3"
           >
             <Printer size={14} />
-            طباعة
+            {t("طباعة")}
           </Button>
         </div>
       </div>
@@ -335,7 +337,7 @@ export default function DriverStatementPage() {
           className="inline-flex items-center gap-1 text-[11px] text-negative hover:underline print:hidden"
         >
           <AlertCircle size={11} />
-          تعذر تحميل قائمة السائقين، أعد المحاولة
+          {t("تعذر تحميل قائمة السائقين، أعد المحاولة")}
         </button>
       )}
 
@@ -345,7 +347,7 @@ export default function DriverStatementPage() {
             <Truck size={21} className="text-ink-400/50" strokeWidth={1.6} />
           </div>
 
-          <p className="text-sm text-ink-400">اختر سائق لعرض كشف حسابه</p>
+          <p className="text-sm text-ink-400">{t("اختر سائق لعرض كشف حسابه")}</p>
         </div>
       ) : (
         <>
@@ -353,11 +355,11 @@ export default function DriverStatementPage() {
 
           <div className="hidden print:block mb-2">
             <h2 className="text-xl font-bold text-ink-900">
-              كشف حساب — {selectedDriverName}
+              {t("كشف حساب —")} {selectedDriverName}
             </h2>
 
             <p className="text-xs text-ink-400">
-              {applied.fromDate ? formatDate(applied.fromDate) : "—"} إلى {applied.toDate ? formatDate(applied.toDate) : "—"}
+              {applied.fromDate ? formatDate(applied.fromDate) : "—"} {t("إلى")} {applied.toDate ? formatDate(applied.toDate) : "—"}
             </p>
           </div>
 
@@ -373,7 +375,7 @@ export default function DriverStatementPage() {
                 <SlidersHorizontal size={14} className="text-ink-400" />
 
                 <span className="text-xs font-medium text-ink-900">
-                  الفلاتر
+                  {t("الفلاتر")}
                 </span>
 
                 {activeFiltersCount > 0 && (
@@ -400,21 +402,21 @@ export default function DriverStatementPage() {
                 <div className="px-3.5 pb-3 pt-1 border-t border-ink-400/10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2.5 mt-2.5">
                     <Input
-                      label="بحث"
+                      label={t("بحث")}
                       value={draft.search}
                       onChange={(e) => setField("search", e.target.value)}
-                      placeholder="ابحث..."
+                      placeholder={t("ابحث...")}
                     />
 
                     <Input
-                      label="من تاريخ"
+                      label={t("من تاريخ")}
                       type="date"
                       value={draft.fromDate}
                       onChange={(e) => setField("fromDate", e.target.value)}
                     />
 
                     <Input
-                      label="إلى تاريخ"
+                      label={t("إلى تاريخ")}
                       type="date"
                       value={draft.toDate}
                       onChange={(e) => setField("toDate", e.target.value)}
@@ -422,20 +424,20 @@ export default function DriverStatementPage() {
 
                     <div>
                       <label className="block text-[11px] font-medium text-ink-400 mb-1">
-                        اتجاه الحركة
+                        {t("اتجاه الحركة")}
                       </label>
 
                       <CompactSelect
                         options={directionOptions}
                         value={draft.direction}
                         onChange={(val) => setField("direction", val)}
-                        placeholder="الكل"
+                        placeholder={t("الكل")}
                       />
                     </div>
 
                     <div>
                       <label className="block text-[11px] font-medium text-ink-400 mb-1">
-                        نوع الحركة
+                        {t("نوع الحركة")}
                       </label>
 
                       <CompactSelect
@@ -451,10 +453,10 @@ export default function DriverStatementPage() {
                         isDisabled={isMovementTypesError}
                         placeholder={
                           isMovementTypesError
-                            ? "تعذر التحميل"
+                            ? t("تعذر التحميل")
                             : isLoadingMovementTypes
-                              ? "جارِ التحميل..."
-                              : "الكل"
+                              ? t("جارِ التحميل...")
+                              : t("الكل")
                         }
                       />
 
@@ -465,20 +467,20 @@ export default function DriverStatementPage() {
                           className="inline-flex items-center gap-1 text-[10px] text-negative hover:underline mt-1"
                         >
                           <AlertCircle size={10} />
-                          أعد المحاولة
+                          {t("أعد المحاولة")}
                         </button>
                       )}
                     </div>
 
                     <Input
-                      label="رقم الرحلة"
+                      label={t("رقم الرحلة")}
                       type="number"
                       value={draft.driverTripId}
                       onChange={(e) => setField("driverTripId", e.target.value)}
                     />
 
                     <Input
-                      label="رقم الفاتورة"
+                      label={t("رقم الفاتورة")}
                       value={draft.invoiceNumber}
                       onChange={(e) =>
                         setField("invoiceNumber", e.target.value)
@@ -487,7 +489,7 @@ export default function DriverStatementPage() {
 
                     <div>
                       <label className="block text-[11px] font-medium text-ink-400 mb-1">
-                        تكلفة الرحلة
+                        {t("تكلفة الرحلة")}
                       </label>
 
                       <CompactSelect
@@ -508,13 +510,13 @@ export default function DriverStatementPage() {
                         }
                         className="rounded border-ink-400/30 accent-primary-500"
                       />
-                      سندات عامة بدون رحلة فقط
+                      {t("سندات عامة بدون رحلة فقط")}
                     </label>
 
                     <div className="flex gap-2">
                       <Button onClick={handleSearch} className="h-8 px-3">
                         <Search size={13} />
-                        بحث
+                        {t("بحث")}
                       </Button>
 
                       <Button
@@ -523,7 +525,7 @@ export default function DriverStatementPage() {
                         className="h-8 px-3"
                       >
                         <RotateCcw size={13} />
-                        تصفير
+                        {t("تصفير")}
                       </Button>
                     </div>
                   </div>
@@ -550,34 +552,34 @@ export default function DriverStatementPage() {
             summary && (
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 animate-fadeUp">
                 <SummaryCard
-                  label="رصيد أول المدة"
+                  label={t("رصيد أول المدة")}
                   value={fmt(summary.openingBalanceAmount)}
                   description={summary.openingBalanceDescription}
                   icon={Wallet}
                 />
 
                 <SummaryCard
-                  label="إجمالي المدفوع للسائق"
+                  label={t("إجمالي المدفوع للسائق")}
                   value={fmt(summary.totalPaidToDriver)}
                   tone="negative"
                   icon={TrendingDown}
                 />
 
                 <SummaryCard
-                  label="إجمالي المستلم منه"
+                  label={t("إجمالي المستلم منه")}
                   value={fmt(summary.totalReceivedFromDriver)}
                   tone="positive"
                   icon={TrendingUp}
                 />
 
                 <SummaryCard
-                  label="إجمالي تكلفة الرحلات"
+                  label={t("إجمالي تكلفة الرحلات")}
                   value={fmt(summary.totalTripCost)}
                   icon={Truck}
                 />
 
                 <SummaryCard
-                  label="رصيد آخر المدة"
+                  label={t("رصيد آخر المدة")}
                   value={fmt(summary.closingBalanceAmount)}
                   description={summary.closingBalanceDescription}
                   icon={Wallet}
@@ -615,8 +617,8 @@ export default function DriverStatementPage() {
             </div>
           ) : isError && error?.status === 403 ? (
             <AccessDeniedState
-              title="غير مصرح بعرض كشف السائق"
-              message="مش عندك صلاحية عرض كشف الحساب ده. تواصل مع مسؤول النظام لو محتاج الصلاحية."
+              title={t("غير مصرح بعرض كشف السائق")}
+              message={t("مش عندك صلاحية عرض كشف الحساب ده. تواصل مع مسؤول النظام لو محتاج الصلاحية.")}
               onRetry={refetch}
             />
           ) : isError ? (
@@ -628,7 +630,7 @@ export default function DriverStatementPage() {
               />
 
               <p className="text-ink-900 font-medium text-sm mb-1">
-                حدث خطأ في تحميل الكشف
+                {t("حدث خطأ في تحميل الكشف")}
               </p>
 
               <button
@@ -636,7 +638,7 @@ export default function DriverStatementPage() {
                 className="inline-flex items-center gap-2 text-xs font-medium text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 px-3.5 py-1.5 rounded-lg transition-colors mt-2"
               >
                 <RefreshCw size={12} />
-                إعادة المحاولة
+                {t("إعادة المحاولة")}
               </button>
             </div>
           ) : rows.length === 0 ? (
@@ -648,10 +650,10 @@ export default function DriverStatementPage() {
               />
 
               <p className="text-ink-900 font-medium text-sm mb-1">
-                لا توجد حركات مطابقة
+                {t("لا توجد حركات مطابقة")}
               </p>
 
-              <p className="text-xs text-ink-400">جرّب تعديل الفلاتر</p>
+              <p className="text-xs text-ink-400">{t("جرّب تعديل الفلاتر")}</p>
             </div>
           ) : (
             <>
@@ -665,57 +667,57 @@ export default function DriverStatementPage() {
                     <tr className="bg-ink-900/[0.03] text-ink-400 text-[10px] print:bg-transparent print:text-ink-600">
                       {/* الرصيد */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
-                        الرصيد
+                        {t("الرصيد")}
                       </th>
 
                       {/* المدفوع للسائق */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 text-negative whitespace-nowrap">
-                        مدفوع للسائق
+                        {t("مدفوع للسائق")}
                       </th>
 
                       {/* المستلم منه */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 text-positive whitespace-nowrap">
-                        مستلم منه
+                        {t("مستلم منه")}
                       </th>
 
                       {/* البلد */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
-                        البلد
+                        {t("البلد")}
                       </th>
 
                       {/* الخزنة */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
-                        الخزنة
+                        {t("الخزنة")}
                       </th>
 
                       {/* البيان */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 min-w-[180px]">
-                        البيان
+                        {t("البيان")}
                       </th>
 
                       {/* الرحلة */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
-                        الرحلة
+                        {t("الرحلة")}
                       </th>
 
                       {/* تكلفة الرحلة */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
-                        تكلفة الرحلة
+                        {t("تكلفة الرحلة")}
                       </th>
 
                       {/* الفاتورة */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
-                        الفاتورة
+                        {t("الفاتورة")}
                       </th>
 
                       {/* العميل */}
                       <th className="px-2 py-2 font-medium border-l border-ink-400/5 min-w-[120px]">
-                        العميل
+                        {t("العميل")}
                       </th>
 
                       {/* التاريخ */}
                       <th className="px-2 py-2 font-medium whitespace-nowrap">
-                        التاريخ
+                        {t("التاريخ")}
                       </th>
                     </tr>
                   </thead>
@@ -776,7 +778,7 @@ export default function DriverStatementPage() {
                             <Link
                               to={`/dashboard/drivers/trip-costs?driverId=${driverId}&tripNumber=${row.driverTripNumber}`}
                               className="text-primary-500 hover:text-primary-600 hover:underline transition-colors print:no-underline print:text-ink-900"
-                              title="عرض/تعديل تكلفة الرحلة"
+                              title={t("عرض/تعديل تكلفة الرحلة")}
                             >
                               {row.driverTripNumber}
                             </Link>
@@ -790,12 +792,12 @@ export default function DriverStatementPage() {
                             row.tripCost > 0 ? (
                               <div className="flex items-center gap-1.5">
                                 <span className="inline-flex items-center justify-center px-1.5 py-0.5 w-full text-center rounded-full text-[10px] font-medium text-positive bg-positive/10">
-                                  {fmt(row.tripCost)}ج.م
+                                  {fmt(row.tripCost)}{t("ج.م")}
                                 </span>
                               </div>
                             ) : (
                               <span className="inline-flex justify-center items-center  w-full px-1.5 py-0.5 rounded-full text-[10px] font-medium text-negative bg-negative/10">
-                                غير متسعّرة
+                                {t("غير متسعّرة")}
                               </span>
                             )
                           ) : (

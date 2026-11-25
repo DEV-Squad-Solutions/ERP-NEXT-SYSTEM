@@ -2,21 +2,23 @@ import { useSelector } from "react-redux";
 import { formatDateTime } from "../../../lib/date.js";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const currencySymbols = {
-  EGP: "ج.م",
+  EGP: t("ج.م"),
   USD: "$",
   EUR: "€",
   GBP: "£",
   SAR: "﷼",
-  AED: "د.إ",
-  KWD: "د.ك",
+  AED: t("د.إ"),
+  KWD: t("د.ك"),
 };
 
 const getCurrencySymbol = (currency) =>
   currencySymbols[currency] || currency || "";
 
 const fmt = (value) =>
-  Number(value ?? 0).toLocaleString("ar-EG", {
+  Number(value ?? 0).toLocaleString(getLocale(), {
     maximumFractionDigits: 2,
   });
 
@@ -43,7 +45,7 @@ export default function DashboardPrintTemplate({ data }) {
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       className="bg-white p-8 font-sans text-slate-900"
       style={{
         width: "277mm",
@@ -63,30 +65,30 @@ export default function DashboardPrintTemplate({ data }) {
           >
             {company?.name || "—"}
           </h1>
-          <h3 className="text-2xl font-bold">تقرير لوحة التحكم</h3>
-          <p className="mt-1 text-sm text-slate-500">الملخص التشغيلي والمالي</p>
+          <h3 className="text-2xl font-bold">{t("تقرير لوحة التحكم")}</h3>
+          <p className="mt-1 text-sm text-slate-500">{t("الملخص التشغيلي والمالي")}</p>
         </div>
 
         <div className="text-left text-xs text-slate-500">
           <p>
-            <span className="font-semibold text-slate-800">السنة المالية:</span>{" "}
+            <span className="font-semibold text-slate-800">{t("السنة المالية:")}</span>{" "}
             {data.fiscalYearName || "—"}
           </p>
 
           <p className="mt-1">
-            <span className="font-semibold text-slate-800">الفترة:</span>{" "}
-            {data.fromDate ? formatDate(data.fromDate) : "—"} إلى {data.toDate ? formatDate(data.toDate) : "—"}
+            <span className="font-semibold text-slate-800">{t("الفترة:")}</span>{" "}
+            {data.fromDate ? formatDate(data.fromDate) : "—"} {t("إلى")} {data.toDate ? formatDate(data.toDate) : "—"}
           </p>
 
           <p className="mt-1">
             <span className="font-semibold text-slate-800">
-              العملة الأساسية:
+              {t("العملة الأساسية:")}
             </span>{" "}
             {data.baseCurrency || "—"}
           </p>
 
           <p className="mt-1">
-            <span className="font-semibold text-slate-800">تاريخ الطباعة:</span>{" "}
+            <span className="font-semibold text-slate-800">{t("تاريخ الطباعة:")}</span>{" "}
             {printedAt}
           </p>
         </div>
@@ -94,65 +96,65 @@ export default function DashboardPrintTemplate({ data }) {
 
       {/* KPI */}
       <section className="mb-6">
-        <h2 className="mb-3 text-sm font-bold">الملخص المالي والتشغيلي</h2>
+        <h2 className="mb-3 text-sm font-bold">{t("الملخص المالي والتشغيلي")}</h2>
 
         <div className="grid grid-cols-5 gap-3">
           <PrintStat
-            label="صافي المبيعات"
+            label={t("صافي المبيعات")}
             value={fmtMoney(sales.net, data.baseCurrency)}
-            sub={`مستحق: ${fmtMoney(sales.outstanding, data.baseCurrency)}`}
+            sub={t("مستحق: {0}", { 0: fmtMoney(sales.outstanding, data.baseCurrency) })}
           />
 
           <PrintStat
-            label="صافي المشتريات"
+            label={t("صافي المشتريات")}
             value={fmtMoney(purchases.net, data.baseCurrency)}
-            sub={`مستحق: ${fmtMoney(purchases.outstanding, data.baseCurrency)}`}
+            sub={t("مستحق: {0}", { 0: fmtMoney(purchases.outstanding, data.baseCurrency) })}
           />
 
           <PrintStat
-            label="إجمالي الربح"
+            label={t("إجمالي الربح")}
             value={fmtMoney(profitability.grossProfit, data.baseCurrency)}
-            sub={`الهامش: ${Number(
+            sub={t("الهامش: {0}%", { 0: Number(
               profitability.grossMarginPercentage ?? 0,
-            ).toFixed(1)}%`}
+            ).toFixed(1) })}
           />
 
           <PrintStat
-            label="قيمة المخزون"
+            label={t("قيمة المخزون")}
             value={fmtMoney(inventory.currentInventoryValue, data.baseCurrency)}
-            sub={`${inventory.zeroStockItemCount ?? 0} بدون رصيد`}
+            sub={t("{0} بدون رصيد", { 0: inventory.zeroStockItemCount ?? 0 })}
           />
 
           <PrintStat
-            label="عدد الفواتير"
+            label={t("عدد الفواتير")}
             value={fmt(invoiceStatus.totalCount ?? counts.invoiceCount)}
-            sub={`متأخرة: ${invoiceStatus.overdueCount ?? 0}`}
+            sub={t("متأخرة: {0}", { 0: invoiceStatus.overdueCount ?? 0 })}
           />
         </div>
       </section>
 
       {/* Counts */}
       <section className="mb-6">
-        <h2 className="mb-3 text-sm font-bold">المؤشرات التشغيلية</h2>
+        <h2 className="mb-3 text-sm font-bold">{t("المؤشرات التشغيلية")}</h2>
 
         <div className="grid grid-cols-5 gap-3">
           <PrintStat
-            label="الشركاء التجاريين"
+            label={t("الشركاء التجاريين")}
             value={fmt(counts.businessPartnerCount)}
-            sub="عملاء وموردين"
+            sub={t("عملاء وموردين")}
           />
 
-          <PrintStat label="الموظفين" value={fmt(counts.employeeCount)} />
+          <PrintStat label={t("الموظفين")} value={fmt(counts.employeeCount)} />
 
-          <PrintStat label="السائقين" value={fmt(counts.driverCount)} />
+          <PrintStat label={t("السائقين")} value={fmt(counts.driverCount)} />
 
           <PrintStat
-            label="الأصناف النشطة"
+            label={t("الأصناف النشطة")}
             value={fmt(inventory.activeItemCount)}
           />
 
           <PrintStat
-            label="الأصناف ذات الرصيد"
+            label={t("الأصناف ذات الرصيد")}
             value={fmt(inventory.itemsWithStockCount)}
           />
         </div>
@@ -160,25 +162,25 @@ export default function DashboardPrintTemplate({ data }) {
 
       {/* Invoice Status */}
       <section className="mb-6 print-break-inside-avoid">
-        <h2 className="mb-3 text-sm font-bold">حالة الفواتير</h2>
+        <h2 className="mb-3 text-sm font-bold">{t("حالة الفواتير")}</h2>
 
         <div className="grid grid-cols-5 gap-3">
-          <PrintStat label="مدفوعة" value={fmt(invoiceStatus.paidCount)} />
+          <PrintStat label={t("مدفوعة")} value={fmt(invoiceStatus.paidCount)} />
 
           <PrintStat
-            label="مدفوعة جزئيًا"
+            label={t("مدفوعة جزئيًا")}
             value={fmt(invoiceStatus.partiallyPaidCount)}
           />
 
           <PrintStat
-            label="غير مدفوعة"
+            label={t("غير مدفوعة")}
             value={fmt(invoiceStatus.unpaidCount)}
           />
 
-          <PrintStat label="متأخرة" value={fmt(invoiceStatus.overdueCount)} />
+          <PrintStat label={t("متأخرة")} value={fmt(invoiceStatus.overdueCount)} />
 
           <PrintStat
-            label="قيمة المتأخرات"
+            label={t("قيمة المتأخرات")}
             value={fmtMoney(invoiceStatus.overdueAmount, data.baseCurrency)}
           />
         </div>
@@ -187,16 +189,16 @@ export default function DashboardPrintTemplate({ data }) {
       {/* Monthly Activity */}
       {monthlyActivity.length > 0 && (
         <section className="mb-6 print-break-inside-avoid">
-          <h2 className="mb-3 text-sm font-bold">النشاط الشهري</h2>
+          <h2 className="mb-3 text-sm font-bold">{t("النشاط الشهري")}</h2>
 
           <table className="w-full border-collapse text-xs">
             <thead>
               <tr className="border-y border-slate-300 bg-slate-50">
-                <th className="px-3 py-2 text-right">الشهر</th>
+                <th className="px-3 py-2 text-right">{t("الشهر")}</th>
 
-                <th className="px-3 py-2 text-left">المبيعات</th>
+                <th className="px-3 py-2 text-left">{t("المبيعات")}</th>
 
-                <th className="px-3 py-2 text-left">المشتريات</th>
+                <th className="px-3 py-2 text-left">{t("المشتريات")}</th>
               </tr>
             </thead>
 
@@ -227,7 +229,7 @@ export default function DashboardPrintTemplate({ data }) {
       {/* Cash Balances */}
       {cashBalances.length > 0 && (
         <section className="mb-6 print-break-inside-avoid">
-          <h2 className="mb-3 text-sm font-bold">أرصدة الخزائن حسب العملة</h2>
+          <h2 className="mb-3 text-sm font-bold">{t("أرصدة الخزائن حسب العملة")}</h2>
 
           <div className="grid grid-cols-4 gap-3">
             {cashBalances.map((cash) => (
@@ -240,12 +242,12 @@ export default function DashboardPrintTemplate({ data }) {
                 </p>
 
                 <PrintField
-                  label="الرصيد الحالي"
+                  label={t("الرصيد الحالي")}
                   value={fmtMoney(cash.currentBalance, cash.currency)}
                 />
 
                 <PrintField
-                  label="عدد الخزائن"
+                  label={t("عدد الخزائن")}
                   value={fmt(cash.cashboxCount)}
                 />
               </div>
@@ -256,32 +258,32 @@ export default function DashboardPrintTemplate({ data }) {
 
       {/* Accounting */}
       <section className="mb-6 print-break-inside-avoid">
-        <h2 className="mb-3 text-sm font-bold">الجاهزية المحاسبية</h2>
+        <h2 className="mb-3 text-sm font-bold">{t("الجاهزية المحاسبية")}</h2>
 
         <div className="rounded-lg border border-slate-300 p-4">
           <div className="grid grid-cols-5 gap-4">
             <PrintField
-              label="الحالة"
-              value={accounting.isReady ? "جاهز" : "يحتاج مراجعة"}
+              label={t("الحالة")}
+              value={accounting.isReady ? t("جاهز") : t("يحتاج مراجعة")}
             />
 
             <PrintField
-              label="عدد المشاكل"
+              label={t("عدد المشاكل")}
               value={fmt(accounting.issueCount)}
             />
 
             <PrintField
-              label="مصادر قيود مفقودة"
+              label={t("مصادر قيود مفقودة")}
               value={fmt(accounting.missingJournalSources)}
             />
 
             <PrintField
-              label="قيود غير متوازنة"
+              label={t("قيود غير متوازنة")}
               value={fmt(accounting.unbalancedJournals)}
             />
 
             <PrintField
-              label="تكاليف مخزون معلقة"
+              label={t("تكاليف مخزون معلقة")}
               value={fmt(accounting.pendingInventoryCosts)}
             />
           </div>
@@ -291,7 +293,7 @@ export default function DashboardPrintTemplate({ data }) {
       {/* Alerts */}
       {alerts.length > 0 && (
         <section className="mb-6 print-break-inside-avoid">
-          <h2 className="mb-3 text-sm font-bold">التنبيهات</h2>
+          <h2 className="mb-3 text-sm font-bold">{t("التنبيهات")}</h2>
 
           <div className="space-y-2">
             {alerts.map((alert, index) => (
@@ -299,7 +301,7 @@ export default function DashboardPrintTemplate({ data }) {
                 key={`${alert.code || "alert"}-${index}`}
                 className="flex items-center justify-between rounded-lg border border-slate-300 px-3 py-2 text-sm"
               >
-                <span>{alert.message || "تنبيه"}</span>
+                <span>{alert.message || t("تنبيه")}</span>
 
                 {alert.count > 0 && (
                   <span className="font-bold">{fmt(alert.count)}</span>
@@ -312,7 +314,7 @@ export default function DashboardPrintTemplate({ data }) {
 
       {/* Footer */}
       <div className="mt-8 flex items-center justify-between border-t border-slate-300 pt-3 text-xs text-slate-500">
-        <span>تقرير لوحة التحكم</span>
+        <span>{t("تقرير لوحة التحكم")}</span>
 
         <span>{data.baseCurrency || "—"}</span>
 

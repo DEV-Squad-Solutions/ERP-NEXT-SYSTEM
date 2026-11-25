@@ -1,3 +1,5 @@
+import { t } from "../../i18n";
+import { getLocale } from "../../i18n";
 // features/payroll/payroll.constants.js
 
 // ============================================================
@@ -5,19 +7,19 @@
 // ============================================================
 
 export const workPlaceStatusOptions = [
-  { value: "InCompany", label: "داخل الشركة" },
-  { value: "OutCompany", label: "خارج الشركة" },
+  { value: "InCompany", label: t("داخل الشركة") },
+  { value: "OutCompany", label: t("خارج الشركة") },
 ];
 
 export const employeeStatusOptions = [
-  { value: "", label: "الكل" },
-  { value: "true", label: "نشط" },
-  { value: "false", label: "غير نشط" },
+  { value: "", label: t("الكل") },
+  { value: "true", label: t("نشط") },
+  { value: "false", label: t("غير نشط") },
 ];
 
 export const EMPLOYEE_TYPE = {
-  Daily: "يومي",
-  Monthly: "شهري",
+  Daily: t("يومي"),
+  Monthly: t("شهري"),
 };
 
 export const employeeTypeOptions = Object.entries(EMPLOYEE_TYPE).map(
@@ -32,8 +34,8 @@ export const employeeTypeOptions = Object.entries(EMPLOYEE_TYPE).map(
 // ============================================================
 
 export const ATTENDANCE_STATUS = {
-  Absent: "غائب",
-  Present: "حاضر",
+  Absent: t("غائب"),
+  Present: t("حاضر"),
 };
 
 export const ATTENDANCE_STATUS_VALUE = {
@@ -72,43 +74,43 @@ export const DAY_RATIO = {
 };
 
 export const DAY_RATIO_LABELS = {
-  OneDay: "يوم كامل",
-  FullDay: "يوم كامل",
-  TwoDays: "يومان",
-  ThreeDays: "ثلاثة أيام",
-  FourDays: "أربعة أيام",
-  FiveDays: "خمسة أيام",
-  ThreeQuarterDay: "ثلاثة أرباع يوم",
-  TwoThirdsDay: "ثلثا يوم",
-  HalfDay: "نصف يوم",
-  ThirdDay: "ثلث يوم",
-  QuarterDay: "ربع يوم",
+  OneDay: t("يوم كامل"),
+  FullDay: t("يوم كامل"),
+  TwoDays: t("يومان"),
+  ThreeDays: t("ثلاثة أيام"),
+  FourDays: t("أربعة أيام"),
+  FiveDays: t("خمسة أيام"),
+  ThreeQuarterDay: t("ثلاثة أرباع يوم"),
+  TwoThirdsDay: t("ثلثا يوم"),
+  HalfDay: t("نصف يوم"),
+  ThirdDay: t("ثلث يوم"),
+  QuarterDay: t("ربع يوم"),
 };
 
 export const dayRatioOptions = [
-  { value: 1, label: "يوم كامل" },
-  { value: 2, label: "يومان" },
-  { value: 3, label: "ثلاثة أيام" },
-  { value: 4, label: "أربعة أيام" },
-  { value: 5, label: "خمسة أيام" },
-  { value: 6, label: "ثلاثة أرباع يوم" },
-  { value: 7, label: "ثلثا يوم" },
-  { value: 8, label: "نصف يوم" },
-  { value: 9, label: "ثلث يوم" },
-  { value: 10, label: "ربع يوم" },
+  { value: 1, label: t("يوم كامل") },
+  { value: 2, label: t("يومان") },
+  { value: 3, label: t("ثلاثة أيام") },
+  { value: 4, label: t("أربعة أيام") },
+  { value: 5, label: t("خمسة أيام") },
+  { value: 6, label: t("ثلاثة أرباع يوم") },
+  { value: 7, label: t("ثلثا يوم") },
+  { value: 8, label: t("نصف يوم") },
+  { value: 9, label: t("ثلث يوم") },
+  { value: 10, label: t("ربع يوم") },
 ];
 
 export const DAY_RATIO_BY_VALUE = {
-  1: "يوم كامل",
-  2: "يومان",
-  3: "ثلاثة أيام",
-  4: "أربعة أيام",
-  5: "خمسة أيام",
-  6: "ثلاثة أرباع يوم",
-  7: "ثلثا يوم",
-  8: "نصف يوم",
-  9: "ثلث يوم",
-  10: "ربع يوم",
+  1: t("يوم كامل"),
+  2: t("يومان"),
+  3: t("ثلاثة أيام"),
+  4: t("أربعة أيام"),
+  5: t("خمسة أيام"),
+  6: t("ثلاثة أرباع يوم"),
+  7: t("ثلثا يوم"),
+  8: t("نصف يوم"),
+  9: t("ثلث يوم"),
+  10: t("ربع يوم"),
 };
 
 // ============================================================
@@ -120,12 +122,12 @@ export const DAY_RATIO_BY_VALUE = {
 // createMovementTypeOptions منفصلة تُستخدم في فورم الإنشاء.
 
 export const MOVEMENT_TYPE_LABELS = {
-  Debit: "مدين",
-  Credit: "دائن",
-  Advance: "سلفة",
-  Deduction: "خصم",
-  Bonus: "مكافأة",
-  Withdrawal: "سحب",
+  Debit: t("مدين"),
+  Credit: t("دائن"),
+  Advance: t("سلفة"),
+  Deduction: t("خصم"),
+  Bonus: t("مكافأة"),
+  Withdrawal: t("سحب"),
 };
 
 export const movementTypeOptions = Object.entries(MOVEMENT_TYPE_LABELS).map(
@@ -146,10 +148,10 @@ export const movementTypeBadge = {
 
 // القيم المسموح بيها فعليًا في POST /EmployeeMovements
 export const CREATE_MOVEMENT_TYPE_LABELS = {
-  Deduction: "خصم",
-  Bonus: "مكافأة",
-  Debit: "مدين",
-  Credit: "دائن",
+  Deduction: t("خصم"),
+  Bonus: t("مكافأة"),
+  Debit: t("مدين"),
+  Credit: t("دائن"),
 };
 
 export const createMovementTypeOptions = Object.entries(
@@ -164,10 +166,10 @@ export const createMovementTypeOptions = Object.entries(
 // ============================================================
 
 export const PAYROLL_STATUS = {
-  Draft: "مسودة",
-  UnderReview: "تحت المراجعة",
-  Approved: "معتمد",
-  Disbursed: "تم الصرف",
+  Draft: t("مسودة"),
+  UnderReview: t("تحت المراجعة"),
+  Approved: t("معتمد"),
+  Disbursed: t("تم الصرف"),
 };
 
 export const payrollStatusBadge = {
@@ -182,13 +184,13 @@ export const payrollStatusBadge = {
 // ============================================================
 
 export const currencyOptions = [
-  { value: "EGP", label: "جنيه مصري" },
-  { value: "USD", label: "دولار أمريكي" },
-  { value: "EUR", label: "يورو" },
-  { value: "GBP", label: "جنيه إسترليني" },
-  { value: "SAR", label: "ريال سعودي" },
-  { value: "AED", label: "درهم إماراتي" },
-  { value: "KWD", label: "دينار كويتي" },
+  { value: "EGP", label: t("جنيه مصري") },
+  { value: "USD", label: t("دولار أمريكي") },
+  { value: "EUR", label: t("يورو") },
+  { value: "GBP", label: t("جنيه إسترليني") },
+  { value: "SAR", label: t("ريال سعودي") },
+  { value: "AED", label: t("درهم إماراتي") },
+  { value: "KWD", label: t("دينار كويتي") },
 ];
 
 // ============================================================
@@ -196,13 +198,13 @@ export const currencyOptions = [
 // ============================================================
 
 export const balanceTypeOptions = [
-  { value: "Debit", label: "مدين" },
-  { value: "Credit", label: "دائن" },
+  { value: "Debit", label: t("مدين") },
+  { value: "Credit", label: t("دائن") },
 ];
 
 export const BALANCE_TYPE_LABELS = {
-  Debit: "مدين",
-  Credit: "دائن",
+  Debit: t("مدين"),
+  Credit: t("دائن"),
 };
 
 export const balanceTypeBadge = {
@@ -214,4 +216,4 @@ export const balanceTypeBadge = {
 // Money Formatter
 // ============================================================
 
-export const fmtMoney = (value) => Number(value || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+export const fmtMoney = (value) => Number(value || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });

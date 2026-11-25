@@ -27,6 +27,8 @@ import PayrollDetailPrintTemplate from "../../../shared/components/print/Payroll
 import { usePayrollDetailPrint } from "../../../shared/hooks/usePayrollDetailPrint";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function SalaryDetailPage() {
   const { salaryId } = useParams();
   const navigate = useNavigate();
@@ -57,7 +59,7 @@ export default function SalaryDetailPage() {
 
   // ✅ لازم يتنادى هنا مع باقي الـ hooks، قبل أي return شرطي تحت
   const { print, printRef } = usePayrollDetailPrint({
-    title: `إيصال-مرتب-${entry?.employeeCode || ""}`,
+    title: t("إيصال-مرتب-{0}", { 0: entry?.employeeCode || "" }),
   });
 
   const cashboxOptions = Array.isArray(cashboxesData)
@@ -79,24 +81,24 @@ export default function SalaryDetailPage() {
 
   const handlePay = async () => {
     if (!postingDate) {
-      toast.error("تاريخ الصرف مطلوب");
+      toast.error(t("تاريخ الصرف مطلوب"));
       return;
     }
 
     if (!cashboxId) {
-      toast.error("اختار الخزنة اللي هيتم الصرف منها");
+      toast.error(t("اختار الخزنة اللي هيتم الصرف منها"));
       return;
     }
 
     if (!entry?.employeeId) {
-      toast.error("بيانات الموظف غير موجودة");
+      toast.error(t("بيانات الموظف غير موجودة"));
       return;
     }
 
     const amount = Number(entry.netSalary);
 
     if (!amount || amount <= 0) {
-      toast.error("صافي المرتب غير صالح للصرف");
+      toast.error(t("صافي المرتب غير صالح للصرف"));
       return;
     }
 
@@ -111,10 +113,10 @@ export default function SalaryDetailPage() {
         cashboxId: Number(cashboxId),
         notes:
           notes.trim() ||
-          `صرف مرتب ${entry.startDate || ""} إلى ${entry.endDate || ""}`,
+          t("صرف مرتب {0} إلى {1}", { 0: entry.startDate || "", 1: entry.endDate || "" }),
       }).unwrap();
 
-      toast.success("تم صرف المرتب وتسجيل الحركة بنجاح");
+      toast.success(t("تم صرف المرتب وتسجيل الحركة بنجاح"));
 
       setShowPayModal(false);
       setNotes("");
@@ -125,7 +127,7 @@ export default function SalaryDetailPage() {
       toast.error(
         error?.data?.message ||
           error?.data?.detail ||
-          "حصل خطأ أثناء صرف المرتب، حاول تاني",
+          t("حصل خطأ أثناء صرف المرتب، حاول تاني"),
       );
     }
   };
@@ -133,22 +135,22 @@ export default function SalaryDetailPage() {
   // ✅ الـ early returns بعد ما كل الـ hooks اتنادت
   if (isLoading) {
     return (
-      <div className="p-6 text-sm text-ink-400" dir="rtl">
-        جاري تحميل بيانات المرتب...
+      <div className="p-6 text-sm text-ink-400" dir={getDir()}>
+        {t("جاري تحميل بيانات المرتب...")}
       </div>
     );
   }
 
   if (isError || !entry) {
     return (
-      <div className="p-6 text-center" dir="rtl">
-        <p className="text-sm text-negative mb-3">تعذر تحميل بيانات المرتب</p>
+      <div className="p-6 text-center" dir={getDir()}>
+        <p className="text-sm text-negative mb-3">{t("تعذر تحميل بيانات المرتب")}</p>
 
         <Button
           variant="outline"
           onClick={() => navigate("/dashboard/payroll/salaries")}
         >
-          العودة للمرتبات
+          {t("العودة للمرتبات")}
         </Button>
       </div>
     );
@@ -157,7 +159,7 @@ export default function SalaryDetailPage() {
   const attendance = entry.attendanceSummary || {};
 
   return (
-    <div className="animate-fadeUp space-y-5" dir="rtl">
+    <div className="animate-fadeUp space-y-5" dir={getDir()}>
       {isFiscalYearReadOnly && (
         <ReadOnlyFiscalYearBanner fiscalYear={fiscalYear} />
       )}
@@ -168,7 +170,7 @@ export default function SalaryDetailPage() {
         className="flex items-center gap-1.5 text-sm text-emerald-700 hover:underline"
       >
         <ArrowRight size={14} />
-        رجوع لقائمة المرتبات
+        {t("رجوع لقائمة المرتبات")}
       </button>
 
       <div className="rounded-2xl border border-ink-400/10 bg-white shadow-card p-5">
@@ -185,7 +187,7 @@ export default function SalaryDetailPage() {
                 </h1>
 
                 <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-ink-400">
-                  {entry.employeeCode && <span>كود: {entry.employeeCode}</span>}
+                  {entry.employeeCode && <span>{t("كود:")} {entry.employeeCode}</span>}
 
                   <span>•</span>
 
@@ -200,7 +202,7 @@ export default function SalaryDetailPage() {
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={print}>
               <Printer size={14} />
-              طباعة
+              {t("طباعة")}
             </Button>
 
             <Button
@@ -208,7 +210,7 @@ export default function SalaryDetailPage() {
               disabled={isPaying || isFiscalYearReadOnly}
             >
               <Wallet size={14} />
-              صرف المرتب
+              {t("صرف المرتب")}
             </Button>
           </div>
         </div>
@@ -217,11 +219,11 @@ export default function SalaryDetailPage() {
           <div className="flex items-center gap-2 text-sm text-ink-700">
             <CalendarDays size={15} className="text-ink-400" />
 
-            <span>الفترة:</span>
+            <span>{t("الفترة:")}</span>
 
             <strong>{formatDate(entry.startDate)}</strong>
 
-            <span className="text-ink-400">إلى</span>
+            <span className="text-ink-400">{t("إلى")}</span>
 
             <strong>{formatDate(entry.endDate)}</strong>
           </div>
@@ -229,53 +231,53 @@ export default function SalaryDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-        <SummaryCard label="إجمالي المرتب" value={entry.grossSalary} />
+        <SummaryCard label={t("إجمالي المرتب")} value={entry.grossSalary} />
 
         <SummaryCard
-          label="الإضافات والمكافآت"
+          label={t("الإضافات والمكافآت")}
           value={entry.bonus}
           positive
           icon={<PlusCircle size={15} />}
         />
 
         <SummaryCard
-          label="الخصومات"
+          label={t("الخصومات")}
           value={entry.deduction}
           negative
           icon={<MinusCircle size={15} />}
         />
 
-        <SummaryCard label="صافي المرتب" value={entry.netSalary} primary />
+        <SummaryCard label={t("صافي المرتب")} value={entry.netSalary} primary />
       </div>
 
       <div className="rounded-2xl border border-ink-400/10 bg-white shadow-card p-5">
         <div className="flex items-center gap-2 mb-4">
           <Clock3 size={17} className="text-primary-600" />
 
-          <h2 className="text-sm font-bold text-ink-900">ملخص الحضور</h2>
+          <h2 className="text-sm font-bold text-ink-900">{t("ملخص الحضور")}</h2>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <AttendanceCard label="أيام الحضور" value={attendance.presentDays} />
+          <AttendanceCard label={t("أيام الحضور")} value={attendance.presentDays} />
 
           <AttendanceCard
-            label="أيام الغياب"
+            label={t("أيام الغياب")}
             value={attendance.absentDays}
             negative
           />
 
           <AttendanceCard
-            label="إجمالي أيام الحضور"
+            label={t("إجمالي أيام الحضور")}
             value={attendance.totalPresentDays}
           />
 
           <AttendanceCard
-            label="أيام الإضافي"
+            label={t("أيام الإضافي")}
             value={attendance.totalOvertimeDays}
           />
 
           <AttendanceCard
-            label="أيام الخصم"
+            label={t("أيام الخصم")}
             value={attendance.totalDeductionDays}
             negative
           />
@@ -284,18 +286,18 @@ export default function SalaryDetailPage() {
 
       <div className="rounded-2xl border border-ink-400/10 bg-white shadow-card overflow-hidden">
         <div className="px-5 py-4 border-b border-ink-400/10">
-          <h2 className="text-sm font-bold text-ink-900">ملخص حساب المرتب</h2>
+          <h2 className="text-sm font-bold text-ink-900">{t("ملخص حساب المرتب")}</h2>
         </div>
 
         <div className="divide-y divide-ink-400/5">
-          <SalaryRow label="إجمالي المرتب" value={entry.grossSalary} />
+          <SalaryRow label={t("إجمالي المرتب")} value={entry.grossSalary} />
 
-          <SalaryRow label="الإضافات والمكافآت" value={entry.bonus} positive />
+          <SalaryRow label={t("الإضافات والمكافآت")} value={entry.bonus} positive />
 
-          <SalaryRow label="الخصومات" value={entry.deduction} negative />
+          <SalaryRow label={t("الخصومات")} value={entry.deduction} negative />
 
           <div className="flex items-center justify-between px-5 py-4 bg-primary-500/[0.04]">
-            <span className="text-sm font-bold text-ink-900">صافي المرتب</span>
+            <span className="text-sm font-bold text-ink-900">{t("صافي المرتب")}</span>
 
             <span className="num text-xl font-bold text-primary-600">
               {fmtMoney(entry.netSalary)}
@@ -307,17 +309,17 @@ export default function SalaryDetailPage() {
       <Modal
         isOpen={showPayModal}
         onClose={() => !isPaying && setShowPayModal(false)}
-        title="صرف المرتب"
+        title={t("صرف المرتب")}
       >
         <div className="space-y-4">
           <div className="rounded-xl bg-primary-50 border border-primary-100 p-4">
-            <p className="text-xs text-ink-400 mb-1">الموظف</p>
+            <p className="text-xs text-ink-400 mb-1">{t("الموظف")}</p>
 
             <p className="text-sm font-bold text-ink-900">
               {entry.employeeName}
             </p>
 
-            <p className="text-xs text-ink-400 mt-3">صافي المرتب</p>
+            <p className="text-xs text-ink-400 mt-3">{t("صافي المرتب")}</p>
 
             <p className="text-xl font-bold num text-primary-600">
               {fmtMoney(entry.netSalary)}
@@ -325,7 +327,7 @@ export default function SalaryDetailPage() {
           </div>
 
           <CompactSelect
-            label="الخزنة"
+            label={t("الخزنة")}
             value={cashboxId}
             onChange={(value) => setCashboxId(value)}
             options={cashboxOptions.map((cashbox) => ({
@@ -335,32 +337,31 @@ export default function SalaryDetailPage() {
                 cashbox.cashboxName ||
                 cashbox.label ||
                 cashbox.code ||
-                `خزنة ${cashbox.id}`,
+                t("خزنة {0}", { 0: cashbox.id }),
             }))}
             placeholder={
-              isCashboxesLoading ? "جاري تحميل الخزائن..." : "اختر الخزنة"
+              isCashboxesLoading ? t("جاري تحميل الخزائن...") : t("اختر الخزنة")
             }
             disabled={isCashboxesLoading || isPaying}
           />
 
           <Input
-            label="تاريخ الصرف"
+            label={t("تاريخ الصرف")}
             type="date"
             value={postingDate}
             onChange={(e) => setPostingDate(e.target.value)}
           />
 
           <Input
-            label="ملاحظات"
+            label={t("ملاحظات")}
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="ملاحظات الصرف..."
+            placeholder={t("ملاحظات الصرف...")}
           />
 
           <div className="rounded-xl border border-primary-100 bg-primary-50 px-3 py-2.5">
             <p className="text-xs text-primary-700">
-              سيتم تسجيل المرتب كحركة موظف من نوع Credit، مع خصم قيمة المرتب من
-              الخزنة المحددة.
+              {t("سيتم تسجيل المرتب كحركة موظف من نوع Credit، مع خصم قيمة المرتب من الخزنة المحددة.")}
             </p>
           </div>
 
@@ -371,7 +372,7 @@ export default function SalaryDetailPage() {
               onClick={() => setShowPayModal(false)}
               disabled={isPaying}
             >
-              إلغاء
+              {t("إلغاء")}
             </Button>
 
             <Button
@@ -381,7 +382,7 @@ export default function SalaryDetailPage() {
             >
               <Wallet size={14} />
 
-              {isPaying ? "جارِ تسجيل الصرف..." : "تأكيد صرف المرتب"}
+              {isPaying ? t("جارِ تسجيل الصرف...") : t("تأكيد صرف المرتب")}
             </Button>
           </div>
         </div>

@@ -44,6 +44,7 @@ import { useFiscalYearGuard } from "../../../lib/useFiscalYearGuard";
 import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFiscalYearBanner";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
 const emptyFilters = {
   employeeId: "",
   fromDate: "",
@@ -103,7 +104,7 @@ export default function AttendancePage() {
       .filter((employee) => employee?.id !== null && employee?.id !== undefined)
       .map((employee) => ({
         id: Number(employee.id),
-        name: employee.name || `موظف #${employee.id}`,
+        name: employee.name || t("موظف #{0}", { 0: employee.id }),
       }));
   }, [employeesData]);
 
@@ -175,26 +176,26 @@ export default function AttendancePage() {
   };
 
   const handleDelete = (row) => {
-    toast(`حذف سجل حضور "${row.employeeName}"؟`, {
-      description: "الإجراء ده لا يمكن التراجع عنه",
+    toast(t("حذف سجل حضور \"{0}\"؟", { 0: row.employeeName }), {
+      description: t("الإجراء ده لا يمكن التراجع عنه"),
       action: {
-        label: "تأكيد الحذف",
+        label: t("تأكيد الحذف"),
         onClick: async () => {
           try {
             await deleteAttendance(row.id).unwrap();
 
-            toast.success("تم حذف سجل الحضور بنجاح");
+            toast.success(t("تم حذف سجل الحضور بنجاح"));
 
             await refetch();
           } catch (error) {
             console.error("Delete attendance error:", error);
 
-            toast.error("حصل خطأ أثناء الحذف، حاول تاني");
+            toast.error(t("حصل خطأ أثناء الحذف، حاول تاني"));
           }
         },
       },
       cancel: {
-        label: "إلغاء",
+        label: t("إلغاء"),
       },
       duration: 6000,
     });
@@ -205,15 +206,15 @@ export default function AttendancePage() {
       return;
     }
 
-    toast(`حذف ${selectedIds.length} سجل حضور؟`, {
-      description: "الإجراء ده لا يمكن التراجع عنه",
+    toast(t("حذف {0} سجل حضور؟", { 0: selectedIds.length }), {
+      description: t("الإجراء ده لا يمكن التراجع عنه"),
       action: {
-        label: "تأكيد الحذف",
+        label: t("تأكيد الحذف"),
         onClick: async () => {
           try {
             await bulkDeleteAttendances(selectedIds).unwrap();
 
-            toast.success(`تم حذف ${selectedIds.length} سجل حضور بنجاح`);
+            toast.success(t("تم حذف {0} سجل حضور بنجاح", { 0: selectedIds.length }));
 
             setSelectedIds([]);
 
@@ -221,12 +222,12 @@ export default function AttendancePage() {
           } catch (error) {
             console.error("Bulk delete attendance error:", error);
 
-            toast.error("حصل خطأ أثناء الحذف الجماعي، حاول تاني");
+            toast.error(t("حصل خطأ أثناء الحذف الجماعي، حاول تاني"));
           }
         },
       },
       cancel: {
-        label: "إلغاء",
+        label: t("إلغاء"),
       },
       duration: 6000,
     });
@@ -314,7 +315,7 @@ export default function AttendancePage() {
     const normalizedStatus = normalizeRowStatus(status);
 
     return (
-      ATTENDANCE_STATUS[normalizedStatus] || normalizedStatus || "غير محدد"
+      ATTENDANCE_STATUS[normalizedStatus] || normalizedStatus || t("غير محدد")
     );
   };
 
@@ -331,11 +332,11 @@ export default function AttendancePage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-2xl font-bold text-ink-900">
-            الحضور والانصراف
+            {t("الحضور والانصراف")}
           </h2>
 
           <p className="mt-1 text-sm text-ink-400">
-            متابعة حضور وانصراف الموظفين
+            {t("متابعة حضور وانصراف الموظفين")}
           </p>
         </div>
 
@@ -344,7 +345,7 @@ export default function AttendancePage() {
           disabled={isFiscalYearReadOnly}
         >
           <Plus size={16} />
-          تسجيل حضور
+          {t("تسجيل حضور")}
         </Button>
       </div>
 
@@ -353,16 +354,16 @@ export default function AttendancePage() {
       )}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <SummaryCard label="أيام العمل" value={summary.workDays} />
+        <SummaryCard label={t("أيام العمل")} value={summary.workDays} />
 
         <SummaryCard
-          label="أيام الحضور"
+          label={t("أيام الحضور")}
           value={summary.present}
           tone="positive"
         />
 
         <SummaryCard
-          label="أيام الغياب"
+          label={t("أيام الغياب")}
           value={summary.absent}
           tone="negative"
         />
@@ -372,7 +373,7 @@ export default function AttendancePage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              الموظف
+              {t("الموظف")}
             </label>
 
             <CompactSelect
@@ -380,14 +381,14 @@ export default function AttendancePage() {
               value={draft.employeeId}
               onChange={(value) => setField("employeeId", value)}
               placeholder={
-                employeesLoading ? "جاري تحميل الموظفين..." : "كل الموظفين"
+                employeesLoading ? t("جاري تحميل الموظفين...") : t("كل الموظفين")
               }
               isDisabled={employeesLoading}
             />
           </div>
 
           <Input
-            label="من تاريخ"
+            label={t("من تاريخ")}
             type="date"
             min={fiscalYear?.startDate}
             max={fiscalYear?.endDate}
@@ -396,7 +397,7 @@ export default function AttendancePage() {
           />
 
           <Input
-            label="إلى تاريخ"
+            label={t("إلى تاريخ")}
             type="date"
             min={fiscalYear?.startDate}
             max={fiscalYear?.endDate}
@@ -406,14 +407,14 @@ export default function AttendancePage() {
 
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              الحالة
+              {t("الحالة")}
             </label>
 
             <CompactSelect
               options={attendanceStatusOptions}
               value={draft.status}
               onChange={(value) => setField("status", value)}
-              placeholder="الكل"
+              placeholder={t("الكل")}
             />
           </div>
         </div>
@@ -421,12 +422,12 @@ export default function AttendancePage() {
         <div className="mt-3 flex justify-end gap-2">
           <Button onClick={handleSearch} className="h-9">
             <Search size={14} />
-            بحث
+            {t("بحث")}
           </Button>
 
           <Button variant="outline" onClick={handleReset} className="h-9">
             <RotateCcw size={14} />
-            تصفير
+            {t("تصفير")}
           </Button>
         </div>
       </div>
@@ -437,9 +438,9 @@ export default function AttendancePage() {
             <CheckSquare size={16} className="text-primary-600" />
 
             <p className="text-sm text-ink-900">
-              تم تحديد{" "}
+              {t("تم تحديد")}{" "}
               <strong className="text-primary-600">{selectedIds.length}</strong>{" "}
-              سجل
+              {t("سجل")}
             </p>
           </div>
 
@@ -451,7 +452,7 @@ export default function AttendancePage() {
               disabled={isBulkDeleting}
             >
               <X size={13} />
-              إلغاء التحديد
+              {t("إلغاء التحديد")}
             </Button>
 
             <Button
@@ -462,7 +463,7 @@ export default function AttendancePage() {
             >
               <Trash2 size={13} />
 
-              {isBulkDeleting ? "جارِ الحذف..." : "حذف المحدد"}
+              {isBulkDeleting ? t("جارِ الحذف...") : t("حذف المحدد")}
             </Button>
           </div>
         </div>
@@ -491,7 +492,7 @@ export default function AttendancePage() {
           />
 
           <p className="mb-1 text-sm font-medium text-ink-900">
-            حدث خطأ في تحميل بيانات الحضور
+            {t("حدث خطأ في تحميل بيانات الحضور")}
           </p>
 
           <button
@@ -499,7 +500,7 @@ export default function AttendancePage() {
             className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-xs font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
           >
             <RefreshCw size={13} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : rows.length === 0 ? (
@@ -513,11 +514,11 @@ export default function AttendancePage() {
           </div>
 
           <p className="mb-1 text-sm font-medium text-ink-900">
-            لا توجد سجلات حضور
+            {t("لا توجد سجلات حضور")}
           </p>
 
           <p className="text-xs text-ink-400">
-            جرّب تعديل الفلاتر أو سجّل حضور اليوم
+            {t("جرّب تعديل الفلاتر أو سجّل حضور اليوم")}
           </p>
         </div>
       ) : (
@@ -540,38 +541,38 @@ export default function AttendancePage() {
                   </th>
 
                   <th className="border-l border-ink-400/5 p-2.5 font-medium">
-                    الموظف
+                    {t("الموظف")}
                   </th>
 
                   <th className="border-l border-ink-400/5 p-2.5 font-medium">
-                    التاريخ
+                    {t("التاريخ")}
                   </th>
 
                   <th className="border-l border-ink-400/5 p-2.5 font-medium">
-                    مكان العمل
+                    {t("مكان العمل")}
                   </th>
 
                   <th className="border-l border-ink-400/5 p-2.5 font-medium">
-                    وقت الحضور
+                    {t("وقت الحضور")}
                   </th>
 
                   <th className="border-l border-ink-400/5 p-2.5 font-medium">
-                    وقت الانصراف
+                    {t("وقت الانصراف")}
                   </th>
 
                   <th className="border-l border-ink-400/5 p-2.5 font-medium">
-                    عدد الساعات
+                    {t("عدد الساعات")}
                   </th>
 
                   <th className="border-l border-ink-400/5 p-2.5 font-medium">
-                    الحالة
+                    {t("الحالة")}
                   </th>
 
                   <th className="border-l border-ink-400/5 p-2.5 font-medium">
-                    ملاحظات
+                    {t("ملاحظات")}
                   </th>
 
-                  <th className="p-2.5 font-medium">الإجراءات</th>
+                  <th className="p-2.5 font-medium">{t("الإجراءات")}</th>
                 </tr>
               </thead>
 
@@ -605,9 +606,9 @@ export default function AttendancePage() {
                           type="button"
                           onClick={() => openEmployeeDetails(row)}
                           className="text-right text-sm font-medium text-primary-600 underline-offset-2 transition-colors hover:text-primary-700 hover:underline"
-                          title="عرض تفاصيل الموظف"
+                          title={t("عرض تفاصيل الموظف")}
                         >
-                          {row.employeeName || `موظف #${row.employeeId}`}
+                          {row.employeeName || t("موظف #{0}", { 0: row.employeeId })}
                         </button>
 
                         <p className="num mt-0.5 text-[10px] text-ink-400">
@@ -632,7 +633,7 @@ export default function AttendancePage() {
                             </span>
                           </div>
                         ) : (
-                          <span className="text-xs text-ink-400">غير محدد</span>
+                          <span className="text-xs text-ink-400">{t("غير محدد")}</span>
                         )}
                       </td>
 
@@ -668,7 +669,7 @@ export default function AttendancePage() {
                             type="button"
                             onClick={() => openDetails(row)}
                             className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                            title="تفاصيل السجل"
+                            title={t("تفاصيل السجل")}
                           >
                             <Eye size={15} />
                           </button>
@@ -679,7 +680,7 @@ export default function AttendancePage() {
                                 type="button"
                                 onClick={() => openEdit(row)}
                                 className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                                title="تعديل"
+                                title={t("تعديل")}
                               >
                                 <Pencil size={15} />
                               </button>
@@ -688,7 +689,7 @@ export default function AttendancePage() {
                                 type="button"
                                 onClick={() => handleDelete(row)}
                                 className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-negative/10 hover:text-negative"
-                                title="حذف"
+                                title={t("حذف")}
                               >
                                 <Trash2 size={15} />
                               </button>

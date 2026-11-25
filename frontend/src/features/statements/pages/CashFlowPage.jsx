@@ -16,6 +16,8 @@ import CashFlowPrintTemplate from "../../../shared/components/print/CashFlowPrin
 import { useCashFlowPrint } from "../../../shared/hooks/useCashFlowPrint";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -26,7 +28,7 @@ function firstOfMonthISO() {
 }
 
 function fmt(n) {
-  return new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 }).format(
+  return new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 2 }).format(
     n ?? 0,
   );
 }
@@ -43,7 +45,7 @@ function buildGroups(items = []) {
     if (!map.has(key)) {
       map.set(key, {
         key,
-        name: r.financialStatementLineName || "بدون بند",
+        name: r.financialStatementLineName || t("بدون بند"),
         code: r.financialStatementLineCode,
         rows: [],
         sum: { debit: 0, credit: 0, net: 0 },
@@ -121,16 +123,15 @@ export default function CashFlowPage({ companyName = "" }) {
   const { printReport, printRef } = useCashFlowPrint();
 
   return (
-    <div className="animate-fadeUp" dir="rtl">
+    <div className="animate-fadeUp" dir={getDir()}>
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-ink-900">
             <WalletCards size={20} className="text-primary-500" />
-            قائمة التدفقات النقدية
+            {t("قائمة التدفقات النقدية")}
           </h2>
           <p className="mt-1 text-sm text-ink-400">
-            التدفقات النقدية الناتجة عن القيود المؤثرة على حسابات الخزائن خلال
-            الفترة، والتحويل بين الخزائن لا يُحسب كتدفق صافٍ
+            {t("التدفقات النقدية الناتجة عن القيود المؤثرة على حسابات الخزائن خلال الفترة، والتحويل بين الخزائن لا يُحسب كتدفق صافٍ")}
           </p>
         </div>
 
@@ -142,7 +143,7 @@ export default function CashFlowPage({ companyName = "" }) {
             className="inline-flex items-center gap-2 rounded-xl border border-ink-400/20 px-4 py-2.5 text-sm font-medium text-ink-600 transition hover:bg-ink-400/5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Printer size={16} />
-            طباعة
+            {t("طباعة")}
           </button>
           <button
             type="button"
@@ -150,7 +151,7 @@ export default function CashFlowPage({ companyName = "" }) {
             className="inline-flex items-center gap-2 rounded-xl border border-ink-400/20 px-4 py-2.5 text-sm font-medium text-ink-600 transition hover:bg-ink-400/5"
           >
             <RefreshCw size={16} className={isFetching ? "animate-spin" : ""} />
-            تحديث
+            {t("تحديث")}
           </button>
         </div>
       </div>
@@ -158,7 +159,7 @@ export default function CashFlowPage({ companyName = "" }) {
       {/* الفلاتر */}
       <div className="mb-5 flex flex-wrap items-end gap-3 rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">من تاريخ</label>
+          <label className="text-xs text-ink-400">{t("من تاريخ")}</label>
           <DateInput
             type="date"
             value={draft.fromDate}
@@ -170,7 +171,7 @@ export default function CashFlowPage({ companyName = "" }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">إلى تاريخ</label>
+          <label className="text-xs text-ink-400">{t("إلى تاريخ")}</label>
           <DateInput
             type="date"
             value={draft.toDate}
@@ -182,7 +183,7 @@ export default function CashFlowPage({ companyName = "" }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">طريقة العرض</label>
+          <label className="text-xs text-ink-400">{t("طريقة العرض")}</label>
           <select
             value={draft.viewMode}
             onChange={(e) =>
@@ -190,13 +191,13 @@ export default function CashFlowPage({ companyName = "" }) {
             }
             className="rounded-xl border border-ink-400/20 bg-white px-3 py-2 text-sm"
           >
-            <option value="Summary">ملخص</option>
-            <option value="Detailed">تفصيلي</option>
+            <option value="Summary">{t("ملخص")}</option>
+            <option value="Detailed">{t("تفصيلي")}</option>
           </select>
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">التسويات</label>
+          <label className="text-xs text-ink-400">{t("التسويات")}</label>
           <select
             value={draft.adjustmentView}
             onChange={(e) =>
@@ -204,8 +205,8 @@ export default function CashFlowPage({ companyName = "" }) {
             }
             className="rounded-xl border border-ink-400/20 bg-white px-3 py-2 text-sm"
           >
-            <option value="AfterAdjustments">بعد التسوية</option>
-            <option value="BeforeAdjustments">قبل التسوية</option>
+            <option value="AfterAdjustments">{t("بعد التسوية")}</option>
+            <option value="BeforeAdjustments">{t("قبل التسوية")}</option>
           </select>
         </div>
 
@@ -218,7 +219,7 @@ export default function CashFlowPage({ companyName = "" }) {
             }
             className="h-4 w-4 accent-primary-500"
           />
-          عرض الحسابات غير المربوطة
+          {t("عرض الحسابات غير المربوطة")}
         </label>
 
         <button
@@ -226,32 +227,32 @@ export default function CashFlowPage({ companyName = "" }) {
           onClick={() => setApplied(draft)}
           className="rounded-xl bg-primary-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-primary-600"
         >
-          عرض
+          {t("عرض")}
         </button>
       </div>
 
       {isLoading && (
         <div className="rounded-2xl border border-dashed border-ink-400/20 py-16 text-center text-ink-400">
-          جاري تحميل قائمة التدفقات النقدية...
+          {t("جاري تحميل قائمة التدفقات النقدية...")}
         </div>
       )}
 
       {isError &&
         (error?.status === 403 ? (
           <AccessDeniedState
-            title="غير مصرح بعرض قائمة التدفقات النقدية"
-            message="التقرير ده بيغطي كل خزائن الشركة. مش عندك وصول لكل الخزائن، فمش بنعرض تقرير جزئي. تواصل مع مسؤول النظام لو محتاج الصلاحية."
+            title={t("غير مصرح بعرض قائمة التدفقات النقدية")}
+            message={t("التقرير ده بيغطي كل خزائن الشركة. مش عندك وصول لكل الخزائن، فمش بنعرض تقرير جزئي. تواصل مع مسؤول النظام لو محتاج الصلاحية.")}
             onRetry={() => refetch()}
           />
         ) : (
           <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
-            <span>حدث خطأ أثناء تحميل قائمة التدفقات النقدية.</span>
+            <span>{t("حدث خطأ أثناء تحميل قائمة التدفقات النقدية.")}</span>
             <button
               type="button"
               onClick={() => refetch()}
               className="rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs font-medium transition hover:bg-rose-100"
             >
-              إعادة المحاولة
+              {t("إعادة المحاولة")}
             </button>
           </div>
         ))}
@@ -262,10 +263,9 @@ export default function CashFlowPage({ companyName = "" }) {
             <div className="mb-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-700">
               <AlertTriangle size={20} className="mt-0.5 shrink-0" />
               <div>
-                <p className="font-semibold">القائمة غير جاهزة للاعتماد</p>
+                <p className="font-semibold">{t("القائمة غير جاهزة للاعتماد")}</p>
                 <p className="mt-1 text-sm">
-                  قد توجد حسابات مقابلة غير مربوطة ببند تدفقات نقدية. فعّل «عرض
-                  الحسابات غير المربوطة» للمراجعة.
+                  {t("قد توجد حسابات مقابلة غير مربوطة ببند تدفقات نقدية. فعّل «عرض الحسابات غير المربوطة» للمراجعة.")}
                 </p>
               </div>
             </div>
@@ -275,7 +275,7 @@ export default function CashFlowPage({ companyName = "" }) {
           <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-2xl border border-primary-500/20 bg-primary-500/5 p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-ink-500">صافي التدفق النقدي</span>
+                <span className="text-sm text-ink-500">{t("صافي التدفق النقدي")}</span>
                 {netCashFlow >= 0 ? (
                   <TrendingUp size={20} className="text-primary-600" />
                 ) : (
@@ -296,7 +296,7 @@ export default function CashFlowPage({ companyName = "" }) {
 
             <div className="rounded-2xl border border-ink-400/10 bg-white p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-ink-400">إجمالي المدين</span>
+                <span className="text-sm text-ink-400">{t("إجمالي المدين")}</span>
                 <TrendingDown size={20} className="text-rose-500" />
               </div>
               <p className="text-2xl font-bold text-ink-900">
@@ -309,7 +309,7 @@ export default function CashFlowPage({ companyName = "" }) {
 
             <div className="rounded-2xl border border-ink-400/10 bg-white p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-ink-400">إجمالي الدائن</span>
+                <span className="text-sm text-ink-400">{t("إجمالي الدائن")}</span>
                 <TrendingUp size={20} className="text-primary-500" />
               </div>
               <p className="text-2xl font-bold text-ink-900">
@@ -332,16 +332,16 @@ export default function CashFlowPage({ companyName = "" }) {
                 <thead>
                   <tr className="bg-ink-400/5 text-xs text-ink-400">
                     <th className="px-3 py-2.5 text-right font-medium">
-                      {isDetailed ? "الحساب" : "بند التدفقات النقدية"}
+                      {isDetailed ? t("الحساب") : t("بند التدفقات النقدية")}
                     </th>
                     <th className="px-3 py-2.5 text-right font-medium">
-                      مدين الفترة
+                      {t("مدين الفترة")}
                     </th>
                     <th className="px-3 py-2.5 text-right font-medium">
-                      دائن الفترة
+                      {t("دائن الفترة")}
                     </th>
                     <th className="px-3 py-2.5 text-right font-medium">
-                      صافي التدفق
+                      {t("صافي التدفق")}
                     </th>
                   </tr>
                 </thead>
@@ -353,7 +353,7 @@ export default function CashFlowPage({ companyName = "" }) {
                         colSpan={4}
                         className="px-3 py-14 text-center text-ink-400"
                       >
-                        لا توجد تدفقات نقدية لهذه الفترة
+                        {t("لا توجد تدفقات نقدية لهذه الفترة")}
                       </td>
                     </tr>
                   ) : isDetailed ? (
@@ -402,7 +402,7 @@ export default function CashFlowPage({ companyName = "" }) {
 
                         <tr className="border-t border-ink-400/20 bg-ink-400/5 font-bold">
                           <td className="px-3 py-2.5 text-ink-900">
-                            إجمالي {g.name}
+                            {t("إجمالي")} {g.name}
                           </td>
                           <td className="px-3 py-2.5 tabular-nums">
                             {fmt(g.sum.debit)}
@@ -449,7 +449,7 @@ export default function CashFlowPage({ companyName = "" }) {
                 {flatRows.length > 0 && (
                   <tfoot>
                     <tr className="border-t-2 border-ink-400/30 bg-ink-400/5 font-bold text-ink-900">
-                      <td className="px-3 py-3">الإجمالي</td>
+                      <td className="px-3 py-3">{t("الإجمالي")}</td>
                       <td className="whitespace-nowrap px-3 py-3 tabular-nums">
                         {fmt(periodDebit)}
                       </td>
@@ -463,8 +463,7 @@ export default function CashFlowPage({ companyName = "" }) {
                     {Math.abs(gap) > 0.005 && (
                       <tr className="bg-amber-50 text-xs font-medium text-amber-700">
                         <td className="px-3 py-2" colSpan={3}>
-                          الفرق بين صافي التدفق ومجموع البنود المعروضة (قد يكون
-                          بسبب حسابات غير مربوطة)
+                          {t("الفرق بين صافي التدفق ومجموع البنود المعروضة (قد يكون بسبب حسابات غير مربوطة)")}
                         </td>
                         <td className="px-3 py-2 tabular-nums">{fmt(gap)}</td>
                       </tr>
@@ -481,11 +480,10 @@ export default function CashFlowPage({ companyName = "" }) {
               <div className="border-b border-amber-100 bg-amber-50 px-4 py-3">
                 <div className="flex items-center gap-2 text-amber-700">
                   <AlertTriangle size={18} />
-                  <h3 className="font-semibold">حسابات غير مربوطة</h3>
+                  <h3 className="font-semibold">{t("حسابات غير مربوطة")}</h3>
                 </div>
                 <p className="mt-1 text-xs text-amber-600">
-                  هذه الحسابات المقابلة لها حركة نقدية ولكن لم يتم ربطها ببند
-                  تدفقات نقدية.
+                  {t("هذه الحسابات المقابلة لها حركة نقدية ولكن لم يتم ربطها ببند تدفقات نقدية.")}
                 </p>
               </div>
 
@@ -494,16 +492,16 @@ export default function CashFlowPage({ companyName = "" }) {
                   <thead>
                     <tr className="bg-ink-400/5 text-xs text-ink-400">
                       <th className="px-4 py-2.5 text-right font-medium">
-                        الحساب
+                        {t("الحساب")}
                       </th>
                       <th className="px-4 py-2.5 text-right font-medium">
-                        مدين الفترة
+                        {t("مدين الفترة")}
                       </th>
                       <th className="px-4 py-2.5 text-right font-medium">
-                        دائن الفترة
+                        {t("دائن الفترة")}
                       </th>
                       <th className="px-4 py-2.5 text-right font-medium">
-                        صافي الحركة
+                        {t("صافي الحركة")}
                       </th>
                     </tr>
                   </thead>
@@ -543,7 +541,7 @@ export default function CashFlowPage({ companyName = "" }) {
           {data.isReadyForReporting && (
             <div className="mt-4 flex items-center gap-2 text-xs text-primary-600">
               <CheckCircle2 size={15} />
-              قائمة التدفقات النقدية جاهزة للتقرير.
+              {t("قائمة التدفقات النقدية جاهزة للتقرير.")}
             </div>
           )}
         </>

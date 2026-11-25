@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 /**
  * أدوات مشتركة للتحقق من إن تاريخ حركة (فاتورة، سند، إلخ) واقع
  * داخل حدود السنة المالية المختارة، قبل الإرسال للـ backend —
@@ -29,7 +30,7 @@ export function isDateWithinFiscalYear(date, fiscalYear) {
 export function getFiscalYearDateWarning(date, fiscalYear) {
   if (isDateWithinFiscalYear(date, fiscalYear)) return null;
 
-  return `التاريخ المحدد خارج حدود السنة المالية "${fiscalYear.name}" (${fiscalYear.startDate} — ${fiscalYear.endDate}).`;
+  return t("التاريخ المحدد خارج حدود السنة المالية \"{0}\" ({1} — {2}).", { 0: fiscalYear.name, 1: fiscalYear.startDate, 2: fiscalYear.endDate });
 }
 
 /* =========================================================

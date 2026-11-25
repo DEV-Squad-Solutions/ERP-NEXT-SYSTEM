@@ -20,6 +20,8 @@ import PartnerItemMovementsPrintTemplate from "../../../shared/components/print/
 import InvoiceNumberLink from "../../../shared/components/InvoiceNumberLink";
 import { formatDate as sharedFormatDate } from "../../../lib/date.js";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const emptyItemFilters = {
   fromDate: "",
   toDate: "",
@@ -88,7 +90,7 @@ export default function PartnerItemsTab({ partnerId }) {
       return "-";
     }
 
-    return Number(value).toLocaleString("ar-EG", {
+    return Number(value).toLocaleString(getLocale(), {
       maximumFractionDigits: 2,
     });
   };
@@ -102,16 +104,16 @@ export default function PartnerItemsTab({ partnerId }) {
   const getMovementLabel = (type) => {
     switch (type?.toLowerCase()) {
       case "sale":
-        return "بيع";
+        return t("بيع");
 
       case "purchase":
-        return "شراء";
+        return t("شراء");
 
       case "sale_return":
-        return "مرتجع بيع";
+        return t("مرتجع بيع");
 
       case "purchase_return":
-        return "مرتجع شراء";
+        return t("مرتجع شراء");
 
       default:
         return type || "-";
@@ -137,7 +139,7 @@ export default function PartnerItemsTab({ partnerId }) {
     }
   };
   const { printList, printRef } = useItemMovementsPrint({
-    title: `حركة-صنف-${data?.itemName || ""}`,
+    title: t("حركة-صنف-{0}", { 0: data?.itemName || "" }),
   });
 
   const handlePrint = () => {
@@ -154,7 +156,7 @@ export default function PartnerItemsTab({ partnerId }) {
           {/* From Date */}
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              من تاريخ
+              {t("من تاريخ")}
             </label>
 
             <DateInput
@@ -168,7 +170,7 @@ export default function PartnerItemsTab({ partnerId }) {
           {/* To Date */}
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              إلى تاريخ
+              {t("إلى تاريخ")}
             </label>
 
             <DateInput
@@ -182,7 +184,7 @@ export default function PartnerItemsTab({ partnerId }) {
           {/* Country */}
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              البلد
+              {t("البلد")}
             </label>
 
             <CompactSelect
@@ -194,14 +196,14 @@ export default function PartnerItemsTab({ partnerId }) {
               }
               value={draft.countryId}
               onChange={(value) => setField("countryId", value)}
-              placeholder="اختر البلد"
+              placeholder={t("اختر البلد")}
             />
           </div>
 
           {/* Item */}
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              الصنف <span className="text-negative">*</span>
+              {t("الصنف")} <span className="text-negative">*</span>
             </label>
 
             <CompactSelect
@@ -213,7 +215,7 @@ export default function PartnerItemsTab({ partnerId }) {
               }
               value={draft.itemId}
               onChange={(value) => setField("itemId", value)}
-              placeholder="اختر الصنف"
+              placeholder={t("اختر الصنف")}
             />
           </div>
 
@@ -225,7 +227,7 @@ export default function PartnerItemsTab({ partnerId }) {
               className="h-9 flex-1"
             >
               <Search size={14} />
-              بحث
+              {t("بحث")}
             </Button>
             <Button
               variant="outline"
@@ -233,7 +235,7 @@ export default function PartnerItemsTab({ partnerId }) {
               disabled={!rows.length}
             >
               <Printer size={16} />
-              طباعة
+              {t("طباعة")}
             </Button>
             <Button variant="outline" onClick={handleReset} className="h-9">
               <RotateCcw size={14} />
@@ -248,7 +250,7 @@ export default function PartnerItemsTab({ partnerId }) {
         <div className="rounded-2xl border border-dashed border-ink-400/20 py-16 text-center">
           <Package size={32} className="mx-auto mb-3 text-ink-400" />
 
-          <p className="text-sm text-ink-400">اختر صنف وابحث لعرض حركته</p>
+          <p className="text-sm text-ink-400">{t("اختر صنف وابحث لعرض حركته")}</p>
         </div>
       ) : isError ? (
         /* =========================
@@ -258,10 +260,10 @@ export default function PartnerItemsTab({ partnerId }) {
         <div className="flex items-center justify-center gap-2 py-16 text-sm text-negative">
           <AlertCircle size={16} />
 
-          <span>حصل خطأ أثناء تحميل البيانات</span>
+          <span>{t("حصل خطأ أثناء تحميل البيانات")}</span>
 
           <button onClick={refetch} className="underline">
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : (
@@ -273,7 +275,7 @@ export default function PartnerItemsTab({ partnerId }) {
           <div className="rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs text-ink-400">الصنف</p>
+                <p className="text-xs text-ink-400">{t("الصنف")}</p>
 
                 <h3 className="mt-1 text-base font-semibold text-ink-900">
                   {data?.itemName || "-"}
@@ -281,7 +283,7 @@ export default function PartnerItemsTab({ partnerId }) {
               </div>
 
               <div className="text-left">
-                <p className="text-xs text-ink-400">العميل / المورد</p>
+                <p className="text-xs text-ink-400">{t("العميل / المورد")}</p>
 
                 <p className="mt-1 text-sm font-medium text-ink-700">
                   {data?.businessPartnerName || "-"}
@@ -296,28 +298,28 @@ export default function PartnerItemsTab({ partnerId }) {
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <SummaryCard
-              title="إجمالي كمية المبيعات"
+              title={t("إجمالي كمية المبيعات")}
               value={summary.totalSalesQuantity}
               icon={<ArrowUp size={16} />}
               iconClass="bg-blue-50 text-blue-600"
             />
 
             <SummaryCard
-              title="إجمالي كمية المشتريات"
+              title={t("إجمالي كمية المشتريات")}
               value={summary.totalPurchaseQuantity}
               icon={<ArrowDown size={16} />}
               iconClass="bg-green-50 text-green-600"
             />
 
             <SummaryCard
-              title="إجمالي وزن المبيعات"
+              title={t("إجمالي وزن المبيعات")}
               value={summary.totalSalesWeight}
               icon={<ArrowUp size={16} />}
               iconClass="bg-blue-50 text-blue-600"
             />
 
             <SummaryCard
-              title="إجمالي وزن المشتريات"
+              title={t("إجمالي وزن المشتريات")}
               value={summary.totalPurchaseWeight}
               icon={<ArrowDown size={16} />}
               iconClass="bg-green-50 text-green-600"
@@ -332,23 +334,23 @@ export default function PartnerItemsTab({ partnerId }) {
             <table className="w-full min-w-[1100px] border-collapse text-right">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
-                  <th className="p-2.5 font-medium">رقم الفاتورة</th>
+                  <th className="p-2.5 font-medium">{t("رقم الفاتورة")}</th>
 
-                  <th className="p-2.5 font-medium">التاريخ</th>
+                  <th className="p-2.5 font-medium">{t("التاريخ")}</th>
 
-                  <th className="p-2.5 font-medium">الحركة</th>
+                  <th className="p-2.5 font-medium">{t("الحركة")}</th>
 
-                  <th className="p-2.5 font-medium">الصنف</th>
+                  <th className="p-2.5 font-medium">{t("الصنف")}</th>
 
-                  <th className="p-2.5 font-medium">العدد</th>
+                  <th className="p-2.5 font-medium">{t("العدد")}</th>
 
-                  <th className="p-2.5 font-medium">الوزن</th>
+                  <th className="p-2.5 font-medium">{t("الوزن")}</th>
 
-                  <th className="p-2.5 font-medium">الكمية</th>
+                  <th className="p-2.5 font-medium">{t("الكمية")}</th>
 
-                  <th className="p-2.5 font-medium">السعر</th>
+                  <th className="p-2.5 font-medium">{t("السعر")}</th>
 
-                  <th className="p-2.5 font-medium">الإجمالي</th>
+                  <th className="p-2.5 font-medium">{t("الإجمالي")}</th>
                 </tr>
               </thead>
 
@@ -359,7 +361,7 @@ export default function PartnerItemsTab({ partnerId }) {
                       colSpan={9}
                       className="p-8 text-center text-sm text-ink-400"
                     >
-                      جارِ التحميل...
+                      {t("جارِ التحميل...")}
                     </td>
                   </tr>
                 ) : rows.length === 0 ? (
@@ -368,7 +370,7 @@ export default function PartnerItemsTab({ partnerId }) {
                       colSpan={9}
                       className="p-8 text-center text-sm text-ink-400"
                     >
-                      لا توجد حركة لهذا الصنف بالفلاتر المحددة
+                      {t("لا توجد حركة لهذا الصنف بالفلاتر المحددة")}
                     </td>
                   </tr>
                 ) : (
@@ -440,7 +442,7 @@ export default function PartnerItemsTab({ partnerId }) {
                 <tfoot>
                   <tr className="bg-ink-900/[0.03] font-semibold">
                     <td colSpan={4} className="p-2.5 text-sm">
-                      إجمالي النتائج
+                      {t("إجمالي النتائج")}
                     </td>
 
                     <td className="p-2.5 text-center text-sm num">
@@ -504,7 +506,7 @@ function SummaryCard({ title, value, icon, iconClass }) {
           <p className="text-xs text-ink-400">{title}</p>
 
           <p className="mt-1 text-lg font-bold text-ink-900 num">
-            {Number(value ?? 0).toLocaleString("ar-EG", {
+            {Number(value ?? 0).toLocaleString(getLocale(), {
               maximumFractionDigits: 2,
             })}
           </p>

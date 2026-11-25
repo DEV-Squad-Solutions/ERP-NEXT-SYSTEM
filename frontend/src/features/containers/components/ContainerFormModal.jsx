@@ -11,8 +11,9 @@ import {
   useUpdateContainerMutation,
 } from "../containersApi";
 
+import { t } from "../../../i18n";
 const containerSchema = z.object({
-  name: z.string().min(1, "اسم العبوة مطلوب"),
+  name: z.string().min(1, t("اسم العبوة مطلوب")),
   description: z.string().optional(),
   isActive: z.preprocess((v) => v === "true" || v === true, z.boolean()),
 });
@@ -55,14 +56,14 @@ export default function ContainerFormModal({ isOpen, onClose, container }) {
     try {
       if (isEditing) {
         await updateContainer({ id: container.id, ...values }).unwrap();
-        toast.success("تم تحديث العبوة بنجاح");
+        toast.success(t("تم تحديث العبوة بنجاح"));
       } else {
         await createContainer(values).unwrap();
-        toast.success("تم إضافة العبوة بنجاح");
+        toast.success(t("تم إضافة العبوة بنجاح"));
       }
       onClose();
     } catch {
-      toast.error("حصل خطأ، حاول تاني");
+      toast.error(t("حصل خطأ، حاول تاني"));
     }
   }
 
@@ -70,16 +71,16 @@ export default function ContainerFormModal({ isOpen, onClose, container }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? "تعديل عبوة" : "عبوة جديدة"}
+      title={isEditing ? t("تعديل عبوة") : t("عبوة جديدة")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="block text-xs text-ink-400 mb-1.5">
-            اسم العبوة
+            {t("اسم العبوة")}
           </label>
           <input
             type="text"
-            placeholder="مثال: برميل 200 لتر"
+            placeholder={t("مثال: برميل 200 لتر")}
             className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
             {...register("name")}
           />
@@ -90,33 +91,33 @@ export default function ContainerFormModal({ isOpen, onClose, container }) {
 
         <div>
           <label className="block text-xs text-ink-400 mb-1.5">
-            الوصف (اختياري)
+            {t("الوصف (اختياري)")}
           </label>
           <textarea
             rows={2}
-            placeholder="أي تفاصيل إضافية عن العبوة"
+            placeholder={t("أي تفاصيل إضافية عن العبوة")}
             className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
             {...register("description")}
           />
         </div>
 
         <div>
-          <label className="block text-xs text-ink-400 mb-1.5">الحالة</label>
+          <label className="block text-xs text-ink-400 mb-1.5">{t("الحالة")}</label>
           <select
             className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
             {...register("isActive")}
           >
-            <option value="true">نشطة</option>
-            <option value="false">غير نشطة</option>
+            <option value="true">{t("نشطة")}</option>
+            <option value="false">{t("غير نشطة")}</option>
           </select>
         </div>
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
           <Button type="submit" disabled={isCreating || isUpdating}>
-            {isEditing ? "حفظ التعديلات" : "إضافة"}
+            {isEditing ? t("حفظ التعديلات") : t("إضافة")}
           </Button>
         </div>
       </form>

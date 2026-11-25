@@ -20,18 +20,19 @@ import {
 
 import { useUpsertStoreContainersMutation } from "../../storeContainers/storeContainersApi";
 
+import { t } from "../../../i18n";
 const CURRENCIES = [
-  { value: "EGP", label: "جنيه مصري" },
-  { value: "USD", label: "دولار أمريكي" },
-  { value: "EUR", label: "يورو" },
-  { value: "GBP", label: "جنيه إسترليني" },
-  { value: "SAR", label: "ريال سعودي" },
-  { value: "AED", label: "درهم إماراتي" },
-  { value: "KWD", label: "دينار كويتي" },
+  { value: "EGP", label: t("جنيه مصري") },
+  { value: "USD", label: t("دولار أمريكي") },
+  { value: "EUR", label: t("يورو") },
+  { value: "GBP", label: t("جنيه إسترليني") },
+  { value: "SAR", label: t("ريال سعودي") },
+  { value: "AED", label: t("درهم إماراتي") },
+  { value: "KWD", label: t("دينار كويتي") },
 ];
 
 const partnerSchema = z.object({
-  name: z.string().trim().min(2, "اسم الشريك مطلوب"),
+  name: z.string().trim().min(2, t("اسم الشريك مطلوب")),
   currency: z.enum(["EGP", "USD", "EUR", "GBP", "SAR", "AED", "KWD"]),
   address: z.string().optional(),
   usesReturnableContainers: z.boolean(),
@@ -39,13 +40,13 @@ const partnerSchema = z.object({
 });
 
 const storeSchema = z.object({
-  name: z.string().trim().min(2, "اسم المخزن مطلوب"),
+  name: z.string().trim().min(2, t("اسم المخزن مطلوب")),
   isContainerStore: z.boolean(),
   address: z.string().optional(),
 });
 
 const newContainerSchema = z.object({
-  name: z.string().trim().min(1, "الاسم مطلوب"),
+  name: z.string().trim().min(1, t("الاسم مطلوب")),
   description: z.string().optional(),
 });
 
@@ -87,8 +88,8 @@ export default function PartnerSetupWizard({
 
   const isSupplier = partnerType === "supplier";
 
-  const partnerLabel = isSupplier ? "المورد" : "العميل";
-  const partnerLabelShort = isSupplier ? "مورد" : "عميل";
+  const partnerLabel = isSupplier ? t("المورد") : t("العميل");
+  const partnerLabelShort = isSupplier ? t("مورد") : t("عميل");
 
   const [step, setStep] = useState(STEP.PARTNER);
   const [partner, setPartner] = useState(null);
@@ -232,7 +233,7 @@ export default function PartnerSetupWizard({
 
       setPartner(partnerData);
 
-      toast.success(`تم إنشاء ${partnerLabel} بنجاح`);
+      toast.success(t("تم إنشاء {0} بنجاح", { 0: partnerLabel }));
 
       if (data.usesReturnableContainers) {
         // تشغيل السلسلة التلقائية: إنشاء مخزن العبوات ثم تحديد كل الحاويات،
@@ -245,7 +246,7 @@ export default function PartnerSetupWizard({
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          `تعذر إنشاء ${partnerLabel}`,
+          t("تعذر إنشاء {0}", { 0: partnerLabel }),
       );
     }
   };
@@ -287,7 +288,7 @@ export default function PartnerSetupWizard({
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "تعذر إنشاء مخزن الحاويات تلقائيًا — كمّل الخطوة يدويًا",
+          t("تعذر إنشاء مخزن الحاويات تلقائيًا — كمّل الخطوة يدويًا"),
       );
       return;
     }
@@ -313,7 +314,7 @@ export default function PartnerSetupWizard({
       // مفيش حاويات أصلًا للتحديد - نوقف الوضع التلقائي ونسيبه يضيف يدويًا
       setAutoMode(false);
       setAutoStage(null);
-      toast.warning("لا توجد حاويات متاحة للتحديد التلقائي — أضف حاوية يدويًا");
+      toast.warning(t("لا توجد حاويات متاحة للتحديد التلقائي — أضف حاوية يدويًا"));
       return;
     }
 
@@ -324,7 +325,7 @@ export default function PartnerSetupWizard({
       }).unwrap();
 
       toast.success(
-        `تم إنشاء مخزن الحاويات وتحديد ${allIds.length} حاوية تلقائيًا`,
+        t("تم إنشاء مخزن الحاويات وتحديد {0} حاوية تلقائيًا", { 0: allIds.length }),
       );
 
       setAutoMode(false);
@@ -336,7 +337,7 @@ export default function PartnerSetupWizard({
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "تعذر حفظ الحاويات تلقائيًا — راجع التحديد وكمّل يدويًا",
+          t("تعذر حفظ الحاويات تلقائيًا — راجع التحديد وكمّل يدويًا"),
       );
     }
   };
@@ -365,14 +366,14 @@ export default function PartnerSetupWizard({
         id: storeData.id,
       });
 
-      toast.success("تم إنشاء مخزن الحاويات بنجاح");
+      toast.success(t("تم إنشاء مخزن الحاويات بنجاح"));
 
       setStep(STEP.CONTAINERS);
     } catch (error) {
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "تعذر إنشاء مخزن الحاويات",
+          t("تعذر إنشاء مخزن الحاويات"),
       );
     }
   };
@@ -411,14 +412,14 @@ export default function PartnerSetupWizard({
         containerIds: selectedContainerIds,
       }).unwrap();
 
-      toast.success("تم حفظ الحاويات المسموحة");
+      toast.success(t("تم حفظ الحاويات المسموحة"));
 
       setStep(STEP.COMPLETE);
     } catch (error) {
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "تعذر حفظ الحاويات المسموحة",
+          t("تعذر حفظ الحاويات المسموحة"),
       );
     }
   };
@@ -443,19 +444,19 @@ export default function PartnerSetupWizard({
         );
       }
 
-      toast.success("تمت إضافة الحاوية وتحديدها");
+      toast.success(t("تمت إضافة الحاوية وتحديدها"));
 
       resetNewContainer(CONTAINER_DEFAULTS);
       setShowAddContainer(false);
     } catch (error) {
       toast.error(
-        error?.data?.message || error?.data?.title || "تعذر إضافة الحاوية",
+        error?.data?.message || error?.data?.title || t("تعذر إضافة الحاوية"),
       );
     }
   };
 
   const finishLabel = useMemo(
-    () => (isFinishing ? "جاري الحفظ..." : "إنهاء الإعداد"),
+    () => (isFinishing ? t("جاري الحفظ...") : t("إنهاء الإعداد")),
     [isFinishing],
   );
 
@@ -463,7 +464,7 @@ export default function PartnerSetupWizard({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={`إنشاء ${partnerLabel} وإعداد مخزن الحاويات`}
+      title={t("إنشاء {0} وإعداد مخزن الحاويات", { 0: partnerLabel })}
       size="lg"
     >
       {/* =====================================================
@@ -471,7 +472,7 @@ export default function PartnerSetupWizard({
       ====================================================== */}
 
       <div className="flex items-center gap-2 mb-6 text-xs font-medium text-ink-500">
-        {[partnerLabel, "مخزن الحاويات", "الحاويات المسموح بها", "اكتمل"].map(
+        {[partnerLabel, t("مخزن الحاويات"), t("الحاويات المسموح بها"), t("اكتمل")].map(
           (label, idx) => (
             <span
               key={label}
@@ -497,13 +498,13 @@ export default function PartnerSetupWizard({
           className="space-y-4"
         >
           <Input
-            label={`اسم ${partnerLabel}`}
+            label={t("اسم {0}", { 0: partnerLabel })}
             {...registerPartner("name")}
             error={partnerErrors.name?.message}
           />
 
           <div>
-            <label className="block text-sm text-ink-700 mb-1.5">العملة</label>
+            <label className="block text-sm text-ink-700 mb-1.5">{t("العملة")}</label>
 
             <select
               {...registerPartner("currency")}
@@ -524,7 +525,7 @@ export default function PartnerSetupWizard({
           </div>
 
           <Input
-            label="العنوان"
+            label={t("العنوان")}
             {...registerPartner("address")}
             error={partnerErrors.address?.message}
           />
@@ -534,7 +535,7 @@ export default function PartnerSetupWizard({
               type="checkbox"
               {...registerPartner("usesReturnableContainers")}
             />
-            يستخدم حاويات مرتجعة
+            {t("يستخدم حاويات مرتجعة")}
           </label>
 
           <label className="flex items-center gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] px-3.5 py-3 text-sm text-ink-700 cursor-pointer select-none transition-colors hover:bg-amber-500/[0.07]">
@@ -544,23 +545,22 @@ export default function PartnerSetupWizard({
               className="h-4 w-4 rounded border-ink-400/30 accent-amber-500"
             />
             <span>
-              شريك خاص
+              {t("شريك خاص")}
               <span className="block text-xs text-ink-400 mt-0.5">
-                يُستخدم لتمييز {partnerLabelShort} كحساب خاص (مثل شركاء الإدارة
-                أو الأطراف ذات المعاملة الاستثنائية)
+                {t("يُستخدم لتمييز")} {partnerLabelShort} {t("كحساب خاص (مثل شركاء الإدارة أو الأطراف ذات المعاملة الاستثنائية)")}
               </span>
             </span>
           </label>
 
           <div className="rounded-xl border border-primary-100 bg-primary-50/50 p-3 text-xs text-ink-600">
             {usesReturnableContainers
-              ? `هيتم تلقائيًا إنشاء مخزن حاويات خاص بـ${partnerLabelShort} وتحديد كل الحاويات المتاحة له، من غير أي خطوات إضافية.`
-              : `إذا تم تفعيل الخيار، هيتم تلقائيًا إنشاء مخزن حاويات وتحديد كل الحاويات لـ${partnerLabelShort}.`}
+              ? t("هيتم تلقائيًا إنشاء مخزن حاويات خاص بـ{0} وتحديد كل الحاويات المتاحة له، من غير أي خطوات إضافية.", { 0: partnerLabelShort })
+              : t("إذا تم تفعيل الخيار، هيتم تلقائيًا إنشاء مخزن حاويات وتحديد كل الحاويات لـ{0}.", { 0: partnerLabelShort })}
           </div>
 
           <div className="flex gap-3 pt-2">
             <Button type="submit" disabled={isSavingPartner} className="flex-1">
-              {isSavingPartner ? "جاري الحفظ..." : `إنشاء ${partnerLabelShort}`}
+              {isSavingPartner ? t("جاري الحفظ...") : t("إنشاء {0}", { 0: partnerLabelShort })}
             </Button>
 
             {!usesReturnableContainers && (
@@ -571,7 +571,7 @@ export default function PartnerSetupWizard({
                 disabled={isSavingPartner}
                 className="flex-1"
               >
-                إلغاء
+                {t("إلغاء")}
               </Button>
             )}
           </div>
@@ -588,7 +588,7 @@ export default function PartnerSetupWizard({
         <>
           {autoMode && autoStage === "store" ? (
             <AutoProgress
-              label={`جاري إنشاء مخزن الحاويات لـ${partnerLabelShort} تلقائيًا...`}
+              label={t("جاري إنشاء مخزن الحاويات لـ{0} تلقائيًا...", { 0: partnerLabelShort })}
             />
           ) : (
             <form
@@ -596,24 +596,24 @@ export default function PartnerSetupWizard({
               className="space-y-4"
             >
               <div className="rounded-xl border border-gold-200 bg-gold-50 p-3 text-xs text-gold-700">
-                التنفيذ التلقائي محتاج مراجعة — كمّل إنشاء المخزن يدويًا.
+                {t("التنفيذ التلقائي محتاج مراجعة — كمّل إنشاء المخزن يدويًا.")}
               </div>
 
               <Input
-                label="اسم مخزن الحاويات"
+                label={t("اسم مخزن الحاويات")}
                 {...registerStore("name")}
                 error={storeErrors.name?.message}
               />
 
               <Input
-                label="العنوان"
+                label={t("العنوان")}
                 {...registerStore("address")}
                 error={storeErrors.address?.message}
               />
 
               <div className="text-xs text-ink-500 flex items-center gap-1.5">
                 <InfoDot />
-                يمكن تخطي إنشاء مخزن الحاويات واستكماله لاحقًا.
+                {t("يمكن تخطي إنشاء مخزن الحاويات واستكماله لاحقًا.")}
               </div>
 
               <div className="flex gap-3 pt-2">
@@ -624,7 +624,7 @@ export default function PartnerSetupWizard({
                   disabled={isSavingStore}
                   className="flex-1"
                 >
-                  تخطي الآن
+                  {t("تخطي الآن")}
                 </Button>
 
                 <Button
@@ -632,7 +632,7 @@ export default function PartnerSetupWizard({
                   disabled={isSavingStore}
                   className="flex-1"
                 >
-                  {isSavingStore ? "جاري الحفظ..." : "إنشاء المخزن والمتابعة"}
+                  {isSavingStore ? t("جاري الحفظ...") : t("إنشاء المخزن والمتابعة")}
                 </Button>
               </div>
             </form>
@@ -647,12 +647,12 @@ export default function PartnerSetupWizard({
       {step === STEP.CONTAINERS && (
         <div className="space-y-4">
           {autoMode && autoStage === "containers" ? (
-            <AutoProgress label="جاري تحديد كل الحاويات المتاحة تلقائيًا..." />
+            <AutoProgress label={t("جاري تحديد كل الحاويات المتاحة تلقائيًا...")} />
           ) : (
             <>
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm text-ink-700">
-                  اختر الحاويات المسموح بها لـ {partnerLabel}.
+                  {t("اختر الحاويات المسموح بها لـ")} {partnerLabel}.
                 </p>
 
                 {isAdmin && (
@@ -661,14 +661,14 @@ export default function PartnerSetupWizard({
                     variant="ghost"
                     onClick={() => setShowAddContainer(true)}
                   >
-                    + إضافة حاوية
+                    {t("+ إضافة حاوية")}
                   </Button>
                 )}
               </div>
 
               <div className="flex items-center justify-between rounded-xl border border-ink-400/10 bg-ink-900/[0.02] px-3 py-2">
                 <span className="text-xs text-ink-500">
-                  محدد: {selectedContainerIds.length} من {containers.length}
+                  {t("محدد:")} {selectedContainerIds.length} {t("من")} {containers.length}
                 </span>
 
                 <Button
@@ -678,18 +678,18 @@ export default function PartnerSetupWizard({
                   disabled={isLoadingContainers || containers.length === 0}
                   className="h-8 px-3 text-xs"
                 >
-                  {allContainersSelected ? "إلغاء تحديد الكل" : "تحديد الكل"}
+                  {allContainersSelected ? t("إلغاء تحديد الكل") : t("تحديد الكل")}
                 </Button>
               </div>
 
               <div className="border rounded-xl divide-y max-h-72 overflow-y-auto">
                 {isLoadingContainers ? (
                   <p className="p-4 text-sm text-ink-500">
-                    جاري تحميل الحاويات...
+                    {t("جاري تحميل الحاويات...")}
                   </p>
                 ) : containers.length === 0 ? (
                   <p className="p-4 text-sm text-ink-500 text-center">
-                    لا توجد حاويات متاحة حاليًا.
+                    {t("لا توجد حاويات متاحة حاليًا.")}
                   </p>
                 ) : (
                   containers.map((container) => (
@@ -717,7 +717,7 @@ export default function PartnerSetupWizard({
                   disabled={isFinishing}
                   className="flex-1"
                 >
-                  رجوع
+                  {t("رجوع")}
                 </Button>
 
                 <Button
@@ -738,20 +738,20 @@ export default function PartnerSetupWizard({
             <Modal
               isOpen={showAddContainer}
               onClose={() => setShowAddContainer(false)}
-              title="إضافة حاوية جديدة"
+              title={t("إضافة حاوية جديدة")}
             >
               <form
                 onSubmit={handleSubmitNewContainer(submitNewContainer)}
                 className="space-y-4"
               >
                 <Input
-                  label="الاسم"
+                  label={t("الاسم")}
                   {...registerNewContainer("name")}
                   error={newContainerErrors.name?.message}
                 />
 
                 <Input
-                  label="الوصف (اختياري)"
+                  label={t("الوصف (اختياري)")}
                   {...registerNewContainer("description")}
                   error={newContainerErrors.description?.message}
                 />
@@ -763,7 +763,7 @@ export default function PartnerSetupWizard({
                     onClick={() => setShowAddContainer(false)}
                     className="flex-1"
                   >
-                    إلغاء
+                    {t("إلغاء")}
                   </Button>
 
                   <Button
@@ -771,7 +771,7 @@ export default function PartnerSetupWizard({
                     disabled={isCreatingContainer}
                     className="flex-1"
                   >
-                    {isCreatingContainer ? "جاري الإنشاء..." : "إنشاء وتحديد"}
+                    {isCreatingContainer ? t("جاري الإنشاء...") : t("إنشاء وتحديد")}
                   </Button>
                 </div>
               </form>
@@ -786,12 +786,12 @@ export default function PartnerSetupWizard({
 
       {step === STEP.COMPLETE && (
         <div className="space-y-4">
-          <CompleteRow label={`تم إنشاء ${partnerLabel}`} />
+          <CompleteRow label={t("تم إنشاء {0}", { 0: partnerLabel })} />
 
-          <CompleteRow label="تم إنشاء مخزن الحاويات تلقائيًا" />
+          <CompleteRow label={t("تم إنشاء مخزن الحاويات تلقائيًا")} />
 
           <CompleteRow
-            label={`تم تحديد ${selectedContainerIds.length} حاوية تلقائيًا`}
+            label={t("تم تحديد {0} حاوية تلقائيًا", { 0: selectedContainerIds.length })}
           />
 
           <Button
@@ -799,7 +799,7 @@ export default function PartnerSetupWizard({
             className="w-full"
             onClick={() => selectPartnerAndClose(partner)}
           >
-            تم — تحديد {partnerLabelShort} وإغلاق
+            {t("تم — تحديد")} {partnerLabelShort} {t("وإغلاق")}
           </Button>
         </div>
       )}
@@ -836,7 +836,7 @@ function AutoProgress({ label }) {
     <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
       <Loader2 size={28} className="animate-spin text-primary-500" />
       <p className="text-sm text-ink-700">{label}</p>
-      <p className="text-xs text-ink-400">من فضلك استنى لحظات...</p>
+      <p className="text-xs text-ink-400">{t("من فضلك استنى لحظات...")}</p>
     </div>
   );
 }

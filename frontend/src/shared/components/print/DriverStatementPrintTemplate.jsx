@@ -1,8 +1,10 @@
 import { useSelector } from "react-redux";
 import { formatDate as sharedFormatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const fmt = (value) =>
-  Number(value || 0).toLocaleString("ar-EG", {
+  Number(value || 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -38,7 +40,7 @@ export default function DriverStatementPrintTemplate({
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       style={{
         width: "297mm",
         minHeight: "210mm",
@@ -81,7 +83,7 @@ export default function DriverStatementPrintTemplate({
               margin: "4px 0 0",
             }}
           >
-            كشف حساب سائق
+            {t("كشف حساب سائق")}
           </p>
         </div>
 
@@ -91,9 +93,9 @@ export default function DriverStatementPrintTemplate({
             fontSize: "10px",
           }}
         >
-          <p style={{ margin: "2px 0" }}>تاريخ الطباعة: {today}</p>
+          <p style={{ margin: "2px 0" }}>{t("تاريخ الطباعة:")} {today}</p>
 
-          <p style={{ margin: "2px 0" }}>عدد الحركات: {items.length}</p>
+          <p style={{ margin: "2px 0" }}>{t("عدد الحركات:")} {items.length}</p>
         </div>
       </div>
 
@@ -122,7 +124,7 @@ export default function DriverStatementPrintTemplate({
               marginBottom: "3px",
             }}
           >
-            السائق
+            {t("السائق")}
           </div>
 
           <div
@@ -150,7 +152,7 @@ export default function DriverStatementPrintTemplate({
               marginBottom: "3px",
             }}
           >
-            كود السائق
+            {t("كود السائق")}
           </div>
 
           <div
@@ -178,43 +180,43 @@ export default function DriverStatementPrintTemplate({
             flexWrap: "wrap",
           }}
         >
-          {filters.fromDate && <span>من: {formatDate(filters.fromDate)}</span>}
+          {filters.fromDate && <span>{t("من:")} {formatDate(filters.fromDate)}</span>}
 
-          {filters.toDate && <span>إلى: {formatDate(filters.toDate)}</span>}
+          {filters.toDate && <span>{t("إلى:")} {formatDate(filters.toDate)}</span>}
 
           {filters.direction && (
             <span>
-              اتجاه الحركة:{" "}
+              {t("اتجاه الحركة:")}{" "}
               {filters.direction === "Receipt"
-                ? "وارد"
+                ? t("وارد")
                 : filters.direction === "Payment"
-                  ? "صادر"
+                  ? t("صادر")
                   : filters.direction}
             </span>
           )}
 
           {filters.cashMovementTypeId && (
-            <span>نوع الحركة: {filters.cashMovementTypeId}</span>
+            <span>{t("نوع الحركة:")} {filters.cashMovementTypeId}</span>
           )}
 
           {filters.driverTripId && (
-            <span>رقم الرحلة: {filters.driverTripId}</span>
+            <span>{t("رقم الرحلة:")} {filters.driverTripId}</span>
           )}
 
           {filters.invoiceNumber && (
-            <span>رقم الفاتورة: {filters.invoiceNumber}</span>
+            <span>{t("رقم الفاتورة:")} {filters.invoiceNumber}</span>
           )}
 
           {filters.hasCost !== "" && filters.hasCost !== undefined && (
             <span>
-              تكلفة الرحلة:{" "}
-              {filters.hasCost === "true" ? "بها تكلفة" : "بدون تكلفة"}
+              {t("تكلفة الرحلة:")}{" "}
+              {filters.hasCost === "true" ? t("بها تكلفة") : t("بدون تكلفة")}
             </span>
           )}
 
-          {filters.transactionsWithoutTrip && <span>سندات عامة بدون رحلة</span>}
+          {filters.transactionsWithoutTrip && <span>{t("سندات عامة بدون رحلة")}</span>}
 
-          {filters.search && <span>البحث: {filters.search}</span>}
+          {filters.search && <span>{t("البحث:")} {filters.search}</span>}
         </div>
       )}
 
@@ -232,18 +234,18 @@ export default function DriverStatementPrintTemplate({
           <tr style={{ background: "#EFF2F0" }}>
             {[
               "#",
-              "التاريخ",
-              "المستند",
-              "البيان",
-              "البلد",
-              "الخزنة",
-              "الرحلة",
-              "الفاتورة",
-              "العميل",
-              "مدفوع للسائق",
-              "مستلم منه",
-              "تكلفة الرحلة",
-              "الرصيد",
+              t("التاريخ"),
+              t("المستند"),
+              t("البيان"),
+              t("البلد"),
+              t("الخزنة"),
+              t("الرحلة"),
+              t("الفاتورة"),
+              t("العميل"),
+              t("مدفوع للسائق"),
+              t("مستلم منه"),
+              t("تكلفة الرحلة"),
+              t("الرصيد"),
             ].map((header) => (
               <th
                 key={header}
@@ -371,7 +373,7 @@ export default function DriverStatementPrintTemplate({
                         fontWeight: 700,
                       }}
                     >
-                      غير متسعّرة
+                      {t("غير متسعّرة")}
                     </span>
                   )
                 ) : (
@@ -420,7 +422,7 @@ export default function DriverStatementPrintTemplate({
                   color: "#6F7C75",
                 }}
               >
-                لا توجد حركات في كشف الحساب
+                {t("لا توجد حركات في كشف الحساب")}
               </td>
             </tr>
           )}
@@ -446,13 +448,13 @@ export default function DriverStatementPrintTemplate({
         >
           <tbody>
             <tr>
-              <td style={summaryTitle}>رصيد أول المدة</td>
+              <td style={summaryTitle}>{t("رصيد أول المدة")}</td>
 
               <td style={summaryValue}>{fmt(summary.openingBalanceAmount)}</td>
             </tr>
 
             <tr>
-              <td style={summaryTitle}>إجمالي المدفوع للسائق</td>
+              <td style={summaryTitle}>{t("إجمالي المدفوع للسائق")}</td>
 
               <td
                 style={{
@@ -466,7 +468,7 @@ export default function DriverStatementPrintTemplate({
             </tr>
 
             <tr>
-              <td style={summaryTitle}>إجمالي المستلم من السائق</td>
+              <td style={summaryTitle}>{t("إجمالي المستلم من السائق")}</td>
 
               <td
                 style={{
@@ -480,7 +482,7 @@ export default function DriverStatementPrintTemplate({
             </tr>
 
             <tr>
-              <td style={summaryTitle}>إجمالي تكلفة الرحلات</td>
+              <td style={summaryTitle}>{t("إجمالي تكلفة الرحلات")}</td>
 
               <td style={summaryValue}>{fmt(summary.totalTripCost)}</td>
             </tr>
@@ -492,7 +494,7 @@ export default function DriverStatementPrintTemplate({
                   fontWeight: 700,
                 }}
               >
-                رصيد آخر المدة
+                {t("رصيد آخر المدة")}
               </td>
 
               <td
@@ -548,7 +550,7 @@ export default function DriverStatementPrintTemplate({
               paddingTop: "6px",
             }}
           >
-            توقيع السائق
+            {t("توقيع السائق")}
           </div>
         </div>
 
@@ -564,7 +566,7 @@ export default function DriverStatementPrintTemplate({
               paddingTop: "6px",
             }}
           >
-            توقيع المسؤول
+            {t("توقيع المسؤول")}
           </div>
         </div>
       </div>

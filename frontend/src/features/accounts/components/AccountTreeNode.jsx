@@ -2,6 +2,7 @@ import { memo, useCallback, useState } from "react";
 import { ChevronDown, Plus, Pencil, Trash2, Circle } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
+import { t } from "../../../i18n";
 const TYPE_STYLES = {
   Asset: {
     dot: "bg-emerald-500",
@@ -26,11 +27,11 @@ const TYPE_STYLES = {
 };
 
 const TYPE_LABELS = {
-  Asset: "أصول",
-  Liability: "التزامات",
-  Equity: "حقوق ملكية",
-  Revenue: "إيرادات",
-  Expense: "مصروفات",
+  Asset: t("أصول"),
+  Liability: t("التزامات"),
+  Equity: t("حقوق ملكية"),
+  Revenue: t("إيرادات"),
+  Expense: t("مصروفات"),
 };
 
 const INDENT_WIDTH = 28;
@@ -54,7 +55,7 @@ const AccountTreeNode = memo(function AccountTreeNode({
   };
 
   const typeLabel =
-    TYPE_LABELS[node.accountType] || node.accountType || "غير محدد";
+    TYPE_LABELS[node.accountType] || node.accountType || t("غير محدد");
 
   const toggleExpanded = useCallback(() => {
     if (!hasChildren) return;
@@ -119,7 +120,7 @@ const AccountTreeNode = memo(function AccountTreeNode({
             onClick={toggleExpanded}
             disabled={!hasChildren}
             aria-label={
-              hasChildren ? (expanded ? "طي الحساب" : "فتح الحساب") : undefined
+              hasChildren ? (expanded ? t("طي الحساب") : t("فتح الحساب")) : undefined
             }
             className={`relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition-colors ${
               hasChildren
@@ -183,7 +184,7 @@ const AccountTreeNode = memo(function AccountTreeNode({
 
             {hasChildren && (
               <div className="text-[10px] leading-4 text-slate-400">
-                {node.children.length} حساب فرعي
+                {node.children.length} {t("حساب فرعي")}
               </div>
             )}
           </button>
@@ -196,13 +197,13 @@ const AccountTreeNode = memo(function AccountTreeNode({
 
           {node.isPosting && (
             <span className="hidden shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-medium text-slate-500 md:inline-flex">
-              قابل للتسجيل
+              {t("قابل للتسجيل")}
             </span>
           )}
 
           {!node.isActive && (
             <span className="hidden shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-medium text-slate-500 lg:inline-flex">
-              غير فعال
+              {t("غير فعال")}
             </span>
           )}
 
@@ -210,7 +211,7 @@ const AccountTreeNode = memo(function AccountTreeNode({
             {!node.isPosting && (
               <motion.button
                 type="button"
-                title="إضافة حساب فرعي"
+                title={t("إضافة حساب فرعي")}
                 whileHover={{ scale: 1.08 }}
                 whileTap={{ scale: 0.92 }}
                 onClick={handleAddChild}
@@ -222,7 +223,7 @@ const AccountTreeNode = memo(function AccountTreeNode({
 
             <motion.button
               type="button"
-              title="تعديل"
+              title={t("تعديل")}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
               onClick={handleEdit}
@@ -233,7 +234,7 @@ const AccountTreeNode = memo(function AccountTreeNode({
 
             <motion.button
               type="button"
-              title="حذف"
+              title={t("حذف")}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
               onClick={handleDelete}

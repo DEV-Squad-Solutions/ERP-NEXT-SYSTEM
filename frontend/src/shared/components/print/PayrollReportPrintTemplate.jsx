@@ -1,6 +1,8 @@
 import { fmtMoney } from "../../../features/payroll/payroll.constants";
 import { formatDate as formatDateDisplay } from "../../../lib/date";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 function formatDate(date) {
   if (!date) return "—";
 
@@ -26,7 +28,7 @@ export default function PayrollReportPrintTemplate({
   const employees = Array.isArray(data?.employees) ? data.employees : [];
 
   return (
-    <div dir="rtl" style={styles.page}>
+    <div dir={getDir()} style={styles.page}>
       <style>
         {`
           @page {
@@ -64,15 +66,15 @@ export default function PayrollReportPrintTemplate({
       {/* Header */}
       <div style={styles.header}>
         <div>
-          <h1 style={styles.title}>تقرير الأجور والمرتبات</h1>
+          <h1 style={styles.title}>{t("تقرير الأجور والمرتبات")}</h1>
 
           <p style={styles.subtitle}>
-            تقرير تفصيلي للرواتب والحضور والاستحقاقات
+            {t("تقرير تفصيلي للرواتب والحضور والاستحقاقات")}
           </p>
         </div>
 
         <div style={styles.dateBox}>
-          <div>فترة التقرير</div>
+          <div>{t("فترة التقرير")}</div>
 
           <strong>
             {formatDate(startDate)} — {formatDate(endDate)}
@@ -82,91 +84,91 @@ export default function PayrollReportPrintTemplate({
 
       {/* Summary */}
       <div style={styles.statsGrid}>
-        <StatBox title="إجمالي الكشوف" value={summary.totalEntries ?? 0} />
+        <StatBox title={t("إجمالي الكشوف")} value={summary.totalEntries ?? 0} />
 
-        <StatBox title="عدد الموظفين" value={summary.totalEmployees ?? 0} />
+        <StatBox title={t("عدد الموظفين")} value={summary.totalEmployees ?? 0} />
 
         <StatBox
-          title="الإجمالي"
+          title={t("الإجمالي")}
           value={fmtMoney(summary.totalGrossSalary ?? 0)}
         />
 
         <StatBox
-          title="الراتب المحسوب"
+          title={t("الراتب المحسوب")}
           value={fmtMoney(summary.totalCalculatedSalary ?? 0)}
         />
 
-        <StatBox title="المكافآت" value={fmtMoney(summary.totalBonus ?? 0)} />
+        <StatBox title={t("المكافآت")} value={fmtMoney(summary.totalBonus ?? 0)} />
 
         <StatBox
-          title="الخصومات"
+          title={t("الخصومات")}
           value={fmtMoney(summary.totalDeduction ?? 0)}
         />
 
         <StatBox
-          title="صافي الرواتب"
+          title={t("صافي الرواتب")}
           value={fmtMoney(summary.totalNetSalary ?? 0)}
         />
 
-        <StatBox title="المدفوع" value={fmtMoney(summary.paidAmount ?? 0)} />
+        <StatBox title={t("المدفوع")} value={fmtMoney(summary.paidAmount ?? 0)} />
 
-        <StatBox title="المعلق" value={fmtMoney(summary.pendingAmount ?? 0)} />
+        <StatBox title={t("المعلق")} value={fmtMoney(summary.pendingAmount ?? 0)} />
 
-        <StatBox title="أيام الحضور" value={summary.totalPresentDays ?? 0} />
+        <StatBox title={t("أيام الحضور")} value={summary.totalPresentDays ?? 0} />
 
-        <StatBox title="أيام الغياب" value={summary.totalAbsentDays ?? 0} />
+        <StatBox title={t("أيام الغياب")} value={summary.totalAbsentDays ?? 0} />
 
-        <StatBox title="وحدات العمل" value={summary.totalWorkedUnits ?? 0} />
+        <StatBox title={t("وحدات العمل")} value={summary.totalWorkedUnits ?? 0} />
       </div>
 
       {/* Payment Summary */}
       <div style={styles.paymentSummary}>
         <div>
-          <strong>حالة السداد</strong>
+          <strong>{t("حالة السداد")}</strong>
         </div>
 
         <div>
-          المدفوع: <strong>{summary.paidCount ?? 0}</strong>
+          {t("المدفوع:")} <strong>{summary.paidCount ?? 0}</strong>
         </div>
 
         <div>
-          المعلق: <strong>{summary.pendingCount ?? 0}</strong>
+          {t("المعلق:")} <strong>{summary.pendingCount ?? 0}</strong>
         </div>
 
         <div>
-          المبلغ المدفوع: <strong>{fmtMoney(summary.paidAmount ?? 0)}</strong>
+          {t("المبلغ المدفوع:")} <strong>{fmtMoney(summary.paidAmount ?? 0)}</strong>
         </div>
 
         <div>
-          المبلغ المعلق: <strong>{fmtMoney(summary.pendingAmount ?? 0)}</strong>
+          {t("المبلغ المعلق:")} <strong>{fmtMoney(summary.pendingAmount ?? 0)}</strong>
         </div>
       </div>
 
       {/* Employees */}
       <section className="print-section" style={styles.section}>
-        <h2 style={styles.sectionTitle}>تفاصيل الموظفين</h2>
+        <h2 style={styles.sectionTitle}>{t("تفاصيل الموظفين")}</h2>
 
         {employees.length === 0 ? (
-          <div style={styles.empty}>لا توجد بيانات موظفين.</div>
+          <div style={styles.empty}>{t("لا توجد بيانات موظفين.")}</div>
         ) : (
           <table>
             <thead>
               <tr>
-                <th style={styles.th}>الكود</th>
-                <th style={styles.th}>الموظف</th>
-                <th style={styles.th}>النوع</th>
-                <th style={styles.th}>من</th>
-                <th style={styles.th}>إلى</th>
-                <th style={styles.th}>حضور</th>
-                <th style={styles.th}>غياب</th>
-                <th style={styles.th}>وحدات</th>
-                <th style={styles.th}>إضافي</th>
-                <th style={styles.th}>خصم وحدات</th>
-                <th style={styles.th}>الإجمالي</th>
-                <th style={styles.th}>المكافأة</th>
-                <th style={styles.th}>الخصم</th>
-                <th style={styles.th}>الصافي</th>
-                <th style={styles.th}>الحالة</th>
+                <th style={styles.th}>{t("الكود")}</th>
+                <th style={styles.th}>{t("الموظف")}</th>
+                <th style={styles.th}>{t("النوع")}</th>
+                <th style={styles.th}>{t("من")}</th>
+                <th style={styles.th}>{t("إلى")}</th>
+                <th style={styles.th}>{t("حضور")}</th>
+                <th style={styles.th}>{t("غياب")}</th>
+                <th style={styles.th}>{t("وحدات")}</th>
+                <th style={styles.th}>{t("إضافي")}</th>
+                <th style={styles.th}>{t("خصم وحدات")}</th>
+                <th style={styles.th}>{t("الإجمالي")}</th>
+                <th style={styles.th}>{t("المكافأة")}</th>
+                <th style={styles.th}>{t("الخصم")}</th>
+                <th style={styles.th}>{t("الصافي")}</th>
+                <th style={styles.th}>{t("الحالة")}</th>
               </tr>
             </thead>
 
@@ -180,7 +182,7 @@ export default function PayrollReportPrintTemplate({
                   </td>
 
                   <td style={styles.td}>
-                    {employee.employeeType === "Daily" ? "يومي" : "شهري"}
+                    {employee.employeeType === "Daily" ? t("يومي") : t("شهري")}
                   </td>
 
                   <td style={styles.td}>{formatDate(employee.startDate)}</td>
@@ -210,7 +212,7 @@ export default function PayrollReportPrintTemplate({
                   </td>
 
                   <td style={styles.td}>
-                    {employee.isPaid ? "مدفوع" : "معلق"}
+                    {employee.isPaid ? t("مدفوع") : t("معلق")}
                   </td>
                 </tr>
               ))}
@@ -221,13 +223,13 @@ export default function PayrollReportPrintTemplate({
 
       {/* Footer */}
       <div style={styles.footer}>
-        <span>تقرير الأجور والمرتبات</span>
+        <span>{t("تقرير الأجور والمرتبات")}</span>
 
         <span>
-          الفترة: {formatDate(startDate)} — {formatDate(endDate)}
+          {t("الفترة:")} {formatDate(startDate)} — {formatDate(endDate)}
         </span>
 
-        <span>عدد الموظفين: {employees.length}</span>
+        <span>{t("عدد الموظفين:")} {employees.length}</span>
       </div>
     </div>
   );

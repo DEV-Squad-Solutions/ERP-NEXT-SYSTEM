@@ -7,6 +7,7 @@ import { Printer } from "lucide-react";
 import InvoiceListPrintTemplate from "../../../shared/components/print/InvoiceListPrintTemplate";
 import SalesStatsCards from "../../sales/components/SalesStatsCards";
 
+import { t } from "../../../i18n";
 /**
  * @param {{ partnerId: string, filters?: Object }} props
  */
@@ -39,7 +40,7 @@ export default function PartnerInvoicesTab({ partnerId, filters }) {
   };
 
   const { printList, printRef } = useInvoiceListPrint({
-    title: "تقرير الفواتير",
+    title: t("تقرير الفواتير"),
   });
 
   return (
@@ -47,16 +48,16 @@ export default function PartnerInvoicesTab({ partnerId, filters }) {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">فواتير العميل</h2>
+          <h2 className="text-lg font-bold text-gray-900">{t("فواتير العميل")}</h2>
 
           <p className="mt-1 text-sm text-gray-500">
-            إجمالي الفواتير: {data?.totalCount ?? data?.items?.length ?? 0}
+            {t("إجمالي الفواتير:")} {data?.totalCount ?? data?.items?.length ?? 0}
           </p>
         </div>
 
         <Button variant="outline" onClick={printList}>
           <Printer size={16} />
-          طباعة التقرير
+          {t("طباعة التقرير")}
         </Button>
       </div>
 

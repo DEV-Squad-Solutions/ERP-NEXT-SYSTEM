@@ -20,6 +20,8 @@ import {
   useDeleteInvoiceMutation,
 } from "../../invoices/invoicesApi";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function InvoiceDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -59,7 +61,7 @@ export default function InvoiceDetailsPage() {
 
   const handleConfirmDelete = async () => {
     if (!id || !invoice?.rowVersion) {
-      toast.error("بيانات الحذف غير مكتملة");
+      toast.error(t("بيانات الحذف غير مكتملة"));
       return;
     }
     try {
@@ -67,14 +69,14 @@ export default function InvoiceDetailsPage() {
         id: id,
         rowVersion: invoice.rowVersion,
       }).unwrap();
-      toast.success("تم حذف الفاتورة بنجاح");
+      toast.success(t("تم حذف الفاتورة بنجاح"));
       setDeleteOpen(false);
       navigate("/dashboard/sales");
     } catch {}
   };
 
   return (
-    <div dir="rtl" className="min-h-screen   px-4 py-6 sm:px-8">
+    <div dir={getDir()} className="min-h-screen   px-4 py-6 sm:px-8">
       {isLoading && <InvoiceDetailsSkeleton />}
 
       {!isLoading && isError && (

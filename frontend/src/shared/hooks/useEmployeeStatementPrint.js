@@ -1,11 +1,12 @@
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
+import { t } from "../../i18n";
 /**
  * Hook لطباعة كشف حساب موظف
  */
 export default function useEmployeeStatementPrint({
-  title = "كشف حساب موظف",
+  title = t("كشف حساب موظف"),
 } = {}) {
   const printRef = useRef(null);
 

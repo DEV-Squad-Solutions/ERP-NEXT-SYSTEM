@@ -26,6 +26,8 @@ import ImportExchangeRatesModal from "../components/ImportExchangeRatesModal";
 import { selectIsAdmin } from "../../auth/authSlice";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 function fmtDate(d) {
   if (!d) return "—";
   return formatDate(new Date(d));
@@ -51,46 +53,46 @@ export default function CurrenciesPage() {
   const rows = data?.items || [];
 
   function handleDelete(r) {
-    toast.warning(`هل أنت متأكد من حذف سعر ${r.currency}؟`, {
+    toast.warning(t("هل أنت متأكد من حذف سعر {0}؟", { 0: r.currency }), {
       duration: 8000,
       action: {
-        label: "حذف",
+        label: t("حذف"),
         onClick: async () => {
           try {
             await deleteExchangeRate({
               id: r.id,
               rowVersion: r.rowVersion,
             }).unwrap();
-            toast.success("تم حذف السعر بنجاح");
+            toast.success(t("تم حذف السعر بنجاح"));
             refetch();
           } catch (err) {
             toast.error(
               err?.data?.detail ||
                 err?.data?.title ||
-                "لا يمكن حذف السعر — قد يكون مرتبطًا بحركات فعلية",
+                t("لا يمكن حذف السعر — قد يكون مرتبطًا بحركات فعلية"),
             );
           }
         },
       },
-      cancel: { label: "إلغاء" },
+      cancel: { label: t("إلغاء") },
     });
   }
 
   return (
-    <div className="animate-fadeUp space-y-5" dir="rtl">
+    <div className="animate-fadeUp space-y-5" dir={getDir()}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-ink-900">
             <Coins size={20} className="text-primary-500" />
-            العملات وأسعار الصرف
+            {t("العملات وأسعار الصرف")}
           </h2>
           <p className="mt-1 text-sm text-ink-400">
-            إدارة أسعار صرف العملات المستخدمة في السندات والفواتير
+            {t("إدارة أسعار صرف العملات المستخدمة في السندات والفواتير")}
           </p>
 
           {!isAdmin && (
             <p className="mt-1 text-xs text-ink-400">
-              عرض فقط — إضافة وتعديل وحذف أسعار الصرف متاحة لمدير النظام.
+              {t("عرض فقط — إضافة وتعديل وحذف أسعار الصرف متاحة لمدير النظام.")}
             </p>
           )}
         </div>
@@ -99,7 +101,7 @@ export default function CurrenciesPage() {
           {isAdmin && (
             <Button variant="outline" onClick={() => setImportOpen(true)}>
               <Download size={16} />
-              استيراد من مصدر خارجي
+              {t("استيراد من مصدر خارجي")}
             </Button>
           )}
 
@@ -109,7 +111,7 @@ export default function CurrenciesPage() {
               disabled={isFiscalYearReadOnly}
             >
               <Plus size={16} />
-              إضافة سعر عملة
+              {t("إضافة سعر عملة")}
             </Button>
           )}
         </div>
@@ -121,7 +123,7 @@ export default function CurrenciesPage() {
 
       {isLoading && (
         <div className="rounded-2xl border border-dashed border-ink-400/20 py-16 text-center text-ink-400">
-          جاري تحميل العملات...
+          {t("جاري تحميل العملات...")}
         </div>
       )}
 
@@ -129,7 +131,7 @@ export default function CurrenciesPage() {
         <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
           <span className="flex items-center gap-2">
             <AlertCircle size={16} />
-            حدث خطأ أثناء تحميل العملات.
+            {t("حدث خطأ أثناء تحميل العملات.")}
           </span>
           <button
             type="button"
@@ -137,7 +139,7 @@ export default function CurrenciesPage() {
             className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs font-medium transition hover:bg-rose-100"
           >
             <RefreshCw size={12} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       )}
@@ -149,21 +151,21 @@ export default function CurrenciesPage() {
           }`}
         >
           <div className="overflow-x-auto">
-            <table className="w-full text-sm" dir="rtl">
+            <table className="w-full text-sm" dir={getDir()}>
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
-                  <th className="px-3 py-2.5 text-right font-medium">العملة</th>
+                  <th className="px-3 py-2.5 text-right font-medium">{t("العملة")}</th>
                   <th className="px-3 py-2.5 text-right font-medium">
-                    السعر (مقابل {rows[0]?.baseCurrency || "EGP"})
+                    {t("السعر (مقابل")} {rows[0]?.baseCurrency || "EGP"})
                   </th>
                   <th className="px-3 py-2.5 text-right font-medium">
-                    تاريخ السعر
+                    {t("تاريخ السعر")}
                   </th>
                   <th className="px-3 py-2.5 text-right font-medium">
-                    آخر تحديث
+                    {t("آخر تحديث")}
                   </th>
                   <th className="px-3 py-2.5 text-right font-medium">
-                    إجراءات
+                    {t("إجراءات")}
                   </th>
                 </tr>
               </thead>
@@ -175,7 +177,7 @@ export default function CurrenciesPage() {
                       colSpan={5}
                       className="px-3 py-14 text-center text-ink-400"
                     >
-                      لا توجد عملات مسجلة
+                      {t("لا توجد عملات مسجلة")}
                     </td>
                   </tr>
                 ) : (
@@ -203,7 +205,7 @@ export default function CurrenciesPage() {
                               <button
                                 type="button"
                                 onClick={() => setEditingRate(r)}
-                                title="تعديل السعر"
+                                title={t("تعديل السعر")}
                                 className="rounded-lg p-1.5 text-ink-400 transition hover:bg-primary-500/10 hover:text-primary-600"
                               >
                                 <Pencil size={15} />
@@ -213,7 +215,7 @@ export default function CurrenciesPage() {
                                 type="button"
                                 onClick={() => handleDelete(r)}
                                 disabled={isDeleting}
-                                title="حذف السعر"
+                                title={t("حذف السعر")}
                                 className="rounded-lg p-1.5 text-ink-400 transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
                               >
                                 <Trash2 size={15} />
@@ -239,7 +241,7 @@ export default function CurrenciesPage() {
                 setPageSize(size);
                 setPage(1);
               }}
-              label="سعر"
+              label={t("سعر")}
             />
           )}
         </div>

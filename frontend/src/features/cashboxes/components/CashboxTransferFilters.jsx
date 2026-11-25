@@ -6,6 +6,7 @@ import DateInput from "../../../shared/components/ui/DateInput.jsx"; // عدّل
 const fieldCls =
   "w-full rounded-lg border border-ink-400/20 bg-white px-3 py-1.5 text-sm text-ink-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500";
 
+import { t } from "../../../i18n";
 export default function CashboxTransferFilters({
   draft,
   onChange,
@@ -21,17 +22,17 @@ export default function CashboxTransferFilters({
     <div className="mb-4 rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-ink-400">بحث</span>
+          <span className="font-medium text-ink-400">{t("بحث")}</span>
           <input
             className={fieldCls}
-            placeholder="رقم التحويل"
+            placeholder={t("رقم التحويل")}
             value={draft.Search}
             onChange={set("Search")}
           />
         </label>
 
         <div className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-ink-400">من خزينة</span>
+          <span className="font-medium text-ink-400">{t("من خزينة")}</span>
           <CompactSelect
             options={cashboxes.map((c) => ({
               value: String(c.id),
@@ -39,12 +40,12 @@ export default function CashboxTransferFilters({
             }))}
             value={draft.SourceCashboxId}
             onChange={setSelect("SourceCashboxId")}
-            placeholder="الكل"
+            placeholder={t("الكل")}
           />
         </div>
 
         <div className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-ink-400">إلى خزينة</span>
+          <span className="font-medium text-ink-400">{t("إلى خزينة")}</span>
           <CompactSelect
             options={cashboxes.map((c) => ({
               value: String(c.id),
@@ -52,12 +53,12 @@ export default function CashboxTransferFilters({
             }))}
             value={draft.DestinationCashboxId}
             onChange={setSelect("DestinationCashboxId")}
-            placeholder="الكل"
+            placeholder={t("الكل")}
           />
         </div>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-ink-400">من تاريخ</span>
+          <span className="font-medium text-ink-400">{t("من تاريخ")}</span>
           <DateInput
             type="date"
             className={fieldCls}
@@ -67,7 +68,7 @@ export default function CashboxTransferFilters({
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium text-ink-400">إلى تاريخ</span>
+          <span className="font-medium text-ink-400">{t("إلى تاريخ")}</span>
           <DateInput
             type="date"
             className={fieldCls}
@@ -83,14 +84,14 @@ export default function CashboxTransferFilters({
           className="inline-flex items-center gap-1.5 rounded-lg border border-ink-400/20 px-3 py-1.5 text-sm text-ink-400 hover:text-ink-900"
         >
           <RotateCcw size={14} />
-          إعادة تعيين
+          {t("إعادة تعيين")}
         </button>
         <button
           onClick={onSearch}
           className="inline-flex items-center gap-1.5 rounded-lg bg-primary-500 px-4 py-1.5 text-sm font-medium text-white hover:opacity-90"
         >
           <Search size={14} />
-          بحث
+          {t("بحث")}
         </button>
       </div>
     </div>

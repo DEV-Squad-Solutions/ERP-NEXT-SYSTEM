@@ -8,6 +8,7 @@ import {
   useUpdateDriverMutation,
 } from "../driversApi";
 
+import { t } from "../../../i18n";
 const emptyForm = {
   name: "",
   phoneNumber: "",
@@ -82,7 +83,7 @@ export default function QuickAddDriverModal({
         : await createDriver(form).unwrap();
 
       toast.success(
-        isEdit ? "تم تحديث بيانات السائق" : "تم إضافة السائق بنجاح",
+        isEdit ? t("تم تحديث بيانات السائق") : t("تم إضافة السائق بنجاح"),
       );
 
       // مهم:
@@ -97,39 +98,39 @@ export default function QuickAddDriverModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل بيانات السائق" : "إضافة سائق جديد"}
+      title={isEdit ? t("تعديل بيانات السائق") : t("إضافة سائق جديد")}
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <Input
-          label="اسم السائق"
+          label={t("اسم السائق")}
           value={form.name}
           onChange={handleChange("name")}
           disabled={isLoading}
         />
 
         <Input
-          label="رقم الهاتف"
+          label={t("رقم الهاتف")}
           value={form.phoneNumber}
           onChange={handleChange("phoneNumber")}
           disabled={isLoading}
         />
 
         <Input
-          label="الرقم القومي"
+          label={t("الرقم القومي")}
           value={form.nationalId}
           onChange={handleChange("nationalId")}
           disabled={isLoading}
         />
 
         <Input
-          label="رقم الرخصة"
+          label={t("رقم الرخصة")}
           value={form.licenseNumber}
           onChange={handleChange("licenseNumber")}
           disabled={isLoading}
         />
 
         <Input
-          label="تاريخ انتهاء الرخصة"
+          label={t("تاريخ انتهاء الرخصة")}
           type="date"
           value={form.licenseExpiryDate}
           onChange={handleChange("licenseExpiryDate")}
@@ -145,12 +146,12 @@ export default function QuickAddDriverModal({
               disabled={isLoading}
               className="rounded border-ink-400/30"
             />
-            نشط
+            {t("نشط")}
           </label>
         )}
 
         <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "جاري الحفظ..." : isEdit ? "حفظ التعديلات" : "إضافة"}
+          {isLoading ? t("جاري الحفظ...") : isEdit ? t("حفظ التعديلات") : t("إضافة")}
         </Button>
       </form>
     </Modal>

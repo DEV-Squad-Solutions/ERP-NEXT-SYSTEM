@@ -17,6 +17,7 @@ import DriverListPrintTemplate from "../../../shared/components/print/DriverList
 import QuickAddDriverModal from "../components/QuickAddDriverModal";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
 export default function DriversListPage() {
   const navigate = useNavigate();
   const [showFormModal, setShowFormModal] = useState(false);
@@ -78,20 +79,20 @@ export default function DriversListPage() {
   };
 
   const handleDelete = (driver) => {
-    toast(`حذف "${driver.name}"؟`, {
-      description: "الإجراء ده لا يمكن التراجع عنه",
+    toast(t("حذف \"{0}\"؟", { 0: driver.name }), {
+      description: t("الإجراء ده لا يمكن التراجع عنه"),
       action: {
-        label: "تأكيد الحذف",
+        label: t("تأكيد الحذف"),
         onClick: async () => {
           try {
             await deleteDriver(driver.id).unwrap();
-            toast.success("تم الحذف بنجاح");
+            toast.success(t("تم الحذف بنجاح"));
           } catch {
-            toast.error("حصل خطأ أثناء الحذف، حاول تاني");
+            toast.error(t("حصل خطأ أثناء الحذف، حاول تاني"));
           }
         },
       },
-      cancel: { label: "إلغاء" },
+      cancel: { label: t("إلغاء") },
       duration: 6000,
     });
   };
@@ -99,16 +100,16 @@ export default function DriversListPage() {
   const isLicenseExpired = (date) => date && new Date(date) < new Date();
 
   const { printList, printRef } = useInvoiceListPrint({
-    title: "تقرير السائقين",
+    title: t("تقرير السائقين"),
   });
 
   return (
     <div className="animate-fadeUp space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
         <div>
-          <h2 className="text-lg font-bold text-gray-900">السائقين</h2>
+          <h2 className="text-lg font-bold text-gray-900">{t("السائقين")}</h2>
           <p className="mt-1 text-sm text-gray-500">
-            إجمالي السائقين: {data?.totalCount ?? 0}
+            {t("إجمالي السائقين:")} {data?.totalCount ?? 0}
           </p>
         </div>
 
@@ -116,7 +117,7 @@ export default function DriversListPage() {
           <div className="relative">
             <Button variant="outline" onClick={() => setShowFilters((s) => !s)}>
               <SlidersHorizontal size={16} />
-              فلاتر
+              {t("فلاتر")}
               {hasActiveFilters && (
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 mr-1" />
               )}
@@ -126,19 +127,19 @@ export default function DriversListPage() {
               <div className="absolute left-0 mt-2 w-80 bg-white border border-ink-400/10 rounded-2xl shadow-lg p-4 z-20 space-y-3">
                 <div>
                   <label className="block text-xs text-ink-400 mb-1.5">
-                    بحث
+                    {t("بحث")}
                   </label>
                   <input
                     type="text"
                     value={filters.search}
                     onChange={handleChange("search")}
-                    placeholder="ابحث بالاسم..."
+                    placeholder={t("ابحث بالاسم...")}
                     className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
                   />
                 </div>
                 <div>
                   <label className="block text-xs text-ink-400 mb-1.5">
-                    الكود
+                    {t("الكود")}
                   </label>
                   <input
                     type="text"
@@ -149,7 +150,7 @@ export default function DriversListPage() {
                 </div>
                 <div>
                   <label className="block text-xs text-ink-400 mb-1.5">
-                    رقم الرخصة
+                    {t("رقم الرخصة")}
                   </label>
                   <input
                     type="text"
@@ -160,30 +161,30 @@ export default function DriversListPage() {
                 </div>
                 <div>
                   <label className="block text-xs text-ink-400 mb-1.5">
-                    حالة الرخصة
+                    {t("حالة الرخصة")}
                   </label>
                   <select
                     value={filters.hasExpiredLicense}
                     onChange={handleChange("hasExpiredLicense")}
                     className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
                   >
-                    <option value="">الكل</option>
-                    <option value="true">منتهية</option>
-                    <option value="false">سارية</option>
+                    <option value="">{t("الكل")}</option>
+                    <option value="true">{t("منتهية")}</option>
+                    <option value="false">{t("سارية")}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-xs text-ink-400 mb-1.5">
-                    الحالة
+                    {t("الحالة")}
                   </label>
                   <select
                     value={filters.isActive}
                     onChange={handleChange("isActive")}
                     className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
                   >
-                    <option value="">الكل</option>
-                    <option value="true">نشط</option>
-                    <option value="false">غير نشط</option>
+                    <option value="">{t("الكل")}</option>
+                    <option value="true">{t("نشط")}</option>
+                    <option value="false">{t("غير نشط")}</option>
                   </select>
                 </div>
                 {hasActiveFilters && (
@@ -192,7 +193,7 @@ export default function DriversListPage() {
                     className="flex items-center gap-1.5 text-xs text-ink-400 hover:text-emerald-700 pt-1"
                   >
                     <RotateCcw size={12} />
-                    إعادة تعيين الفلاتر
+                    {t("إعادة تعيين الفلاتر")}
                   </button>
                 )}
               </div>
@@ -201,12 +202,12 @@ export default function DriversListPage() {
 
           <Button variant="outline" onClick={printList}>
             <Printer size={16} />
-            طباعة القائمة
+            {t("طباعة القائمة")}
           </Button>
 
           <Button onClick={openCreate}>
             <Plus size={16} />
-            سائق جديد
+            {t("سائق جديد")}
           </Button>
         </div>
       </div>
@@ -225,19 +226,19 @@ export default function DriversListPage() {
 
         {isError && (
           <div className="text-center py-16">
-            <p className="text-red-500 mb-3">حدث خطأ أثناء تحميل البيانات</p>
+            <p className="text-red-500 mb-3">{t("حدث خطأ أثناء تحميل البيانات")}</p>
             <Button variant="outline" onClick={refetch}>
-              إعادة المحاولة
+              {t("إعادة المحاولة")}
             </Button>
           </div>
         )}
 
         {!isLoading && !isError && drivers.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-ink-400 mb-3">لا يوجد سائقين</p>
+            <p className="text-ink-400 mb-3">{t("لا يوجد سائقين")}</p>
             <Button onClick={openCreate}>
               <Plus size={16} />
-              إضافة أول سائق
+              {t("إضافة أول سائق")}
             </Button>
           </div>
         )}
@@ -247,13 +248,13 @@ export default function DriversListPage() {
             <table className="w-full text-right">
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
-                  <th className="py-3 px-4 font-medium">الكود</th>
-                  <th className="py-3 px-4 font-medium">الاسم</th>
-                  <th className="py-3 px-4 font-medium">التليفون</th>
-                  <th className="py-3 px-4 font-medium">رقم الرخصة</th>
-                  <th className="py-3 px-4 font-medium">انتهاء الرخصة</th>
-                  <th className="py-3 px-4 font-medium">الحالة</th>
-                  <th className="py-3 px-4 font-medium">إجراءات</th>
+                  <th className="py-3 px-4 font-medium">{t("الكود")}</th>
+                  <th className="py-3 px-4 font-medium">{t("الاسم")}</th>
+                  <th className="py-3 px-4 font-medium">{t("التليفون")}</th>
+                  <th className="py-3 px-4 font-medium">{t("رقم الرخصة")}</th>
+                  <th className="py-3 px-4 font-medium">{t("انتهاء الرخصة")}</th>
+                  <th className="py-3 px-4 font-medium">{t("الحالة")}</th>
+                  <th className="py-3 px-4 font-medium">{t("إجراءات")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -288,7 +289,7 @@ export default function DriversListPage() {
                           }
                         >
                           {driver.licenseExpiryDate ? formatDate(driver.licenseExpiryDate) : "—"}
-                          {expired && " (منتهية)"}
+                          {expired && t(" (منتهية)")}
                         </span>
                       </td>
                       <td className="py-3 px-4 whitespace-nowrap">
@@ -299,7 +300,7 @@ export default function DriversListPage() {
                               : "text-red-500 text-xs font-semibold bg-red-500/10 px-2 py-0.5 rounded-full"
                           }
                         >
-                          {driver.isActive ? "نشط" : "غير نشط"}
+                          {driver.isActive ? t("نشط") : t("غير نشط")}
                         </span>
                       </td>
                       <td className="py-3 px-4">
@@ -311,7 +312,7 @@ export default function DriversListPage() {
                               setShowFormModal(true);
                             }}
                             className="text-ink-400 hover:text-emerald-700 p-1"
-                            title="تعديل"
+                            title={t("تعديل")}
                           >
                             <Pencil size={14} />
                           </button>
@@ -321,7 +322,7 @@ export default function DriversListPage() {
                               handleDelete(driver);
                             }}
                             className="text-ink-400 hover:text-red-600 p-1"
-                            title="حذف"
+                            title={t("حذف")}
                           >
                             <Trash2 size={14} />
                           </button>

@@ -2,6 +2,7 @@
 
 import Select from "react-select";
 
+import { t } from "../../../i18n";
 // src/shared/components/ui/CompactSelect.jsx
 // (نفس الملف — تعديل compactStyles بس، الباقي زي ما هو)
 
@@ -110,7 +111,7 @@ export default function CompactSelect({
   onChange,
   isLoading,
   isDisabled,
-  placeholder = "— اختر —",
+  placeholder = t("— اختر —"),
   formatOptionLabel, // اختياري — بيتمرر من الـ caller لو محتاج شكل مخصص
   formatGroupLabel, // اختياري — نفس الفكرة لعنوان الجروب
 }) {
@@ -149,8 +150,8 @@ export default function CompactSelect({
       isClearable
       isRtl
       placeholder={placeholder}
-      noOptionsMessage={() => "لا توجد نتائج"}
-      loadingMessage={() => "جاري التحميل..."}
+      noOptionsMessage={() => t("لا توجد نتائج")}
+      loadingMessage={() => t("جاري التحميل...")}
       styles={compactStyles}
       formatOptionLabel={formatOptionLabel}
       formatGroupLabel={formatGroupLabel}

@@ -19,6 +19,7 @@ import {
   useUpdateDriverTripMutation,
 } from "../driversApi";
 
+import { t } from "../../../i18n";
 function todayISO() {
   return new Date().toLocaleDateString("en-CA");
 }
@@ -36,22 +37,22 @@ function emptyForm() {
 
 const ERROR_MESSAGES = {
   "DriverTrips.LinkedVoucher":
-    "توجد سندات حالية أو تاريخية مرتبطة بالرحلة؛ لا يمكن حذفها أو تغيير السائق أو الطرف أو التاريخ.",
+    t("توجد سندات حالية أو تاريخية مرتبطة بالرحلة؛ لا يمكن حذفها أو تغيير السائق أو الطرف أو التاريخ."),
   "DriverTrips.Concurrency":
-    "تم تعديل الرحلة من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى.",
-  "DriverTrips.FiscalYearImmutable": "لا يمكن تغيير السنة المالية للرحلة.",
+    t("تم تعديل الرحلة من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى."),
+  "DriverTrips.FiscalYearImmutable": t("لا يمكن تغيير السنة المالية للرحلة."),
   "DriverTrips.DriverUnavailable":
-    "يجب اختيار سائق نشط داخل الشركة الحالية.",
+    t("يجب اختيار سائق نشط داخل الشركة الحالية."),
   "DriverTrips.PartnerUnavailable":
-    "يجب اختيار طرف نشط داخل الشركة الحالية.",
+    t("يجب اختيار طرف نشط داخل الشركة الحالية."),
   "DriverTrips.InvoiceOwned":
-    "رحلة الفاتورة تدار من خلال الفاتورة أو شاشة تكاليف الرحلات.",
+    t("رحلة الفاتورة تدار من خلال الفاتورة أو شاشة تكاليف الرحلات."),
   "DriverTrips.RowVersionRequired":
-    "تعذر إرسال إصدار الرحلة الحالي. أعد تحميل الصفحة وحاول مرة أخرى.",
-  "DriverTrips.InvalidRequest": "بيانات رحلة السائق غير صالحة.",
+    t("تعذر إرسال إصدار الرحلة الحالي. أعد تحميل الصفحة وحاول مرة أخرى."),
+  "DriverTrips.InvalidRequest": t("بيانات رحلة السائق غير صالحة."),
   "FiscalYears.QueryDateOutsideRange":
-    "تاريخ الرحلة خارج حدود السنة المالية المحددة.",
-  "FiscalYears.Closed": "السنة المالية مغلقة.",
+    t("تاريخ الرحلة خارج حدود السنة المالية المحددة."),
+  "FiscalYears.Closed": t("السنة المالية مغلقة."),
 };
 
 export default function DriverTripModal({ isOpen, onClose, editingItem }) {
@@ -119,17 +120,17 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
     event.preventDefault();
 
     if (!form.driverId) {
-      toast.error("اختر السائق");
+      toast.error(t("اختر السائق"));
       return;
     }
 
     if (!form.tripDate) {
-      toast.error("حدد تاريخ الرحلة");
+      toast.error(t("حدد تاريخ الرحلة"));
       return;
     }
 
     if (!tripFiscalYearId) {
-      toast.error("اختر السنة المالية أولًا");
+      toast.error(t("اختر السنة المالية أولًا"));
       return;
     }
 
@@ -139,7 +140,7 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
     }
 
     if (form.cost !== "" && Number(form.cost) < 0) {
-      toast.error("تكلفة الرحلة لا يمكن أن تكون سالبة");
+      toast.error(t("تكلفة الرحلة لا يمكن أن تكون سالبة"));
       return;
     }
 
@@ -163,10 +164,10 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
           rowVersion: editingItem.rowVersion,
         }).unwrap();
 
-        toast.success("تم تعديل الرحلة بنجاح");
+        toast.success(t("تم تعديل الرحلة بنجاح"));
       } else {
         await createTrip(payload).unwrap();
-        toast.success("تم إنشاء الرحلة بنجاح");
+        toast.success(t("تم إنشاء الرحلة بنجاح"));
       }
 
       onClose();
@@ -178,7 +179,7 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
           error?.data?.detail ||
           error?.data?.message ||
           error?.data?.title ||
-          "تعذر حفظ الرحلة",
+          t("تعذر حفظ الرحلة"),
       );
     }
   };
@@ -187,44 +188,44 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
     <Modal
       isOpen={isOpen}
       onClose={isSaving ? () => {} : onClose}
-      title={isEditing ? "تعديل رحلة مستقلة" : "إضافة رحلة مستقلة"}
+      title={isEditing ? t("تعديل رحلة مستقلة") : t("إضافة رحلة مستقلة")}
       wide
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="rounded-xl border border-ink-400/10 bg-ink-400/5 px-4 py-3 text-xs leading-6 text-ink-500">
-          الرحلة المستقلة بدون فاتورة. السنة المالية:{" "}
+          {t("الرحلة المستقلة بدون فاتورة. السنة المالية:")}{" "}
           <strong className="text-ink-700">
             {editingItem?.fiscalYearName || selectedFiscalYear?.name || "—"}
           </strong>
           {isEditing && (
             <>
               {" "}
-              — رقم الرحلة:{" "}
+              {t("— رقم الرحلة:")}{" "}
               <strong className="num text-ink-700">
                 {editingItem?.tripNumber}
               </strong>
             </>
           )}
-          . التكلفة والعملة بيتحددوا تلقائيًا حسب إعدادات الشركة.
+          {t(". التكلفة والعملة بيتحددوا تلقائيًا حسب إعدادات الشركة.")}
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-ink-700">
-              السائق
+              {t("السائق")}
             </label>
 
             <CompactSelect
               options={driverOptions}
               value={form.driverId}
               onChange={(value) => setField("driverId", value)}
-              placeholder="اختر السائق"
+              placeholder={t("اختر السائق")}
               isDisabled={isSaving}
             />
           </div>
 
           <Input
-            label="تاريخ الرحلة"
+            label={t("تاريخ الرحلة")}
             type="date"
             value={form.tripDate}
             min={selectedFiscalYear?.startDate}
@@ -238,20 +239,20 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-ink-700">
-              العميل / المورد <span className="text-ink-400">(اختياري)</span>
+              {t("العميل / المورد")} <span className="text-ink-400">{t("(اختياري)")}</span>
             </label>
 
             <CompactSelect
               options={partnerOptions}
               value={form.businessPartnerId}
               onChange={(value) => setField("businessPartnerId", value)}
-              placeholder="بدون طرف"
+              placeholder={t("بدون طرف")}
               isDisabled={isSaving}
             />
           </div>
 
           <Input
-            label="اسم السائق الفعلي (اختياري)"
+            label={t("اسم السائق الفعلي (اختياري)")}
             value={form.actualDriverName}
             maxLength={200}
             onChange={(event) =>
@@ -263,7 +264,7 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
 
         <div>
           <label className="mb-1.5 block text-xs font-semibold text-ink-700">
-            تكلفة الرحلة <span className="text-ink-400">(اختياري)</span>
+            {t("تكلفة الرحلة")} <span className="text-ink-400">{t("(اختياري)")}</span>
           </label>
 
           <NumericInput
@@ -275,13 +276,13 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
           />
 
           <p className="mt-1 text-[11px] text-ink-400">
-            القيمة الفارغة أو صفر تعني عدم وجود تكلفة على الرحلة.
+            {t("القيمة الفارغة أو صفر تعني عدم وجود تكلفة على الرحلة.")}
           </p>
         </div>
 
         <div>
           <label className="mb-1.5 block text-xs font-semibold text-ink-700">
-            ملاحظات
+            {t("ملاحظات")}
           </label>
 
           <textarea
@@ -289,7 +290,7 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
             maxLength={1000}
             value={form.notes}
             onChange={(event) => setField("notes", event.target.value)}
-            placeholder="أضف ملاحظات اختيارية..."
+            placeholder={t("أضف ملاحظات اختيارية...")}
             className="w-full resize-none rounded-lg border border-ink-400/15 bg-white px-3 py-2 text-sm font-medium text-ink-800 outline-none transition-all duration-200 placeholder:text-ink-400 hover:border-ink-400/25 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
             disabled={isSaving}
           />
@@ -297,8 +298,7 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
 
         {isEditing && (
           <div className="rounded-xl border border-gold-200 bg-gold-50/50 px-4 py-3 text-[11px] leading-5 text-gold-700">
-            لو الرحلة مرتبطة بسند قبض أو صرف (حالي أو محذوف)، مش هينفع تغيير
-            السائق أو الطرف أو التاريخ — لكن التكلفة والملاحظات ممكن يتعدلوا.
+            {t("لو الرحلة مرتبطة بسند قبض أو صرف (حالي أو محذوف)، مش هينفع تغيير السائق أو الطرف أو التاريخ — لكن التكلفة والملاحظات ممكن يتعدلوا.")}
           </div>
         )}
 
@@ -310,19 +310,19 @@ export default function DriverTripModal({ isOpen, onClose, editingItem }) {
             disabled={isSaving}
             className="flex-1"
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isSaving} className="flex-1">
             {isSaving ? (
               <>
                 <Loader2 size={16} className="animate-spin" />
-                جاري الحفظ...
+                {t("جاري الحفظ...")}
               </>
             ) : (
               <>
                 <Save size={16} />
-                حفظ
+                {t("حفظ")}
               </>
             )}
           </Button>

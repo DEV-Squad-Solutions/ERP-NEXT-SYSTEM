@@ -3,11 +3,12 @@
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
+import { t } from "../../i18n";
 /**
  * Hook لطباعة قائمة قيود اليومية كتقرير
  */
 export function useJournalEntriesListPrint({
-  title = "تقرير قيود اليومية",
+  title = t("تقرير قيود اليومية"),
 } = {}) {
   const printRef = useRef(null);
 

@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CalendarDays } from "lucide-react";
 import { formatDate, parseDisplayDate } from "../../../lib/date";
+import { t } from "../../../i18n";
 /**
  * خانة إدخال تاريخ موحّدة على مستوى النظام.
  *
@@ -23,7 +24,7 @@ export default function DateInput({
   name,
   id,
   className = "",
-  placeholder = "يوم/شهر/سنة",
+  placeholder = t("يوم/شهر/سنة"),
   disabled = false,
   required = false,
   readOnly = false,
@@ -192,7 +193,7 @@ export default function DateInput({
         tabIndex={-1}
         disabled={disabled || readOnly}
         onClick={openPicker}
-        aria-label="اختيار التاريخ"
+        aria-label={t("اختيار التاريخ")}
         className={`
           absolute
           inset-y-0

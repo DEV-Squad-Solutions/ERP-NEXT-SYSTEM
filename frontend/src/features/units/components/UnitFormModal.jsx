@@ -11,8 +11,9 @@ import {
   useUpdateItemUnitMutation,
 } from "../itemUnitsApi";
 
+import { t } from "../../../i18n";
 const unitSchema = z.object({
-  name: z.string().min(1, "اسم الوحدة مطلوب"),
+  name: z.string().min(1, t("اسم الوحدة مطلوب")),
   isActive: z.preprocess((v) => v === "true" || v === true, z.boolean()),
 });
 
@@ -48,14 +49,14 @@ export default function UnitFormModal({ isOpen, onClose, unit }) {
     try {
       if (isEditing) {
         await updateUnit({ id: unit.id, ...values }).unwrap();
-        toast.success("تم تحديث الوحدة بنجاح");
+        toast.success(t("تم تحديث الوحدة بنجاح"));
       } else {
         await createUnit(values).unwrap();
-        toast.success("تم إضافة الوحدة بنجاح");
+        toast.success(t("تم إضافة الوحدة بنجاح"));
       }
       onClose();
     } catch {
-      toast.error("حصل خطأ، حاول تاني");
+      toast.error(t("حصل خطأ، حاول تاني"));
     }
   }
 
@@ -63,16 +64,16 @@ export default function UnitFormModal({ isOpen, onClose, unit }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? "تعديل وحدة" : "وحدة جديدة"}
+      title={isEditing ? t("تعديل وحدة") : t("وحدة جديدة")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="block text-xs text-ink-400 mb-1.5">
-            اسم الوحدة
+            {t("اسم الوحدة")}
           </label>
           <input
             type="text"
-            placeholder="مثال: كيلوجرام"
+            placeholder={t("مثال: كيلوجرام")}
             className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
             {...register("name")}
           />
@@ -82,22 +83,22 @@ export default function UnitFormModal({ isOpen, onClose, unit }) {
         </div>
 
         <div>
-          <label className="block text-xs text-ink-400 mb-1.5">الحالة</label>
+          <label className="block text-xs text-ink-400 mb-1.5">{t("الحالة")}</label>
           <select
             className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
             {...register("isActive")}
           >
-            <option value="true">نشطة</option>
-            <option value="false">غير نشطة</option>
+            <option value="true">{t("نشطة")}</option>
+            <option value="false">{t("غير نشطة")}</option>
           </select>
         </div>
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
           <Button type="submit" disabled={isCreating || isUpdating}>
-            {isEditing ? "حفظ التعديلات" : "إضافة"}
+            {isEditing ? t("حفظ التعديلات") : t("إضافة")}
           </Button>
         </div>
       </form>

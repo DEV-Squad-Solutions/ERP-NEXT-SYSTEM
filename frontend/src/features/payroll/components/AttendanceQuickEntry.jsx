@@ -29,6 +29,8 @@ import {
   useGetEmployeesSelectQuery,
 } from "../payrollApi";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 // =========================================================
 // Constants
 // =========================================================
@@ -43,15 +45,15 @@ const DEFAULT_DEDUCTION_RATIO = "FullDay";
 const STATUS_PILLS = [
   {
     value: "Present",
-    label: "حاضر",
-    shortLabel: "حاضر",
+    label: t("حاضر"),
+    shortLabel: t("حاضر"),
     icon: UserCheck,
     activeClass: "text-emerald-700 bg-emerald-50 border-emerald-200",
   },
   {
     value: "Absent",
-    label: "غائب",
-    shortLabel: "غائب",
+    label: t("غائب"),
+    shortLabel: t("غائب"),
     icon: UserX,
     activeClass: "text-negative bg-negative/10 border-negative/20",
   },
@@ -60,23 +62,23 @@ const STATUS_PILLS = [
 const WORK_DAY_RATIOS = [
   {
     value: "QuarterDay",
-    label: "ربع يوم",
+    label: t("ربع يوم"),
   },
   {
     value: "ThirdDay",
-    label: "ثلث يوم",
+    label: t("ثلث يوم"),
   },
   {
     value: "HalfDay",
-    label: "نصف يوم",
+    label: t("نصف يوم"),
   },
   {
     value: "ThreeQuarterDay",
-    label: "ثلاثة أرباع",
+    label: t("ثلاثة أرباع"),
   },
   {
     value: "FullDay",
-    label: "يوم كامل",
+    label: t("يوم كامل"),
   },
 ];
 
@@ -342,7 +344,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
       return next;
     });
 
-    toast.success("تم تحديد جميع الموظفين كحاضر");
+    toast.success(t("تم تحديد جميع الموظفين كحاضر"));
   }, [employees, isSaving]);
 
   // =========================================================
@@ -373,7 +375,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
       return next;
     });
 
-    toast.success("تم تحديد جميع الموظفين كغائب");
+    toast.success(t("تم تحديد جميع الموظفين كغائب"));
   }, [employees, isSaving]);
 
   // =========================================================
@@ -400,7 +402,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
       return next;
     });
 
-    toast.success("تم مسح حالات الحضور");
+    toast.success(t("تم مسح حالات الحضور"));
   }, [employees, isSaving]);
 
   // =========================================================
@@ -429,7 +431,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
     const entries = Object.entries(rows).filter(([, row]) => !!row.status);
 
     if (!entries.length) {
-      toast.error("حدد حالة موظف واحد على الأقل");
+      toast.error(t("حدد حالة موظف واحد على الأقل"));
       return;
     }
 
@@ -467,14 +469,14 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
         attendances,
       }).unwrap();
 
-      toast.success(`تم حفظ حضور ${attendances.length} موظف بنجاح`);
+      toast.success(t("تم حفظ حضور {0} موظف بنجاح", { 0: attendances.length }));
 
       onSaved?.();
     } catch (error) {
       console.error("Bulk attendance save error:", error);
 
       toast.error(
-        error?.data?.message || error?.message || "حدث خطأ أثناء حفظ الحضور",
+        error?.data?.message || error?.message || t("حدث خطأ أثناء حفظ الحضور"),
       );
     } finally {
       setIsSaving(false);
@@ -490,10 +492,10 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
       isOpen={true}
       onClose={isSaving ? undefined : onClose}
       wide
-      title="تسجيل حضور الموظفين"
+      title={t("تسجيل حضور الموظفين")}
     >
       <div
-        dir="rtl"
+        dir={getDir()}
         className="
           w-full
           max-w-[1650px]
@@ -517,11 +519,11 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
         >
           <div className="min-w-0">
             <h3 className="text-sm font-bold text-ink-900">
-              تسجيل الحضور اليومي
+              {t("تسجيل الحضور اليومي")}
             </h3>
 
             <p className="text-xs text-ink-400 mt-1">
-              الموظفون الذين لا يملكون سجل حضور يتم اعتبارهم حاضرين تلقائيًا.
+              {t("الموظفون الذين لا يملكون سجل حضور يتم اعتبارهم حاضرين تلقائيًا.")}
             </p>
           </div>
 
@@ -575,7 +577,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
 
             <div className="w-full sm:w-[180px] shrink-0">
               <Input
-                label="التاريخ"
+                label={t("التاريخ")}
                 type="date"
                                 min={selectedFiscalYear?.startDate}
                 max={selectedFiscalYear?.endDate}
@@ -631,7 +633,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                     group-hover:scale-110
                   "
                 />
-                الكل حاضر
+                {t("الكل حاضر")}
               </button>
 
               {/* All Absent */}
@@ -670,7 +672,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                     group-hover:scale-110
                   "
                 />
-                الكل غائب
+                {t("الكل غائب")}
               </button>
 
               {/* Clear */}
@@ -710,7 +712,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                     group-hover:rotate-[-90deg]
                   "
                 />
-                مسح
+                {t("مسح")}
               </button>
             </div>
           </div>
@@ -730,7 +732,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
           >
             <Stat
               icon={UserCheck}
-              label="حاضر"
+              label={t("حاضر")}
               value={stats.present}
               className="
                 text-emerald-700
@@ -741,7 +743,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
 
             <Stat
               icon={UserX}
-              label="غائب"
+              label={t("غائب")}
               value={stats.absent}
               className="
                 text-negative
@@ -752,7 +754,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
 
             <Stat
               icon={Users}
-              label="الإجمالي"
+              label={t("الإجمالي")}
               value={stats.total}
               className="
                 text-primary-700
@@ -763,7 +765,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
 
             <Stat
               icon={Check}
-              label="محدد"
+              label={t("محدد")}
               value={stats.filled}
               className="
                 text-sky-700
@@ -847,7 +849,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                             whitespace-nowrap
                           "
                         >
-                          الموظف
+                          {t("الموظف")}
                         </th>
 
                         <th
@@ -862,7 +864,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                             whitespace-nowrap
                           "
                         >
-                          الحالة
+                          {t("الحالة")}
                         </th>
 
                         <th
@@ -877,7 +879,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                             whitespace-nowrap
                           "
                         >
-                          الحضور والانصراف
+                          {t("الحضور والانصراف")}
                         </th>
 
                         <th
@@ -892,7 +894,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                             whitespace-nowrap
                           "
                         >
-                          يوم العمل
+                          {t("يوم العمل")}
                         </th>
 
                         <th
@@ -907,7 +909,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                             whitespace-nowrap
                           "
                         >
-                          الإضافي
+                          {t("الإضافي")}
                         </th>
 
                         <th
@@ -922,7 +924,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                             whitespace-nowrap
                           "
                         >
-                          خصم الأيام
+                          {t("خصم الأيام")}
                         </th>
                       </tr>
                     </thead>
@@ -1015,7 +1017,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
               text-ink-400
             "
           >
-            <span>تم تحديد</span>
+            <span>{t("تم تحديد")}</span>
 
             <strong
               className="
@@ -1029,10 +1031,10 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
               {stats.filled}
             </strong>
 
-            <span>من {stats.total}</span>
+            <span>{t("من")} {stats.total}</span>
 
             {stats.remaining > 0 && (
-              <span className="text-ink-300">({stats.remaining} متبقي)</span>
+              <span className="text-ink-300">({stats.remaining} {t("متبقي)")}</span>
             )}
           </div>
 
@@ -1051,7 +1053,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
               disabled={isSaving}
               className="flex-1 sm:flex-none"
             >
-              إلغاء
+              {t("إلغاء")}
             </Button>
 
             <Button
@@ -1069,7 +1071,7 @@ export default function AttendanceQuickEntry({ onClose, onSaved }) {
                 <Save size={14} />
               )}
 
-              {isSaving ? "جارِ الحفظ..." : `حفظ (${stats.filled})`}
+              {isSaving ? t("جارِ الحفظ...") : t("حفظ ({0})", { 0: stats.filled })}
             </Button>
           </div>
         </div>
@@ -1150,7 +1152,7 @@ function AttendanceTableRow({
                 mt-0.5
               "
             >
-              كود الموظف: {employeeId}
+              {t("كود الموظف:")} {employeeId}
             </div>
           </div>
         </div>
@@ -1187,7 +1189,7 @@ function AttendanceTableRow({
           value={row.workDayRatio || DEFAULT_WORK_DAY_RATIO}
           onChange={(value) => onRatioChange(employeeId, "workDayRatio", value)}
           isDisabled={isSaving}
-          placeholder="يوم العمل"
+          placeholder={t("يوم العمل")}
         />
       </td>
 
@@ -1201,7 +1203,7 @@ function AttendanceTableRow({
             onRatioChange(employeeId, "workOverTimeRatio", value)
           }
           isDisabled={isSaving}
-          placeholder="الإضافي"
+          placeholder={t("الإضافي")}
         />
       </td>
 
@@ -1215,7 +1217,7 @@ function AttendanceTableRow({
             onRatioChange(employeeId, "workDaysDeductionRatio", value)
           }
           isDisabled={isSaving}
-          placeholder="الخصم"
+          placeholder={t("الخصم")}
         />
       </td>
     </tr>
@@ -1302,7 +1304,7 @@ function AttendanceMobileCard({
                 mt-0.5
               "
             >
-              كود الموظف: {employeeId}
+              {t("كود الموظف:")} {employeeId}
             </div>
           </div>
         </div>
@@ -1340,7 +1342,7 @@ function AttendanceMobileCard({
           "
         >
           <Clock3 size={12} />
-          الحضور والانصراف
+          {t("الحضور والانصراف")}
         </div>
 
         <TimeControls
@@ -1364,14 +1366,14 @@ function AttendanceMobileCard({
         "
       >
         <MobileRatio
-          label="يوم العمل"
+          label={t("يوم العمل")}
           value={row.workDayRatio || DEFAULT_WORK_DAY_RATIO}
           disabled={isSaving}
           onChange={(value) => onRatioChange(employeeId, "workDayRatio", value)}
         />
 
         <MobileRatio
-          label="العمل الإضافي"
+          label={t("العمل الإضافي")}
           value={row.workOverTimeRatio || DEFAULT_OVERTIME_RATIO}
           disabled={isSaving}
           onChange={(value) =>
@@ -1380,7 +1382,7 @@ function AttendanceMobileCard({
         />
 
         <MobileRatio
-          label="خصم أيام العمل"
+          label={t("خصم أيام العمل")}
           value={row.workDaysDeductionRatio || DEFAULT_DEDUCTION_RATIO}
           disabled={isSaving}
           onChange={(value) =>
@@ -1483,7 +1485,7 @@ function TimeControls({
           text-ink-400
         `}
       >
-        لا يوجد وقت
+        {t("لا يوجد وقت")}
       </div>
     );
   }
@@ -1499,7 +1501,7 @@ function TimeControls({
       `}
     >
       <TimeInput
-        label="دخول"
+        label={t("دخول")}
         value={row.checkIn || DEFAULT_CHECK_IN}
         disabled={isSaving}
         onChange={(value) => onChange(employeeId, "checkIn", value)}
@@ -1508,7 +1510,7 @@ function TimeControls({
       <span className="mt-4 text-xs text-ink-300 shrink-0">→</span>
 
       <TimeInput
-        label="خروج"
+        label={t("خروج")}
         value={row.checkOut || DEFAULT_CHECK_OUT}
         disabled={isSaving}
         onChange={(value) => onChange(employeeId, "checkOut", value)}
@@ -1647,7 +1649,7 @@ function LoadingState() {
           mt-3
         "
       >
-        جارِ تحميل بيانات الحضور...
+        {t("جارِ تحميل بيانات الحضور...")}
       </p>
 
       <p
@@ -1657,7 +1659,7 @@ function LoadingState() {
           mt-1
         "
       >
-        يرجى الانتظار
+        {t("يرجى الانتظار")}
       </p>
     </div>
   );
@@ -1707,7 +1709,7 @@ function EmptyState() {
           mt-3
         "
       >
-        لا يوجد موظفون
+        {t("لا يوجد موظفون")}
       </p>
 
       <p
@@ -1717,7 +1719,7 @@ function EmptyState() {
           mt-1
         "
       >
-        لا يوجد موظفون متاحون لتسجيل الحضور.
+        {t("لا يوجد موظفون متاحون لتسجيل الحضور.")}
       </p>
     </div>
   );

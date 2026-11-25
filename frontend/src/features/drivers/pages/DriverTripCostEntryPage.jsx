@@ -34,16 +34,18 @@ import { selectIsAdmin } from "../../auth/authSlice";
 import { selectSelectedFiscalYearId } from "../../fiscalYears/fiscalYearSlice";
 import DriverTripModal from "../components/DriverTripModal";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const hasCostOptions = [
-  { value: "", label: "الكل" },
-  { value: "true", label: "بها تكلفة" },
-  { value: "false", label: "بدون تكلفة" },
+  { value: "", label: t("الكل") },
+  { value: "true", label: t("بها تكلفة") },
+  { value: "false", label: t("بدون تكلفة") },
 ];
 
 const standaloneOptions = [
-  { value: "", label: "الكل" },
-  { value: "true", label: "مستقلة (بدون فاتورة)" },
-  { value: "false", label: "مرتبطة بفاتورة" },
+  { value: "", label: t("الكل") },
+  { value: "true", label: t("مستقلة (بدون فاتورة)") },
+  { value: "false", label: t("مرتبطة بفاتورة") },
 ];
 
 const emptyFilters = {
@@ -58,12 +60,12 @@ const emptyFilters = {
 
 const DELETE_ERROR_MESSAGES = {
   "DriverTrips.LinkedVoucher":
-    "توجد سندات حالية أو تاريخية مرتبطة بالرحلة؛ لا يمكن حذفها.",
+    t("توجد سندات حالية أو تاريخية مرتبطة بالرحلة؛ لا يمكن حذفها."),
   "DriverTrips.Concurrency":
-    "تم تعديل الرحلة من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى.",
+    t("تم تعديل الرحلة من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى."),
   "DriverTrips.InvoiceOwned":
-    "رحلة الفاتورة تدار من خلال الفاتورة أو شاشة تكاليف الرحلات.",
-  "DriverTrips.NotFound": "تعذر العثور على الرحلة داخل الشركة الحالية.",
+    t("رحلة الفاتورة تدار من خلال الفاتورة أو شاشة تكاليف الرحلات."),
+  "DriverTrips.NotFound": t("تعذر العثور على الرحلة داخل الشركة الحالية."),
 };
 
 export default function DriverTripCostEntryPage() {
@@ -158,7 +160,7 @@ export default function DriverTripCostEntryPage() {
         rowVersion: itemToDelete.rowVersion,
       }).unwrap();
 
-      toast.success("تم حذف الرحلة");
+      toast.success(t("تم حذف الرحلة"));
       setItemToDelete(null);
     } catch (error) {
       const code = error?.data?.errorCode ?? error?.data?.code;
@@ -168,7 +170,7 @@ export default function DriverTripCostEntryPage() {
           error?.data?.detail ||
           error?.data?.message ||
           error?.data?.title ||
-          "تعذر حذف الرحلة",
+          t("تعذر حذف الرحلة"),
       );
 
       if (
@@ -208,17 +210,17 @@ export default function DriverTripCostEntryPage() {
     setSaving(true);
     try {
       await bulkUpdate({ items }).unwrap();
-      toast.success(`تم تحديث تكلفة ${items.length} رحلة`);
+      toast.success(t("تم تحديث تكلفة {0} رحلة", { 0: items.length }));
       setEdits({});
     } catch (error) {
       const code = error?.data?.errorCode ?? error?.data?.code;
 
       toast.error(
         code === "DriverTrips.Concurrency"
-          ? "تم تعديل رحلة من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى."
+          ? t("تم تعديل رحلة من مكان آخر. أعد تحميل البيانات ثم حاول مرة أخرى.")
           : error?.data?.detail ||
               error?.data?.message ||
-              "تعذر حفظ التعديلات — تأكد من عدم وجود صف قديم أو غير صحيح",
+              t("تعذر حفظ التعديلات — تأكد من عدم وجود صف قديم أو غير صحيح"),
       );
     } finally {
       setSaving(false);
@@ -230,11 +232,10 @@ export default function DriverTripCostEntryPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-display text-2xl font-bold text-ink-900">
-            تكلفة رحلات السائقين
+            {t("تكلفة رحلات السائقين")}
           </h2>
           <p className="text-sm text-ink-400 mt-1">
-            أضف رحلات مستقلة بدون فواتير، أو عدّل تكلفة أكتر من رحلة واحفظهم
-            مرة واحدة
+            {t("أضف رحلات مستقلة بدون فواتير، أو عدّل تكلفة أكتر من رحلة واحفظهم مرة واحدة")}
           </p>
         </div>
 
@@ -246,7 +247,7 @@ export default function DriverTripCostEntryPage() {
               disabled={!canManage || !selectedFiscalYearId}
             >
               <Plus size={16} />
-              إضافة رحلة مستقلة
+              {t("إضافة رحلة مستقلة")}
             </Button>
           )}
 
@@ -260,7 +261,7 @@ export default function DriverTripCostEntryPage() {
               ) : (
                 <Save size={16} />
               )}
-              حفظ التعديلات ({Object.keys(edits).length})
+              {t("حفظ التعديلات (")}{Object.keys(edits).length})
             </Button>
           )}
         </div>
@@ -272,25 +273,24 @@ export default function DriverTripCostEntryPage() {
 
       {!isAdmin && (
         <div className="rounded-2xl border border-ink-400/10 bg-ink-400/5 px-4 py-3 text-xs leading-6 text-ink-500">
-          إنشاء أو تعديل أو حذف رحلات السائقين متاح للمدير فقط. تقدر تشوف
-          الرحلات وتكاليفها من هنا.
+          {t("إنشاء أو تعديل أو حذف رحلات السائقين متاح للمدير فقط. تقدر تشوف الرحلات وتكاليفها من هنا.")}
         </div>
       )}
 
       <div className="bg-white rounded-2xl border border-ink-400/10 shadow-card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <CompactSelect
-            label="السائق"
+            label={t("السائق")}
             options={
               drivers?.map((d) => ({ value: d.id, label: d.name })) || []
             }
             value={draft.driverId}
             onChange={(val) => setField("driverId", val)}
-            placeholder="كل السائقين"
+            placeholder={t("كل السائقين")}
           />
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              نوع الرحلة
+              {t("نوع الرحلة")}
             </label>
             <CompactSelect
               options={standaloneOptions}
@@ -299,7 +299,7 @@ export default function DriverTripCostEntryPage() {
             />
           </div>
           <Input
-            label="من تاريخ"
+            label={t("من تاريخ")}
             type="date"
             min={fiscalYear?.startDate}
             max={fiscalYear?.endDate}
@@ -307,7 +307,7 @@ export default function DriverTripCostEntryPage() {
             onChange={(e) => setField("fromDate", e.target.value)}
           />
           <Input
-            label="إلى تاريخ"
+            label={t("إلى تاريخ")}
             type="date"
             min={fiscalYear?.startDate}
             max={fiscalYear?.endDate}
@@ -315,18 +315,18 @@ export default function DriverTripCostEntryPage() {
             onChange={(e) => setField("toDate", e.target.value)}
           />
           <Input
-            label="رقم الرحلة"
+            label={t("رقم الرحلة")}
             value={draft.tripNumber}
             onChange={(e) => setField("tripNumber", e.target.value)}
           />
           <Input
-            label="رقم الفاتورة"
+            label={t("رقم الفاتورة")}
             value={draft.invoiceNumber}
             onChange={(e) => setField("invoiceNumber", e.target.value)}
           />
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              تكلفة الرحلة
+              {t("تكلفة الرحلة")}
             </label>
             <CompactSelect
               options={hasCostOptions}
@@ -338,11 +338,11 @@ export default function DriverTripCostEntryPage() {
 
         <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-ink-400/10">
           <Button onClick={handleSearch} className="h-9">
-            بحث
+            {t("بحث")}
           </Button>
           <Button variant="outline" onClick={handleReset} className="h-9">
             <RotateCcw size={14} />
-            تصفير
+            {t("تصفير")}
           </Button>
         </div>
       </div>
@@ -364,22 +364,22 @@ export default function DriverTripCostEntryPage() {
             strokeWidth={1.6}
           />
           <p className="text-ink-900 font-medium text-sm mb-1">
-            حدث خطأ في تحميل الرحلات
+            {t("حدث خطأ في تحميل الرحلات")}
           </p>
           <button
             onClick={refetch}
             className="inline-flex items-center gap-2 text-xs font-medium text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-lg transition-colors mt-2"
           >
             <RefreshCw size={13} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : rows.length === 0 ? (
         <div className="text-center py-16 border border-dashed border-ink-400/20 rounded-2xl">
           <p className="text-ink-900 font-medium text-sm mb-1">
-            لا توجد رحلات مطابقة
+            {t("لا توجد رحلات مطابقة")}
           </p>
-          <p className="text-xs text-ink-400">جرّب تعديل الفلاتر</p>
+          <p className="text-xs text-ink-400">{t("جرّب تعديل الفلاتر")}</p>
         </div>
       ) : (
         <>
@@ -392,39 +392,39 @@ export default function DriverTripCostEntryPage() {
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    رقم الرحلة
+                    {t("رقم الرحلة")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    التاريخ
+                    {t("التاريخ")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    السائق
+                    {t("السائق")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    العميل
+                    {t("العميل")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الدولة
+                    {t("الدولة")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    رقم الفاتورة
+                    {t("رقم الفاتورة")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    تكلفة الرحلة
+                    {t("تكلفة الرحلة")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    ملاحظات
+                    {t("ملاحظات")}
                   </th>
 
                   {canManage && (
-                    <th className="p-2.5 font-medium w-20">إجراءات</th>
+                    <th className="p-2.5 font-medium w-20">{t("إجراءات")}</th>
                   )}
                 </tr>
               </thead>
@@ -479,7 +479,7 @@ export default function DriverTripCostEntryPage() {
                                 : "bg-ink-400/10 text-ink-500"
                             }`}
                           >
-                            {isStandalone ? "مستقلة" : "فاتورة"}
+                            {isStandalone ? t("مستقلة") : t("فاتورة")}
                           </span>
                         </div>
                       </td>
@@ -506,7 +506,7 @@ export default function DriverTripCostEntryPage() {
                               className="text-[10px] text-ink-400 mt-0.5 truncate"
                               title={row.actualDriverName}
                             >
-                              الفعلي: {row.actualDriverName}
+                              {t("الفعلي:")} {row.actualDriverName}
                             </span>
                           )}
 
@@ -550,7 +550,7 @@ export default function DriverTripCostEntryPage() {
                           />
                         ) : (
                           <span className="inline-flex items-center rounded-md bg-ink-400/10 px-2 py-1 text-[11px] font-medium text-ink-500">
-                            بدون فاتورة
+                            {t("بدون فاتورة")}
                           </span>
                         )}
                       </td>
@@ -563,7 +563,7 @@ export default function DriverTripCostEntryPage() {
                               {row.costText ??
                                 (row.cost == null
                                   ? "—"
-                                  : Number(row.cost).toLocaleString("ar-EG", {
+                                  : Number(row.cost).toLocaleString(getLocale(), {
                                       maximumFractionDigits: 2,
                                     }))}
                             </span>
@@ -583,7 +583,7 @@ export default function DriverTripCostEntryPage() {
                               onChange={(e) =>
                                 setEdit(row, "cost", e.target.value)
                               }
-                              placeholder="أدخل التكلفة"
+                              placeholder={t("أدخل التكلفة")}
                               className={`
                     w-full text-xs
                     bg-white
@@ -622,7 +622,7 @@ export default function DriverTripCostEntryPage() {
                             onChange={(e) =>
                               setEdit(row, "notes", e.target.value)
                             }
-                            placeholder="ملاحظة..."
+                            placeholder={t("ملاحظة...")}
                             className="
                   w-full text-xs
                   bg-white
@@ -647,7 +647,7 @@ export default function DriverTripCostEntryPage() {
                                 type="button"
                                 onClick={() => openEditModal(row)}
                                 className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                                title="تعديل الرحلة"
+                                title={t("تعديل الرحلة")}
                               >
                                 <Pencil size={14} />
                               </button>
@@ -656,14 +656,14 @@ export default function DriverTripCostEntryPage() {
                                 type="button"
                                 onClick={() => setItemToDelete(row)}
                                 className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-negative/10 hover:text-negative"
-                                title="حذف الرحلة"
+                                title={t("حذف الرحلة")}
                               >
                                 <Trash2 size={14} />
                               </button>
                             </div>
                           ) : (
                             <span className="block text-center text-[10px] text-ink-300">
-                              {isRowReadOnly ? "للقراءة فقط" : "—"}
+                              {isRowReadOnly ? t("للقراءة فقط") : "—"}
                             </span>
                           )}
                         </td>
@@ -700,9 +700,9 @@ export default function DriverTripCostEntryPage() {
         isOpen={Boolean(itemToDelete)}
         onClose={() => setItemToDelete(null)}
         onConfirm={handleConfirmDelete}
-        title="حذف رحلة"
+        title={t("حذف رحلة")}
         itemName={itemToDelete?.tripNumber}
-        description="سيتم حذف الرحلة المستقلة وقيد تكلفتها المرتبط. لا يمكن التراجع عن هذا الإجراء."
+        description={t("سيتم حذف الرحلة المستقلة وقيد تكلفتها المرتبط. لا يمكن التراجع عن هذا الإجراء.")}
         isDeleting={isDeleting}
       />
     </div>

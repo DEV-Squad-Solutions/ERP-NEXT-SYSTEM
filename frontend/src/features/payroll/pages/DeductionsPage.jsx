@@ -3,15 +3,16 @@ import { MinusCircle } from "lucide-react";
 import EmployeeTransactionsListPage from "../components/EmployeeTransactionsListPage";
 import { categoryOptionsFor, deductionCategories } from "../payroll.constants";
 
+import { t } from "../../../i18n";
 export default function DeductionsPage() {
   return (
     <EmployeeTransactionsListPage
-      title="الخصومات"
-      subtitle="خصومات الغياب والتأخير والجزاءات"
+      title={t("الخصومات")}
+      subtitle={t("خصومات الغياب والتأخير والجزاءات")}
       categoryOptions={categoryOptionsFor(deductionCategories)}
       categoryKeys={deductionCategories}
       emptyIcon={MinusCircle}
-      emptyLabel="لا توجد خصومات"
+      emptyLabel={t("لا توجد خصومات")}
     />
   );
 }

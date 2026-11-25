@@ -34,6 +34,7 @@ import { useSelector } from "react-redux";
 import { selectSelectedFiscalYear } from "../../fiscalYears/fiscalYearSlice";
 import { getFiscalYearDateWarning } from "../../../lib/fiscalYearDateRange";
 
+import { t } from "../../../i18n";
 // ============================================================
 // Schema
 // ============================================================
@@ -42,14 +43,14 @@ const lineSchema = z.object({
   itemId: z
     .union([z.string(), z.number()])
     .refine((value) => String(value || "").trim() !== "", {
-      message: "الصنف مطلوب",
+      message: t("الصنف مطلوب"),
     }),
 
   quantity: z
     .union([z.string(), z.number()])
     .transform((value) => Number(value))
     .refine((value) => Number.isFinite(value) && value > 0, {
-      message: "الكمية يجب أن تكون أكبر من صفر",
+      message: t("الكمية يجب أن تكون أكبر من صفر"),
     }),
 
   notes: z.string().optional(),
@@ -57,26 +58,26 @@ const lineSchema = z.object({
 
 const schema = z
   .object({
-    transferDate: z.string().min(1, "تاريخ التحويل مطلوب"),
+    transferDate: z.string().min(1, t("تاريخ التحويل مطلوب")),
 
     sourceStoreId: z
       .union([z.string(), z.number()])
       .refine((value) => String(value || "").trim() !== "", {
-        message: "المخزن المصدر مطلوب",
+        message: t("المخزن المصدر مطلوب"),
       }),
 
     destinationStoreId: z
       .union([z.string(), z.number()])
       .refine((value) => String(value || "").trim() !== "", {
-        message: "المخزن الوجهة مطلوب",
+        message: t("المخزن الوجهة مطلوب"),
       }),
 
     notes: z.string().optional(),
 
     lines: z
       .array(lineSchema)
-      .min(1, "يجب إضافة صنف واحد على الأقل")
-      .max(100, "لا يمكن إضافة أكثر من 100 صنف"),
+      .min(1, t("يجب إضافة صنف واحد على الأقل"))
+      .max(100, t("لا يمكن إضافة أكثر من 100 صنف")),
   })
   .superRefine((data, ctx) => {
     // ========================================================
@@ -91,7 +92,7 @@ const schema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["destinationStoreId"],
-        message: "المخزن الوجهة يجب أن يكون مختلفًا عن المخزن المصدر",
+        message: t("المخزن الوجهة يجب أن يكون مختلفًا عن المخزن المصدر"),
       });
     }
 
@@ -111,7 +112,7 @@ const schema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["lines", index, "itemId"],
-            message: "هذا الصنف مضاف بالفعل",
+            message: t("هذا الصنف مضاف بالفعل"),
           });
         }
       });
@@ -241,7 +242,7 @@ export default function StockTransferFormModal({
     return source.map((store) => ({
       value: String(store.id),
 
-      label: store.name || store.storeName || store.code || `مخزن ${store.id}`,
+      label: store.name || store.storeName || store.code || t("مخزن {0}", { 0: store.id }),
     }));
   }, [storesData]);
 
@@ -261,7 +262,7 @@ export default function StockTransferFormModal({
 
       label: item.code
         ? `${item.code} - ${item.name}`
-        : item.name || `صنف ${item.id}`,
+        : item.name || t("صنف {0}", { 0: item.id }),
     }));
   }, [itemsData]);
 
@@ -310,7 +311,7 @@ export default function StockTransferFormModal({
 
   const handleAddLine = () => {
     if (fields.length >= 100) {
-      toast.error("لا يمكن إضافة أكثر من 100 صنف");
+      toast.error(t("لا يمكن إضافة أكثر من 100 صنف"));
 
       return;
     }
@@ -379,11 +380,11 @@ export default function StockTransferFormModal({
           rowVersion: transfer.rowVersion,
         }).unwrap();
 
-        toast.success("تم تحديث التحويل المخزني بنجاح");
+        toast.success(t("تم تحديث التحويل المخزني بنجاح"));
       } else {
         await createStockTransfer(payload).unwrap();
 
-        toast.success("تم إنشاء التحويل المخزني بنجاح");
+        toast.success(t("تم إنشاء التحويل المخزني بنجاح"));
       }
 
       onSaved?.();
@@ -394,7 +395,7 @@ export default function StockTransferFormModal({
       const message =
         error?.data?.detail ||
         error?.data?.title ||
-        "حدث خطأ أثناء حفظ التحويل المخزني";
+        t("حدث خطأ أثناء حفظ التحويل المخزني");
 
       toast.error(message);
     }
@@ -409,7 +410,7 @@ export default function StockTransferFormModal({
       wide
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل تحويل مخزني" : "تحويل مخزني جديد"}
+      title={isEdit ? t("تعديل تحويل مخزني") : t("تحويل مخزني جديد")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         {/* ====================================================
@@ -418,7 +419,7 @@ export default function StockTransferFormModal({
 
         <div className="grid grid-cols-1 gap-4">
           <Input
-            label="تاريخ التحويل"
+            label={t("تاريخ التحويل")}
             type="date"
             {...register("transferDate")}
             error={errors.transferDate?.message || dateWarning}
@@ -428,7 +429,7 @@ export default function StockTransferFormModal({
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              المخزن المصدر
+              {t("المخزن المصدر")}
             </label>
 
             <Controller
@@ -443,8 +444,8 @@ export default function StockTransferFormModal({
                   }}
                   placeholder={
                     isStoresLoading
-                      ? "جاري تحميل المخازن..."
-                      : "اختر المخزن المصدر"
+                      ? t("جاري تحميل المخازن...")
+                      : t("اختر المخزن المصدر")
                   }
                   isDisabled={isStoresLoading}
                 />
@@ -462,7 +463,7 @@ export default function StockTransferFormModal({
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              المخزن الوجهة
+              {t("المخزن الوجهة")}
             </label>
 
             <Controller
@@ -475,8 +476,8 @@ export default function StockTransferFormModal({
                   onChange={field.onChange}
                   placeholder={
                     isStoresLoading
-                      ? "جاري تحميل المخازن..."
-                      : "اختر المخزن الوجهة"
+                      ? t("جاري تحميل المخازن...")
+                      : t("اختر المخزن الوجهة")
                   }
                   isDisabled={isStoresLoading}
                 />
@@ -505,7 +506,7 @@ export default function StockTransferFormModal({
               />
 
               <p className="text-xs text-negative">
-                لا يمكن التحويل من المخزن إلى نفس المخزن.
+                {t("لا يمكن التحويل من المخزن إلى نفس المخزن.")}
               </p>
             </div>
           )}
@@ -517,11 +518,11 @@ export default function StockTransferFormModal({
         <div className="flex items-center justify-between gap-3 pt-2">
           <div>
             <h3 className="text-sm font-semibold text-ink-900">
-              أصناف التحويل
+              {t("أصناف التحويل")}
             </h3>
 
             <p className="text-[11px] text-ink-400 mt-0.5">
-              اختر الصنف ليظهر رصيده الحالي في المخزن المصدر
+              {t("اختر الصنف ليظهر رصيده الحالي في المخزن المصدر")}
             </p>
           </div>
 
@@ -533,7 +534,7 @@ export default function StockTransferFormModal({
             className="h-9"
           >
             <Plus size={14} />
-            إضافة صنف
+            {t("إضافة صنف")}
           </Button>
         </div>
 
@@ -545,7 +546,7 @@ export default function StockTransferFormModal({
           <div className="flex items-center gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2.5 text-xs text-amber-700">
             <AlertCircle size={15} />
 
-            <span>اختر المخزن المصدر أولاً حتى يتم عرض رصيد الأصناف.</span>
+            <span>{t("اختر المخزن المصدر أولاً حتى يتم عرض رصيد الأصناف.")}</span>
           </div>
         )}
 
@@ -575,8 +576,8 @@ export default function StockTransferFormModal({
         ===================================================== */}
 
         <Input
-          label="ملاحظات"
-          placeholder="ملاحظات التحويل..."
+          label={t("ملاحظات")}
+          placeholder={t("ملاحظات التحويل...")}
           {...register("notes")}
         />
 
@@ -591,7 +592,7 @@ export default function StockTransferFormModal({
             onClick={onClose}
             disabled={isSubmitting}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button
@@ -606,13 +607,13 @@ export default function StockTransferFormModal({
             {isSubmitting ? (
               <>
                 <Loader2 size={15} className="animate-spin" />
-                جاري الحفظ...
+                {t("جاري الحفظ...")}
               </>
             ) : (
               <>
                 <Save size={15} />
 
-                {isEdit ? "حفظ التعديلات" : "إنشاء التحويل"}
+                {isEdit ? t("حفظ التعديلات") : t("إنشاء التحويل")}
               </>
             )}
           </Button>
@@ -825,16 +826,16 @@ function StockTransferLine({
 
           <div>
             <p className="text-xs font-semibold text-ink-900">
-              الصنف {index + 1}
+              {t("الصنف")} {index + 1}
             </p>
 
             {hasValidItem && hasValidStore && (
               <p className="text-[10px] text-ink-400 mt-0.5">
-                الرصيد الحالي في المخزن المصدر:{" "}
+                {t("الرصيد الحالي في المخزن المصدر:")}{" "}
                 {isStockLoadingState ? (
                   <span className="inline-flex items-center gap-1">
                     <Loader2 size={10} className="animate-spin" />
-                    جاري القراءة...
+                    {t("جاري القراءة...")}
                   </span>
                 ) : (
                   <strong
@@ -865,7 +866,7 @@ function StockTransferLine({
             hover:bg-negative/10
             transition-colors
           "
-          title="حذف الصنف"
+          title={t("حذف الصنف")}
         >
           <Trash2 size={15} />
         </button>
@@ -882,7 +883,7 @@ function StockTransferLine({
 
         <div>
           <label className="block text-xs font-medium text-ink-400 mb-1">
-            الصنف
+            {t("الصنف")}
           </label>
 
           <Controller
@@ -894,7 +895,7 @@ function StockTransferLine({
                 value={field.value}
                 onChange={field.onChange}
                 placeholder={
-                  isItemsLoading ? "جاري تحميل الأصناف..." : "اختر الصنف"
+                  isItemsLoading ? t("جاري تحميل الأصناف...") : t("اختر الصنف")
                 }
                 isDisabled={isItemsLoading}
               />
@@ -910,7 +911,7 @@ function StockTransferLine({
               <AlertCircle size={13} className="text-amber-600" />
 
               <span className="text-[11px] text-amber-700">
-                اختر المخزن المصدر أولاً لمعرفة الرصيد.
+                {t("اختر المخزن المصدر أولاً لمعرفة الرصيد.")}
               </span>
             </div>
           )}
@@ -926,7 +927,7 @@ function StockTransferLine({
                   <Loader2 size={13} className="animate-spin text-ink-400" />
 
                   <span className="text-[11px] text-ink-400">
-                    جاري جلب رصيد الصنف من المخزن...
+                    {t("جاري جلب رصيد الصنف من المخزن...")}
                   </span>
                 </div>
               ) : isStockError ? (
@@ -938,7 +939,7 @@ function StockTransferLine({
 
                   <div>
                     <span className="text-[11px] text-negative">
-                      تعذر جلب رصيد الصنف من المخزن المصدر.
+                      {t("تعذر جلب رصيد الصنف من المخزن المصدر.")}
                     </span>
 
                     {stockError?.data?.detail && (
@@ -975,7 +976,7 @@ function StockTransferLine({
                     />
 
                     <span className="text-[11px] text-ink-500">
-                      الرصيد المتاح بالمخزن
+                      {t("الرصيد المتاح بالمخزن")}
                     </span>
                   </div>
 
@@ -997,7 +998,7 @@ function StockTransferLine({
 
           {isDuplicate && (
             <p className="text-[11px] text-negative mt-1.5">
-              هذا الصنف مضاف بالفعل في التحويل.
+              {t("هذا الصنف مضاف بالفعل في التحويل.")}
             </p>
           )}
 
@@ -1016,7 +1017,7 @@ function StockTransferLine({
 
         <div>
           <Input
-            label="الكمية"
+            label={t("الكمية")}
             type="number"
             min="0"
             step="any"
@@ -1028,11 +1029,11 @@ function StockTransferLine({
                 const numericValue = Number(value);
 
                 if (!Number.isFinite(numericValue)) {
-                  return "أدخل كمية صحيحة";
+                  return t("أدخل كمية صحيحة");
                 }
 
                 if (numericValue <= 0) {
-                  return "الكمية يجب أن تكون أكبر من صفر";
+                  return t("الكمية يجب أن تكون أكبر من صفر");
                 }
 
                 if (
@@ -1040,7 +1041,7 @@ function StockTransferLine({
                   !isStockLoadingState &&
                   numericValue > balance
                 ) {
-                  return `الرصيد المتاح ${balance}`;
+                  return t("الرصيد المتاح {0}", { 0: balance });
                 }
 
                 return true;
@@ -1054,7 +1055,7 @@ function StockTransferLine({
             !isStockLoadingState &&
             balance !== null && (
               <div className="mt-1 flex justify-between text-[10px]">
-                <span className="text-ink-400">المتاح</span>
+                <span className="text-ink-400">{t("المتاح")}</span>
 
                 <span
                   className={
@@ -1079,10 +1080,10 @@ function StockTransferLine({
           <AlertCircle size={15} className="text-negative shrink-0 mt-0.5" />
 
           <div className="text-xs text-negative">
-            <p className="font-semibold">الكمية المطلوبة أكبر من الرصيد</p>
+            <p className="font-semibold">{t("الكمية المطلوبة أكبر من الرصيد")}</p>
 
             <p className="mt-0.5">
-              الرصيد المتاح في المخزن المصدر:{" "}
+              {t("الرصيد المتاح في المخزن المصدر:")}{" "}
               <strong className="num">{balance}</strong>
             </p>
           </div>
@@ -1102,7 +1103,7 @@ function StockTransferLine({
             <AlertCircle size={14} className="text-amber-600" />
 
             <span className="text-xs text-amber-700">
-              لا يوجد رصيد متاح لهذا الصنف في المخزن المصدر.
+              {t("لا يوجد رصيد متاح لهذا الصنف في المخزن المصدر.")}
             </span>
           </div>
         )}
@@ -1113,8 +1114,8 @@ function StockTransferLine({
 
       <div className="mt-3">
         <Input
-          label="ملاحظات الصنف"
-          placeholder="ملاحظات اختيارية..."
+          label={t("ملاحظات الصنف")}
+          placeholder={t("ملاحظات اختيارية...")}
           {...register(`lines.${index}.notes`)}
         />
       </div>

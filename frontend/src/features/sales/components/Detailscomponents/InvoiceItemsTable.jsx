@@ -1,5 +1,7 @@
 import { Package } from "lucide-react";
 
+import { t } from "../../../../i18n";
+import { getLocale } from "../../../../i18n";
 /**
  * @param {{ items: Array, currency?: string }} props
  */
@@ -12,12 +14,12 @@ export default function InvoiceItemsTable({ items, currency }) {
           className="mx-auto text-ink-400/40 mb-2"
           strokeWidth={1.6}
         />
-        <p className="text-sm text-ink-400">لا توجد أصناف في هذه الفاتورة</p>
+        <p className="text-sm text-ink-400">{t("لا توجد أصناف في هذه الفاتورة")}</p>
       </div>
     );
   }
 
-  const symbol = currency === "USD" ? "$" : "ج.م";
+  const symbol = currency === "USD" ? "$" : t("ج.م");
 
   return (
     <div className="rounded-2xl border border-ink-400/10 bg-white shadow-card overflow-hidden">
@@ -25,7 +27,7 @@ export default function InvoiceItemsTable({ items, currency }) {
       <div className="flex items-center gap-2 px-5 py-4 border-b border-ink-400/10">
         <Package size={18} className="text-primary-500" />
         <h3 className="font-display text-base font-semibold text-ink-900">
-          أصناف الفاتورة
+          {t("أصناف الفاتورة")}
         </h3>
       </div>
 
@@ -34,15 +36,15 @@ export default function InvoiceItemsTable({ items, currency }) {
         <table className="w-full text-right border-collapse text-sm min-w-[750px]">
           <thead>
             <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
-              <th className="p-3 font-medium">الكود</th>
-              <th className="p-3 font-medium">الصنف</th>
-              <th className="p-3 font-medium">الوحدة</th>
-              <th className="p-3 font-medium">العدد</th>
-              <th className="p-3 font-medium">وزن الوحدة</th>
-              <th className="p-3 font-medium">الكمية</th>
-              <th className="p-3 font-medium">السعر</th>
-              <th className="p-3 font-medium">الإجمالي</th>
-              <th className="p-3 font-medium">ملاحظات</th>
+              <th className="p-3 font-medium">{t("الكود")}</th>
+              <th className="p-3 font-medium">{t("الصنف")}</th>
+              <th className="p-3 font-medium">{t("الوحدة")}</th>
+              <th className="p-3 font-medium">{t("العدد")}</th>
+              <th className="p-3 font-medium">{t("وزن الوحدة")}</th>
+              <th className="p-3 font-medium">{t("الكمية")}</th>
+              <th className="p-3 font-medium">{t("السعر")}</th>
+              <th className="p-3 font-medium">{t("الإجمالي")}</th>
+              <th className="p-3 font-medium">{t("ملاحظات")}</th>
             </tr>
           </thead>
 
@@ -63,23 +65,23 @@ export default function InvoiceItemsTable({ items, currency }) {
                 <td className="p-3 text-ink-600">{item.itemUnitName || "—"}</td>
 
                 <td className="p-3 num text-center">
-                  {item.count?.toLocaleString("ar-EG", { maximumFractionDigits: 2 }) || "—"}
+                  {item.count?.toLocaleString(getLocale(), { maximumFractionDigits: 2 }) || "—"}
                 </td>
 
                 <td className="p-3 num text-ink-600">
-                  {(item.weight || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                  {(item.weight || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
                 </td>
 
                 <td className="p-3 num font-medium text-ink-900">
-                  {(item.quantity || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                  {(item.quantity || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
                 </td>
 
                 <td className="p-3 num text-ink-600">
-                  {(item.price || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                  {(item.price || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
                 </td>
 
                 <td className="p-3 num font-medium">
-                  {(item.total || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 })} {symbol}
+                  {(item.total || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 })} {symbol}
                 </td>
 
                 <td className="p-3 text-ink-400 text-xs">

@@ -18,6 +18,7 @@ import {
   createMovementTypeOptions,
 } from "../payroll.constants";
 
+import { t } from "../../../i18n";
 function getToday() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
@@ -28,12 +29,12 @@ function getToday() {
 
 const schema = z
   .object({
-    employeeId: z.string().min(1, "اختر الموظف"),
-    type: z.string().min(1, "نوع الحركة مطلوب"),
-    amount: z.coerce.number().positive("أدخل مبلغ صحيح"),
-    currency: z.string().min(1, "اختر العملة"),
+    employeeId: z.string().min(1, t("اختر الموظف")),
+    type: z.string().min(1, t("نوع الحركة مطلوب")),
+    amount: z.coerce.number().positive(t("أدخل مبلغ صحيح")),
+    currency: z.string().min(1, t("اختر العملة")),
     exchangeRate: z.coerce.number().optional(),
-    movementDate: z.string().min(1, "تاريخ الحركة مطلوب"),
+    movementDate: z.string().min(1, t("تاريخ الحركة مطلوب")),
     notes: z.string().optional(),
   })
   .superRefine((data, ctx) => {
@@ -41,7 +42,7 @@ const schema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["exchangeRate"],
-        message: "أدخل سعر الصرف",
+        message: t("أدخل سعر الصرف"),
       });
     }
   });
@@ -116,7 +117,7 @@ export default function EmployeeMovementFormModal({
 
     try {
       await createMovement(payload).unwrap();
-      toast.success("تم تسجيل الحركة بنجاح");
+      toast.success(t("تم تسجيل الحركة بنجاح"));
       onSaved?.();
       onClose();
     } catch (error) {
@@ -124,7 +125,7 @@ export default function EmployeeMovementFormModal({
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "حدث خطأ أثناء تسجيل الحركة",
+          t("حدث خطأ أثناء تسجيل الحركة"),
       );
     }
   };
@@ -132,13 +133,13 @@ export default function EmployeeMovementFormModal({
   const quickAmounts = [100, 200, 500, 1000];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="تسجيل حركة موظف">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("تسجيل حركة موظف")}>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* Employee */}
           <div className="sm:col-span-2">
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              الموظف
+              {t("الموظف")}
             </label>
             <Controller
               name="employeeId"
@@ -148,7 +149,7 @@ export default function EmployeeMovementFormModal({
                   options={employeeOptions}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="اختر الموظف"
+                  placeholder={t("اختر الموظف")}
                 />
               )}
             />
@@ -162,7 +163,7 @@ export default function EmployeeMovementFormModal({
           {/* Movement Type */}
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              نوع الحركة
+              {t("نوع الحركة")}
             </label>
             <Controller
               name="type"
@@ -172,7 +173,7 @@ export default function EmployeeMovementFormModal({
                   options={createMovementTypeOptions}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="اختر نوع الحركة"
+                  placeholder={t("اختر نوع الحركة")}
                 />
               )}
             />
@@ -185,7 +186,7 @@ export default function EmployeeMovementFormModal({
 
           {/* Date */}
           <Input
-            label="تاريخ الحركة"
+            label={t("تاريخ الحركة")}
             type="date"
             min={selectedFiscalYear?.startDate}
             max={selectedFiscalYear?.endDate}
@@ -196,7 +197,7 @@ export default function EmployeeMovementFormModal({
           {/* Amount */}
           <div className="sm:col-span-2">
             <Input
-              label="المبلغ"
+              label={t("المبلغ")}
               type="number"
               step="0.01"
               min="0"
@@ -220,7 +221,7 @@ export default function EmployeeMovementFormModal({
           {/* Currency */}
           <div>
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              العملة
+              {t("العملة")}
             </label>
             <Controller
               name="currency"
@@ -230,7 +231,7 @@ export default function EmployeeMovementFormModal({
                   options={currencyOptions}
                   value={field.value}
                   onChange={field.onChange}
-                  placeholder="اختر العملة"
+                  placeholder={t("اختر العملة")}
                 />
               )}
             />
@@ -244,7 +245,7 @@ export default function EmployeeMovementFormModal({
           {/* Exchange Rate - يظهر بس لو العملة مش EGP */}
           {currency !== "EGP" && (
             <Input
-              label="سعر الصرف"
+              label={t("سعر الصرف")}
               type="number"
               step="0.01"
               min="0"
@@ -256,12 +257,12 @@ export default function EmployeeMovementFormModal({
           {/* Notes */}
           <div className="sm:col-span-2">
             <label className="mb-1 block text-xs font-medium text-ink-400">
-              ملاحظات
+              {t("ملاحظات")}
             </label>
             <textarea
               {...register("notes")}
               rows={2}
-              placeholder="أضف ملاحظات إن وجدت..."
+              placeholder={t("أضف ملاحظات إن وجدت...")}
               className="w-full rounded-lg border border-ink-400/15 bg-white px-3 py-2 text-sm outline-none transition focus:border-primary-500"
             />
           </div>
@@ -275,10 +276,10 @@ export default function EmployeeMovementFormModal({
             onClick={onClose}
             disabled={isSubmitting}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "جارِ الحفظ..." : "حفظ الحركة"}
+            {isSubmitting ? t("جارِ الحفظ...") : t("حفظ الحركة")}
           </Button>
         </div>
       </form>

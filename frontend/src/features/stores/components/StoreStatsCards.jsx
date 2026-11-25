@@ -1,5 +1,6 @@
 import { Package, Layers, Coins } from "lucide-react";
 
+import { t } from "../../../i18n";
 function StatCard({ icon: Icon, label, value, isPlaceholder }) {
   return (
     <div className="bg-white rounded-2xl shadow-card p-5 flex items-center gap-4">
@@ -9,7 +10,7 @@ function StatCard({ icon: Icon, label, value, isPlaceholder }) {
       <div className="min-w-0">
         <p className="text-xs text-ink-500 mb-1">{label}</p>
         {isPlaceholder ? (
-          <p className="text-sm text-ink-300">— قريبًا —</p>
+          <p className="text-sm text-ink-300">{t("— قريبًا —")}</p>
         ) : (
           <p className="font-display text-lg font-bold text-ink-900 truncate">
             {value}
@@ -27,18 +28,18 @@ export default function StoreStatsCards({ stats }) {
   const cards = [
     {
       icon: Package,
-      label: "عدد الأصناف",
+      label: t("عدد الأصناف"),
       value: stats?.itemsCount,
     },
     {
       icon: Layers,
-      label: "عدد الأصناف المتوفرة",
+      label: t("عدد الأصناف المتوفرة"),
       value: stats?.itemsWithStockCount,
     },
     {
       icon: Coins,
-      label: "إجمالي قيمة المخزون",
-      value: stats?.totalValue ? `${stats.totalValue} ج.م` : undefined,
+      label: t("إجمالي قيمة المخزون"),
+      value: stats?.totalValue ? t("{0} ج.م", { 0: stats.totalValue }) : undefined,
     },
   ];
 

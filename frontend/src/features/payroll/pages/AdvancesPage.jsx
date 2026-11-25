@@ -10,16 +10,17 @@ import { useNavigate } from "react-router-dom";
 import EmployeeTransactionsListPage from "../components/EmployeeTransactionsListPage";
 import { categoryOptionsFor, advanceCategories } from "../payroll.constants";
 
+import { t } from "../../../i18n";
 export default function AdvancesPage() {
   const navigate = useNavigate();
   return (
     <EmployeeTransactionsListPage
-      title="السلف"
-      subtitle="سلف الموظفين وأقساطها"
+      title={t("السلف")}
+      subtitle={t("سلف الموظفين وأقساطها")}
       categoryOptions={categoryOptionsFor(advanceCategories)}
       categoryKeys={advanceCategories}
       emptyIcon={CreditCard}
-      emptyLabel="لا توجد سلف"
+      emptyLabel={t("لا توجد سلف")}
       onView={(row) => navigate(`/dashboard/payroll/advances/${row.id}`)}
     />
   );

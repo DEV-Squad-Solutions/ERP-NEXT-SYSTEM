@@ -18,11 +18,13 @@ import CashMovementTypeFormModal from "../components/CashMovementTypeFormModal";
 import Modal from "../../../shared/components/ui/Modal";
 import Pagination from "../../../shared/components/ui/Pagination";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const CLASSIFICATION_LABELS = {
-  PartnerSettlement: "تسوية عميل/مورد",
-  Expense: "مصروفات",
-  Revenue: "إيرادات",
-  Other: "أخرى",
+  PartnerSettlement: t("تسوية عميل/مورد"),
+  Expense: t("مصروفات"),
+  Revenue: t("إيرادات"),
+  Other: t("أخرى"),
 };
 
 const CLASSIFICATION_TONES = {
@@ -34,10 +36,10 @@ const CLASSIFICATION_TONES = {
 
 function accountingEffect(type) {
   if (!type.forPartner)
-    return { text: "بدون أثر على العميل/المورد", tone: "neutral" };
+    return { text: t("بدون أثر على العميل/المورد"), tone: "neutral" };
   if (type.direction === "Receipt")
-    return { text: "دائن للعميل/المورد", tone: "credit" };
-  return { text: "مدين على العميل/المورد", tone: "debit" };
+    return { text: t("دائن للعميل/المورد"), tone: "credit" };
+  return { text: t("مدين على العميل/المورد"), tone: "debit" };
 }
 
 function ClassificationBadge({ classification }) {
@@ -134,13 +136,13 @@ export default function CashMovementTypesListPage() {
   const confirmDelete = async () => {
     try {
       await deleteType(pendingDelete.id).unwrap();
-      toast.success("تم حذف نوع الحركة");
+      toast.success(t("تم حذف نوع الحركة"));
       setPendingDelete(null);
     } catch (err) {
       if (err?.status === 409 || err?.status === 400) {
-        toast.error("النوع ده مستخدم في حركات سابقة، مينفعش يتحذف");
+        toast.error(t("النوع ده مستخدم في حركات سابقة، مينفعش يتحذف"));
       } else {
-        toast.error("حصل خطأ أثناء الحذف");
+        toast.error(t("حصل خطأ أثناء الحذف"));
       }
     }
   };
@@ -160,13 +162,12 @@ export default function CashMovementTypesListPage() {
   const items = data?.items ?? [];
 
   return (
-    <div dir="rtl" className="animate-fadeUp space-y-4 p-6">
+    <div dir={getDir()} className="animate-fadeUp space-y-4 p-6">
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold/20 bg-white p-5 shadow-sm">
         <div>
-          <h1 className="text-xl font-bold text-ink">أنواع حركات الخزنة</h1>
+          <h1 className="text-xl font-bold text-ink">{t("أنواع حركات الخزنة")}</h1>
           <p className="mt-1 text-sm text-ink/60">
-            تصنيفات سندات القبض والصرف (تسوية عميل/مورد، مصروفات، إيرادات)،
-            وربطها كافتراضي لفواتير البيع والشراء
+            {t("تصنيفات سندات القبض والصرف (تسوية عميل/مورد، مصروفات، إيرادات)، وربطها كافتراضي لفواتير البيع والشراء")}
           </p>
         </div>
 
@@ -181,7 +182,7 @@ export default function CashMovementTypesListPage() {
               }`}
             >
               <SlidersHorizontal className="h-4 w-4" />
-              فلاتر
+              {t("فلاتر")}
               {hasActiveFilters && (
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
               )}
@@ -191,14 +192,14 @@ export default function CashMovementTypesListPage() {
               <div className="absolute left-0 z-20 mt-2 w-80 animate-fadeUp space-y-3 rounded-2xl border border-gold/20 bg-white p-4 shadow-lg">
                 <div>
                   <label className="mb-1.5 block text-xs text-ink/50">
-                    بحث
+                    {t("بحث")}
                   </label>
                   <div className="relative">
                     <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
                     <input
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
-                      placeholder="ابحث بالاسم..."
+                      placeholder={t("ابحث بالاسم...")}
                       className="w-full rounded-xl border border-gold/30 bg-white py-2 pe-9 ps-3 text-sm outline-none transition-colors focus:border-emerald-600"
                     />
                   </div>
@@ -206,7 +207,7 @@ export default function CashMovementTypesListPage() {
 
                 <div>
                   <label className="mb-1.5 block text-xs text-ink/50">
-                    التصنيف
+                    {t("التصنيف")}
                   </label>
                   <select
                     value={classification}
@@ -216,17 +217,17 @@ export default function CashMovementTypesListPage() {
                     }}
                     className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
                   >
-                    <option value="">كل التصنيفات</option>
-                    <option value="PartnerSettlement">تسوية عميل/مورد</option>
-                    <option value="Expense">مصروفات</option>
-                    <option value="Revenue">إيرادات</option>
-                    <option value="Other">أخرى</option>
+                    <option value="">{t("كل التصنيفات")}</option>
+                    <option value="PartnerSettlement">{t("تسوية عميل/مورد")}</option>
+                    <option value="Expense">{t("مصروفات")}</option>
+                    <option value="Revenue">{t("إيرادات")}</option>
+                    <option value="Other">{t("أخرى")}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="mb-1.5 block text-xs text-ink/50">
-                    الاتجاه
+                    {t("الاتجاه")}
                   </label>
                   <select
                     value={direction}
@@ -236,15 +237,15 @@ export default function CashMovementTypesListPage() {
                     }}
                     className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
                   >
-                    <option value="">كل الاتجاهات</option>
-                    <option value="Receipt">قبض</option>
-                    <option value="Payment">صرف</option>
+                    <option value="">{t("كل الاتجاهات")}</option>
+                    <option value="Receipt">{t("قبض")}</option>
+                    <option value="Payment">{t("صرف")}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="mb-1.5 block text-xs text-ink/50">
-                    الربط بعميل/مورد
+                    {t("الربط بعميل/مورد")}
                   </label>
                   <select
                     value={forPartner}
@@ -254,15 +255,15 @@ export default function CashMovementTypesListPage() {
                     }}
                     className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
                   >
-                    <option value="">عميل/مورد + عام</option>
-                    <option value="true">مرتبط بعميل/مورد فقط</option>
-                    <option value="false">عام فقط (مصاريف، أجور...)</option>
+                    <option value="">{t("عميل/مورد + عام")}</option>
+                    <option value="true">{t("مرتبط بعميل/مورد فقط")}</option>
+                    <option value="false">{t("عام فقط (مصاريف، أجور...)")}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="mb-1.5 block text-xs text-ink/50">
-                    الحالة
+                    {t("الحالة")}
                   </label>
                   <select
                     value={isActive}
@@ -272,9 +273,9 @@ export default function CashMovementTypesListPage() {
                     }}
                     className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-emerald-600"
                   >
-                    <option value="">كل الحالات</option>
-                    <option value="true">نشط فقط</option>
-                    <option value="false">غير نشط فقط</option>
+                    <option value="">{t("كل الحالات")}</option>
+                    <option value="true">{t("نشط فقط")}</option>
+                    <option value="false">{t("غير نشط فقط")}</option>
                   </select>
                 </div>
 
@@ -284,7 +285,7 @@ export default function CashMovementTypesListPage() {
                     className="flex items-center gap-1.5 pt-1 text-xs text-ink/50 transition-colors hover:text-emerald-700"
                   >
                     <RotateCcw className="h-3 w-3" />
-                    إعادة تعيين الفلاتر
+                    {t("إعادة تعيين الفلاتر")}
                   </button>
                 )}
               </div>
@@ -296,7 +297,7 @@ export default function CashMovementTypesListPage() {
             className="flex items-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-800"
           >
             <Plus className="h-4 w-4" />
-            إضافة نوع جديد
+            {t("إضافة نوع جديد")}
           </button>
         </div>
       </div>
@@ -310,25 +311,25 @@ export default function CashMovementTypesListPage() {
           <thead className="bg-ink/[0.03] text-ink/60">
             <tr>
               <th className="px-4 py-3 text-start text-xs font-medium">
-                الاسم
+                {t("الاسم")}
               </th>
               <th className="px-4 py-3 text-start text-xs font-medium">
-                التصنيف
+                {t("التصنيف")}
               </th>
               <th className="px-4 py-3 text-start text-xs font-medium">
-                الاتجاه
+                {t("الاتجاه")}
               </th>
               <th className="px-4 py-3 text-start text-xs font-medium">
-                الأثر المحاسبي
+                {t("الأثر المحاسبي")}
               </th>
               <th className="px-4 py-3 text-start text-xs font-medium">
-                افتراضي لـ
+                {t("افتراضي لـ")}
               </th>
               <th className="px-4 py-3 text-start text-xs font-medium">
-                الحالة
+                {t("الحالة")}
               </th>
               <th className="px-4 py-3 text-start text-xs font-medium">
-                إجراءات
+                {t("إجراءات")}
               </th>
             </tr>
           </thead>
@@ -346,15 +347,15 @@ export default function CashMovementTypesListPage() {
                 <td colSpan={7} className="px-4 py-14 text-center">
                   <p className="mb-3 text-sm text-ink/50">
                     {hasActiveFilters
-                      ? "مفيش أنواع حركات مطابقة، جرّب تغيّر الفلاتر"
-                      : "مفيش أنواع حركات لسه، ابدأ بإضافة نوع جديد"}
+                      ? t("مفيش أنواع حركات مطابقة، جرّب تغيّر الفلاتر")
+                      : t("مفيش أنواع حركات لسه، ابدأ بإضافة نوع جديد")}
                   </p>
                   <button
                     onClick={openCreate}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-800"
                   >
                     <Plus className="h-4 w-4" />
-                    إضافة نوع جديد
+                    {t("إضافة نوع جديد")}
                   </button>
                 </td>
               </tr>
@@ -370,7 +371,7 @@ export default function CashMovementTypesListPage() {
                       {type.name}
                       {!type.forPartner && (
                         <span className="ms-2 rounded bg-ink/5 px-1.5 py-0.5 text-[10px] text-ink/50">
-                          عام
+                          {t("عام")}
                         </span>
                       )}
                     </td>
@@ -383,12 +384,12 @@ export default function CashMovementTypesListPage() {
                       {type.direction === "Receipt" ? (
                         <span className="flex w-fit items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-800">
                           <ArrowDownCircle className="h-3.5 w-3.5" />
-                          قبض
+                          {t("قبض")}
                         </span>
                       ) : (
                         <span className="flex w-fit items-center gap-1 rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700">
                           <ArrowUpCircle className="h-3.5 w-3.5" />
-                          صرف
+                          {t("صرف")}
                         </span>
                       )}
                     </td>
@@ -406,7 +407,7 @@ export default function CashMovementTypesListPage() {
                             : "bg-ink/5 text-ink/40"
                         }`}
                       >
-                        {type.isActive ? "نشط" : "غير نشط"}
+                        {type.isActive ? t("نشط") : t("غير نشط")}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -414,14 +415,14 @@ export default function CashMovementTypesListPage() {
                         <button
                           onClick={() => openEdit(type)}
                           className="rounded-lg p-1.5 text-ink/50 transition-colors hover:bg-ink/5 hover:text-ink"
-                          title="تعديل"
+                          title={t("تعديل")}
                         >
                           <Pencil className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => openDeleteConfirm(type)}
                           className="rounded-lg p-1.5 text-red-500/70 transition-colors hover:bg-red-50 hover:text-red-700"
-                          title="حذف"
+                          title={t("حذف")}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -447,7 +448,7 @@ export default function CashMovementTypesListPage() {
             setPageSize(size);
             setPageNumber(1);
           }}
-          label="نوع"
+          label={t("نوع")}
         />
       )}
 
@@ -460,25 +461,24 @@ export default function CashMovementTypesListPage() {
       <Modal
         isOpen={Boolean(pendingDelete)}
         onClose={() => setPendingDelete(null)}
-        title="حذف نوع الحركة؟"
+        title={t("حذف نوع الحركة؟")}
       >
         <p className="text-sm text-ink/60">
-          هيتم حذف "{pendingDelete?.name}" نهائيًا. لو النوع ده مستخدم في حركات
-          سابقة، الحذف هيترفض.
+          {t("هيتم حذف \"")}{pendingDelete?.name}{t("\" نهائيًا. لو النوع ده مستخدم في حركات سابقة، الحذف هيترفض.")}
         </p>
         <div className="mt-4 flex justify-end gap-2">
           <button
             onClick={() => setPendingDelete(null)}
             className="rounded-xl border border-gold/30 px-4 py-2 text-sm text-ink transition-colors hover:bg-ink/5"
           >
-            إلغاء
+            {t("إلغاء")}
           </button>
           <button
             onClick={confirmDelete}
             disabled={isDeleting}
             className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
           >
-            {isDeleting ? "جاري الحذف..." : "حذف"}
+            {isDeleting ? t("جاري الحذف...") : t("حذف")}
           </button>
         </div>
       </Modal>

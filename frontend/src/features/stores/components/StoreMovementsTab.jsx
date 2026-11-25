@@ -5,23 +5,25 @@ import { useGetItemsSelectQuery } from "../../inventory/inventoryApi";
 import Pagination from "../../../shared/components/ui/Pagination"; // عدّل المسار حسب مكانك // عدّل المسار حسب مكان inventoryApi عندك
 import { formatDate } from "../../../lib/date";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const MOVEMENT_TYPE_LABELS = {
-  Sales: "فاتورة مبيعات",
-  SalesReturn: "مرتجع مبيعات",
-  Purchase: "فاتورة مشتريات",
-  PurchaseReturn: "مرتجع مشتريات",
-  OpeningBalance: "رصيد افتتاحي",
-  AdjustmentIncrease: "تسوية زيادة",
-  AdjustmentDecrease: "تسوية نقص",
-  TransferIn: "تحويل وارد",
-  TransferOut: "تحويل صادر",
+  Sales: t("فاتورة مبيعات"),
+  SalesReturn: t("مرتجع مبيعات"),
+  Purchase: t("فاتورة مشتريات"),
+  PurchaseReturn: t("مرتجع مشتريات"),
+  OpeningBalance: t("رصيد افتتاحي"),
+  AdjustmentIncrease: t("تسوية زيادة"),
+  AdjustmentDecrease: t("تسوية نقص"),
+  TransferIn: t("تحويل وارد"),
+  TransferOut: t("تحويل صادر"),
 };
 
 const COST_STATUS_LABELS = {
-  Final: "نهائية",
-  PartiallyCosted: "مكلفة جزئيًا",
-  Pending: "معلقة",
-  Revalued: "معاد تقييمها",
+  Final: t("نهائية"),
+  PartiallyCosted: t("مكلفة جزئيًا"),
+  Pending: t("معلقة"),
+  Revalued: t("معاد تقييمها"),
 };
 
 // ملاحظة هامة:
@@ -58,11 +60,11 @@ export default function StoreMovementsTab({ storeId }) {
     })) ?? [];
 
   return (
-    <div className="bg-white rounded-2xl shadow-card p-6" dir="rtl">
+    <div className="bg-white rounded-2xl shadow-card p-6" dir={getDir()}>
       {/* اختيار الصنف - إجباري حسب متطلبات الـ API الحالية */}
       <div className="mb-5 max-w-sm">
         <label className="text-xs text-ink-500 mb-1.5 block">
-          اختر الصنف لعرض حركاته داخل هذا المخزن
+          {t("اختر الصنف لعرض حركاته داخل هذا المخزن")}
         </label>
         <Select
           isRtl
@@ -73,26 +75,26 @@ export default function StoreMovementsTab({ storeId }) {
             setSelectedItem(opt);
             setPageNumber(1);
           }}
-          placeholder="ابحث عن صنف..."
+          placeholder={t("ابحث عن صنف...")}
           classNamePrefix="rs"
         />
       </div>
 
       {!selectedItem && (
         <div className="py-14 text-center text-sm text-ink-400">
-          اختر صنفًا لعرض سجل الحركات الخاص به داخل هذا المخزن.
+          {t("اختر صنفًا لعرض سجل الحركات الخاص به داخل هذا المخزن.")}
         </div>
       )}
 
       {selectedItem && isFetching && (
         <div className="py-14 text-center text-sm text-ink-400">
-          جاري تحميل الحركات...
+          {t("جاري تحميل الحركات...")}
         </div>
       )}
 
       {selectedItem && isError && (
         <div className="py-14 text-center text-sm text-rose-500">
-          حدث خطأ أثناء تحميل الحركات.
+          {t("حدث خطأ أثناء تحميل الحركات.")}
         </div>
       )}
 
@@ -112,19 +114,19 @@ export default function StoreMovementsTab({ storeId }) {
           {report?.summary && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
               <SummaryChip
-                label="الرصيد الحالي"
+                label={t("الرصيد الحالي")}
                 value={report.summary.currentQuantity}
               />
               <SummaryChip
-                label="متوسط التكلفة"
+                label={t("متوسط التكلفة")}
                 value={report.summary.currentAverageCost}
               />
               <SummaryChip
-                label="قيمة المخزون الحالية"
+                label={t("قيمة المخزون الحالية")}
                 value={report.summary.currentInventoryValue}
               />
               <SummaryChip
-                label="حركات معلقة التكلفة"
+                label={t("حركات معلقة التكلفة")}
                 value={report.summary.pendingMovementCount}
               />
             </div>
@@ -135,21 +137,21 @@ export default function StoreMovementsTab({ storeId }) {
               <thead>
                 <tr className="text-ink-500 text-xs border-b border-ink-100">
                   <th className="py-2.5 px-3 text-right font-medium">
-                    التاريخ
+                    {t("التاريخ")}
                   </th>
                   <th className="py-2.5 px-3 text-right font-medium">
-                    نوع الحركة
+                    {t("نوع الحركة")}
                   </th>
                   <th className="py-2.5 px-3 text-right font-medium">
-                    رقم المستند
+                    {t("رقم المستند")}
                   </th>
-                  <th className="py-2.5 px-3 text-right font-medium">وارد</th>
-                  <th className="py-2.5 px-3 text-right font-medium">صادر</th>
+                  <th className="py-2.5 px-3 text-right font-medium">{t("وارد")}</th>
+                  <th className="py-2.5 px-3 text-right font-medium">{t("صادر")}</th>
                   <th className="py-2.5 px-3 text-right font-medium">
-                    الرصيد بعد الحركة
+                    {t("الرصيد بعد الحركة")}
                   </th>
                   <th className="py-2.5 px-3 text-right font-medium">
-                    حالة التكلفة
+                    {t("حالة التكلفة")}
                   </th>
                 </tr>
               </thead>
@@ -194,7 +196,7 @@ export default function StoreMovementsTab({ storeId }) {
                         {row.costStatus === "PartiallyCosted" &&
                           row.pendingCostQuantity > 0 && (
                             <span className="block text-[11px] text-amber-600 mt-0.5">
-                              معلق: {row.pendingCostQuantity}
+                              {t("معلق:")} {row.pendingCostQuantity}
                             </span>
                           )}
                       </td>
@@ -203,7 +205,7 @@ export default function StoreMovementsTab({ storeId }) {
                 ) : (
                   <tr>
                     <td colSpan={7} className="py-10 text-center text-ink-400">
-                      لا توجد حركات لهذا الصنف داخل هذا المخزن.
+                      {t("لا توجد حركات لهذا الصنف داخل هذا المخزن.")}
                     </td>
                   </tr>
                 )}
@@ -221,7 +223,7 @@ export default function StoreMovementsTab({ storeId }) {
                 setPageSize(size);
                 setPageNumber(1);
               }}
-              label="حركة"
+              label={t("حركة")}
             />
           )}
         </>

@@ -28,8 +28,10 @@ import {
 
 import DescriptionCascadeSelect from "./DescriptionCascadeSelect";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const schema = z.object({
-  voucherDate: z.string().min(1, "التاريخ مطلوب"),
+  voucherDate: z.string().min(1, t("التاريخ مطلوب")),
 
   direction: z.enum(["Receipt", "Payment"]),
 
@@ -39,8 +41,8 @@ const schema = z.object({
 
   amount: z
     .string()
-    .min(1, "المبلغ مطلوب")
-    .refine((value) => Number(value) > 0, "المبلغ يجب أن يكون أكبر من صفر"),
+    .min(1, t("المبلغ مطلوب"))
+    .refine((value) => Number(value) > 0, t("المبلغ يجب أن يكون أكبر من صفر")),
 
   exchangeRate: z.string().optional(),
 
@@ -368,16 +370,16 @@ export default function CashVoucherEditModal({
       onClose={onClose}
       title={
         isDraft
-          ? `تعديل المسودة ${voucher.voucherNumber || ""}`
+          ? t("تعديل المسودة {0}", { 0: voucher.voucherNumber || "" })
           : isPostedEditable
-            ? `تعديل السند ${voucher.voucherNumber || ""}`
-            : `السند ${voucher.voucherNumber || ""}`
+            ? t("تعديل السند {0}", { 0: voucher.voucherNumber || "" })
+            : t("السند {0}", { 0: voucher.voucherNumber || "" })
       }
     >
       {isInvoiceGenerated ? (
         <div className="space-y-4">
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-700">
-            هذا السند مولد من فاتورة رقم{" "}
+            {t("هذا السند مولد من فاتورة رقم")}{" "}
             <InvoiceNumberLink
               invoiceId={voucher.invoiceId}
               invoiceType={voucher.invoiceType}
@@ -385,42 +387,41 @@ export default function CashVoucherEditModal({
               number={voucher.invoiceNumber || voucher.invoiceId}
               className="font-semibold"
             />
-            ، ولا يمكن تعديله من هنا.
+            {t("، ولا يمكن تعديله من هنا.")}
             <br />
-            يمكن تعديله من خلال الفاتورة نفسها.
+            {t("يمكن تعديله من خلال الفاتورة نفسها.")}
           </div>
 
           <div className="flex justify-end">
             <Button type="button" variant="outline" onClick={onClose}>
-              إغلاق
+              {t("إغلاق")}
             </Button>
           </div>
         </div>
       ) : !isDraft && !canEditPosted ? (
         <div className="space-y-4">
           <div className="rounded-xl border border-positive/20 bg-positive/5 px-4 py-3 text-sm leading-6 text-ink-700">
-            هذا السند مرحّل بالفعل. بياناته وقيده المحاسبي للقراءة فقط، ولا
-            يمكن تعديله أو حذفه.
+            {t("هذا السند مرحّل بالفعل. بياناته وقيده المحاسبي للقراءة فقط، ولا يمكن تعديله أو حذفه.")}
           </div>
 
           <div className="rounded-xl border border-ink-400/15 bg-ink-400/5 p-3 text-sm leading-6 text-ink-700">
             <div className="flex flex-wrap gap-x-6 gap-y-1">
               <span>
-                التاريخ:{" "}
+                {t("التاريخ:")}{" "}
                 <strong className="num">
                   {formatDate(voucher.voucherDate)}
                 </strong>
               </span>
               <span>
-                الاتجاه:{" "}
+                {t("الاتجاه:")}{" "}
                 <strong>
-                  {voucher.direction === "Receipt" ? "وارد" : "صادر"}
+                  {voucher.direction === "Receipt" ? t("وارد") : t("صادر")}
                 </strong>
               </span>
               <span>
-                المبلغ:{" "}
+                {t("المبلغ:")}{" "}
                 <strong className="num">
-                  {Number(voucher.amount ?? 0).toLocaleString("ar-EG", {
+                  {Number(voucher.amount ?? 0).toLocaleString(getLocale(), {
                     maximumFractionDigits: 2,
                   })}{" "}
                   {currency}
@@ -430,18 +431,18 @@ export default function CashVoucherEditModal({
 
             {voucher.description && (
               <div className="mt-2">
-                البيان: <strong>{voucher.description}</strong>
+                {t("البيان:")} <strong>{voucher.description}</strong>
               </div>
             )}
 
             {voucher.notes && (
-              <div className="mt-1 text-ink-500">ملاحظات: {voucher.notes}</div>
+              <div className="mt-1 text-ink-500">{t("ملاحظات:")} {voucher.notes}</div>
             )}
           </div>
 
           <div className="flex justify-end">
             <Button type="button" variant="outline" onClick={onClose}>
-              إغلاق
+              {t("إغلاق")}
             </Button>
           </div>
         </div>
@@ -449,8 +450,7 @@ export default function CashVoucherEditModal({
         <form onSubmit={handleSubmit(submitPost)} className="space-y-4">
           {isPostedEditable && (
             <div className="rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm leading-6 text-ink-700">
-              هذا السند مرحّل بالفعل. التعديل متاح للأدمن أو المحاسب، وأي حفظ
-              هيتم مزامنته مع القيد المحاسبي ورصيد الخزنة والحركات المرتبطة.
+              {t("هذا السند مرحّل بالفعل. التعديل متاح للأدمن أو المحاسب، وأي حفظ هيتم مزامنته مع القيد المحاسبي ورصيد الخزنة والحركات المرتبطة.")}
             </div>
           )}
 
@@ -458,7 +458,7 @@ export default function CashVoucherEditModal({
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Input
               type="date"
-              label="تاريخ السند"
+              label={t("تاريخ السند")}
                             min={selectedFiscalYear?.startDate}
               max={selectedFiscalYear?.endDate}
               {...register("voucherDate")}
@@ -467,7 +467,7 @@ export default function CashVoucherEditModal({
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-ink-900">
-                الاتجاه
+                {t("الاتجاه")}
               </label>
 
               <Controller
@@ -484,7 +484,7 @@ export default function CashVoucherEditModal({
                           : "text-ink-400 hover:bg-ink-900/5"
                       }`}
                     >
-                      وارد
+                      {t("وارد")}
                     </button>
 
                     <button
@@ -496,7 +496,7 @@ export default function CashVoucherEditModal({
                           : "text-ink-400 hover:bg-ink-900/5"
                       }`}
                     >
-                      صادر
+                      {t("صادر")}
                     </button>
                   </div>
                 )}
@@ -507,7 +507,7 @@ export default function CashVoucherEditModal({
           {/* التوصيف */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink-900">
-              التوصيف
+              {t("التوصيف")}
             </label>
 
             <Controller
@@ -520,7 +520,7 @@ export default function CashVoucherEditModal({
                   onChange={field.onChange}
                   isLoading={isLoadingPartySelect}
                   isDisabled={!canDescribe}
-                  placeholder="اختر الحساب أو التوصيف"
+                  placeholder={t("اختر الحساب أو التوصيف")}
                 />
               )}
             />
@@ -533,10 +533,10 @@ export default function CashVoucherEditModal({
 
             <p className="mt-1 text-[11px] leading-5 text-ink-400">
               {!canDescribe
-                ? "السند موصّف بالفعل — التوصيف والتعديل للأدمن أو المحاسب فقط. يمكنك تعديل بيانات الحركة."
+                ? t("السند موصّف بالفعل — التوصيف والتعديل للأدمن أو المحاسب فقط. يمكنك تعديل بيانات الحركة.")
                 : voucher?.isDraft
-                  ? "اختر التوصيف ثم استخدم «توصيف وترحيل» لاعتماده، أو «حفظ كمسودة» لتعديل البيانات بدون ترحيل."
-                  : "السند مرحّل — أي تعديل هيتم مزامنته مع القيد المحاسبي ورصيد الخزنة."}
+                  ? t("اختر التوصيف ثم استخدم «توصيف وترحيل» لاعتماده، أو «حفظ كمسودة» لتعديل البيانات بدون ترحيل.")
+                  : t("السند مرحّل — أي تعديل هيتم مزامنته مع القيد المحاسبي ورصيد الخزنة.")}
             </p>
           </div>
 
@@ -545,7 +545,7 @@ export default function CashVoucherEditModal({
             <Input
               type="number"
               step="0.01"
-              label={`المبلغ (${currency || "EGP"})`}
+              label={t("المبلغ ({0})", { 0: currency || "EGP" })}
               {...register("amount")}
               error={errors.amount?.message}
             />
@@ -555,11 +555,11 @@ export default function CashVoucherEditModal({
                 <Input
                   type="number"
                   step="0.01"
-                  label={`سعر الصرف (${baseCurrency || "EGP"})`}
+                  label={t("سعر الصرف ({0})", { 0: baseCurrency || "EGP" })}
                   placeholder={
                     isResolvingRate
-                      ? "جاري تحميل السعر..."
-                      : "سعر يوم السند تلقائيًا إن ترك فارغًا"
+                      ? t("جاري تحميل السعر...")
+                      : t("سعر يوم السند تلقائيًا إن ترك فارغًا")
                   }
                   {...register("exchangeRate")}
                   error={errors.exchangeRate?.message}
@@ -568,7 +568,7 @@ export default function CashVoucherEditModal({
                 {isResolvingRate && (
                   <p className="mt-1 flex items-center gap-1 text-[11px] text-ink-400">
                     <Loader2 size={11} className="animate-spin" />
-                    جاري جلب سعر {currency} بتاريخ السند...
+                    {t("جاري جلب سعر")} {currency} {t("بتاريخ السند...")}
                   </p>
                 )}
               </div>
@@ -581,16 +581,14 @@ export default function CashVoucherEditModal({
               <Input
                 type="number"
                 step="0.01"
-                label={`سعر تسوية الشريك (${baseCurrency || "EGP"} لكل ${partnerCurrency})`}
-                placeholder="اتركه فارغًا ليُحل تلقائيًا"
+                label={t("سعر تسوية الشريك ({0} لكل {1})", { 0: baseCurrency || "EGP", 1: partnerCurrency })}
+                placeholder={t("اتركه فارغًا ليُحل تلقائيًا")}
                 {...register("partnerExchangeRate")}
                 error={errors.partnerExchangeRate?.message}
               />
 
               <p className="mt-1 text-[11px] leading-5 text-ink-400">
-                الخزنة بعملة {currency} وحساب الشريك بعملة {partnerCurrency}.
-                السعر بوحدات العملة الأساسية لكل وحدة من عملة الشريك. لو
-                اترك فارغًا، النظام بيدوّر سعر مناسب يغطي تاريخ السند.
+                {t("الخزنة بعملة")} {currency} {t("وحساب الشريك بعملة")} {partnerCurrency}{t(". السعر بوحدات العملة الأساسية لكل وحدة من عملة الشريك. لو اترك فارغًا، النظام بيدوّر سعر مناسب يغطي تاريخ السند.")}
               </p>
             </div>
           )}
@@ -599,15 +597,15 @@ export default function CashVoucherEditModal({
           {voucher.partnerCurrency && (
             <div className="rounded-xl border border-ink-400/15 bg-ink-400/5 p-3 text-xs leading-6 text-ink-600">
               <div className="mb-1 font-medium text-ink-900">
-                تسوية الشريك المحفوظة
+                {t("تسوية الشريك المحفوظة")}
               </div>
               <div className="flex flex-wrap gap-x-6 gap-y-1">
                 <span>
-                  العملة: <strong>{voucher.partnerCurrency}</strong>
+                  {t("العملة:")} <strong>{voucher.partnerCurrency}</strong>
                 </span>
                 {voucher.partnerAmount != null && (
                   <span>
-                    مبلغ الشريك:{" "}
+                    {t("مبلغ الشريك:")}{" "}
                     <strong>
                       {voucher.partnerAmount} {voucher.partnerCurrency}
                     </strong>
@@ -615,7 +613,7 @@ export default function CashVoucherEditModal({
                 )}
                 {voucher.partnerBaseAmount != null && (
                   <span>
-                    مقابل الأساس:{" "}
+                    {t("مقابل الأساس:")}{" "}
                     <strong>
                       {voucher.partnerBaseAmount} {baseCurrency || "EGP"}
                     </strong>
@@ -627,14 +625,14 @@ export default function CashVoucherEditModal({
 
           {/* الرقم المرجعي */}
           <Input
-            label="الرقم المرجعي"
+            label={t("الرقم المرجعي")}
             {...register("referenceNumber")}
             error={errors.referenceNumber?.message}
           />
 
           {/* البيان */}
           <Input
-            label="البيان"
+            label={t("البيان")}
             {...register("description")}
             error={errors.description?.message}
           />
@@ -642,14 +640,14 @@ export default function CashVoucherEditModal({
           {/* الملاحظات */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink-900">
-              ملاحظات
+              {t("ملاحظات")}
             </label>
 
             <textarea
               {...register("notes")}
               rows={3}
               className="w-full resize-none rounded-lg border border-ink-400/15 px-3 py-2 text-sm outline-none transition placeholder:text-ink-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/10"
-              placeholder="أضف ملاحظات إن وجدت..."
+              placeholder={t("أضف ملاحظات إن وجدت...")}
             />
 
             {errors.notes && (
@@ -664,12 +662,12 @@ export default function CashVoucherEditModal({
             <div className="space-y-3 border-t border-ink-400/10 pt-4">
               <div className="rounded-xl border border-gold-200 bg-gold-50 px-4 py-3 text-sm leading-6 text-ink-700">
                 <p className="mb-1 font-semibold text-ink-900">
-                  تأكيد التوصيف والترحيل
+                  {t("تأكيد التوصيف والترحيل")}
                 </p>
                 <p>
                   {isDraft
-                    ? "الترحيل هيأثر على رصيد الخزنة والقيود المحاسبية. بعد الترحيل السند يبقى قابلًا للتعديل أو الحذف من الأدمن والمحاسب."
-                    : "هيتم تحديث القيد المحاسبي ورصيد الخزنة والحركات المرتبطة بالسند فورًا."}
+                    ? t("الترحيل هيأثر على رصيد الخزنة والقيود المحاسبية. بعد الترحيل السند يبقى قابلًا للتعديل أو الحذف من الأدمن والمحاسب.")
+                    : t("هيتم تحديث القيد المحاسبي ورصيد الخزنة والحركات المرتبطة بالسند فورًا.")}
                 </p>
               </div>
 
@@ -680,19 +678,19 @@ export default function CashVoucherEditModal({
                   onClick={() => setPendingPost(null)}
                   disabled={saving}
                 >
-                  رجوع
+                  {t("رجوع")}
                 </Button>
 
                 <Button type="button" onClick={confirmPost} disabled={saving}>
                   {saving ? (
                     <>
                       <Loader2 size={16} className="animate-spin" />
-                      جاري الترحيل...
+                      {t("جاري الترحيل...")}
                     </>
                   ) : (
                     <>
                       <Save size={16} />
-                      تأكيد الترحيل
+                      {t("تأكيد الترحيل")}
                     </>
                   )}
                 </Button>
@@ -706,7 +704,7 @@ export default function CashVoucherEditModal({
                 onClick={onClose}
                 disabled={saving}
               >
-                إلغاء
+                {t("إلغاء")}
               </Button>
 
               {isDraft && (
@@ -719,12 +717,12 @@ export default function CashVoucherEditModal({
                   {saving ? (
                     <>
                       <Loader2 size={16} className="animate-spin" />
-                      جاري الحفظ...
+                      {t("جاري الحفظ...")}
                     </>
                   ) : (
                     <>
                       <Save size={16} />
-                      حفظ كمسودة
+                      {t("حفظ كمسودة")}
                     </>
                   )}
                 </Button>
@@ -732,7 +730,7 @@ export default function CashVoucherEditModal({
 
               <Button type="submit" disabled={saving}>
                 <Save size={16} />
-                {isDraft ? "توصيف وترحيل" : "حفظ التعديلات"}
+                {isDraft ? t("توصيف وترحيل") : t("حفظ التعديلات")}
               </Button>
             </div>
           )}

@@ -6,6 +6,7 @@ import Modal from "../../../shared/components/ui/Modal";
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import Input from "../../../shared/components/ui/Input";
 
+import { t } from "../../../i18n";
 /**
  * نفس فئات التوصيف المستخدمة في CashVoucherEditModal — لازم تفضل متطابقة
  * بين المودالين. لو عدّلت واحدة عدّل التانية.
@@ -13,37 +14,37 @@ import Input from "../../../shared/components/ui/Input";
 const TAWSEEF_CATEGORIES = [
   {
     value: "PartnerSettlement",
-    label: "عملاء وموردين",
+    label: t("عملاء وموردين"),
     accountKind: "partner",
     partyType: "Partner",
   },
   {
     value: "Revenue",
-    label: "إيرادات",
+    label: t("إيرادات"),
     accountKind: "movementType",
     partyType: "None",
   },
   {
     value: "Expense",
-    label: "مصاريف",
+    label: t("مصاريف"),
     accountKind: "movementType",
     partyType: "None",
   },
   {
     value: "Driver",
-    label: "سائقين",
+    label: t("سائقين"),
     accountKind: "driver",
     partyType: "Driver",
   },
   {
     value: "Salary",
-    label: "رواتب وأجور",
+    label: t("رواتب وأجور"),
     accountKind: "employee",
     partyType: "Employee",
   },
   {
     value: "Advance",
-    label: "سلف",
+    label: t("سلف"),
     accountKind: "employee",
     partyType: "Employee",
   },
@@ -181,7 +182,7 @@ export default function DescriptionPickerModal({
       label:
         category.accountKind === "movementType"
           ? type.name
-          : `${type.name} — ${type.direction === "Receipt" ? "وارد" : "صادر"}`,
+          : `${type.name} — ${type.direction === "Receipt" ? t("وارد") : t("صادر")}`,
     }));
   }, [movementTypeOptions, category.accountKind]);
 
@@ -296,12 +297,12 @@ export default function DescriptionPickerModal({
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="توصيف الحركة">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("توصيف الحركة")}>
       <div className="space-y-5">
         {/* التوصيف */}
         <div>
           <label className="mb-2 block text-sm font-medium text-ink">
-            التوصيف
+            {t("التوصيف")}
           </label>
 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -326,8 +327,8 @@ export default function DescriptionPickerModal({
         <div>
           <label className="mb-1.5 block text-sm font-medium text-ink">
             {category.accountKind === "movementType"
-              ? "الحساب (نوع الحركة)"
-              : "نوع الحركة"}
+              ? t("الحساب (نوع الحركة)")
+              : t("نوع الحركة")}
           </label>
 
           <CompactSelect
@@ -337,13 +338,13 @@ export default function DescriptionPickerModal({
             isLoading={loadingTypes}
             isDisabled={loadingTypes}
             placeholder={
-              loadingTypes ? "جاري تحميل أنواع الحركة..." : "اختر نوع الحركة"
+              loadingTypes ? t("جاري تحميل أنواع الحركة...") : t("اختر نوع الحركة")
             }
           />
 
           {!loadingTypes && movementTypeOptions.length === 0 && (
             <p className="mt-1.5 text-xs text-ink/50">
-              لا توجد أنواع حركة متاحة لهذا التوصيف.
+              {t("لا توجد أنواع حركة متاحة لهذا التوصيف.")}
             </p>
           )}
         </div>
@@ -352,14 +353,14 @@ export default function DescriptionPickerModal({
         {category.accountKind === "partner" && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              الحساب (عميل / مورد)
+              {t("الحساب (عميل / مورد)")}
             </label>
 
             <CompactSelect
               options={partnerOptions}
               value={businessPartnerId}
               onChange={(value) => setBusinessPartnerId(value || "")}
-              placeholder="اختر العميل / المورد"
+              placeholder={t("اختر العميل / المورد")}
             />
           </div>
         )}
@@ -368,14 +369,14 @@ export default function DescriptionPickerModal({
         {category.accountKind === "driver" && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              الحساب (السائق)
+              {t("الحساب (السائق)")}
             </label>
 
             <CompactSelect
               options={driverSelectOptions}
               value={driverId}
               onChange={(value) => setDriverId(value || "")}
-              placeholder="اختر السائق"
+              placeholder={t("اختر السائق")}
             />
           </div>
         )}
@@ -384,14 +385,14 @@ export default function DescriptionPickerModal({
         {category.accountKind === "employee" && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              الحساب (الموظف)
+              {t("الحساب (الموظف)")}
             </label>
 
             <CompactSelect
               options={employeeSelectOptions}
               value={employeeId}
               onChange={(value) => setEmployeeId(value || "")}
-              placeholder="اختر الموظف"
+              placeholder={t("اختر الموظف")}
             />
           </div>
         )}
@@ -400,14 +401,13 @@ export default function DescriptionPickerModal({
         {isPersonalExpense && (
           <div>
             <Input
-              label="المستفيد"
+              label={t("المستفيد")}
               value={beneficiaryName}
               onChange={(e) => setBeneficiaryName(e.target.value)}
-              placeholder="اسم الشخص المستفيد من المصروف الشخصي"
+              placeholder={t("اسم الشخص المستفيد من المصروف الشخصي")}
             />
             <p className="mt-1 text-xs text-ink/50">
-              ده بيان توضيحي بس، القيد بيتسجل على "مصروف شخصي" كحساب مش على
-              الشخص ده.
+              {t("ده بيان توضيحي بس، القيد بيتسجل على \"مصروف شخصي\" كحساب مش على الشخص ده.")}
             </p>
           </div>
         )}
@@ -419,7 +419,7 @@ export default function DescriptionPickerModal({
             onClick={onClose}
             className="rounded-xl border border-gold/30 px-4 py-2 text-sm text-ink transition hover:bg-ink/5"
           >
-            إلغاء
+            {t("إلغاء")}
           </button>
 
           <button
@@ -428,7 +428,7 @@ export default function DescriptionPickerModal({
             disabled={!canConfirm}
             className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            تأكيد
+            {t("تأكيد")}
           </button>
         </div>
       </div>

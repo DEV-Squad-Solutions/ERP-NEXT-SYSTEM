@@ -11,27 +11,28 @@ import {
 } from "../accountsApi";
 import { getAccountErrorMessage } from "../utils/getAccountErrorMessage";
 
+import { t } from "../../../i18n";
 const ACCOUNT_TYPES = [
-  { value: "Asset", label: "أصول" },
-  { value: "Liability", label: "التزامات" },
-  { value: "Equity", label: "حقوق ملكية" },
-  { value: "Revenue", label: "إيرادات" },
-  { value: "Expense", label: "مصروفات" },
+  { value: "Asset", label: t("أصول") },
+  { value: "Liability", label: t("التزامات") },
+  { value: "Equity", label: t("حقوق ملكية") },
+  { value: "Revenue", label: t("إيرادات") },
+  { value: "Expense", label: t("مصروفات") },
 ];
 
 const NORMAL_BALANCES = [
-  { value: "Debit", label: "مدين" },
-  { value: "Credit", label: "دائن" },
+  { value: "Debit", label: t("مدين") },
+  { value: "Credit", label: t("دائن") },
 ];
 
 const schema = z.object({
-  name: z.string().trim().min(1, "الاسم مطلوب"),
+  name: z.string().trim().min(1, t("الاسم مطلوب")),
   parentAccountId: z.union([z.number(), z.null()]).optional(),
   accountType: z.enum(["Asset", "Liability", "Equity", "Revenue", "Expense"], {
-    errorMap: () => ({ message: "نوع الحساب مطلوب" }),
+    errorMap: () => ({ message: t("نوع الحساب مطلوب") }),
   }),
   normalBalance: z.enum(["Debit", "Credit"], {
-    errorMap: () => ({ message: "طبيعة الرصيد مطلوبة" }),
+    errorMap: () => ({ message: t("طبيعة الرصيد مطلوبة") }),
   }),
   isPosting: z.boolean(),
   isActive: z.boolean(),
@@ -159,16 +160,16 @@ export default function AccountFormModal({
     <Modal
       isOpen={open}
       onClose={onClose}
-      title={isEdit ? `تعديل حساب: ${account.name}` : "إضافة حساب جديد"}
+      title={isEdit ? t("تعديل حساب: {0}", { 0: account.name }) : t("إضافة حساب جديد")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <div>
-            <label className="mb-1 block text-sm text-gray-600">الاسم</label>
+            <label className="mb-1 block text-sm text-gray-600">{t("الاسم")}</label>
             <input
               {...register("name")}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-              placeholder="مثال: بنك الأهلي"
+              placeholder={t("مثال: بنك الأهلي")}
             />
             {errors.name && (
               <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
@@ -178,7 +179,7 @@ export default function AccountFormModal({
 
         <div>
           <label className="mb-1 block text-sm text-gray-600">
-            الحساب الأب
+            {t("الحساب الأب")}
           </label>
           <Controller
             control={control}
@@ -191,20 +192,19 @@ export default function AccountFormModal({
                   field.onChange(value === "" ? null : value)
                 }
                 isLoading={isLoadingParents}
-                placeholder="— بدون أب (حساب رئيسي) —"
+                placeholder={t("— بدون أب (حساب رئيسي) —")}
               />
             )}
           />
           <p className="mt-1 text-xs text-gray-400">
-            الأب لازم يكون حساب غير قابل للتسجيل. اختيار الأب بيحدد النوع وطبيعة
-            الرصيد تلقائيًا.
+            {t("الأب لازم يكون حساب غير قابل للتسجيل. اختيار الأب بيحدد النوع وطبيعة الرصيد تلقائيًا.")}
           </p>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1 block text-sm text-gray-600">
-              نوع الحساب
+              {t("نوع الحساب")}
             </label>
             <Controller
               control={control}
@@ -215,7 +215,7 @@ export default function AccountFormModal({
                   value={field.value}
                   onChange={field.onChange}
                   isDisabled={Boolean(selectedParentRaw)}
-                  placeholder="اختر نوع الحساب"
+                  placeholder={t("اختر نوع الحساب")}
                 />
               )}
             />
@@ -223,7 +223,7 @@ export default function AccountFormModal({
 
           <div>
             <label className="mb-1 block text-sm text-gray-600">
-              طبيعة الرصيد
+              {t("طبيعة الرصيد")}
             </label>
             <Controller
               control={control}
@@ -234,7 +234,7 @@ export default function AccountFormModal({
                   value={field.value}
                   onChange={field.onChange}
                   isDisabled={Boolean(selectedParentRaw)}
-                  placeholder="اختر طبيعة الرصيد"
+                  placeholder={t("اختر طبيعة الرصيد")}
                 />
               )}
             />
@@ -248,7 +248,7 @@ export default function AccountFormModal({
               {...register("isPosting")}
               className="h-4 w-4"
             />
-            قابل للتسجيل عليه (حساب فرعي نهائي)
+            {t("قابل للتسجيل عليه (حساب فرعي نهائي)")}
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-700">
             <input
@@ -256,14 +256,13 @@ export default function AccountFormModal({
               {...register("isActive")}
               className="h-4 w-4"
             />
-            فعال
+            {t("فعال")}
           </label>
         </div>
 
         {isPostingValue && (
           <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
-            تنبيه: الحساب القابل للتسجيل لا يمكن أن يكون أبًا لحسابات أخرى
-            لاحقًا.
+            {t("تنبيه: الحساب القابل للتسجيل لا يمكن أن يكون أبًا لحسابات أخرى لاحقًا.")}
           </p>
         )}
 
@@ -279,7 +278,7 @@ export default function AccountFormModal({
             onClick={onClose}
             className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
           >
-            إلغاء
+            {t("إلغاء")}
           </button>
           <button
             type="submit"
@@ -287,10 +286,10 @@ export default function AccountFormModal({
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
           >
             {isSubmitting
-              ? "جارِ الحفظ..."
+              ? t("جارِ الحفظ...")
               : isEdit
-                ? "حفظ التعديلات"
-                : "إضافة الحساب"}
+                ? t("حفظ التعديلات")
+                : t("إضافة الحساب")}
           </button>
         </div>
       </form>

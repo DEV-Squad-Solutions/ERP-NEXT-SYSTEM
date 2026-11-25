@@ -2,7 +2,9 @@ import { useSelector } from "react-redux";
 import { EMPLOYEE_TYPE } from "../../../features/payroll/payroll.constants";
 import { formatDate } from "../../../lib/date.js";
 
-const fmt = (v) => Number(v || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
+const fmt = (v) => Number(v || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 const netOf = (entry) =>
   Number(entry?.netSalary || entry?.calculatedSalary || 0);
@@ -27,7 +29,7 @@ export default function PayrollDetailPrintTemplate({ entry }) {
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       style={{
         width: "210mm",
         minHeight: "297mm",
@@ -55,18 +57,18 @@ export default function PayrollDetailPrintTemplate({ entry }) {
           </h1>
 
           <p style={{ fontSize: "11px", color: "#6F7C75", margin: "4px 0 0" }}>
-            إيصال صرف مرتب
+            {t("إيصال صرف مرتب")}
           </p>
         </div>
 
         <div style={{ textAlign: "left", fontSize: "11px" }}>
-          <p style={{ margin: "2px 0" }}>تاريخ الطباعة: {today}</p>
+          <p style={{ margin: "2px 0" }}>{t("تاريخ الطباعة:")} {today}</p>
           <p style={{ margin: "2px 0" }}>
-            حالة الترحيل: {isMoved(entry) ? "مُرحّل" : "لم يُرحّل"}
+            {t("حالة الترحيل:")} {isMoved(entry) ? t("مُرحّل") : t("لم يُرحّل")}
           </p>
           {entry.salaryMovedOn && (
             <p style={{ margin: "2px 0" }}>
-              تاريخ الصرف: {entry.salaryMovedOn}
+              {t("تاريخ الصرف:")} {entry.salaryMovedOn}
             </p>
           )}
         </div>
@@ -85,22 +87,22 @@ export default function PayrollDetailPrintTemplate({ entry }) {
           fontSize: "12px",
         }}
       >
-        <InfoRow label="اسم الموظف" value={entry.employeeName} />
-        <InfoRow label="كود الموظف" value={entry.employeeCode} />
+        <InfoRow label={t("اسم الموظف")} value={entry.employeeName} />
+        <InfoRow label={t("كود الموظف")} value={entry.employeeCode} />
         <InfoRow
-          label="نوع الموظف"
+          label={t("نوع الموظف")}
           value={EMPLOYEE_TYPE[entry.employeeType] || entry.employeeType}
         />
         <InfoRow
-          label="مكان العمل"
+          label={t("مكان العمل")}
           value={
             entry.workPlaceStatus === "OutCompany"
-              ? "خارج الشركة"
-              : "داخل الشركة"
+              ? t("خارج الشركة")
+              : t("داخل الشركة")
           }
         />
-        <InfoRow label="من تاريخ" value={entry.startDate} />
-        <InfoRow label="إلى تاريخ" value={entry.endDate} />
+        <InfoRow label={t("من تاريخ")} value={entry.startDate} />
+        <InfoRow label={t("إلى تاريخ")} value={entry.endDate} />
       </div>
 
       {/* ملخص الحضور */}
@@ -113,7 +115,7 @@ export default function PayrollDetailPrintTemplate({ entry }) {
             color: "#0C4A3E",
           }}
         >
-          ملخص الحضور
+          {t("ملخص الحضور")}
         </h2>
 
         <table
@@ -126,11 +128,11 @@ export default function PayrollDetailPrintTemplate({ entry }) {
           <thead>
             <tr style={{ background: "#0C4A3E" }}>
               {[
-                "أيام الحضور",
-                "أيام الغياب",
-                "إجمالي أيام الحضور",
-                "أيام الإضافي",
-                "أيام الخصم",
+                t("أيام الحضور"),
+                t("أيام الغياب"),
+                t("إجمالي أيام الحضور"),
+                t("أيام الإضافي"),
+                t("أيام الخصم"),
               ].map((h) => (
                 <th
                   key={h}
@@ -178,7 +180,7 @@ export default function PayrollDetailPrintTemplate({ entry }) {
             color: "#0C4A3E",
           }}
         >
-          ملخص حساب المرتب
+          {t("ملخص حساب المرتب")}
         </h2>
 
         <table
@@ -190,12 +192,12 @@ export default function PayrollDetailPrintTemplate({ entry }) {
         >
           <tbody>
             <tr>
-              <td style={summaryTitle}>إجمالي المرتب</td>
+              <td style={summaryTitle}>{t("إجمالي المرتب")}</td>
               <td style={summaryValue}>{fmt(entry.grossSalary)}</td>
             </tr>
 
             <tr>
-              <td style={summaryTitle}>الإضافات والمكافآت</td>
+              <td style={summaryTitle}>{t("الإضافات والمكافآت")}</td>
               <td
                 style={{ ...summaryValue, color: "#059669", fontWeight: 700 }}
               >
@@ -204,7 +206,7 @@ export default function PayrollDetailPrintTemplate({ entry }) {
             </tr>
 
             <tr>
-              <td style={summaryTitle}>الخصومات</td>
+              <td style={summaryTitle}>{t("الخصومات")}</td>
               <td
                 style={{ ...summaryValue, color: "#C0392B", fontWeight: 700 }}
               >
@@ -220,7 +222,7 @@ export default function PayrollDetailPrintTemplate({ entry }) {
                   color: "#fff",
                 }}
               >
-                صافي المرتب
+                {t("صافي المرتب")}
               </td>
               <td
                 style={{
@@ -249,13 +251,13 @@ export default function PayrollDetailPrintTemplate({ entry }) {
       >
         <div style={{ textAlign: "center", width: "180px" }}>
           <div style={{ borderTop: "1px solid #0A2540", paddingTop: "6px" }}>
-            توقيع الموظف
+            {t("توقيع الموظف")}
           </div>
         </div>
 
         <div style={{ textAlign: "center", width: "180px" }}>
           <div style={{ borderTop: "1px solid #0A2540", paddingTop: "6px" }}>
-            توقيع المسؤول
+            {t("توقيع المسؤول")}
           </div>
         </div>
       </div>

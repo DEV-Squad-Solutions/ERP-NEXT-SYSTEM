@@ -2,22 +2,23 @@
 import { Search, RotateCcw } from "lucide-react";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
 const SOURCE_TYPES = [
-  { value: "", label: "الكل" },
-  { value: "OpeningBalance", label: "رصيد افتتاحي" },
-  { value: "SalaryTransfer", label: "تحويل راتب" },
-  { value: "Movement", label: "حركة" },
-  { value: "CashVoucher", label: "سند نقدي" },
+  { value: "", label: t("الكل") },
+  { value: "OpeningBalance", label: t("رصيد افتتاحي") },
+  { value: "SalaryTransfer", label: t("تحويل راتب") },
+  { value: "Movement", label: t("حركة") },
+  { value: "CashVoucher", label: t("سند نقدي") },
 ];
 
 const MOVEMENT_TYPES = [
-  { value: "", label: "الكل" },
-  { value: "Debit", label: "مدين" },
-  { value: "Credit", label: "دائن" },
-  { value: "Advance", label: "سلفة" },
-  { value: "Deduction", label: "خصم" },
-  { value: "Bonus", label: "مكافأة" },
-  { value: "Withdrawal", label: "سحب" },
+  { value: "", label: t("الكل") },
+  { value: "Debit", label: t("مدين") },
+  { value: "Credit", label: t("دائن") },
+  { value: "Advance", label: t("سلفة") },
+  { value: "Deduction", label: t("خصم") },
+  { value: "Bonus", label: t("مكافأة") },
+  { value: "Withdrawal", label: t("سحب") },
 ];
 
 export default function EmployeeStatementFilters({
@@ -32,17 +33,17 @@ export default function EmployeeStatementFilters({
     <div className="rounded-2xl border border-ink-400/10 bg-white/60 p-3 sm:p-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <label className="mb-1 block text-xs text-ink-400">بحث</label>
+          <label className="mb-1 block text-xs text-ink-400">{t("بحث")}</label>
           <input
             type="text"
             value={draft.Search}
             onChange={(e) => set("Search", e.target.value)}
-            placeholder="بحث برقم المستند أو الوصف..."
+            placeholder={t("بحث برقم المستند أو الوصف...")}
             className="h-9 w-full rounded-lg border border-ink-400/15 bg-white px-3 text-sm outline-none focus:border-primary-500"
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs text-ink-400">من تاريخ</label>
+          <label className="mb-1 block text-xs text-ink-400">{t("من تاريخ")}</label>
           <DateInput
             type="date"
             value={draft.FromDate}
@@ -51,7 +52,7 @@ export default function EmployeeStatementFilters({
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs text-ink-400">إلى تاريخ</label>
+          <label className="mb-1 block text-xs text-ink-400">{t("إلى تاريخ")}</label>
           <DateInput
             type="date"
             value={draft.ToDate}
@@ -60,7 +61,7 @@ export default function EmployeeStatementFilters({
           />
         </div>
         <div>
-          <label className="mb-1 block text-xs text-ink-400">نوع المصدر</label>
+          <label className="mb-1 block text-xs text-ink-400">{t("نوع المصدر")}</label>
           <select
             value={draft.SourceType}
             onChange={(e) => set("SourceType", e.target.value)}
@@ -74,7 +75,7 @@ export default function EmployeeStatementFilters({
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-xs text-ink-400">نوع الحركة</label>
+          <label className="mb-1 block text-xs text-ink-400">{t("نوع الحركة")}</label>
           <select
             value={draft.MovementType}
             onChange={(e) => set("MovementType", e.target.value)}
@@ -96,7 +97,7 @@ export default function EmployeeStatementFilters({
           className="inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-xs text-ink-400 hover:bg-ink-400/5 sm:text-sm"
         >
           <RotateCcw size={14} />
-          إعادة تعيين
+          {t("إعادة تعيين")}
         </button>
         <button
           type="button"
@@ -104,7 +105,7 @@ export default function EmployeeStatementFilters({
           className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary-500 px-4 text-xs font-medium text-white hover:bg-primary-600 sm:text-sm"
         >
           <Search size={14} />
-          بحث
+          {t("بحث")}
         </button>
       </div>
     </div>

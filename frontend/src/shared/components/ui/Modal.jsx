@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
+import { t } from "../../../i18n";
 /**
  * @param {{
  *   isOpen: boolean,
@@ -166,7 +167,7 @@ export default function Modal({
           <button
             type="button"
             onClick={onClose}
-            aria-label="إغلاق"
+            aria-label={t("إغلاق")}
             className={[
               "group flex h-8 w-8 shrink-0",
               "items-center justify-center",

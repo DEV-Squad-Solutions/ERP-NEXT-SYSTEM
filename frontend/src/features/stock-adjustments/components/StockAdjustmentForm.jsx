@@ -21,24 +21,26 @@ import Button from "../../../shared/components/ui/Button"; // عدّل المس�
 
 // ---------- Validation ----------
 const lineSchema = z.object({
-  itemId: z.coerce.number().min(1, "اختر الصنف"),
-  quantity: z.coerce.number().positive("الكمية يجب أن تكون أكبر من صفر"),
+  itemId: z.coerce.number().min(1, t("اختر الصنف")),
+  quantity: z.coerce.number().positive(t("الكمية يجب أن تكون أكبر من صفر")),
   reason: z.string().optional(),
   // مطلوب فقط لسطور الزيادة (بيتحقق منه في superRefine تحت لأنه بيعتمد
   // على direction المستند ككل، مش على السطر نفسه)
   unitCost: z.union([z.coerce.number().min(0), z.literal("")]).optional(),
 });
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const schema = z
   .object({
-    storeId: z.coerce.number().min(1, "اختر المخزن"),
-    documentNumber: z.string().min(1, "رقم المستند مطلوب"),
-    documentDate: z.string().min(1, "التاريخ مطلوب"),
+    storeId: z.coerce.number().min(1, t("اختر المخزن")),
+    documentNumber: z.string().min(1, t("رقم المستند مطلوب")),
+    documentDate: z.string().min(1, t("التاريخ مطلوب")),
     direction: z.enum(["Increase", "Decrease"], {
-      required_error: "اختر نوع التسوية",
+      required_error: t("اختر نوع التسوية"),
     }),
     reason: z.string().optional(),
-    lines: z.array(lineSchema).min(1, "أضف سطر واحد على الأقل"),
+    lines: z.array(lineSchema).min(1, t("أضف سطر واحد على الأقل")),
   })
   .superRefine((data, ctx) => {
     if (data.direction === "Increase") {
@@ -51,7 +53,7 @@ const schema = z
         ) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: "تكلفة الوحدة مطلوبة لسطور الزيادة",
+            message: t("تكلفة الوحدة مطلوبة لسطور الزيادة"),
             path: ["lines", idx, "unitCost"],
           });
         }
@@ -167,41 +169,41 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
           ...payload,
           rowVersion: adjustment.rowVersion, // إجباري لـ optimistic concurrency
         }).unwrap();
-        toast.success("تم تحديث التسوية بنجاح");
+        toast.success(t("تم تحديث التسوية بنجاح"));
       } else {
         await createStockAdjustment(payload).unwrap();
-        toast.success("تم إنشاء التسوية بنجاح");
+        toast.success(t("تم إنشاء التسوية بنجاح"));
       }
       navigate("/dashboard/inventory/adjustments");
     } catch (err) {
       // الباك اند بيرجع 409 (تعارض rowVersion) لو حد عدّل نفس التسوية في نفس الوقت
       if (err?.status === 409) {
         toast.error(
-          "التسوية دي اتعدّلت من حد تاني في نفس الوقت. حدّث الصفحة وحاول تاني.",
+          t("التسوية دي اتعدّلت من حد تاني في نفس الوقت. حدّث الصفحة وحاول تاني."),
         );
       } else {
         toast.error(
           err?.data?.title ||
-            (isEditMode ? "فشل تحديث التسوية" : "فشل إنشاء التسوية"),
+            (isEditMode ? t("فشل تحديث التسوية") : t("فشل إنشاء التسوية")),
         );
       }
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" dir="rtl">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" dir={getDir()}>
       {/* بيانات الهيدر */}
       <div className="bg-white rounded-2xl shadow-card p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              المخزن
+              {t("المخزن")}
             </label>
             <select
               {...register("storeId")}
               className="w-full rounded-xl border border-ink-400/15 px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:border-primary-500"
             >
-              <option value="">اختر المخزن</option>
+              <option value="">{t("اختر المخزن")}</option>
               {stores?.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -216,34 +218,34 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
           </div>
 
           <Input
-            label="رقم المستند"
+            label={t("رقم المستند")}
             {...register("documentNumber")}
             error={errors.documentNumber?.message}
           />
 
           <Input
             type="date"
-            label="التاريخ"
+            label={t("التاريخ")}
             {...register("documentDate")}
             error={errors.documentDate?.message || dateWarning}
           />
 
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              نوع التسوية
+              {t("نوع التسوية")}
             </label>
             <div className="flex items-center gap-1 bg-ink-50 rounded-xl p-1">
               <DirectionToggle
                 control={control}
                 value="Increase"
-                label="زيادة"
+                label={t("زيادة")}
                 icon={ArrowUpCircle}
                 activeClass="bg-emerald-500 text-white"
               />
               <DirectionToggle
                 control={control}
                 value="Decrease"
-                label="نقص"
+                label={t("نقص")}
                 icon={ArrowDownCircle}
                 activeClass="bg-rose-500 text-white"
               />
@@ -253,7 +255,7 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
 
         <div className="mt-4">
           <Input
-            label="سبب التسوية (اختياري)"
+            label={t("سبب التسوية (اختياري)")}
             {...register("reason")}
             error={errors.reason?.message}
           />
@@ -264,7 +266,7 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
       <div className="bg-white rounded-2xl shadow-card p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-display text-sm font-semibold text-ink-900">
-            أصناف التسوية
+            {t("أصناف التسوية")}
           </h3>
           <button
             type="button"
@@ -272,7 +274,7 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
             className="flex items-center gap-1.5 text-xs font-medium text-ink-600 hover:text-ink-900 bg-ink-50 hover:bg-ink-100 px-3 py-1.5 rounded-lg transition-colors"
           >
             <Plus size={14} />
-            إضافة صنف
+            {t("إضافة صنف")}
           </button>
         </div>
 
@@ -300,7 +302,7 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
                         itemOptions.find((o) => o.value === f.value) || null
                       }
                       onChange={(opt) => f.onChange(opt?.value)}
-                      placeholder="ابحث عن صنف..."
+                      placeholder={t("ابحث عن صنف...")}
                       classNamePrefix="rs"
                     />
                   )}
@@ -316,7 +318,7 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
                 <Input
                   type="number"
                   step="any"
-                  placeholder="الكمية"
+                  placeholder={t("الكمية")}
                   {...register(`lines.${index}.quantity`)}
                   error={errors.lines?.[index]?.quantity?.message}
                 />
@@ -328,7 +330,7 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
                   <Input
                     type="number"
                     step="any"
-                    placeholder="تكلفة الوحدة"
+                    placeholder={t("تكلفة الوحدة")}
                     {...register(`lines.${index}.unitCost`)}
                     error={errors.lines?.[index]?.unitCost?.message}
                   />
@@ -336,14 +338,14 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
               ) : (
                 <div className="sm:col-span-2 flex items-center">
                   <span className="text-xs text-ink-400">
-                    تُحسب تلقائيًا من متوسط التكلفة
+                    {t("تُحسب تلقائيًا من متوسط التكلفة")}
                   </span>
                 </div>
               )}
 
               <div className="sm:col-span-3">
                 <Input
-                  placeholder="سبب السطر (اختياري)"
+                  placeholder={t("سبب السطر (اختياري)")}
                   {...register(`lines.${index}.reason`)}
                 />
               </div>
@@ -354,7 +356,7 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
                   onClick={() => fields.length > 1 && remove(index)}
                   disabled={fields.length <= 1}
                   className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 disabled:opacity-30"
-                  title="حذف السطر"
+                  title={t("حذف السطر")}
                 >
                   <Trash2 size={15} />
                 </button>
@@ -367,17 +369,17 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={isSaving}>
           {isSaving
-            ? "جاري الحفظ..."
+            ? t("جاري الحفظ...")
             : isEditMode
-              ? "حفظ التعديلات"
-              : "إنشاء التسوية"}
+              ? t("حفظ التعديلات")
+              : t("إنشاء التسوية")}
         </Button>
         <button
           type="button"
           onClick={() => navigate("/dashboard/inventory/adjustments")}
           className="px-4 py-2.5 rounded-xl text-sm font-medium text-ink-600 hover:bg-ink-50 transition-colors"
         >
-          إلغاء
+          {t("إلغاء")}
         </button>
       </div>
     </form>

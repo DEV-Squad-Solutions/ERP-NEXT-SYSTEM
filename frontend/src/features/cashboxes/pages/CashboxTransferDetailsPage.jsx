@@ -4,8 +4,10 @@ import { ArrowRight, ArrowLeftRight, Receipt } from "lucide-react";
 import { useGetCashboxTransferByIdQuery } from "../cashboxTransfersApi";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 function fmtAmount(n, currency) {
-  return `${new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 }).format(n ?? 0)} ${currency ?? ""}`;
+  return `${new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 2 }).format(n ?? 0)} ${currency ?? ""}`;
 }
 
 function fmtDate(d) {
@@ -27,7 +29,7 @@ export default function CashboxTransferDetailsPage() {
   const navigate = useNavigate();
 
   const {
-    data: t,
+    data: transfer,
     isLoading,
     isError,
     refetch,
@@ -41,76 +43,75 @@ export default function CashboxTransferDetailsPage() {
         <button
           onClick={() => navigate(-1)}
           className="flex h-9 w-9 items-center justify-center rounded-xl border text-gray-400 hover:text-gray-900"
-          title="رجوع"
+          title={t("رجوع")}
         >
           <ArrowRight size={16} />
         </button>
         <div>
           <h2 className="flex items-center gap-2 text-2xl font-bold">
             <ArrowLeftRight size={20} className="text-primary-500" />
-            تفاصيل التحويل {t?.transferNumber ?? ""}
+            {t("تفاصيل التحويل")} {t?.transferNumber ?? ""}
           </h2>
         </div>
       </div>
 
       {isLoading && (
         <div className="rounded-2xl border border-dashed py-16 text-center text-gray-400">
-          جاري تحميل بيانات التحويل...
+          {t("جاري تحميل بيانات التحويل...")}
         </div>
       )}
 
       {isError && (
         <div className="flex items-center justify-between rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-          <span>لم يتم العثور على التحويل، أو حدث خطأ أثناء التحميل.</span>
+          <span>{t("لم يتم العثور على التحويل، أو حدث خطأ أثناء التحميل.")}</span>
           <button
             onClick={refetch}
             className="rounded-lg border border-red-200 bg-white px-3 py-1 text-xs font-medium hover:bg-red-100"
           >
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       )}
 
-      {t && (
+      {transfer && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="rounded-2xl border bg-white p-4 shadow-sm">
             <h3 className="mb-2 text-sm font-bold text-gray-900">
-              بيانات التحويل
+              {t("بيانات التحويل")}
             </h3>
-            <Row label="رقم التحويل" value={t.transferNumber} />
-            <Row label="التاريخ" value={fmtDate(t.transferDate)} />
-            <Row label="من خزينة" value={t.sourceCashboxName} />
-            <Row label="إلى خزينة" value={t.destinationCashboxName} />
-            <Row label="المبلغ" value={fmtAmount(t.amount, t.currency)} />
-            {t.baseCurrency && t.baseCurrency !== t.currency && (
+            <Row label={t("رقم التحويل")} value={transfer.transferNumber} />
+            <Row label={t("التاريخ")} value={fmtDate(transfer.transferDate)} />
+            <Row label={t("من خزينة")} value={transfer.sourceCashboxName} />
+            <Row label={t("إلى خزينة")} value={transfer.destinationCashboxName} />
+            <Row label={t("المبلغ")} value={fmtAmount(transfer.amount, transfer.currency)} />
+            {transfer.baseCurrency && transfer.baseCurrency !== transfer.currency && (
               <>
-                <Row label="سعر الصرف" value={t.exchangeRate} />
+                <Row label={t("سعر الصرف")} value={transfer.exchangeRate} />
                 <Row
-                  label="المبلغ بعملة الأساس"
-                  value={fmtAmount(t.baseAmount, t.baseCurrency)}
+                  label={t("المبلغ بعملة الأساس")}
+                  value={fmtAmount(transfer.baseAmount, transfer.baseCurrency)}
                 />
               </>
             )}
-            <Row label="الوصف" value={t.description} />
-            <Row label="ملاحظات" value={t.notes} />
+            <Row label={t("الوصف")} value={transfer.description} />
+            <Row label={t("ملاحظات")} value={transfer.notes} />
           </div>
 
           <div className="rounded-2xl border bg-white p-4 shadow-sm">
             <h3 className="mb-2 flex items-center gap-1.5 text-sm font-bold text-gray-900">
               <Receipt size={14} className="text-primary-500" />
-              السندات المرتبطة
+              {t("السندات المرتبطة")}
             </h3>
             <Row
-              label="سند الصرف (من خزينة المصدر)"
-              value={t.paymentVoucherNumber}
+              label={t("سند الصرف (من خزينة المصدر)")}
+              value={transfer.paymentVoucherNumber}
             />
             <Row
-              label="سند القبض (لخزينة الوجهة)"
-              value={t.receiptVoucherNumber}
+              label={t("سند القبض (لخزينة الوجهة)")}
+              value={transfer.receiptVoucherNumber}
             />
             <p className="mt-3 text-xs text-gray-400">
-              السندات دي بتتولد تلقائيًا مع التحويل ومش قابلة للتعديل بشكل
-              مستقل.
+              {t("السندات دي بتتولد تلقائيًا مع التحويل ومش قابلة للتعديل بشكل مستقل.")}
             </p>
           </div>
         </div>

@@ -12,6 +12,8 @@ import {
 
 import { useGetItemByIdQuery, useDeleteItemMutation } from "../inventoryApi";
 import QuickAddItemModal from "../components/QuickAddItemModal";
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function ItemDetailPage() {
   const { id } = useParams();
   const itemId = Number(id);
@@ -35,14 +37,14 @@ export default function ItemDetailPage() {
   const handleDelete = async () => {
     try {
       await deleteItem(itemId).unwrap();
-      toast.success("تم حذف الصنف بنجاح");
+      toast.success(t("تم حذف الصنف بنجاح"));
       if (fromStoreId) {
         navigate(`/dashboard/stores/${fromStoreId}?tab=${fromTab}`);
       } else {
         navigate("/dashboard/items");
       }
     } catch (err) {
-      toast.error(err?.data?.title || "فشل حذف الصنف");
+      toast.error(err?.data?.title || t("فشل حذف الصنف"));
     }
   };
 
@@ -56,7 +58,7 @@ export default function ItemDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 max-w-3xl mx-auto" dir="rtl">
+      <div className="p-6 max-w-3xl mx-auto" dir={getDir()}>
         <ItemDetailSkeleton />
       </div>
     );
@@ -64,28 +66,28 @@ export default function ItemDetailPage() {
 
   if (isError || !item) {
     return (
-      <div className="p-6 max-w-3xl mx-auto text-center" dir="rtl">
+      <div className="p-6 max-w-3xl mx-auto text-center" dir={getDir()}>
         <AlertCircle
           size={32}
           className="mx-auto text-negative/70 mb-3"
           strokeWidth={1.6}
         />
         <p className="text-ink-900 font-medium text-sm mb-3">
-          تعذر تحميل بيانات الصنف
+          {t("تعذر تحميل بيانات الصنف")}
         </p>
         <button
           onClick={refetch}
           className="inline-flex items-center gap-2 text-xs font-medium text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-lg transition-colors"
         >
           <RefreshCw size={13} />
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-3xl mx-auto" dir="rtl">
+    <div className="p-6 max-w-3xl mx-auto" dir={getDir()}>
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-card p-6 mb-6">
         <div className="flex items-start justify-between flex-wrap gap-4">
@@ -106,7 +108,7 @@ export default function ItemDetailPage() {
                       : "bg-rose-50 text-rose-700"
                   }`}
                 >
-                  {item.isActive ? "نشط" : "غير نشط"}
+                  {item.isActive ? t("نشط") : t("غير نشط")}
                 </span>
               </div>
               <p className="text-sm text-ink-500 font-mono mt-1.5">
@@ -121,14 +123,14 @@ export default function ItemDetailPage() {
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-ink-600 hover:bg-ink-50 transition-colors"
             >
               <ArrowRight className="w-4 h-4" />
-              رجوع
+              {t("رجوع")}
             </button>
             <button
               onClick={() => setIsEditOpen(true)}
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-ink-700 bg-ink-50 hover:bg-ink-100 transition-colors"
             >
               <Pencil className="w-4 h-4" />
-              تعديل
+              {t("تعديل")}
             </button>
             <button
               onClick={handleDelete}
@@ -136,7 +138,7 @@ export default function ItemDetailPage() {
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors disabled:opacity-60"
             >
               <Trash2 className="w-4 h-4" />
-              {isDeleting ? "جاري الحذف..." : "حذف"}
+              {isDeleting ? t("جاري الحذف...") : t("حذف")}
             </button>
           </div>
         </div>
@@ -145,12 +147,12 @@ export default function ItemDetailPage() {
       {/* Details */}
       <div className="bg-white rounded-2xl shadow-card p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <Field label="كود الصنف" value={item.code} />
-          <Field label="اسم الصنف" value={item.name} />
-          <Field label="الوحدة" value={item.itemUnitName} />
-          <Field label="الحالة" value={item.isActive ? "نشط" : "غير نشط"} />
+          <Field label={t("كود الصنف")} value={item.code} />
+          <Field label={t("اسم الصنف")} value={item.name} />
+          <Field label={t("الوحدة")} value={item.itemUnitName} />
+          <Field label={t("الحالة")} value={item.isActive ? t("نشط") : t("غير نشط")} />
           <div className="sm:col-span-2">
-            <Field label="الوصف" value={item.description} />
+            <Field label={t("الوصف")} value={item.description} />
           </div>
         </div>
       </div>

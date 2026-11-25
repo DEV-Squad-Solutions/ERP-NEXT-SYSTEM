@@ -2,9 +2,11 @@ import Modal from "../../../shared/components/ui/Modal";
 import InvoiceNumberLink from "../../../shared/components/InvoiceNumberLink";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 function fmtAmount(n, currency) {
   if (n == null) return "—";
-  return `${new Intl.NumberFormat("ar-EG", {
+  return `${new Intl.NumberFormat(getLocale(), {
     maximumFractionDigits: 2,
   }).format(n)} ${currency ?? ""}`;
 }
@@ -20,7 +22,7 @@ function partyLabel(v) {
       return v.businessPartnerName ?? "—";
     case "Driver":
       return v.driverTripInvoiceNumber
-        ? `${v.driverName} (رحلة ${v.driverTripInvoiceNumber})`
+        ? t("{0} (رحلة {1})", { 0: v.driverName, 1: v.driverTripInvoiceNumber })
         : (v.driverName ?? "—");
     case "Employee":
       return v.employeeName ?? "—";
@@ -54,18 +56,18 @@ export default function ExpenseDetailsModal({ voucher, onClose, onEdit }) {
     <Modal
       isOpen={Boolean(v)}
       onClose={onClose}
-      title={v ? `تفاصيل سند ${v.voucherNumber || `#${v.id}`}` : ""}
+      title={v ? t("تفاصيل سند {0}", { 0: v.voucherNumber || `#${v.id}` }) : ""}
     >
       {v && (
-        <div dir="rtl">
+        <div dir={getDir()}>
           <div className="space-y-0.5">
-            <Row label="التاريخ" value={fmtDate(v.voucherDate)} />
-            <Row label="الخزينة" value={v.cashboxName} />
-            <Row label="نوع الحركة" value={v.cashMovementTypeName} />
-            <Row label="التصنيف" value={v.classification} />
-            <Row label="الجهة" value={partyLabel(v)} />
+            <Row label={t("التاريخ")} value={fmtDate(v.voucherDate)} />
+            <Row label={t("الخزينة")} value={v.cashboxName} />
+            <Row label={t("نوع الحركة")} value={v.cashMovementTypeName} />
+            <Row label={t("التصنيف")} value={v.classification} />
+            <Row label={t("الجهة")} value={partyLabel(v)} />
             <Row
-              label="المبلغ"
+              label={t("المبلغ")}
               value={
                 <span className="font-bold text-rose-600">
                   {fmtAmount(v.amount, v.currency)}
@@ -74,13 +76,13 @@ export default function ExpenseDetailsModal({ voucher, onClose, onEdit }) {
             />
             {v.baseCurrency && v.baseCurrency !== v.currency && (
               <>
-                <Row label="سعر الصرف" value={v.exchangeRate} />
+                <Row label={t("سعر الصرف")} value={v.exchangeRate} />
                 <Row
-                  label="المبلغ بالعملة الأساسية"
+                  label={t("المبلغ بالعملة الأساسية")}
                   value={fmtAmount(v.baseAmount, v.baseCurrency)}
                 />
                 <Row
-                  label="فرق العملة المحقق"
+                  label={t("فرق العملة المحقق")}
                   value={fmtAmount(
                     v.realizedExchangeDifference,
                     v.baseCurrency,
@@ -88,13 +90,13 @@ export default function ExpenseDetailsModal({ voucher, onClose, onEdit }) {
                 />
               </>
             )}
-            <Row label="رقم المرجع" value={v.referenceNumber} />
-            <Row label="الوصف" value={v.description} />
-            <Row label="ملاحظات" value={v.notes} />
+            <Row label={t("رقم المرجع")} value={v.referenceNumber} />
+            <Row label={t("الوصف")} value={v.description} />
+            <Row label={t("ملاحظات")} value={v.notes} />
             {v.invoiceNumber && (
               <>
                 <Row
-                  label="فاتورة مرتبطة"
+                  label={t("فاتورة مرتبطة")}
                   value={
                     <InvoiceNumberLink
                       invoiceId={v.invoiceId}
@@ -105,7 +107,7 @@ export default function ExpenseDetailsModal({ voucher, onClose, onEdit }) {
                   }
                 />
                 <Row
-                  label="المبلغ المُطبّق على الفاتورة"
+                  label={t("المبلغ المُطبّق على الفاتورة")}
                   value={fmtAmount(
                     v.appliedInvoiceAmount,
                     v.appliedInvoiceCurrency,
@@ -113,7 +115,7 @@ export default function ExpenseDetailsModal({ voucher, onClose, onEdit }) {
                 />
               </>
             )}
-            <Row label="الحالة" value={v.isDraft ? "مسودة" : "معتمد"} />
+            <Row label={t("الحالة")} value={v.isDraft ? t("مسودة") : t("معتمد")} />
           </div>
         </div>
       )}

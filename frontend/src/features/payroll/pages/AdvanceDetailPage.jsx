@@ -11,6 +11,8 @@ import { useGetEmployeeTransactionsQuery } from "../payrollApi";
 import { parseCategory, fmtMoney } from "../payroll.constants";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const MOCK_INSTALLMENT_MONTHS = 3;
 
 function buildMockInstallments(advance) {
@@ -20,7 +22,7 @@ function buildMockInstallments(advance) {
   return Array.from({ length: MOCK_INSTALLMENT_MONTHS }).map((_, i) => {
     const d = new Date(startDate);
     d.setMonth(d.getMonth() + i + 1);
-    const label = d.toLocaleDateString("ar-EG", {
+    const label = d.toLocaleDateString(getLocale(), {
       month: "long",
       year: "numeric",
     });
@@ -28,7 +30,7 @@ function buildMockInstallments(advance) {
       month: label,
       amount: monthly,
       dueDate: d.toISOString().slice(0, 10),
-      status: i === 0 && advance.isProcessed ? "مدفوع" : "مستحق",
+      status: i === 0 && advance.isProcessed ? t("مدفوع") : t("مستحق"),
     };
   });
 }
@@ -44,9 +46,9 @@ export default function AdvanceDetailPage() {
   });
   const advance = data?.items?.find((t) => String(t.id) === String(advanceId));
 
-  if (isLoading) return <div className="p-6 text-ink-400">جاري التحميل...</div>;
+  if (isLoading) return <div className="p-6 text-ink-400">{t("جاري التحميل...")}</div>;
   if (!advance)
-    return <div className="p-6 text-red-500">تعذر إيجاد السلفة</div>;
+    return <div className="p-6 text-red-500">{t("تعذر إيجاد السلفة")}</div>;
 
   const { cleanNotes } = parseCategory(advance.notes);
   const installments = buildMockInstallments(advance);
@@ -62,15 +64,13 @@ export default function AdvanceDetailPage() {
         className="flex items-center gap-1.5 text-sm text-emerald-700 hover:underline"
       >
         <ArrowRight size={14} />
-        رجوع لقائمة السلف
+        {t("رجوع لقائمة السلف")}
       </button>
 
       <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
         <AlertTriangle size={15} className="shrink-0 mt-0.5" />
         <p>
-          جدول الأقساط ده بيانات تجريبية (Mock) لحد ما يتوفر endpoint حقيقي
-          لتفاصيل أقساط السلف من الباك إند. القيمة الإجمالية وتاريخ السلفة بس
-          هما البيانات الحقيقية.
+          {t("جدول الأقساط ده بيانات تجريبية (Mock) لحد ما يتوفر endpoint حقيقي لتفاصيل أقساط السلف من الباك إند. القيمة الإجمالية وتاريخ السلفة بس هما البيانات الحقيقية.")}
         </p>
       </div>
 
@@ -78,29 +78,29 @@ export default function AdvanceDetailPage() {
         <h2 className="text-xl font-bold text-ink-900 mb-1">
           {advance.employeeName}
         </h2>
-        <p className="text-sm text-ink-400 mb-6">{cleanNotes || "سلفة"}</p>
+        <p className="text-sm text-ink-400 mb-6">{cleanNotes || t("سلفة")}</p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
           <div>
-            <p className="text-xs text-ink-400 mb-1">قيمة السلفة</p>
+            <p className="text-xs text-ink-400 mb-1">{t("قيمة السلفة")}</p>
             <p className="text-lg font-bold num text-ink-900">
               {fmtMoney(advance.amount)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-ink-400 mb-1">إجمالي المدفوع</p>
+            <p className="text-xs text-ink-400 mb-1">{t("إجمالي المدفوع")}</p>
             <p className="text-lg font-bold num text-positive">
               {fmtMoney(paid)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-ink-400 mb-1">المتبقي</p>
+            <p className="text-xs text-ink-400 mb-1">{t("المتبقي")}</p>
             <p className="text-lg font-bold num text-negative">
               {fmtMoney(remaining)}
             </p>
           </div>
           <div>
-            <p className="text-xs text-ink-400 mb-1">القسط الشهري</p>
+            <p className="text-xs text-ink-400 mb-1">{t("القسط الشهري")}</p>
             <p className="text-lg font-bold num text-ink-900">
               {fmtMoney(advance.amount / MOCK_INSTALLMENT_MONTHS)}
             </p>
@@ -108,22 +108,22 @@ export default function AdvanceDetailPage() {
         </div>
 
         <h3 className="text-sm font-semibold text-ink-900 mb-3">
-          جدول الأقساط
+          {t("جدول الأقساط")}
         </h3>
         <div className="overflow-x-auto custom-scroll rounded-xl border border-ink-400/10">
           <table className="w-full text-right border-collapse">
             <thead>
               <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                 <th className="p-2.5 font-medium border-l border-ink-400/5">
-                  الشهر
+                  {t("الشهر")}
                 </th>
                 <th className="p-2.5 font-medium border-l border-ink-400/5">
-                  قيمة القسط
+                  {t("قيمة القسط")}
                 </th>
                 <th className="p-2.5 font-medium border-l border-ink-400/5">
-                  تاريخ الاستحقاق
+                  {t("تاريخ الاستحقاق")}
                 </th>
-                <th className="p-2.5 font-medium">الحالة</th>
+                <th className="p-2.5 font-medium">{t("الحالة")}</th>
               </tr>
             </thead>
             <tbody>

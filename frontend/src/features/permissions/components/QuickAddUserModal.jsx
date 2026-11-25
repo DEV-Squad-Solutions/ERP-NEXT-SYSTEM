@@ -14,19 +14,20 @@ import {
 } from "../usersApi";
 import { useGetCompaniesForSelectQuery } from "../companiesApi";
 
+import { t } from "../../../i18n";
 const baseShape = {
-  userName: z.string().min(1, "اسم المستخدم مطلوب").max(256),
-  email: z.string().min(1, "الإيميل مطلوب").email("إيميل غير صحيح").max(256),
-  firstName: z.string().min(1, "الاسم الأول مطلوب").max(100),
-  lastName: z.string().min(1, "اسم العائلة مطلوب").max(100),
+  userName: z.string().min(1, t("اسم المستخدم مطلوب")).max(256),
+  email: z.string().min(1, t("الإيميل مطلوب")).email(t("إيميل غير صحيح")).max(256),
+  firstName: z.string().min(1, t("الاسم الأول مطلوب")).max(100),
+  lastName: z.string().min(1, t("اسم العائلة مطلوب")).max(100),
   phoneNumber: z.string().optional().or(z.literal("")),
-  roles: z.array(z.string()).min(1, "اختر دور واحد على الأقل"),
-  companyIds: z.array(z.number()).min(1, "اختر شركة واحدة على الأقل"),
+  roles: z.array(z.string()).min(1, t("اختر دور واحد على الأقل")),
+  companyIds: z.array(z.number()).min(1, t("اختر شركة واحدة على الأقل")),
 };
 
 const createSchema = z.object({
   ...baseShape,
-  password: z.string().min(8, "8 أحرف على الأقل").max(128),
+  password: z.string().min(8, t("8 أحرف على الأقل")).max(128),
 });
 const editSchema = z.object(baseShape);
 
@@ -102,7 +103,7 @@ export default function QuickAddUserModal({
         : await createUser(data).unwrap();
 
       toast.success(
-        isEdit ? "تم تحديث بيانات المستخدم" : "تم إضافة المستخدم بنجاح",
+        isEdit ? t("تم تحديث بيانات المستخدم") : t("تم إضافة المستخدم بنجاح"),
       );
 
       const savedUser = response?.data ?? response;
@@ -111,8 +112,8 @@ export default function QuickAddUserModal({
     } catch (err) {
       const message =
         err?.status === 409
-          ? "اسم المستخدم أو الإيميل مستخدم بالفعل"
-          : "تعذر الحفظ، حاول مرة أخرى";
+          ? t("اسم المستخدم أو الإيميل مستخدم بالفعل")
+          : t("تعذر الحفظ، حاول مرة أخرى");
       toast.error(message);
     }
   };
@@ -121,44 +122,44 @@ export default function QuickAddUserModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل مستخدم" : "إضافة مستخدم جديد"}
+      title={isEdit ? t("تعديل مستخدم") : t("إضافة مستخدم جديد")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="الاسم الأول"
+            label={t("الاسم الأول")}
             {...register("firstName")}
             error={errors.firstName?.message}
           />
           <Input
-            label="اسم العائلة"
+            label={t("اسم العائلة")}
             {...register("lastName")}
             error={errors.lastName?.message}
           />
         </div>
 
         <Input
-          label="اسم المستخدم"
+          label={t("اسم المستخدم")}
           disabled={isEdit}
           {...register("userName")}
           error={errors.userName?.message}
         />
 
         <Input
-          label="الإيميل"
+          label={t("الإيميل")}
           {...register("email")}
           error={errors.email?.message}
         />
 
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="رقم الهاتف"
+            label={t("رقم الهاتف")}
             {...register("phoneNumber")}
             error={errors.phoneNumber?.message}
           />
           {!isEdit && (
             <Input
-              label="كلمة المرور"
+              label={t("كلمة المرور")}
               type="password"
               {...register("password")}
               error={errors.password?.message}
@@ -168,7 +169,7 @@ export default function QuickAddUserModal({
 
         <div>
           <label className="block mb-1.5 text-sm font-medium text-ink-900">
-            الأدوار (الصلاحيات)
+            {t("الأدوار (الصلاحيات)")}
           </label>
           <Controller
             name="roles"
@@ -208,7 +209,7 @@ export default function QuickAddUserModal({
 
         <div>
           <label className="block mb-1.5 text-sm font-medium text-ink-900">
-            الشركات المتاحة له
+            {t("الشركات المتاحة له")}
           </label>
           <Controller
             name="companyIds"
@@ -249,7 +250,7 @@ export default function QuickAddUserModal({
         </div>
 
         <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "جاري الحفظ..." : isEdit ? "حفظ التعديلات" : "إضافة"}
+          {isLoading ? t("جاري الحفظ...") : isEdit ? t("حفظ التعديلات") : t("إضافة")}
         </Button>
       </form>
     </Modal>

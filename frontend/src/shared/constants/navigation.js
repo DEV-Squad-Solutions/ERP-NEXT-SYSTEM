@@ -33,6 +33,7 @@ import {
   Waves,
 } from "lucide-react";
 
+import { t } from "../../i18n";
 const FULL_ACCESS_ROLES = ["Admin", "Accountant"];
 
 const LIMITED_ACCESS_ROLES = ["User", "Cashier"];
@@ -47,7 +48,7 @@ const PAYROLL_ROLES = ["Admin", "Accountant", "User", "Cashier"];
 
 export const navigationItems = [
   {
-    label: "الرئيسية",
+    label: t("الرئيسية"),
     path: "/dashboard",
     icon: LayoutDashboard,
     end: true,
@@ -56,12 +57,12 @@ export const navigationItems = [
 
   {
     type: "section",
-    label: "التشغيل",
+    label: t("التشغيل"),
     roles: ["Admin", "Accountant", "User", "Cashier"],
   },
 
   {
-    label: "المبيعات والمشتريات",
+    label: t("المبيعات والمشتريات"),
     path: "/dashboard/sales",
     icon: ShoppingCart,
     end: true,
@@ -69,33 +70,33 @@ export const navigationItems = [
   },
 
   {
-    label: "العملاء والموردين",
+    label: t("العملاء والموردين"),
     icon: Users,
     roles: FULL_ACCESS_ROLES,
     children: [
       {
-        label: "قائمة العملاء والموردين",
+        label: t("قائمة العملاء والموردين"),
         path: "/dashboard/partners",
         icon: Users,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "كشف حساب عميل/مورد",
+        label: t("كشف حساب عميل/مورد"),
         path: "/dashboard/partners/statement",
         icon: FileText,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "أرصدة افتتاحية",
+        label: t("أرصدة افتتاحية"),
         path: "/dashboard/partners/opening-balances",
         icon: History,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "الدول",
+        label: t("الدول"),
         path: "/dashboard/partners/countries",
         icon: Globe,
         end: true,
@@ -105,47 +106,47 @@ export const navigationItems = [
   },
 
   {
-    label: "المخازن",
+    label: t("المخازن"),
     icon: Boxes,
     roles: FULL_ACCESS_ROLES,
     children: [
       {
-        label: "قائمة المخازن",
+        label: t("قائمة المخازن"),
         path: "/dashboard/stores",
         icon: Building,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "التحويلات المخزنية",
+        label: t("التحويلات المخزنية"),
         path: "/dashboard/inventory/stock-transfers",
         icon: ArrowLeftRight,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "تسويات المخزون",
+        label: t("تسويات المخزون"),
         path: "/dashboard/inventory/adjustments",
         icon: SlidersHorizontal,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "أرصدة افتتاحية مخزنية",
+        label: t("أرصدة افتتاحية مخزنية"),
         path: "/dashboard/inventory/opening-balances",
         icon: History,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "العبوات",
+        label: t("العبوات"),
         path: "/dashboard/inventory/containers",
         icon: PackageOpen,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "وحدات القياس",
+        label: t("وحدات القياس"),
         path: "/dashboard/inventory/units",
         icon: Ruler,
         end: true,
@@ -155,33 +156,33 @@ export const navigationItems = [
   },
 
   {
-    label: "السائقين",
+    label: t("السائقين"),
     icon: Truck,
     roles: FULL_ACCESS_ROLES,
     children: [
       {
-        label: "قائمة السائقين",
+        label: t("قائمة السائقين"),
         path: "/dashboard/drivers",
         icon: Van,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "كشف حساب سائق",
+        label: t("كشف حساب سائق"),
         path: "/dashboard/drivers/statement",
         icon: FileText,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "مصاريف الرحلات",
+        label: t("مصاريف الرحلات"),
         path: "/dashboard/drivers/trip-costs",
         icon: Receipt,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "الأرصدة الافتتاحية",
+        label: t("الأرصدة الافتتاحية"),
         path: "/dashboard/drivers/opening-balances",
         icon: Coins,
         end: true,
@@ -192,38 +193,38 @@ export const navigationItems = [
 
   {
     type: "section",
-    label: "المالية",
+    label: t("المالية"),
     roles: ["Admin", "Accountant", "User", "Cashier"],
   },
 
   {
-    label: "الخزائن والبنوك",
+    label: t("الخزائن والبنوك"),
     icon: Wallet,
     roles: TREASURY_ROLES,
     children: [
       {
-        label: "الخزائن والبنوك",
+        label: t("الخزائن والبنوك"),
         path: "/dashboard/treasury",
         icon: Wallet,
         end: true,
         roles: TREASURY_ROLES,
       },
       {
-        label: "التحويلات بين الخزائن",
+        label: t("التحويلات بين الخزائن"),
         path: "/dashboard/treasury/transfers",
         icon: ArrowLeftRight,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "أنواع حركات الخزنة",
+        label: t("أنواع حركات الخزنة"),
         path: "/dashboard/treasury/cash-movement-types",
         icon: SlidersHorizontal,
         end: true,
         roles: FULL_ACCESS_ROLES,
       },
       {
-        label: "العملات وأسعار الصرف",
+        label: t("العملات وأسعار الصرف"),
         path: "/dashboard/treasury/currencies",
         icon: Coins,
         end: true,
@@ -233,7 +234,7 @@ export const navigationItems = [
   },
 
   {
-    label: "المصاريف",
+    label: t("المصاريف"),
     path: "/dashboard/expenses",
     icon: Receipt,
     end: true,
@@ -242,66 +243,66 @@ export const navigationItems = [
 
   {
     type: "section",
-    label: "الموارد البشرية",
+    label: t("الموارد البشرية"),
     roles: PAYROLL_ROLES,
   },
 
   {
-    label: "الأجور والمرتبات",
+    label: t("الأجور والمرتبات"),
     icon: DollarSign,
     roles: PAYROLL_ROLES,
     children: [
       {
-        label: "لوحة التحكم",
+        label: t("لوحة التحكم"),
         path: "/dashboard/payroll",
         icon: LayoutDashboard,
         end: true,
         roles: PAYROLL_ROLES,
       },
       {
-        label: "الموظفين",
+        label: t("الموظفين"),
         path: "/dashboard/payroll/employees",
         icon: Users,
         end: true,
         roles: PAYROLL_ROLES,
       },
       {
-        label: "كشف حساب موظف",
+        label: t("كشف حساب موظف"),
         path: "/dashboard/payroll/employees/statement",
         icon: FileText,
         end: true,
         roles: PAYROLL_ROLES,
       },
       {
-        label: "الأرصدة الافتتاحية",
+        label: t("الأرصدة الافتتاحية"),
         path: "/dashboard/payroll/opening-balances",
         icon: History,
         end: true,
         roles: PAYROLL_ROLES,
       },
       {
-        label: "الحضور والانصراف",
+        label: t("الحضور والانصراف"),
         path: "/dashboard/payroll/attendance/records",
         icon: CalendarRange,
         end: true,
         roles: PAYROLL_ROLES,
       },
       {
-        label: "الحركات المالية للموظفين",
+        label: t("الحركات المالية للموظفين"),
         path: "/dashboard/payroll/movements",
         icon: ArrowRightLeft,
         end: true,
         roles: PAYROLL_ROLES,
       },
       {
-        label: "المرتبات",
+        label: t("المرتبات"),
         path: "/dashboard/payroll/salaries",
         icon: WalletCards,
         end: true,
         roles: PAYROLL_ROLES,
       },
       {
-        label: "تقارير المرتبات",
+        label: t("تقارير المرتبات"),
         path: "/dashboard/payroll/reports",
         icon: FileBarChart,
         end: true,
@@ -312,18 +313,18 @@ export const navigationItems = [
 
   {
     type: "section",
-    label: "المحاسبة",
+    label: t("المحاسبة"),
     roles: FULL_ACCESS_ROLES,
   },
   {
-    label: "مراقبة الجاهزية المحاسبية",
+    label: t("مراقبة الجاهزية المحاسبية"),
     path: "/dashboard/accounting-readiness",
     icon: ShieldCheck,
     end: true,
     roles: FULL_ACCESS_ROLES,
   },
   {
-    label: "السنوات المالية",
+    label: t("السنوات المالية"),
     path: "/dashboard/fiscal-years",
     icon: CalendarRange,
     end: true,
@@ -331,7 +332,7 @@ export const navigationItems = [
   },
 
   {
-    label: "دليل الحسابات",
+    label: t("دليل الحسابات"),
     path: "/dashboard/accounts",
     icon: ListTree,
     end: true,
@@ -339,7 +340,7 @@ export const navigationItems = [
   },
 
   {
-    label: "إعدادات الربط المحاسبي",
+    label: t("إعدادات الربط المحاسبي"),
     path: "/dashboard/account-mappings",
     icon: Link2,
     end: true,
@@ -347,7 +348,7 @@ export const navigationItems = [
   },
 
   {
-    label: "قيود اليومية",
+    label: t("قيود اليومية"),
     path: "/dashboard/journal-entries",
     icon: BookOpen,
     end: true,
@@ -355,7 +356,7 @@ export const navigationItems = [
   },
 
   {
-    label: "ميزان المراجعة قبل التسوية",
+    label: t("ميزان المراجعة قبل التسوية"),
     path: "/dashboard/trial-balance/before-adjustments",
     icon: ClipboardList,
     end: true,
@@ -363,7 +364,7 @@ export const navigationItems = [
   },
 
   {
-    label: "ميزان المراجعة بعد التسوية",
+    label: t("ميزان المراجعة بعد التسوية"),
     path: "/dashboard/trial-balance/after-adjustments",
     icon: Scale,
     end: true,
@@ -371,7 +372,7 @@ export const navigationItems = [
   },
 
   {
-    label: "تشكيل القوائم المالية",
+    label: t("تشكيل القوائم المالية"),
     path: "/dashboard/financial-statements",
     icon: ListTree,
     end: true,
@@ -379,7 +380,7 @@ export const navigationItems = [
   },
 
   {
-    label: "قائمة الدخل",
+    label: t("قائمة الدخل"),
     path: "/dashboard/income",
     icon: ChartNoAxesCombined,
     end: true,
@@ -387,7 +388,7 @@ export const navigationItems = [
   },
 
   {
-    label: "المركز المالي",
+    label: t("المركز المالي"),
     path: "/dashboard/financial-position",
     icon: PieChart,
     end: true,
@@ -395,7 +396,7 @@ export const navigationItems = [
   },
 
   {
-    label: "قائمة التدفقات النقدية",
+    label: t("قائمة التدفقات النقدية"),
     path: "/dashboard/cash-flow",
     icon: Waves,
     end: true,
@@ -404,29 +405,29 @@ export const navigationItems = [
 
   {
     type: "section",
-    label: "التقارير",
+    label: t("التقارير"),
     roles: FULL_ACCESS_ROLES,
   },
 
   {
-    label: "التقارير",
+    label: t("التقارير"),
     icon: FileBarChart,
     roles: FULL_ACCESS_ROLES,
     children: [
       {
-        label: "تقارير الربحية",
+        label: t("تقارير الربحية"),
         icon: TrendingUp,
         roles: FULL_ACCESS_ROLES,
         children: [
           {
-            label: "ربحية الفواتير",
+            label: t("ربحية الفواتير"),
             path: "/dashboard/reports/profitability/invoices",
             icon: Receipt,
             end: true,
             roles: FULL_ACCESS_ROLES,
           },
           {
-            label: "ربحية الأصناف",
+            label: t("ربحية الأصناف"),
             path: "/dashboard/reports/profitability/items",
             icon: Boxes,
             end: true,
@@ -439,19 +440,19 @@ export const navigationItems = [
 
   {
     type: "section",
-    label: "الإدارة",
+    label: t("الإدارة"),
     roles: ["Admin"],
   },
 
   {
-    label: "الصلاحيات",
+    label: t("الصلاحيات"),
     path: "/dashboard/permissions",
     icon: ShieldCheck,
     end: true,
     roles: ["Admin"],
   },
   {
-    label: "إعداد الأدمن والشركات",
+    label: t("إعداد الأدمن والشركات"),
     path: "/dashboard/setup",
     icon: ShieldCheck,
     end: true,

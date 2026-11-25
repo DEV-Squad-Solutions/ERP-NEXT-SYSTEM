@@ -2,7 +2,9 @@ import { useSelector } from "react-redux";
 import { EMPLOYEE_TYPE } from "../../../features/payroll/payroll.constants";
 import { formatDate } from "../../../lib/date.js";
 
-const fmt = (v) => Number(v || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
+const fmt = (v) => Number(v || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 // بعض السجلات لسه calculatedSalary فيها صفر لو اتحسبت لاحقًا
 const netOf = (row) => Number(row.netSalary || row.calculatedSalary || 0);
@@ -13,16 +15,16 @@ const isRowMoved = (row) =>
   );
 
 const COLUMNS = [
-  "الموظف",
-  "الكود",
-  "النوع",
-  "مكان العمل",
-  "الفترة",
-  "الإضافات",
-  "الخصومات",
-  "الإجمالي",
-  "الصافي",
-  "حالة الترحيل",
+  t("الموظف"),
+  t("الكود"),
+  t("النوع"),
+  t("مكان العمل"),
+  t("الفترة"),
+  t("الإضافات"),
+  t("الخصومات"),
+  t("الإجمالي"),
+  t("الصافي"),
+  t("حالة الترحيل"),
 ];
 
 /**
@@ -48,7 +50,7 @@ export default function PayrollListPrintTemplate({ rows, filters }) {
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       style={{
         width: "297mm",
         minHeight: "210mm",
@@ -76,13 +78,13 @@ export default function PayrollListPrintTemplate({ rows, filters }) {
           </h1>
 
           <p style={{ fontSize: "10px", color: "#6F7C75", margin: "4px 0 0" }}>
-            تقرير قيود المرتبات
+            {t("تقرير قيود المرتبات")}
           </p>
         </div>
 
         <div style={{ textAlign: "left", fontSize: "10px" }}>
-          <p style={{ margin: "2px 0" }}>تاريخ الطباعة: {today}</p>
-          <p style={{ margin: "2px 0" }}>عدد السجلات: {rows.length}</p>
+          <p style={{ margin: "2px 0" }}>{t("تاريخ الطباعة:")} {today}</p>
+          <p style={{ margin: "2px 0" }}>{t("عدد السجلات:")} {rows.length}</p>
         </div>
       </div>
 
@@ -98,15 +100,15 @@ export default function PayrollListPrintTemplate({ rows, filters }) {
             flexWrap: "wrap",
           }}
         >
-          {filters.startDate && <span>من: {formatDate(filters.startDate)}</span>}
-          {filters.endDate && <span>إلى: {formatDate(filters.endDate)}</span>}
+          {filters.startDate && <span>{t("من:")} {formatDate(filters.startDate)}</span>}
+          {filters.endDate && <span>{t("إلى:")} {formatDate(filters.endDate)}</span>}
           {filters.employeeType && (
             <span>
-              النوع:{" "}
+              {t("النوع:")}{" "}
               {EMPLOYEE_TYPE[filters.employeeType] || filters.employeeType}
             </span>
           )}
-          {filters.search && <span>بحث: {filters.search}</span>}
+          {filters.search && <span>{t("بحث:")} {filters.search}</span>}
         </div>
       )}
 
@@ -150,8 +152,8 @@ export default function PayrollListPrintTemplate({ rows, filters }) {
                 </td>
                 <td style={cellCenter}>
                   {row.workPlaceStatus === "OutCompany"
-                    ? "خارج الشركة"
-                    : "داخل الشركة"}
+                    ? t("خارج الشركة")
+                    : t("داخل الشركة")}
                 </td>
                 <td style={cellCenter}>
                   {formatDate(row.startDate)} → {formatDate(row.endDate)}
@@ -168,7 +170,7 @@ export default function PayrollListPrintTemplate({ rows, filters }) {
                 <td style={{ ...cellCenter, fontWeight: 700 }}>
                   {fmt(netOf(row))}
                 </td>
-                <td style={cellCenter}>{moved ? "مُرحّل" : "لم يُرحّل"}</td>
+                <td style={cellCenter}>{moved ? t("مُرحّل") : t("لم يُرحّل")}</td>
               </tr>
             );
           })}
@@ -192,7 +194,7 @@ export default function PayrollListPrintTemplate({ rows, filters }) {
         >
           <tbody>
             <tr>
-              <td style={summaryTitle}>إجمالي الإضافات</td>
+              <td style={summaryTitle}>{t("إجمالي الإضافات")}</td>
               <td
                 style={{ ...summaryValue, color: "#059669", fontWeight: 700 }}
               >
@@ -201,7 +203,7 @@ export default function PayrollListPrintTemplate({ rows, filters }) {
             </tr>
 
             <tr>
-              <td style={summaryTitle}>إجمالي الخصومات</td>
+              <td style={summaryTitle}>{t("إجمالي الخصومات")}</td>
               <td
                 style={{ ...summaryValue, color: "#C0392B", fontWeight: 700 }}
               >
@@ -210,14 +212,14 @@ export default function PayrollListPrintTemplate({ rows, filters }) {
             </tr>
 
             <tr>
-              <td style={summaryTitle}>إجمالي الأساسي</td>
+              <td style={summaryTitle}>{t("إجمالي الأساسي")}</td>
               <td style={{ ...summaryValue, fontWeight: 700 }}>
                 {fmt(totals.gross)}
               </td>
             </tr>
 
             <tr>
-              <td style={summaryTitle}>إجمالي الصافي</td>
+              <td style={summaryTitle}>{t("إجمالي الصافي")}</td>
               <td style={{ ...summaryValue, fontWeight: 700 }}>
                 {fmt(totals.net)}
               </td>
@@ -237,7 +239,7 @@ export default function PayrollListPrintTemplate({ rows, filters }) {
       >
         <div style={{ textAlign: "center", width: "180px" }}>
           <div style={{ borderTop: "1px solid #0A2540", paddingTop: "6px" }}>
-            توقيع المسؤول
+            {t("توقيع المسؤول")}
           </div>
         </div>
       </div>

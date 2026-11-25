@@ -37,6 +37,8 @@ import PayrollDashboardPrintTemplate from "../../../shared/components/print/Payr
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const EMPLOYEE_TYPES = {
   DAILY: "Daily",
   MONTHLY: "Monthly",
@@ -102,7 +104,7 @@ function SectionHeader({ icon: Icon, title, count }) {
 
           {count !== undefined && (
             <p className="text-xs text-slate-500">
-              {count} {count === 1 ? "عنصر" : "عناصر"}
+              {count} {count === 1 ? t("عنصر") : t("عناصر")}
             </p>
           )}
         </div>
@@ -199,7 +201,7 @@ export default function PayrollDashboardPage() {
           employee.employeeName ??
           employee.fullName ??
           employee.code ??
-          `موظف ${employee.id ?? employee.employeeId}`,
+          t("موظف {0}", { 0: employee.id ?? employee.employeeId }),
       })),
     [employees],
   );
@@ -208,11 +210,11 @@ export default function PayrollDashboardPage() {
     () => [
       {
         value: EMPLOYEE_TYPES.DAILY,
-        label: "يومي",
+        label: t("يومي"),
       },
       {
         value: EMPLOYEE_TYPES.MONTHLY,
-        label: "شهري",
+        label: t("شهري"),
       },
     ],
     [],
@@ -244,7 +246,7 @@ export default function PayrollDashboardPage() {
     useGetPayrollDashboardQuery(params);
 
   const { printDashboard, printRef } = usePayrollDashboardPrint({
-    title: "تقرير الأجور والمرتبات",
+    title: t("تقرير الأجور والمرتبات"),
   });
 
   const selectedEmployeeName = useMemo(() => {
@@ -277,14 +279,14 @@ export default function PayrollDashboardPage() {
 
   if (isLoading) {
     return (
-      <div dir="rtl" className="space-y-6">
+      <div dir={getDir()} className="space-y-6">
         <div>
           <h1 className="text-xl font-bold text-slate-900">
-            لوحة الأجور والمرتبات
+            {t("لوحة الأجور والمرتبات")}
           </h1>
 
           <p className="mt-1 text-sm text-slate-500">
-            ملخص شامل لحالة الرواتب والمدفوعات والاستحقاقات
+            {t("ملخص شامل لحالة الرواتب والمدفوعات والاستحقاقات")}
           </p>
         </div>
 
@@ -294,23 +296,23 @@ export default function PayrollDashboardPage() {
   }
 
   return (
-    <div dir="rtl" className="space-y-6">
+    <div dir={getDir()} className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-slate-900">
-            لوحة الأجور والمرتبات
+            {t("لوحة الأجور والمرتبات")}
           </h1>
 
           <p className="mt-1 text-sm text-slate-500">
-            ملخص شامل لحالة الرواتب والمدفوعات والاستحقاقات
+            {t("ملخص شامل لحالة الرواتب والمدفوعات والاستحقاقات")}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={refetch} disabled={isFetching}>
             <RefreshCw size={15} className={isFetching ? "animate-spin" : ""} />
-            تحديث
+            {t("تحديث")}
           </Button>
 
           <Button
@@ -319,7 +321,7 @@ export default function PayrollDashboardPage() {
             disabled={isFetching || isError || !data}
           >
             <Printer size={15} />
-            طباعة
+            {t("طباعة")}
           </Button>
         </div>
       </div>
@@ -329,14 +331,14 @@ export default function PayrollDashboardPage() {
         <div className="mb-4 flex items-center gap-2">
           <CalendarDays size={17} className="text-slate-500" />
 
-          <h2 className="text-sm font-bold text-slate-900">فلاتر التقرير</h2>
+          <h2 className="text-sm font-bold text-slate-900">{t("فلاتر التقرير")}</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {/* From Date */}
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-600">
-              من تاريخ
+              {t("من تاريخ")}
             </label>
 
             <DateInput
@@ -352,7 +354,7 @@ export default function PayrollDashboardPage() {
           {/* To Date */}
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-600">
-              إلى تاريخ
+              {t("إلى تاريخ")}
             </label>
 
             <DateInput
@@ -368,7 +370,7 @@ export default function PayrollDashboardPage() {
           {/* Employee */}
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-600">
-              الموظف
+              {t("الموظف")}
             </label>
 
             <CompactSelect
@@ -376,21 +378,21 @@ export default function PayrollDashboardPage() {
               value={employeeId}
               onChange={setEmployeeId}
               isLoading={employeesLoading}
-              placeholder="كل الموظفين"
+              placeholder={t("كل الموظفين")}
             />
           </div>
 
           {/* Employee Type */}
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-600">
-              نوع الموظف
+              {t("نوع الموظف")}
             </label>
 
             <CompactSelect
               options={employeeTypeOptions}
               value={employeeType}
               onChange={setEmployeeType}
-              placeholder="كل الأنواع"
+              placeholder={t("كل الأنواع")}
             />
           </div>
         </div>
@@ -399,21 +401,21 @@ export default function PayrollDashboardPage() {
       {/* Error */}
       {isError && (
         <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          حدث خطأ أثناء تحميل بيانات لوحة الأجور.
+          {t("حدث خطأ أثناء تحميل بيانات لوحة الأجور.")}
         </div>
       )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <StatCard
-          title="إجمالي كشوف الرواتب"
+          title={t("إجمالي كشوف الرواتب")}
           value={data?.totalPayrolls ?? 0}
           icon={ReceiptText}
           iconClassName="text-slate-600"
         />
 
         <StatCard
-          title="صافي المستحق"
+          title={t("صافي المستحق")}
           value={fmtMoney(data?.netPayable ?? 0)}
           icon={Wallet}
           iconClassName="text-emerald-600"
@@ -421,7 +423,7 @@ export default function PayrollDashboardPage() {
         />
 
         <StatCard
-          title="إجمالي المدفوع"
+          title={t("إجمالي المدفوع")}
           value={fmtMoney(data?.totalPaid ?? 0)}
           icon={Banknote}
           iconClassName="text-blue-600"
@@ -429,7 +431,7 @@ export default function PayrollDashboardPage() {
         />
 
         <StatCard
-          title="إجمالي الخصومات"
+          title={t("إجمالي الخصومات")}
           value={fmtMoney(data?.totalDeductions ?? 0)}
           icon={TrendingDown}
           iconClassName="text-red-600"
@@ -437,7 +439,7 @@ export default function PayrollDashboardPage() {
         />
 
         <StatCard
-          title="إجمالي السلف"
+          title={t("إجمالي السلف")}
           value={fmtMoney(data?.totalAdvances ?? 0)}
           icon={CreditCard}
           iconClassName="text-amber-600"
@@ -445,7 +447,7 @@ export default function PayrollDashboardPage() {
         />
 
         <StatCard
-          title="عدد الموظفين"
+          title={t("عدد الموظفين")}
           value={data?.employeeCount ?? 0}
           icon={Users}
           iconClassName="text-violet-600"
@@ -458,14 +460,14 @@ export default function PayrollDashboardPage() {
         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <SectionHeader
             icon={Clock3}
-            title="كشوف الرواتب المعلقة"
+            title={t("كشوف الرواتب المعلقة")}
             count={pendingPayrolls.length}
           />
 
           {pendingPayrolls.length === 0 ? (
             <EmptyState
-              title="لا توجد كشوف معلقة"
-              description="لا توجد رواتب معلقة ضمن الفلاتر الحالية."
+              title={t("لا توجد كشوف معلقة")}
+              description={t("لا توجد رواتب معلقة ضمن الفلاتر الحالية.")}
             />
           ) : (
             <div className="space-y-2">
@@ -491,15 +493,15 @@ export default function PayrollDashboardPage() {
                       <p className="mt-0.5 text-xs text-slate-500">
                         {item.employeeCode || "—"} •{" "}
                         {item.employeeType === EMPLOYEE_TYPES.DAILY
-                          ? "يومي"
-                          : "شهري"}
+                          ? t("يومي")
+                          : t("شهري")}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex shrink-0 items-center gap-3">
                     <div className="text-left">
-                      <p className="text-xs text-slate-500">صافي الراتب</p>
+                      <p className="text-xs text-slate-500">{t("صافي الراتب")}</p>
 
                       <p className="mt-0.5 text-sm font-bold text-slate-900">
                         {fmtMoney(item.netSalary ?? 0)}
@@ -521,14 +523,14 @@ export default function PayrollDashboardPage() {
         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <SectionHeader
             icon={TrendingUp}
-            title="آخر العمليات"
+            title={t("آخر العمليات")}
             count={recentOperations.length}
           />
 
           {recentOperations.length === 0 ? (
             <EmptyState
-              title="لا توجد عمليات حديثة"
-              description="لا توجد عمليات مالية ضمن الفترة المحددة."
+              title={t("لا توجد عمليات حديثة")}
+              description={t("لا توجد عمليات مالية ضمن الفترة المحددة.")}
             />
           ) : (
             <div className="space-y-2">
@@ -546,7 +548,7 @@ export default function PayrollDashboardPage() {
                       <p className="truncate text-sm font-semibold text-slate-800">
                         {operation.operationName ||
                           operation.operationType ||
-                          "عملية مالية"}
+                          t("عملية مالية")}
                       </p>
 
                       <p className="mt-0.5 truncate text-xs text-slate-500">
@@ -580,15 +582,15 @@ export default function PayrollDashboardPage() {
           <CalendarDays size={14} />
 
           <span>
-            الفترة: {fromDate ? formatDate(fromDate) : "—"} إلى{" "}
+            {t("الفترة:")} {fromDate ? formatDate(fromDate) : "—"} {t("إلى")}{" "}
             {toDate ? formatDate(toDate) : "—"}
           </span>
         </div>
 
         <div>
           {employeeId
-            ? `الموظف: ${selectedEmployeeName || "—"}`
-            : "كل الموظفين"}
+            ? t("الموظف: {0}", { 0: selectedEmployeeName || "—" })
+            : t("كل الموظفين")}
         </div>
       </div>
 

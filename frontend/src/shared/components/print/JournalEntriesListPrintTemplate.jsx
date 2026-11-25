@@ -1,20 +1,22 @@
 import { useSelector } from "react-redux";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 // =========================================================
 // Constants
 // =========================================================
 
 const ENTRY_TYPE_LABELS = {
-  Manual: "يدوي",
-  Adjustment: "تسوية",
-  Opening: "افتتاحي",
-  Automatic: "تلقائي",
+  Manual: t("يدوي"),
+  Adjustment: t("تسوية"),
+  Opening: t("افتتاحي"),
+  Automatic: t("تلقائي"),
 };
 
 const STATUS_LABELS = {
-  Posted: "مرحّل",
-  Reversed: "معكوس",
+  Posted: t("مرحّل"),
+  Reversed: t("معكوس"),
 };
 
 // =========================================================
@@ -22,7 +24,7 @@ const STATUS_LABELS = {
 // =========================================================
 
 const fmt = (value) =>
-  Number(value ?? 0).toLocaleString("ar-EG", {
+  Number(value ?? 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -31,10 +33,10 @@ const getEntryTypeLabel = (type) => {
   if (typeof type === "number") {
     return (
       {
-        1: "يدوي",
-        2: "تسوية",
-        3: "افتتاحي",
-        4: "تلقائي",
+        1: t("يدوي"),
+        2: t("تسوية"),
+        3: t("افتتاحي"),
+        4: t("تلقائي"),
       }[type] ?? type
     );
   }
@@ -46,8 +48,8 @@ const getStatusLabel = (status) => {
   if (typeof status === "number") {
     return (
       {
-        1: "مرحّل",
-        2: "معكوس",
+        1: t("مرحّل"),
+        2: t("معكوس"),
       }[status] ?? status
     );
   }
@@ -147,7 +149,7 @@ export default function JournalEntriesListPrintTemplate({
       </style>
 
       <div
-        dir="rtl"
+        dir={getDir()}
         className="journal-print-page"
         style={{
           width: "100%",
@@ -208,7 +210,7 @@ export default function JournalEntriesListPrintTemplate({
                 color: "#6F7C75",
               }}
             >
-              نظام الإدارة والمحاسبة
+              {t("نظام الإدارة والمحاسبة")}
             </div>
           </div>
 
@@ -232,7 +234,7 @@ export default function JournalEntriesListPrintTemplate({
                   lineHeight: 1.2,
                 }}
               >
-                تقرير قيود اليومية
+                {t("تقرير قيود اليومية")}
               </div>
 
               <div
@@ -276,7 +278,7 @@ export default function JournalEntriesListPrintTemplate({
                   fontSize: "8.5px",
                 }}
               >
-                <span style={{ color: "#6F7C75" }}>تاريخ الطباعة</span>
+                <span style={{ color: "#6F7C75" }}>{t("تاريخ الطباعة")}</span>
 
                 <strong style={{ color: "#0A2540" }}>{today}</strong>
               </div>
@@ -289,10 +291,10 @@ export default function JournalEntriesListPrintTemplate({
                   fontSize: "8.5px",
                 }}
               >
-                <span style={{ color: "#6F7C75" }}>عدد القيود</span>
+                <span style={{ color: "#6F7C75" }}>{t("عدد القيود")}</span>
 
                 <strong style={{ color: "#0A2540" }}>
-                  {Number(entries.length).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+                  {Number(entries.length).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
                 </strong>
               </div>
             </div>
@@ -330,7 +332,7 @@ export default function JournalEntriesListPrintTemplate({
                 whiteSpace: "nowrap",
               }}
             >
-              معايير التقرير
+              {t("معايير التقرير")}
             </div>
 
             <div
@@ -343,36 +345,36 @@ export default function JournalEntriesListPrintTemplate({
               }}
             >
               {filters.search && (
-                <FilterItem label="البحث" value={filters.search} />
+                <FilterItem label={t("البحث")} value={filters.search} />
               )}
 
               {filters.fiscalYearName && (
                 <FilterItem
-                  label="السنة المالية"
+                  label={t("السنة المالية")}
                   value={filters.fiscalYearName}
                 />
               )}
 
               {filters.entryType && (
                 <FilterItem
-                  label="نوع القيد"
+                  label={t("نوع القيد")}
                   value={getEntryTypeLabel(filters.entryType)}
                 />
               )}
 
               {filters.status && (
                 <FilterItem
-                  label="الحالة"
+                  label={t("الحالة")}
                   value={getStatusLabel(filters.status)}
                 />
               )}
 
               {filters.fromDate && (
-                <FilterItem label="من" value={filters.fromDate} />
+                <FilterItem label={t("من")} value={filters.fromDate} />
               )}
 
               {filters.toDate && (
-                <FilterItem label="إلى" value={filters.toDate} />
+                <FilterItem label={t("إلى")} value={filters.toDate} />
               )}
 
               {!filters.search &&
@@ -381,7 +383,7 @@ export default function JournalEntriesListPrintTemplate({
                 !filters.status &&
                 !filters.fromDate &&
                 !filters.toDate && (
-                  <span style={{ color: "#9AA6A0" }}>بدون فلاتر</span>
+                  <span style={{ color: "#9AA6A0" }}>{t("بدون فلاتر")}</span>
                 )}
             </div>
           </div>
@@ -421,13 +423,13 @@ export default function JournalEntriesListPrintTemplate({
             >
               {[
                 "#",
-                "رقم القيد",
-                "التاريخ",
-                "البيان",
-                "النوع",
-                "الحالة",
-                "مدين",
-                "دائن",
+                t("رقم القيد"),
+                t("التاريخ"),
+                t("البيان"),
+                t("النوع"),
+                t("الحالة"),
+                t("مدين"),
+                t("دائن"),
               ].map((header) => (
                 <th
                   key={header}
@@ -567,7 +569,7 @@ export default function JournalEntriesListPrintTemplate({
                     color: "#9AA6A0",
                   }}
                 >
-                  لا توجد قيود لعرضها
+                  {t("لا توجد قيود لعرضها")}
                 </td>
               </tr>
             )}
@@ -594,7 +596,7 @@ export default function JournalEntriesListPrintTemplate({
                     color: "#42504A",
                   }}
                 >
-                  إجمالي التقرير
+                  {t("إجمالي التقرير")}
                 </td>
 
                 <td
@@ -661,7 +663,7 @@ export default function JournalEntriesListPrintTemplate({
                   marginBottom: "3px",
                 }}
               >
-                حالة التوازن المحاسبي
+                {t("حالة التوازن المحاسبي")}
               </div>
 
               <div
@@ -671,7 +673,7 @@ export default function JournalEntriesListPrintTemplate({
                   color: difference === 0 ? "#072D26" : "#A13027",
                 }}
               >
-                {difference === 0 ? "القيد متوازن ✓" : "يوجد فرق في الأرصدة"}
+                {difference === 0 ? t("القيد متوازن ✓") : t("يوجد فرق في الأرصدة")}
               </div>
 
               <div
@@ -681,7 +683,7 @@ export default function JournalEntriesListPrintTemplate({
                   color: "#6F7C75",
                 }}
               >
-                الفرق:{" "}
+                {t("الفرق:")}{" "}
                 <strong
                   style={{
                     direction: "ltr",
@@ -704,13 +706,13 @@ export default function JournalEntriesListPrintTemplate({
             >
               <tbody>
                 <tr>
-                  <td style={summaryTitle}>إجمالي المدين</td>
+                  <td style={summaryTitle}>{t("إجمالي المدين")}</td>
 
                   <td style={summaryValue}>{fmt(totalDebit)}</td>
                 </tr>
 
                 <tr>
-                  <td style={summaryTitle}>إجمالي الدائن</td>
+                  <td style={summaryTitle}>{t("إجمالي الدائن")}</td>
 
                   <td style={summaryValue}>{fmt(totalCredit)}</td>
                 </tr>
@@ -722,7 +724,7 @@ export default function JournalEntriesListPrintTemplate({
                       fontWeight: 800,
                     }}
                   >
-                    الفرق
+                    {t("الفرق")}
                   </td>
 
                   <td
@@ -737,11 +739,11 @@ export default function JournalEntriesListPrintTemplate({
                 </tr>
 
                 <tr>
-                  <td style={summaryTitle}>عدد القيود</td>
+                  <td style={summaryTitle}>{t("عدد القيود")}</td>
 
                   <td style={summaryValue}>
                     {Number(summary.count ?? entries.length).toLocaleString(
-                      "ar-EG",
+                      getLocale(),
                     )}
                   </td>
                 </tr>
@@ -781,7 +783,7 @@ export default function JournalEntriesListPrintTemplate({
                 marginBottom: "4px",
               }}
             />
-            توقيع المراجع
+            {t("توقيع المراجع")}
           </div>
 
           <div
@@ -791,7 +793,7 @@ export default function JournalEntriesListPrintTemplate({
               color: "#9AA6A0",
             }}
           >
-            تم استخراج التقرير بتاريخ {today}
+            {t("تم استخراج التقرير بتاريخ")} {today}
           </div>
 
           <div
@@ -809,7 +811,7 @@ export default function JournalEntriesListPrintTemplate({
                 marginBottom: "4px",
               }}
             />
-            توقيع المسؤول
+            {t("توقيع المسؤول")}
           </div>
         </div>
       </div>

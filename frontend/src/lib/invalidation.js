@@ -1,5 +1,6 @@
 import { resourceTagsMap } from "./realtime/resourceTagsMap";
 
+import { t } from "../i18n";
 /**
  * tagsFor("CashVoucher")
  *   => [{type:"CashVoucher"}, {type:"Cashbox"}, {type:"Party"}, ...]
@@ -22,7 +23,7 @@ export function tagsFor(resource, extra = []) {
   if (!base && process.env.NODE_ENV !== "production") {
     // eslint-disable-next-line no-console
     console.warn(
-      `[tagsFor] "${resource}" مش مسجل في resourceTagsMap.js — invalidation هيبقى ناقص لحد ما تضيفه.`,
+      t("[tagsFor] \"{0}\" مش مسجل في resourceTagsMap.js — invalidation هيبقى ناقص لحد ما تضيفه.", { 0: resource }),
     );
   }
 

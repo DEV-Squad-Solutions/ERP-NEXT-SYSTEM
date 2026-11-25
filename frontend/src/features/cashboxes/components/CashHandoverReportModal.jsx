@@ -10,25 +10,27 @@ import CashHandoverReportPrintTemplate from "../../../shared/components/print/Ca
 import { formatDate } from "../../../lib/date.js";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const currencySymbols = {
-  EGP: "ج.م",
+  EGP: t("ج.م"),
   USD: "$",
   EUR: "€",
   GBP: "£",
   SAR: "﷼",
-  AED: "د.إ",
-  KWD: "د.ك",
+  AED: t("د.إ"),
+  KWD: t("د.ك"),
 };
 
 const fmt = (n) =>
-  Number(n ?? 0).toLocaleString("ar-EG", {
+  Number(n ?? 0).toLocaleString(getLocale(), {
     maximumFractionDigits: 2,
   });
 
 const directionOptions = [
-  { value: "", label: "الكل" },
-  { value: "Receipt", label: "وارد" },
-  { value: "Payment", label: "صادر" },
+  { value: "", label: t("الكل") },
+  { value: "Receipt", label: t("وارد") },
+  { value: "Payment", label: t("صادر") },
 ];
 
 function emptyFilters() {
@@ -99,7 +101,7 @@ export default function CashHandoverReportModal({
   const totalCount = data?.totalCount || 0;
   const totalPages = data?.totalPages || 0;
   const { printList, printRef } = useCashHandoverReportPrint({
-    title: `تقرير تسليم العهدة - ${cashboxName || "الخزنة"}`,
+    title: t("تقرير تسليم العهدة - {0}", { 0: cashboxName || "الخزنة" }),
   });
   const handlePrint = () => {
     window.print();
@@ -109,15 +111,14 @@ export default function CashHandoverReportModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`تسليم العهدة — ${cashboxName}`}
+      title={t("تسليم العهدة — {0}", { 0: cashboxName })}
       wide
     >
       <div className="flex items-start gap-2 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-xs text-amber-800">
         <AlertTriangle size={16} className="mt-0.5 shrink-0" />
 
         <p>
-          المسودات دي سجلات عهدة تشغيلية فقط، ومش مؤثرة على رصيد الخزنة الفعلي
-          ولا كشوف الحسابات ولا القيود المحاسبية لحد ما يتم ترحيلها.
+          {t("المسودات دي سجلات عهدة تشغيلية فقط، ومش مؤثرة على رصيد الخزنة الفعلي ولا كشوف الحسابات ولا القيود المحاسبية لحد ما يتم ترحيلها.")}
         </p>
       </div>
 
@@ -135,7 +136,7 @@ export default function CashHandoverReportModal({
 
               <div className="grid grid-cols-2 gap-y-2 text-xs">
                 <div>
-                  <p className="text-ink-400">الرصيد الحالي</p>
+                  <p className="text-ink-400">{t("الرصيد الحالي")}</p>
 
                   <p className="num font-bold text-ink-900">
                     {fmt(b.currentBalance)}
@@ -143,7 +144,7 @@ export default function CashHandoverReportModal({
                 </div>
 
                 <div>
-                  <p className="text-ink-400">الرصيد المتوقع بعد الترحيل</p>
+                  <p className="text-ink-400">{t("الرصيد المتوقع بعد الترحيل")}</p>
 
                   <p
                     className={`num font-bold ${
@@ -157,13 +158,13 @@ export default function CashHandoverReportModal({
                 </div>
 
                 <div>
-                  <p className="text-ink-400">مسودات وارد</p>
+                  <p className="text-ink-400">{t("مسودات وارد")}</p>
 
                   <p className="num text-emerald-600">{fmt(b.draftReceipt)}</p>
                 </div>
 
                 <div>
-                  <p className="text-ink-400">مسودات صادر</p>
+                  <p className="text-ink-400">{t("مسودات صادر")}</p>
 
                   <p className="num text-red-600">{fmt(b.draftPayment)}</p>
                 </div>
@@ -176,7 +177,7 @@ export default function CashHandoverReportModal({
       <div className="mt-4 flex flex-wrap items-end gap-2">
         <div>
           <label className="mb-1 block text-[11px] text-ink-400">
-            من تاريخ
+            {t("من تاريخ")}
           </label>
 
           <DateInput
@@ -189,7 +190,7 @@ export default function CashHandoverReportModal({
 
         <div>
           <label className="mb-1 block text-[11px] text-ink-400">
-            إلى تاريخ
+            {t("إلى تاريخ")}
           </label>
 
           <DateInput
@@ -201,7 +202,7 @@ export default function CashHandoverReportModal({
         </div>
 
         <div>
-          <label className="mb-1 block text-[11px] text-ink-400">الاتجاه</label>
+          <label className="mb-1 block text-[11px] text-ink-400">{t("الاتجاه")}</label>
 
           <select
             value={filters.direction}
@@ -217,13 +218,13 @@ export default function CashHandoverReportModal({
         </div>
 
         <div className="min-w-[160px] flex-1">
-          <label className="mb-1 block text-[11px] text-ink-400">بحث</label>
+          <label className="mb-1 block text-[11px] text-ink-400">{t("بحث")}</label>
 
           <input
             type="text"
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
-            placeholder="رقم السند أو البيان"
+            placeholder={t("رقم السند أو البيان")}
             className="w-full rounded-lg border border-ink-400/15 px-2.5 py-1.5 text-xs outline-none transition-colors focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
           />
         </div>
@@ -235,30 +236,30 @@ export default function CashHandoverReportModal({
             className="flex items-center gap-1 rounded-lg border border-ink-400/15 px-2.5 py-1.5 text-xs text-ink-500 transition-colors hover:bg-ink-900/[0.03]"
           >
             <X size={12} />
-            مسح الفلاتر
+            {t("مسح الفلاتر")}
           </button>
         )}
 
         <Button variant="outline" onClick={printList} className="mr-auto">
           <Printer size={16} />
-          طباعة
+          {t("طباعة")}
         </Button>
       </div>
 
       <div className="mt-4">
         {isLoading ? (
           <p className="py-10 text-center text-sm text-ink-400">
-            جاري تحميل التقرير...
+            {t("جاري تحميل التقرير...")}
           </p>
         ) : isError ? (
           <p className="py-10 text-center text-sm text-red-600">
-            حصل خطأ أثناء تحميل التقرير
+            {t("حصل خطأ أثناء تحميل التقرير")}
           </p>
         ) : items.length === 0 ? (
           <p className="py-10 text-center text-sm text-ink-400">
             {hasActiveFilters
-              ? "لا يوجد سندات مطابقة لهذا الفلتر"
-              : "لا يوجد سندات مسودة معلقة على الخزنة دي حاليًا"}
+              ? t("لا يوجد سندات مطابقة لهذا الفلتر")
+              : t("لا يوجد سندات مسودة معلقة على الخزنة دي حاليًا")}
           </p>
         ) : (
           <>
@@ -274,12 +275,12 @@ export default function CashHandoverReportModal({
                 >
                   <p className="mb-2 text-xs font-semibold text-ink-500">
                     {currencySymbols[s.currency] || ""} {s.currency} — {s.count}{" "}
-                    سند
+                    {t("سند")}
                   </p>
 
                   <div className="grid grid-cols-3 gap-2 text-center text-xs">
                     <div>
-                      <p className="text-ink-400">وارد</p>
+                      <p className="text-ink-400">{t("وارد")}</p>
 
                       <p className="num font-bold text-emerald-600">
                         {fmt(s.receipt)}
@@ -287,7 +288,7 @@ export default function CashHandoverReportModal({
                     </div>
 
                     <div>
-                      <p className="text-ink-400">صادر</p>
+                      <p className="text-ink-400">{t("صادر")}</p>
 
                       <p className="num font-bold text-red-600">
                         {fmt(s.payment)}
@@ -295,7 +296,7 @@ export default function CashHandoverReportModal({
                     </div>
 
                     <div>
-                      <p className="text-ink-400">الصافي</p>
+                      <p className="text-ink-400">{t("الصافي")}</p>
 
                       <p className="num font-bold text-ink-900">{fmt(s.net)}</p>
                     </div>
@@ -312,15 +313,15 @@ export default function CashHandoverReportModal({
               <table className="w-full text-sm">
                 <thead className="bg-slate-50 text-xs text-ink-400">
                   <tr>
-                    <th className="px-3 py-2 text-right">رقم السند</th>
+                    <th className="px-3 py-2 text-right">{t("رقم السند")}</th>
 
-                    <th className="px-3 py-2 text-right">التاريخ</th>
+                    <th className="px-3 py-2 text-right">{t("التاريخ")}</th>
 
-                    <th className="px-3 py-2 text-right">الاتجاه</th>
+                    <th className="px-3 py-2 text-right">{t("الاتجاه")}</th>
 
-                    <th className="px-3 py-2 text-right">البيان</th>
+                    <th className="px-3 py-2 text-right">{t("البيان")}</th>
 
-                    <th className="px-3 py-2 text-left">المبلغ</th>
+                    <th className="px-3 py-2 text-left">{t("المبلغ")}</th>
                   </tr>
                 </thead>
 
@@ -343,7 +344,7 @@ export default function CashHandoverReportModal({
                               : "bg-red-50 text-red-700"
                           }`}
                         >
-                          {v.direction === "Receipt" ? "وارد" : "صادر"}
+                          {v.direction === "Receipt" ? t("وارد") : t("صادر")}
                         </span>
                       </td>
 
@@ -365,7 +366,7 @@ export default function CashHandoverReportModal({
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-ink-400">
-                    عدد السجلات: {totalCount}
+                    {t("عدد السجلات:")} {totalCount}
                   </span>
 
                   <select
@@ -382,7 +383,7 @@ export default function CashHandoverReportModal({
                     <option value={100}>100</option>
                   </select>
 
-                  <span className="text-xs text-ink-400">سجل في الصفحة</span>
+                  <span className="text-xs text-ink-400">{t("سجل في الصفحة")}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -391,11 +392,11 @@ export default function CashHandoverReportModal({
                     disabled={page <= 1 || isFetching}
                     onClick={() => handlePageChange(page - 1)}
                   >
-                    السابق
+                    {t("السابق")}
                   </Button>
 
                   <span className="self-center text-xs text-ink-400">
-                    صفحة {page} من {totalPages}
+                    {t("صفحة")} {page} {t("من")} {totalPages}
                   </span>
 
                   <Button
@@ -403,7 +404,7 @@ export default function CashHandoverReportModal({
                     disabled={page >= totalPages || isFetching}
                     onClick={() => handlePageChange(page + 1)}
                   >
-                    التالي
+                    {t("التالي")}
                   </Button>
                 </div>
               </div>

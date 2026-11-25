@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import Select from "react-select";
 
+import { t } from "../../../i18n";
 /**
  * مكوّن اختيار عام (Searchable Select) مبني على react-select
  * يدعم شكلين من البيانات:
@@ -22,7 +23,7 @@ export default function SearchableSelect({
   data = [],
   value,
   onChange,
-  placeholder = "اختر...",
+  placeholder = t("اختر..."),
   getOptionLabel,
   getOptionValue,
   isClearable = false,
@@ -60,7 +61,7 @@ export default function SearchableSelect({
       isClearable={isClearable}
       isDisabled={isDisabled}
       isRtl
-      noOptionsMessage={() => "لا توجد نتائج"}
+      noOptionsMessage={() => t("لا توجد نتائج")}
       styles={{ ...defaultStyles, ...styles }}
     />
   );

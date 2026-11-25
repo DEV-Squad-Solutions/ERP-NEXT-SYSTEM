@@ -8,6 +8,8 @@ import { useGetStockTransferByIdQuery } from "../stockTransfersApi";
 import { formatMoney, formatQuantity } from "../stockTransfers.constants";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 export default function StockTransferDetailsModal({
   isOpen,
   onClose,
@@ -30,13 +32,13 @@ export default function StockTransferDetailsModal({
       wide
       isOpen={isOpen}
       onClose={onClose}
-      title="تفاصيل التحويل المخزني"
+      title={t("تفاصيل التحويل المخزني")}
     >
       {isLoading ? (
         <DetailsSkeleton />
       ) : isError || !transfer ? (
         <div className="py-12 text-center">
-          <p className="text-sm text-negative">تعذر تحميل تفاصيل التحويل</p>
+          <p className="text-sm text-negative">{t("تعذر تحميل تفاصيل التحويل")}</p>
         </div>
       ) : (
         <div className="space-y-5">
@@ -45,7 +47,7 @@ export default function StockTransferDetailsModal({
           <div className="rounded-2xl border border-ink-400/10 bg-ink-900/[0.02] p-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs text-ink-400 mb-1">رقم المستند</p>
+                <p className="text-xs text-ink-400 mb-1">{t("رقم المستند")}</p>
 
                 <h3 className="text-lg font-bold text-ink-900 num">
                   {transfer.documentNumber}
@@ -61,21 +63,21 @@ export default function StockTransferDetailsModal({
             {/* Stores */}
 
             <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-3 mt-5">
-              <StoreBox label="المخزن المصدر" name={transfer.sourceStoreName} />
+              <StoreBox label={t("المخزن المصدر")} name={transfer.sourceStoreName} />
 
               <div className="hidden sm:flex w-9 h-9 rounded-full bg-primary-50 text-primary-600 items-center justify-center">
                 <ArrowLeftRight size={17} />
               </div>
 
               <StoreBox
-                label="المخزن المستلم"
+                label={t("المخزن المستلم")}
                 name={transfer.destinationStoreName}
               />
             </div>
 
             {transfer.notes && (
               <div className="mt-4 pt-4 border-t border-ink-400/10">
-                <p className="text-xs text-ink-400 mb-1">ملاحظات</p>
+                <p className="text-xs text-ink-400 mb-1">{t("ملاحظات")}</p>
 
                 <p className="text-sm text-ink-700">{transfer.notes}</p>
               </div>
@@ -87,11 +89,11 @@ export default function StockTransferDetailsModal({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-semibold text-sm text-ink-900">
-                أصناف التحويل
+                {t("أصناف التحويل")}
               </h4>
 
               <span className="text-xs text-ink-400">
-                {transfer.lines?.length || 0} صنف
+                {transfer.lines?.length || 0} {t("صنف")}
               </span>
             </div>
 
@@ -100,38 +102,38 @@ export default function StockTransferDetailsModal({
                 <thead>
                   <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                     <th className="p-2.5 font-medium border-l border-ink-400/5">
-                      الصنف
+                      {t("الصنف")}
                     </th>
 
                     <th className="p-2.5 font-medium border-l border-ink-400/5">
-                      الوحدة
+                      {t("الوحدة")}
                     </th>
 
                     <th className="p-2.5 font-medium border-l border-ink-400/5">
-                      الكمية
+                      {t("الكمية")}
                     </th>
 
                     <th className="p-2.5 font-medium border-l border-ink-400/5">
-                      تكلفة الوحدة
+                      {t("تكلفة الوحدة")}
                     </th>
 
                     <th className="p-2.5 font-medium border-l border-ink-400/5">
-                      إجمالي التكلفة
+                      {t("إجمالي التكلفة")}
                     </th>
 
                     <th className="p-2.5 font-medium border-l border-ink-400/5">
-                      رصيد المصدر
+                      {t("رصيد المصدر")}
                     </th>
 
                     <th className="p-2.5 font-medium border-l border-ink-400/5">
-                      متوسط المصدر
+                      {t("متوسط المصدر")}
                     </th>
 
                     <th className="p-2.5 font-medium border-l border-ink-400/5">
-                      رصيد الوجهة
+                      {t("رصيد الوجهة")}
                     </th>
 
-                    <th className="p-2.5 font-medium">متوسط الوجهة</th>
+                    <th className="p-2.5 font-medium">{t("متوسط الوجهة")}</th>
                   </tr>
                 </thead>
 
@@ -197,12 +199,12 @@ export default function StockTransferDetailsModal({
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <SummaryCard
-              label="عدد الأصناف"
+              label={t("عدد الأصناف")}
               value={transfer.lines?.length || 0}
             />
 
             <SummaryCard
-              label="إجمالي الكميات"
+              label={t("إجمالي الكميات")}
               value={(transfer.lines || []).reduce(
                 (sum, line) => sum + Number(line.quantity || 0),
                 0,
@@ -211,7 +213,7 @@ export default function StockTransferDetailsModal({
             />
 
             <SummaryCard
-              label="إجمالي التكلفة"
+              label={t("إجمالي التكلفة")}
               value={(transfer.lines || []).reduce(
                 (sum, line) => sum + Number(line.sourceTotalCost || 0),
                 0,
@@ -219,12 +221,12 @@ export default function StockTransferDetailsModal({
               money
             />
 
-            <SummaryCard label="الحالة" value="تم التحويل" positive />
+            <SummaryCard label={t("الحالة")} value={t("تم التحويل")} positive />
           </div>
 
           <div className="flex justify-end pt-2 border-t border-ink-400/10">
             <Button variant="outline" onClick={onClose}>
-              إغلاق
+              {t("إغلاق")}
             </Button>
           </div>
         </div>
@@ -259,7 +261,7 @@ function SummaryCard({ label, value, money, quantity, positive }) {
       >
         {money || quantity ? (
           <span className="num">
-            {Number(value || 0).toLocaleString("ar-EG", {
+            {Number(value || 0).toLocaleString(getLocale(), {
               maximumFractionDigits: 2,
             })}
           </span>

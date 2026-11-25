@@ -1,21 +1,23 @@
 import { useSelector } from "react-redux";
 import { formatDate as sharedFormatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const SOURCE_TYPE_LABELS = {
-  OpeningBalance: "رصيد افتتاحي",
-  SalaryTransfer: "تحويل راتب",
-  Movement: "حركة",
-  CashVoucher: "سند نقدي",
+  OpeningBalance: t("رصيد افتتاحي"),
+  SalaryTransfer: t("تحويل راتب"),
+  Movement: t("حركة"),
+  CashVoucher: t("سند نقدي"),
 };
 
 const fmt = (value) =>
-  Number(value || 0).toLocaleString("ar-EG", {
+  Number(value || 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 
 const formatRate = (value) =>
-  Number(value || 0).toLocaleString("ar-EG", {
+  Number(value || 0).toLocaleString(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -67,7 +69,7 @@ export default function EmployeeStatementPrintTemplate({
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       style={{
         width: "297mm",
         minHeight: "210mm",
@@ -111,7 +113,7 @@ export default function EmployeeStatementPrintTemplate({
               margin: "4px 0 0",
             }}
           >
-            كشف حساب موظف
+            {t("كشف حساب موظف")}
           </p>
         </div>
 
@@ -122,11 +124,11 @@ export default function EmployeeStatementPrintTemplate({
             fontSize: "10px",
           }}
         >
-          <p style={{ margin: "2px 0" }}>تاريخ الطباعة: {today}</p>
+          <p style={{ margin: "2px 0" }}>{t("تاريخ الطباعة:")} {today}</p>
 
-          <p style={{ margin: "2px 0" }}>عدد الحركات: {items.length}</p>
+          <p style={{ margin: "2px 0" }}>{t("عدد الحركات:")} {items.length}</p>
 
-          <p style={{ margin: "2px 0" }}>العملة: {currency}</p>
+          <p style={{ margin: "2px 0" }}>{t("العملة:")} {currency}</p>
         </div>
       </div>
 
@@ -155,7 +157,7 @@ export default function EmployeeStatementPrintTemplate({
               marginBottom: "3px",
             }}
           >
-            الموظف
+            {t("الموظف")}
           </div>
 
           <div
@@ -183,7 +185,7 @@ export default function EmployeeStatementPrintTemplate({
               marginBottom: "3px",
             }}
           >
-            كود الموظف
+            {t("كود الموظف")}
           </div>
 
           <div
@@ -211,22 +213,22 @@ export default function EmployeeStatementPrintTemplate({
             flexWrap: "wrap",
           }}
         >
-          {filters.FromDate && <span>من: {formatDate(filters.FromDate)}</span>}
+          {filters.FromDate && <span>{t("من:")} {formatDate(filters.FromDate)}</span>}
 
-          {filters.ToDate && <span>إلى: {formatDate(filters.ToDate)}</span>}
+          {filters.ToDate && <span>{t("إلى:")} {formatDate(filters.ToDate)}</span>}
 
           {filters.SourceType && (
             <span>
-              المصدر:{" "}
+              {t("المصدر:")}{" "}
               {SOURCE_TYPE_LABELS[filters.SourceType] || filters.SourceType}
             </span>
           )}
 
           {filters.MovementType && (
-            <span>نوع الحركة: {filters.MovementType}</span>
+            <span>{t("نوع الحركة:")} {filters.MovementType}</span>
           )}
 
-          {filters.Search && <span>البحث: {filters.Search}</span>}
+          {filters.Search && <span>{t("البحث:")} {filters.Search}</span>}
         </div>
       )}
 
@@ -244,14 +246,14 @@ export default function EmployeeStatementPrintTemplate({
           <tr style={{ background: "#EFF2F0" }}>
             {[
               "#",
-              "التاريخ",
-              "رقم المستند",
-              "المرجع",
-              "البيان",
-              `مدين (${currency})`,
-              `دائن (${currency})`,
-              `الرصيد (${currency})`,
-              ...(isForeignCurrency ? ["سعر الصرف"] : []),
+              t("التاريخ"),
+              t("رقم المستند"),
+              t("المرجع"),
+              t("البيان"),
+              t("مدين ({0})", { 0: currency }),
+              t("دائن ({0})", { 0: currency }),
+              t("الرصيد ({0})", { 0: currency }),
+              ...(isForeignCurrency ? [t("سعر الصرف")] : []),
             ].map((header) => (
               <th
                 key={header}
@@ -396,7 +398,7 @@ export default function EmployeeStatementPrintTemplate({
                   color: "#6F7C75",
                 }}
               >
-                لا توجد حركات في كشف الحساب
+                {t("لا توجد حركات في كشف الحساب")}
               </td>
             </tr>
           )}
@@ -423,21 +425,21 @@ export default function EmployeeStatementPrintTemplate({
           <tbody>
             {/* Opening */}
             <tr>
-              <td style={summaryTitle}>الرصيد الافتتاحي</td>
+              <td style={summaryTitle}>{t("الرصيد الافتتاحي")}</td>
 
               <td style={summaryValue}>{fmt(summary.openingBalanceAmount)}</td>
             </tr>
 
             {/* Debits */}
             <tr>
-              <td style={summaryTitle}>إجمالي المدين</td>
+              <td style={summaryTitle}>{t("إجمالي المدين")}</td>
 
               <td style={summaryValue}>{fmt(summary.totalDebits)}</td>
             </tr>
 
             {/* Credits */}
             <tr>
-              <td style={summaryTitle}>إجمالي الدائن</td>
+              <td style={summaryTitle}>{t("إجمالي الدائن")}</td>
 
               <td
                 style={{
@@ -458,7 +460,7 @@ export default function EmployeeStatementPrintTemplate({
                   fontWeight: 700,
                 }}
               >
-                الرصيد الختامي
+                {t("الرصيد الختامي")}
               </td>
 
               <td
@@ -493,7 +495,7 @@ export default function EmployeeStatementPrintTemplate({
             {isForeignCurrency && (
               <>
                 <tr>
-                  <td style={summaryTitle}>الرصيد الختامي ({baseCurrency})</td>
+                  <td style={summaryTitle}>{t("الرصيد الختامي (")}{baseCurrency})</td>
 
                   <td style={summaryValue}>
                     {fmt(summary.baseClosingBalanceAmount)}
@@ -501,13 +503,13 @@ export default function EmployeeStatementPrintTemplate({
                 </tr>
 
                 <tr>
-                  <td style={summaryTitle}>إجمالي المدين ({baseCurrency})</td>
+                  <td style={summaryTitle}>{t("إجمالي المدين (")}{baseCurrency})</td>
 
                   <td style={summaryValue}>{fmt(summary.baseTotalDebits)}</td>
                 </tr>
 
                 <tr>
-                  <td style={summaryTitle}>إجمالي الدائن ({baseCurrency})</td>
+                  <td style={summaryTitle}>{t("إجمالي الدائن (")}{baseCurrency})</td>
 
                   <td style={summaryValue}>{fmt(summary.baseTotalCredits)}</td>
                 </tr>
@@ -540,7 +542,7 @@ export default function EmployeeStatementPrintTemplate({
               paddingTop: "6px",
             }}
           >
-            توقيع الموظف
+            {t("توقيع الموظف")}
           </div>
         </div>
 
@@ -556,7 +558,7 @@ export default function EmployeeStatementPrintTemplate({
               paddingTop: "6px",
             }}
           >
-            توقيع المسؤول
+            {t("توقيع المسؤول")}
           </div>
         </div>
       </div>

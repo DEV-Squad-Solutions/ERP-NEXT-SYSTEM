@@ -16,6 +16,8 @@ import IncomeStatementPrintTemplate from "../../../shared/components/print/Incom
 import { useIncomeStatementPrint } from "../../../shared/hooks/useIncomeStatementPrint";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -26,15 +28,15 @@ function firstOfMonthISO() {
 }
 
 function fmt(n) {
-  return new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 }).format(
+  return new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 2 }).format(
     n ?? 0,
   );
 }
 
 const SECTIONS = [
-  { key: "Revenue", title: "الإيرادات", nature: "credit" },
-  { key: "Expense", title: "المصروفات", nature: "debit" },
-  { key: "Other", title: "بنود أخرى", nature: "credit" },
+  { key: "Revenue", title: t("الإيرادات"), nature: "credit" },
+  { key: "Expense", title: t("المصروفات"), nature: "debit" },
+  { key: "Other", title: t("بنود أخرى"), nature: "credit" },
 ];
 
 function sectionKeyOf(accountType) {
@@ -125,15 +127,15 @@ export default function IncomeStatementPage({ companyName = "" }) {
   const { printReport, printRef } = useIncomeStatementPrint();
 
   return (
-    <div className="animate-fadeUp" dir="rtl">
+    <div className="animate-fadeUp" dir={getDir()}>
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-ink-900">
             <BarChart3 size={20} className="text-primary-500" />
-            قائمة الدخل
+            {t("قائمة الدخل")}
           </h2>
           <p className="mt-1 text-sm text-ink-400">
-            الإيرادات والمصروفات وصافي نتيجة الفترة من القيود المرحلة
+            {t("الإيرادات والمصروفات وصافي نتيجة الفترة من القيود المرحلة")}
           </p>
         </div>
 
@@ -145,7 +147,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
             className="inline-flex items-center gap-2 rounded-xl border border-ink-400/20 px-4 py-2.5 text-sm font-medium text-ink-600 transition hover:bg-ink-400/5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Printer size={16} />
-            طباعة
+            {t("طباعة")}
           </button>
           <button
             type="button"
@@ -153,7 +155,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
             className="inline-flex items-center gap-2 rounded-xl border border-ink-400/20 px-4 py-2.5 text-sm font-medium text-ink-600 transition hover:bg-ink-400/5"
           >
             <RefreshCw size={16} className={isFetching ? "animate-spin" : ""} />
-            تحديث
+            {t("تحديث")}
           </button>
         </div>
       </div>
@@ -161,7 +163,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
       {/* الفلاتر */}
       <div className="mb-5 flex flex-wrap items-end gap-3 rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">من تاريخ</label>
+          <label className="text-xs text-ink-400">{t("من تاريخ")}</label>
           <DateInput
             type="date"
             value={draft.fromDate}
@@ -173,7 +175,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">إلى تاريخ</label>
+          <label className="text-xs text-ink-400">{t("إلى تاريخ")}</label>
           <DateInput
             type="date"
             value={draft.toDate}
@@ -185,7 +187,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">طريقة العرض</label>
+          <label className="text-xs text-ink-400">{t("طريقة العرض")}</label>
           <select
             value={draft.viewMode}
             onChange={(e) =>
@@ -193,13 +195,13 @@ export default function IncomeStatementPage({ companyName = "" }) {
             }
             className="rounded-xl border border-ink-400/20 bg-white px-3 py-2 text-sm"
           >
-            <option value="Summary">ملخص</option>
-            <option value="Detailed">تفصيلي</option>
+            <option value="Summary">{t("ملخص")}</option>
+            <option value="Detailed">{t("تفصيلي")}</option>
           </select>
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">التسويات</label>
+          <label className="text-xs text-ink-400">{t("التسويات")}</label>
           <select
             value={draft.adjustmentView}
             onChange={(e) =>
@@ -207,8 +209,8 @@ export default function IncomeStatementPage({ companyName = "" }) {
             }
             className="rounded-xl border border-ink-400/20 bg-white px-3 py-2 text-sm"
           >
-            <option value="AfterAdjustments">بعد التسوية</option>
-            <option value="BeforeAdjustments">قبل التسوية</option>
+            <option value="AfterAdjustments">{t("بعد التسوية")}</option>
+            <option value="BeforeAdjustments">{t("قبل التسوية")}</option>
           </select>
         </div>
 
@@ -221,7 +223,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
             }
             className="h-4 w-4 accent-primary-500"
           />
-          عرض الحسابات غير المربوطة
+          {t("عرض الحسابات غير المربوطة")}
         </label>
 
         <button
@@ -229,32 +231,32 @@ export default function IncomeStatementPage({ companyName = "" }) {
           onClick={() => setApplied(draft)}
           className="rounded-xl bg-primary-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-primary-600"
         >
-          عرض
+          {t("عرض")}
         </button>
       </div>
 
       {isLoading && (
         <div className="rounded-2xl border border-dashed border-ink-400/20 py-16 text-center text-ink-400">
-          جاري تحميل قائمة الدخل...
+          {t("جاري تحميل قائمة الدخل...")}
         </div>
       )}
 
       {isError &&
         (error?.status === 403 ? (
           <AccessDeniedState
-            title="غير مصرح بعرض قائمة الدخل"
-            message="التقرير ده بيغطي كل خزائن الشركة. مش عندك وصول لكل الخزائن، فمش بنعرض تقرير جزئي. تواصل مع مسؤول النظام لو محتاج الصلاحية."
+            title={t("غير مصرح بعرض قائمة الدخل")}
+            message={t("التقرير ده بيغطي كل خزائن الشركة. مش عندك وصول لكل الخزائن، فمش بنعرض تقرير جزئي. تواصل مع مسؤول النظام لو محتاج الصلاحية.")}
             onRetry={() => refetch()}
           />
         ) : (
           <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
-            <span>حدث خطأ أثناء تحميل قائمة الدخل.</span>
+            <span>{t("حدث خطأ أثناء تحميل قائمة الدخل.")}</span>
             <button
               type="button"
               onClick={() => refetch()}
               className="rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs font-medium transition hover:bg-rose-100"
             >
-              إعادة المحاولة
+              {t("إعادة المحاولة")}
             </button>
           </div>
         ))}
@@ -265,10 +267,9 @@ export default function IncomeStatementPage({ companyName = "" }) {
             <div className="mb-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-700">
               <AlertTriangle size={20} className="mt-0.5 shrink-0" />
               <div>
-                <p className="font-semibold">القائمة غير جاهزة للاعتماد</p>
+                <p className="font-semibold">{t("القائمة غير جاهزة للاعتماد")}</p>
                 <p className="mt-1 text-sm">
-                  قد يكون السبب تكلفة مخزون معلقة أو فرق جرد غير مسوى، أو وجود
-                  حسابات غير مربوطة. فعّل «عرض الحسابات غير المربوطة» للمراجعة.
+                  {t("قد يكون السبب تكلفة مخزون معلقة أو فرق جرد غير مسوى، أو وجود حسابات غير مربوطة. فعّل «عرض الحسابات غير المربوطة» للمراجعة.")}
                 </p>
               </div>
             </div>
@@ -278,7 +279,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
           <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-2xl border border-ink-400/10 bg-white p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-ink-400">إجمالي الإيرادات</span>
+                <span className="text-sm text-ink-400">{t("إجمالي الإيرادات")}</span>
                 <TrendingUp size={20} className="text-primary-500" />
               </div>
               <p className="text-2xl font-bold text-ink-900">{fmt(revenue)}</p>
@@ -289,7 +290,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
 
             <div className="rounded-2xl border border-ink-400/10 bg-white p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-ink-400">إجمالي المصروفات</span>
+                <span className="text-sm text-ink-400">{t("إجمالي المصروفات")}</span>
                 <TrendingDown size={20} className="text-rose-500" />
               </div>
               <p className="text-2xl font-bold text-ink-900">{fmt(expense)}</p>
@@ -300,7 +301,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
 
             <div className="rounded-2xl border border-primary-500/20 bg-primary-500/5 p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-ink-500">صافي نتيجة الفترة</span>
+                <span className="text-sm text-ink-500">{t("صافي نتيجة الفترة")}</span>
                 {netResult >= 0 ? (
                   <TrendingUp size={20} className="text-primary-600" />
                 ) : (
@@ -315,7 +316,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
                 {fmt(netResult)}
               </p>
               <span className="text-xs text-ink-400">
-                {netResult >= 0 ? "صافي ربح" : "صافي خسارة"}
+                {netResult >= 0 ? t("صافي ربح") : t("صافي خسارة")}
               </span>
             </div>
           </div>
@@ -331,21 +332,21 @@ export default function IncomeStatementPage({ companyName = "" }) {
                 <thead>
                   <tr className="bg-ink-400/5 text-xs text-ink-400">
                     <th className="px-3 py-2.5 text-right font-medium">
-                      بند القائمة
+                      {t("بند القائمة")}
                     </th>
                     {isDetailed && (
                       <th className="px-3 py-2.5 text-right font-medium">
-                        الحساب
+                        {t("الحساب")}
                       </th>
                     )}
                     <th className="px-3 py-2.5 text-right font-medium">
-                      مدين الفترة
+                      {t("مدين الفترة")}
                     </th>
                     <th className="px-3 py-2.5 text-right font-medium">
-                      دائن الفترة
+                      {t("دائن الفترة")}
                     </th>
                     <th className="px-3 py-2.5 text-right font-medium">
-                      الصافي
+                      {t("الصافي")}
                     </th>
                   </tr>
                 </thead>
@@ -357,7 +358,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
                         colSpan={colCount}
                         className="px-3 py-14 text-center text-ink-400"
                       >
-                        لا توجد بيانات لهذه الفترة
+                        {t("لا توجد بيانات لهذه الفترة")}
                       </td>
                     </tr>
                   ) : (
@@ -418,7 +419,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
                             className="px-3 py-2.5 text-ink-900"
                             colSpan={isDetailed ? 2 : 1}
                           >
-                            إجمالي {section.title}
+                            {t("إجمالي")} {section.title}
                           </td>
                           <td className="px-3 py-2.5 tabular-nums">
                             {fmt(section.sum.debit)}
@@ -439,7 +440,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
                   <tfoot>
                     <tr className="border-t-2 border-ink-400/30 font-bold text-ink-900">
                       <td className="px-3 py-3" colSpan={colCount - 1}>
-                        إجمالي الإيرادات
+                        {t("إجمالي الإيرادات")}
                       </td>
                       <td className="px-3 py-3">
                         <NetCell value={revenue} bold />
@@ -447,7 +448,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
                     </tr>
                     <tr className="font-bold text-ink-900">
                       <td className="px-3 py-3" colSpan={colCount - 1}>
-                        إجمالي المصروفات
+                        {t("إجمالي المصروفات")}
                       </td>
                       <td className="px-3 py-3">
                         <NetCell value={expense} bold />
@@ -456,8 +457,8 @@ export default function IncomeStatementPage({ companyName = "" }) {
                     <tr className="border-t-2 border-ink-400/30 bg-primary-500/5 font-bold text-ink-900">
                       <td className="px-3 py-3" colSpan={colCount - 1}>
                         {netResult >= 0
-                          ? "صافي ربح الفترة"
-                          : "صافي خسارة الفترة"}
+                          ? t("صافي ربح الفترة")
+                          : t("صافي خسارة الفترة")}
                       </td>
                       <td className="px-3 py-3">
                         <NetCell value={netResult} bold />
@@ -476,11 +477,11 @@ export default function IncomeStatementPage({ companyName = "" }) {
                 <div className="flex items-center gap-2 text-amber-700">
                   <AlertTriangle size={18} />
                   <h3 className="font-semibold">
-                    حسابات غير مربوطة ببند في قائمة الدخل
+                    {t("حسابات غير مربوطة ببند في قائمة الدخل")}
                   </h3>
                 </div>
                 <p className="mt-1 text-xs text-amber-600">
-                  هذه الحسابات لها حركة ولكن لم يتم ربطها ببند في قائمة الدخل.
+                  {t("هذه الحسابات لها حركة ولكن لم يتم ربطها ببند في قائمة الدخل.")}
                 </p>
               </div>
 
@@ -489,16 +490,16 @@ export default function IncomeStatementPage({ companyName = "" }) {
                   <thead>
                     <tr className="bg-ink-400/5 text-xs text-ink-400">
                       <th className="px-4 py-2.5 text-right font-medium">
-                        الحساب
+                        {t("الحساب")}
                       </th>
                       <th className="px-4 py-2.5 text-right font-medium">
-                        مدين الفترة
+                        {t("مدين الفترة")}
                       </th>
                       <th className="px-4 py-2.5 text-right font-medium">
-                        دائن الفترة
+                        {t("دائن الفترة")}
                       </th>
                       <th className="px-4 py-2.5 text-right font-medium">
-                        الصافي
+                        {t("الصافي")}
                       </th>
                     </tr>
                   </thead>
@@ -544,7 +545,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
           {data.isReadyForReporting && (
             <div className="mt-4 flex items-center gap-2 text-xs text-primary-600">
               <CheckCircle2 size={15} />
-              القائمة جاهزة للاعتماد والتقارير.
+              {t("القائمة جاهزة للاعتماد والتقارير.")}
             </div>
           )}
         </>

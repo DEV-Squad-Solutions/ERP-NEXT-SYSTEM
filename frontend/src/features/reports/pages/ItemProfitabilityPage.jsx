@@ -35,6 +35,8 @@ import { useGetItemsSelectQuery } from "../../inventory/inventoryApi";
 import { toast } from "sonner";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const today = new Date().toISOString().slice(0, 10);
 
 const initialFilters = {
@@ -47,7 +49,7 @@ const initialFilters = {
   search: "",
 };
 
-const numberFormatter = new Intl.NumberFormat("ar-EG", {
+const numberFormatter = new Intl.NumberFormat(getLocale(), {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
@@ -159,7 +161,7 @@ function CostStatusBadge({ status }) {
   if (normalized === "final") {
     return (
       <span className="inline-flex whitespace-nowrap rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
-        مكتملة التكلفة
+        {t("مكتملة التكلفة")}
       </span>
     );
   }
@@ -168,7 +170,7 @@ function CostStatusBadge({ status }) {
     return (
       <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700">
         <AlertCircle size={12} />
-        معلقة
+        {t("معلقة")}
       </span>
     );
   }
@@ -177,7 +179,7 @@ function CostStatusBadge({ status }) {
     return (
       <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-medium text-orange-700">
         <AlertCircle size={12} />
-        جزئية
+        {t("جزئية")}
       </span>
     );
   }
@@ -200,7 +202,7 @@ function ItemProfitabilityPrint({ data, filters }) {
   return (
     <div
       ref={undefined}
-      dir="rtl"
+      dir={getDir()}
       className="hidden bg-white p-8 text-black print:block"
       style={{
         fontFamily: "Arial, sans-serif",
@@ -211,24 +213,24 @@ function ItemProfitabilityPrint({ data, filters }) {
       <div className="mb-6 border-b-2 border-black pb-4">
         <div className="flex items-start justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-bold">تقرير ربحية الأصناف</h1>
+            <h1 className="text-2xl font-bold">{t("تقرير ربحية الأصناف")}</h1>
 
             <p className="mt-1 text-sm text-gray-600">
-              إجمالي ربحية كل صنف بعد خصم مرتجعات البيع
+              {t("إجمالي ربحية كل صنف بعد خصم مرتجعات البيع")}
             </p>
           </div>
 
           <div className="text-left text-sm">
             <p>
-              من: <strong>{filters.fromDate ? formatDate(filters.fromDate) : "—"}</strong>
+              {t("من:")} <strong>{filters.fromDate ? formatDate(filters.fromDate) : "—"}</strong>
             </p>
 
             <p>
-              إلى: <strong>{filters.toDate ? formatDate(filters.toDate) : "—"}</strong>
+              {t("إلى:")} <strong>{filters.toDate ? formatDate(filters.toDate) : "—"}</strong>
             </p>
 
             <p className="mt-1">
-              تاريخ الطباعة:{" "}
+              {t("تاريخ الطباعة:")}{" "}
               <strong>{formatDate(new Date())}</strong>
             </p>
           </div>
@@ -239,7 +241,7 @@ function ItemProfitabilityPrint({ data, filters }) {
 
       <div className="mb-6 grid grid-cols-6 gap-2">
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">إيراد المبيعات</div>
+          <div className="text-xs text-gray-500">{t("إيراد المبيعات")}</div>
 
           <div className="mt-1 font-bold">
             {formatNumber(summary.salesRevenue)}
@@ -247,7 +249,7 @@ function ItemProfitabilityPrint({ data, filters }) {
         </div>
 
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">إيراد المرتجعات</div>
+          <div className="text-xs text-gray-500">{t("إيراد المرتجعات")}</div>
 
           <div className="mt-1 font-bold">
             {formatNumber(summary.returnRevenue)}
@@ -255,7 +257,7 @@ function ItemProfitabilityPrint({ data, filters }) {
         </div>
 
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">صافي الإيراد</div>
+          <div className="text-xs text-gray-500">{t("صافي الإيراد")}</div>
 
           <div className="mt-1 font-bold">
             {formatNumber(summary.netRevenue)}
@@ -263,7 +265,7 @@ function ItemProfitabilityPrint({ data, filters }) {
         </div>
 
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">مجمل الربح</div>
+          <div className="text-xs text-gray-500">{t("مجمل الربح")}</div>
 
           <div className="mt-1 font-bold">
             {formatNumber(summary.grossProfit)}
@@ -271,7 +273,7 @@ function ItemProfitabilityPrint({ data, filters }) {
         </div>
 
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">هامش الربح</div>
+          <div className="text-xs text-gray-500">{t("هامش الربح")}</div>
 
           <div className="mt-1 font-bold">
             {formatPercentage(summary.grossMarginPercentage)}
@@ -279,7 +281,7 @@ function ItemProfitabilityPrint({ data, filters }) {
         </div>
 
         <div className="rounded border p-3">
-          <div className="text-xs text-gray-500">عدد الأصناف</div>
+          <div className="text-xs text-gray-500">{t("عدد الأصناف")}</div>
 
           <div className="mt-1 font-bold">
             {formatNumber(summary.itemCount)}
@@ -292,22 +294,22 @@ function ItemProfitabilityPrint({ data, filters }) {
       <table className="w-full border-collapse text-[10px]">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border p-2">الصنف</th>
-            <th className="border p-2">الكود</th>
-            <th className="border p-2">الوحدة</th>
-            <th className="border p-2">كمية البيع</th>
-            <th className="border p-2">المرتجع</th>
-            <th className="border p-2">الصافي</th>
-            <th className="border p-2">إيراد البيع</th>
-            <th className="border p-2">تكلفة البيع</th>
-            <th className="border p-2">إيراد المرتجع</th>
-            <th className="border p-2">تكلفة المرتجع</th>
-            <th className="border p-2">صافي الإيراد</th>
-            <th className="border p-2">التكلفة</th>
-            <th className="border p-2">الربح</th>
-            <th className="border p-2">الهامش</th>
-            <th className="border p-2">الفواتير</th>
-            <th className="border p-2">الحالة</th>
+            <th className="border p-2">{t("الصنف")}</th>
+            <th className="border p-2">{t("الكود")}</th>
+            <th className="border p-2">{t("الوحدة")}</th>
+            <th className="border p-2">{t("كمية البيع")}</th>
+            <th className="border p-2">{t("المرتجع")}</th>
+            <th className="border p-2">{t("الصافي")}</th>
+            <th className="border p-2">{t("إيراد البيع")}</th>
+            <th className="border p-2">{t("تكلفة البيع")}</th>
+            <th className="border p-2">{t("إيراد المرتجع")}</th>
+            <th className="border p-2">{t("تكلفة المرتجع")}</th>
+            <th className="border p-2">{t("صافي الإيراد")}</th>
+            <th className="border p-2">{t("التكلفة")}</th>
+            <th className="border p-2">{t("الربح")}</th>
+            <th className="border p-2">{t("الهامش")}</th>
+            <th className="border p-2">{t("الفواتير")}</th>
+            <th className="border p-2">{t("الحالة")}</th>
           </tr>
         </thead>
 
@@ -361,7 +363,7 @@ function ItemProfitabilityPrint({ data, filters }) {
                 <td className="border p-2 font-semibold">
                   {profitAvailable
                     ? formatNumber(item.grossProfit)
-                    : "غير مكتمل"}
+                    : t("غير مكتمل")}
                 </td>
 
                 <td className="border p-2">
@@ -383,7 +385,7 @@ function ItemProfitabilityPrint({ data, filters }) {
 
       {summary.pendingLineCount > 0 && (
         <div className="mt-5 rounded border border-amber-400 p-3 text-sm">
-          توجد {summary.pendingLineCount} سطر بتكلفة معلقة.
+          {t("توجد")} {summary.pendingLineCount} {t("سطر بتكلفة معلقة.")}
         </div>
       )}
     </div>
@@ -442,7 +444,7 @@ export default function ItemProfitabilityPage() {
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `تقرير-ربحية-الأصناف-${appliedFilters.fromDate}-${appliedFilters.toDate}`,
+    documentTitle: t("تقرير-ربحية-الأصناف-{0}-{1}", { 0: appliedFilters.fromDate, 1: appliedFilters.toDate }),
   });
 
   /* ------------------------------------------------------------------------ */
@@ -453,7 +455,7 @@ export default function ItemProfitabilityPage() {
     () => [
       {
         value: "",
-        label: "كل العملاء",
+        label: t("كل العملاء"),
       },
       ...(parties?.items ?? parties ?? []).map((item) => ({
         value: String(item.id),
@@ -467,7 +469,7 @@ export default function ItemProfitabilityPage() {
     () => [
       {
         value: "",
-        label: "كل المخازن",
+        label: t("كل المخازن"),
       },
       ...(stores?.items ?? stores ?? []).map((item) => ({
         value: String(item.id),
@@ -481,7 +483,7 @@ export default function ItemProfitabilityPage() {
     () => [
       {
         value: "",
-        label: "كل الأصناف",
+        label: t("كل الأصناف"),
       },
       ...(items?.items ?? items ?? []).map((item) => ({
         value: String(item.id),
@@ -495,7 +497,7 @@ export default function ItemProfitabilityPage() {
     () => [
       {
         value: "",
-        label: "كل التصنيفات",
+        label: t("كل التصنيفات"),
       },
       ...(categories?.items ?? categories ?? []).map((item) => ({
         value: String(item.id),
@@ -522,7 +524,7 @@ export default function ItemProfitabilityPage() {
       filters.toDate &&
       filters.fromDate > filters.toDate
     ) {
-      toast.error("تاريخ البداية يجب أن يكون قبل تاريخ النهاية");
+      toast.error(t("تاريخ البداية يجب أن يكون قبل تاريخ النهاية"));
 
       return;
     }
@@ -548,7 +550,7 @@ export default function ItemProfitabilityPage() {
 
   return (
     <>
-      <div dir="rtl" className="min-h-full space-y-5 bg-slate-50/50 p-4 md:p-6">
+      <div dir={getDir()} className="min-h-full space-y-5 bg-slate-50/50 p-4 md:p-6">
         {/* ------------------------------------------------------------------ */}
         {/* Header                                                             */}
         {/* ------------------------------------------------------------------ */}
@@ -567,11 +569,11 @@ export default function ItemProfitabilityPage() {
 
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-slate-900 md:text-2xl">
-                  ربحية الأصناف
+                  {t("ربحية الأصناف")}
                 </h1>
 
                 <p className="mt-1 text-xs text-slate-500 md:text-sm">
-                  إجمالي ربحية كل صنف بعد خصم مرتجعات البيع
+                  {t("إجمالي ربحية كل صنف بعد خصم مرتجعات البيع")}
                 </p>
               </div>
             </div>
@@ -589,7 +591,7 @@ export default function ItemProfitabilityPage() {
                 size={16}
                 className={isFetching ? "animate-spin" : ""}
               />
-              تحديث
+              {t("تحديث")}
             </Button>
 
             <Button
@@ -600,7 +602,7 @@ export default function ItemProfitabilityPage() {
               className="gap-2"
             >
               <Printer size={16} />
-              طباعة
+              {t("طباعة")}
             </Button>
           </div>
         </motion.div>
@@ -628,18 +630,18 @@ export default function ItemProfitabilityPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-semibold text-slate-800">
-                    فلاتر التقرير
+                    {t("فلاتر التقرير")}
                   </h2>
 
                   {hasActiveFilters && (
                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
-                      فلاتر مفعلة
+                      {t("فلاتر مفعلة")}
                     </span>
                   )}
                 </div>
 
                 <p className="mt-0.5 text-[11px] text-slate-400">
-                  حدد الفترة والعميل والمخزن والصنف والتصنيف
+                  {t("حدد الفترة والعميل والمخزن والصنف والتصنيف")}
                 </p>
               </div>
             </div>
@@ -679,7 +681,7 @@ export default function ItemProfitabilityPage() {
                 <div className="border-t border-slate-100 px-4 pb-4 pt-4 md:px-5">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                     <Input
-                      label="من تاريخ"
+                      label={t("من تاريخ")}
                       type="date"
                       value={filters.fromDate}
                       onChange={(event) =>
@@ -688,7 +690,7 @@ export default function ItemProfitabilityPage() {
                     />
 
                     <Input
-                      label="إلى تاريخ"
+                      label={t("إلى تاريخ")}
                       type="date"
                       value={filters.toDate}
                       onChange={(event) =>
@@ -697,7 +699,7 @@ export default function ItemProfitabilityPage() {
                     />
 
                     <CompactSelect
-                      label="العميل"
+                      label={t("العميل")}
                       options={partyOptions}
                       value={filters.businessPartnerId}
                       onChange={(value) =>
@@ -707,7 +709,7 @@ export default function ItemProfitabilityPage() {
                     />
 
                     <CompactSelect
-                      label="المخزن"
+                      label={t("المخزن")}
                       options={storeOptions}
                       value={filters.storeId}
                       onChange={(value) => updateFilter("storeId", value)}
@@ -715,7 +717,7 @@ export default function ItemProfitabilityPage() {
                     />
 
                     <CompactSelect
-                      label="الصنف"
+                      label={t("الصنف")}
                       options={itemOptions}
                       value={filters.itemId}
                       onChange={(value) => updateFilter("itemId", value)}
@@ -723,7 +725,7 @@ export default function ItemProfitabilityPage() {
                     />
 
                     <CompactSelect
-                      label="التصنيف"
+                      label={t("التصنيف")}
                       options={categoryOptions}
                       value={filters.itemsCategoryId}
                       onChange={(value) =>
@@ -737,7 +739,7 @@ export default function ItemProfitabilityPage() {
 
                   <div className="mt-3">
                     <Input
-                      placeholder="اسم الصنف أو الكود..."
+                      placeholder={t("اسم الصنف أو الكود...")}
                       value={filters.search}
                       onChange={(event) =>
                         updateFilter("search", event.target.value)
@@ -759,7 +761,7 @@ export default function ItemProfitabilityPage() {
                       className="gap-2"
                     >
                       <Search size={15} />
-                      تطبيق
+                      {t("تطبيق")}
                     </Button>
 
                     <Button
@@ -769,7 +771,7 @@ export default function ItemProfitabilityPage() {
                       className="gap-2"
                     >
                       <X size={15} />
-                      إعادة ضبط
+                      {t("إعادة ضبط")}
                     </Button>
 
                     <div className="mr-auto flex items-center gap-1.5 text-xs text-slate-400">
@@ -794,28 +796,28 @@ export default function ItemProfitabilityPage() {
           className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6"
         >
           <SummaryCard
-            title="إيراد المبيعات"
+            title={t("إيراد المبيعات")}
             value={formatNumber(summary.salesRevenue)}
             icon={ShoppingCart}
             description={data?.baseCurrency || "EGP"}
           />
 
           <SummaryCard
-            title="إيراد المرتجعات"
+            title={t("إيراد المرتجعات")}
             value={formatNumber(summary.returnRevenue)}
             icon={RotateCcw}
             description={data?.baseCurrency || "EGP"}
           />
 
           <SummaryCard
-            title="صافي الإيراد"
+            title={t("صافي الإيراد")}
             value={formatNumber(summary.netRevenue)}
             icon={Wallet}
             description={data?.baseCurrency || "EGP"}
           />
 
           <SummaryCard
-            title="مجمل الربح"
+            title={t("مجمل الربح")}
             value={formatNumber(summary.grossProfit)}
             icon={TrendingUp}
             danger={summary.pendingLineCount > 0}
@@ -823,18 +825,18 @@ export default function ItemProfitabilityPage() {
           />
 
           <SummaryCard
-            title="هامش الربح"
+            title={t("هامش الربح")}
             value={formatPercentage(summary.grossMarginPercentage)}
             icon={Percent}
           />
 
           <SummaryCard
-            title="عدد الأصناف"
+            title={t("عدد الأصناف")}
             value={formatNumber(summary.itemCount)}
             icon={Package}
             description={
               summary.pendingLineCount > 0
-                ? `${summary.pendingLineCount} سطر بتكلفة معلقة`
+                ? t("{0} سطر بتكلفة معلقة", { 0: summary.pendingLineCount })
                 : undefined
             }
             danger={summary.pendingLineCount > 0}
@@ -871,16 +873,16 @@ export default function ItemProfitabilityPage() {
 
               <div>
                 <p className="text-sm font-semibold">
-                  توجد أصناف لم تكتمل تكلفتها
+                  {t("توجد أصناف لم تكتمل تكلفتها")}
                 </p>
 
                 <p className="mt-1 text-xs">
-                  عدد السطور ذات التكلفة المعلقة:{" "}
+                  {t("عدد السطور ذات التكلفة المعلقة:")}{" "}
                   <strong>{summary.pendingLineCount}</strong>
                 </p>
 
                 <p className="mt-1 text-[11px] text-amber-700">
-                  يتم إخفاء الربح النهائي للصنف عندما تكون تكلفته غير مكتملة.
+                  {t("يتم إخفاء الربح النهائي للصنف عندما تكون تكلفته غير مكتملة.")}
                 </p>
               </div>
             </motion.div>
@@ -911,11 +913,11 @@ export default function ItemProfitabilityPage() {
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3.5 md:px-5">
             <div>
               <h2 className="text-sm font-semibold text-slate-800">
-                ربحية الأصناف
+                {t("ربحية الأصناف")}
               </h2>
 
               <p className="mt-1 text-[11px] text-slate-400">
-                إجمالي النتائج: {data?.totalCount ?? 0}
+                {t("إجمالي النتائج:")} {data?.totalCount ?? 0}
               </p>
             </div>
 
@@ -936,37 +938,37 @@ export default function ItemProfitabilityPage() {
             <table className="min-w-[1500px] w-full text-xs">
               <thead className="bg-slate-50/80">
                 <tr className="border-b border-slate-200 text-right text-slate-600">
-                  <th className="px-4 py-3 font-semibold">الصنف</th>
+                  <th className="px-4 py-3 font-semibold">{t("الصنف")}</th>
 
-                  <th className="px-4 py-3 font-semibold">الكود</th>
+                  <th className="px-4 py-3 font-semibold">{t("الكود")}</th>
 
-                  <th className="px-4 py-3 font-semibold">الوحدة</th>
+                  <th className="px-4 py-3 font-semibold">{t("الوحدة")}</th>
 
-                  <th className="px-4 py-3 font-semibold">كمية البيع</th>
+                  <th className="px-4 py-3 font-semibold">{t("كمية البيع")}</th>
 
-                  <th className="px-4 py-3 font-semibold">المرتجع</th>
+                  <th className="px-4 py-3 font-semibold">{t("المرتجع")}</th>
 
-                  <th className="px-4 py-3 font-semibold">الصافي</th>
+                  <th className="px-4 py-3 font-semibold">{t("الصافي")}</th>
 
-                  <th className="px-4 py-3 font-semibold">إيراد البيع</th>
+                  <th className="px-4 py-3 font-semibold">{t("إيراد البيع")}</th>
 
-                  <th className="px-4 py-3 font-semibold">تكلفة البيع</th>
+                  <th className="px-4 py-3 font-semibold">{t("تكلفة البيع")}</th>
 
-                  <th className="px-4 py-3 font-semibold">إيراد المرتجع</th>
+                  <th className="px-4 py-3 font-semibold">{t("إيراد المرتجع")}</th>
 
-                  <th className="px-4 py-3 font-semibold">تكلفة المرتجع</th>
+                  <th className="px-4 py-3 font-semibold">{t("تكلفة المرتجع")}</th>
 
-                  <th className="px-4 py-3 font-semibold">صافي الإيراد</th>
+                  <th className="px-4 py-3 font-semibold">{t("صافي الإيراد")}</th>
 
-                  <th className="px-4 py-3 font-semibold">التكلفة</th>
+                  <th className="px-4 py-3 font-semibold">{t("التكلفة")}</th>
 
-                  <th className="px-4 py-3 font-semibold">الربح</th>
+                  <th className="px-4 py-3 font-semibold">{t("الربح")}</th>
 
-                  <th className="px-4 py-3 font-semibold">الهامش</th>
+                  <th className="px-4 py-3 font-semibold">{t("الهامش")}</th>
 
-                  <th className="px-4 py-3 font-semibold">الفواتير</th>
+                  <th className="px-4 py-3 font-semibold">{t("الفواتير")}</th>
 
-                  <th className="px-4 py-3 font-semibold">حالة التكلفة</th>
+                  <th className="px-4 py-3 font-semibold">{t("حالة التكلفة")}</th>
                 </tr>
               </thead>
 
@@ -989,7 +991,7 @@ export default function ItemProfitabilityPage() {
                       colSpan={16}
                       className="px-4 py-12 text-center text-sm text-red-500"
                     >
-                      حدث خطأ أثناء تحميل التقرير
+                      {t("حدث خطأ أثناء تحميل التقرير")}
                     </td>
                   </tr>
                 ) : itemRows.length === 0 ? (
@@ -998,7 +1000,7 @@ export default function ItemProfitabilityPage() {
                       colSpan={16}
                       className="px-4 py-12 text-center text-sm text-slate-500"
                     >
-                      لا توجد بيانات مطابقة للفلاتر
+                      {t("لا توجد بيانات مطابقة للفلاتر")}
                     </td>
                   </tr>
                 ) : (
@@ -1080,7 +1082,7 @@ export default function ItemProfitabilityPage() {
                         >
                           {profitAvailable
                             ? formatNumber(item.grossProfit)
-                            : "غير مكتمل"}
+                            : t("غير مكتمل")}
                         </td>
 
                         <td className="px-4 py-3">

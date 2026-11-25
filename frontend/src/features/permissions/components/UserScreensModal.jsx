@@ -10,6 +10,7 @@ import {
   useSetUserScreenAccessMutation,
 } from "../../screenAccess/screenAccessApi";
 
+import { t } from "../../../i18n";
 /** الأدمن يحدد الشاشات اللي تظهر للمستخدم (المحدد = ظاهر). */
 export default function UserScreensModal({ isOpen, onClose, user }) {
   const userId = user?.id;
@@ -32,10 +33,10 @@ export default function UserScreensModal({ isOpen, onClose, user }) {
   const handleSave = async () => {
     try {
       await save({ userId, hiddenScreens: hidden }).unwrap();
-      toast.success("تم حفظ الشاشات");
+      toast.success(t("تم حفظ الشاشات"));
       onClose();
     } catch {
-      toast.error("تعذر حفظ الشاشات");
+      toast.error(t("تعذر حفظ الشاشات"));
     }
   };
 
@@ -47,7 +48,7 @@ export default function UserScreensModal({ isOpen, onClose, user }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`الشاشات الظاهرة لـ ${user?.userName || ""}`}
+      title={t("الشاشات الظاهرة لـ {0}", { 0: user?.userName || "" })}
     >
       {isLoading ? (
         <div className="flex justify-center py-6">
@@ -57,7 +58,7 @@ export default function UserScreensModal({ isOpen, onClose, user }) {
         <div className="space-y-3">
           {isAdminUser && (
             <p className="text-sm text-ink-500">
-              الأدمن بيشوف كل الشاشات دايمًا ومش بتتأثر بالاختيارات دي.
+              {t("الأدمن بيشوف كل الشاشات دايمًا ومش بتتأثر بالاختيارات دي.")}
             </p>
           )}
           <div className="max-h-96 space-y-1 overflow-y-auto">
@@ -80,7 +81,7 @@ export default function UserScreensModal({ isOpen, onClose, user }) {
           </div>
           <div className="flex justify-end gap-2">
             <Button onClick={handleSave} disabled={saving}>
-              <Save size={14} /> حفظ
+              <Save size={14} /> {t("حفظ")}
             </Button>
           </div>
         </div>

@@ -13,6 +13,7 @@ import Button from "../../../shared/components/ui/Button";
 
 import { useBulkMoveSalaryMutation } from "../payrollApi";
 
+import { t } from "../../../i18n";
 const defaultValues = {
   defaultPostingDate: "",
   notes: "",
@@ -61,13 +62,13 @@ export default function BulkMoveSalaryModal({
         notes: data.notes,
       }).unwrap();
 
-      toast.success(`تم ترحيل ${payrollEntryIds.length} راتب بنجاح`);
+      toast.success(t("تم ترحيل {0} راتب بنجاح", { 0: payrollEntryIds.length }));
 
       onSaved?.();
     } catch (error) {
       // الباك هو المسؤول عن الخطأ
       toast.error(
-        error?.data?.message || error?.data?.title || "حدث خطأ أثناء الترحيل",
+        error?.data?.message || error?.data?.title || t("حدث خطأ أثناء الترحيل"),
       );
     }
   };
@@ -78,15 +79,15 @@ export default function BulkMoveSalaryModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`ترحيل ${payrollEntryIds.length} راتب`}
+      title={t("ترحيل {0} راتب", { 0: payrollEntryIds.length })}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <p className="text-xs text-ink-400 -mt-1">
-          سيتم تطبيق تاريخ الترحيل والملاحظات على جميع القيود المحددة.
+          {t("سيتم تطبيق تاريخ الترحيل والملاحظات على جميع القيود المحددة.")}
         </p>
 
         <Input
-          label="تاريخ الترحيل"
+          label={t("تاريخ الترحيل")}
           type="date"
           min={selectedFiscalYear?.startDate}
           max={selectedFiscalYear?.endDate}
@@ -94,9 +95,9 @@ export default function BulkMoveSalaryModal({
         />
 
         <Input
-          label="ملاحظات عامة"
+          label={t("ملاحظات عامة")}
           {...register("notes")}
-          placeholder="أضف ملاحظات إن وجدت"
+          placeholder={t("أضف ملاحظات إن وجدت")}
         />
 
         <div className="flex justify-end gap-2 pt-2 border-t border-ink-400/10">
@@ -106,13 +107,13 @@ export default function BulkMoveSalaryModal({
             onClick={onClose}
             disabled={isLoading}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isLoading}>
             {isLoading
-              ? "جارِ الترحيل..."
-              : `ترحيل (${payrollEntryIds.length})`}
+              ? t("جارِ الترحيل...")
+              : t("ترحيل ({0})", { 0: payrollEntryIds.length })}
           </Button>
         </div>
       </form>

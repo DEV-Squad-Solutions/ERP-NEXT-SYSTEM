@@ -31,6 +31,8 @@ import { useFiscalYearGuard } from "../../../lib/useFiscalYearGuard";
 import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFiscalYearBanner";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const DEFAULT_CHECK_IN = "09:00";
 const DEFAULT_CHECK_OUT = "17:00";
 
@@ -140,7 +142,7 @@ const getApiErrorMessage = (error) => {
     error?.data?.message ||
     error?.data?.title ||
     error?.error ||
-    "حدث خطأ أثناء حفظ الحضور والغياب"
+    t("حدث خطأ أثناء حفظ الحضور والغياب")
   );
 };
 
@@ -202,7 +204,7 @@ const AttendanceTakingPage = () => {
       .filter((employee) => employee?.id !== null && employee?.id !== undefined)
       .map((employee) => ({
         id: Number(employee.id),
-        name: employee.name || `موظف #${employee.id}`,
+        name: employee.name || t("موظف #{0}", { 0: employee.id }),
       }));
   }, [employeesData]);
 
@@ -391,7 +393,7 @@ const AttendanceTakingPage = () => {
 
   const markSelectedPresent = useCallback(() => {
     if (!selectedIds.size) {
-      toast.error("اختر موظفًا واحدًا على الأقل");
+      toast.error(t("اختر موظفًا واحدًا على الأقل"));
       return;
     }
 
@@ -402,7 +404,7 @@ const AttendanceTakingPage = () => {
 
   const markSelectedAbsent = useCallback(() => {
     if (!selectedIds.size) {
-      toast.error("اختر موظفًا واحدًا على الأقل");
+      toast.error(t("اختر موظفًا واحدًا على الأقل"));
       return;
     }
 
@@ -416,7 +418,7 @@ const AttendanceTakingPage = () => {
       setEmployeeStatus(row.employee.id, STATUS.PRESENT);
     });
 
-    toast.success("تم تحديد الموظفين الظاهرين كحاضرين");
+    toast.success(t("تم تحديد الموظفين الظاهرين كحاضرين"));
   }, [filteredRows, setEmployeeStatus]);
 
   const markAllAbsent = useCallback(() => {
@@ -424,12 +426,12 @@ const AttendanceTakingPage = () => {
       setEmployeeStatus(row.employee.id, STATUS.ABSENT);
     });
 
-    toast.success("تم تحديد الموظفين الظاهرين كغائبين");
+    toast.success(t("تم تحديد الموظفين الظاهرين كغائبين"));
   }, [filteredRows, setEmployeeStatus]);
 
   const applyDefaultTimes = useCallback(() => {
     if (!defaultCheckIn || !defaultCheckOut) {
-      toast.error("حدد وقت الحضور والانصراف أولًا");
+      toast.error(t("حدد وقت الحضور والانصراف أولًا"));
       return;
     }
 
@@ -449,13 +451,13 @@ const AttendanceTakingPage = () => {
       return next;
     });
 
-    toast.success("تم تطبيق أوقات الحضور والانصراف");
+    toast.success(t("تم تطبيق أوقات الحضور والانصراف"));
   }, [defaultCheckIn, defaultCheckOut, filteredRows]);
 
   const handleReset = useCallback(() => {
     setLocalRows({});
     setSelectedIds(new Set());
-    toast.success("تم إلغاء التعديلات المحلية");
+    toast.success(t("تم إلغاء التعديلات المحلية"));
   }, []);
 
   const buildAttendance = useCallback(
@@ -501,7 +503,7 @@ const AttendanceTakingPage = () => {
 
   const handleSave = async () => {
     if (!employeeRows.length) {
-      toast.error("لا يوجد موظفون لتسجيل الحضور");
+      toast.error(t("لا يوجد موظفون لتسجيل الحضور"));
       return;
     }
 
@@ -510,7 +512,7 @@ const AttendanceTakingPage = () => {
     );
 
     if (!recordedRows.length) {
-      toast.error("لم يتم تسجيل حضور أو غياب لأي موظف");
+      toast.error(t("لم يتم تسجيل حضور أو غياب لأي موظف"));
       return;
     }
 
@@ -520,7 +522,7 @@ const AttendanceTakingPage = () => {
 
     if (invalidPresentRows.length) {
       toast.error(
-        `يوجد ${invalidPresentRows.length} موظف حاضر بدون وقت حضور أو انصراف`,
+        t("يوجد {0} موظف حاضر بدون وقت حضور أو انصراف", { 0: invalidPresentRows.length }),
       );
       return;
     }
@@ -554,7 +556,7 @@ const AttendanceTakingPage = () => {
       await refetch();
 
       toast.success(
-        `تم حفظ الحضور والغياب بنجاح — جديد: ${created}، تعديل: ${updated}`,
+        t("تم حفظ الحضور والغياب بنجاح — جديد: {0}، تعديل: {1}", { 0: created, 1: updated }),
       );
     } catch (error) {
       toast.error(getApiErrorMessage(error));
@@ -568,7 +570,7 @@ const AttendanceTakingPage = () => {
   const isFetching = employeesFetching || attendanceFetching;
 
   return (
-    <div dir="rtl" className="flex h-full min-h-0 flex-col gap-4 p-4">
+    <div dir={getDir()} className="flex h-full min-h-0 flex-col gap-4 p-4">
       {isFiscalYearReadOnly && (
         <ReadOnlyFiscalYearBanner fiscalYear={fiscalYear} />
       )}
@@ -582,11 +584,11 @@ const AttendanceTakingPage = () => {
 
             <div>
               <h1 className="text-xl font-bold text-ink-900">
-                تسجيل الحضور والغياب
+                {t("تسجيل الحضور والغياب")}
               </h1>
 
               <p className="text-sm text-ink-500">
-                تسجيل ومراجعة حضور الموظفين ليوم محدد
+                {t("تسجيل ومراجعة حضور الموظفين ليوم محدد")}
               </p>
             </div>
           </div>
@@ -600,7 +602,7 @@ const AttendanceTakingPage = () => {
             disabled={!Object.keys(localRows).length || isSaving}
           >
             <RotateCcw size={17} />
-            إلغاء التعديلات
+            {t("إلغاء التعديلات")}
           </Button>
 
           <Button
@@ -618,7 +620,7 @@ const AttendanceTakingPage = () => {
             ) : (
               <FileCheck2 size={17} />
             )}
-            حفظ الحضور
+            {t("حفظ الحضور")}
           </Button>
         </div>
       </div>
@@ -626,7 +628,7 @@ const AttendanceTakingPage = () => {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <div className="rounded-2xl border border-ink-100 bg-white p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-ink-500">إجمالي الموظفين</span>
+            <span className="text-sm text-ink-500">{t("إجمالي الموظفين")}</span>
 
             <Users size={19} className="text-primary-600" />
           </div>
@@ -638,7 +640,7 @@ const AttendanceTakingPage = () => {
 
         <div className="rounded-2xl border border-positive/10 bg-positive/5 p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-ink-500">الحاضرون</span>
+            <span className="text-sm text-ink-500">{t("الحاضرون")}</span>
 
             <UserCheck size={19} className="text-positive" />
           </div>
@@ -650,7 +652,7 @@ const AttendanceTakingPage = () => {
 
         <div className="rounded-2xl border border-negative/10 bg-negative/5 p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-ink-500">الغائبون</span>
+            <span className="text-sm text-ink-500">{t("الغائبون")}</span>
 
             <UserX size={19} className="text-negative" />
           </div>
@@ -662,7 +664,7 @@ const AttendanceTakingPage = () => {
 
         <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4 shadow-sm">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-ink-500">لم يسجل</span>
+            <span className="text-sm text-ink-500">{t("لم يسجل")}</span>
 
             <Clock3 size={19} className="text-amber-600" />
           </div>
@@ -677,7 +679,7 @@ const AttendanceTakingPage = () => {
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-5">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink-700">
-              تاريخ الحضور
+              {t("تاريخ الحضور")}
             </label>
 
             <div className="relative">
@@ -697,7 +699,7 @@ const AttendanceTakingPage = () => {
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink-700">
-              البحث عن موظف
+              {t("البحث عن موظف")}
             </label>
 
             <div className="relative">
@@ -710,7 +712,7 @@ const AttendanceTakingPage = () => {
                 type="text"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="اسم الموظف أو الرقم..."
+                placeholder={t("اسم الموظف أو الرقم...")}
                 className="h-10 w-full rounded-xl border border-ink-200 bg-white pr-10 pl-3 text-sm text-ink-800 outline-none transition placeholder:text-ink-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
               />
             </div>
@@ -718,28 +720,28 @@ const AttendanceTakingPage = () => {
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink-700">
-              الحالة
+              {t("الحالة")}
             </label>
 
             <CompactSelect
               value={statusFilter}
               onChange={setStatusFilter}
               options={[
-                { value: "", label: "الكل" },
-                { value: STATUS.PRESENT, label: "حاضر" },
-                { value: STATUS.ABSENT, label: "غائب" },
+                { value: "", label: t("الكل") },
+                { value: STATUS.PRESENT, label: t("حاضر") },
+                { value: STATUS.ABSENT, label: t("غائب") },
                 {
                   value: STATUS.NOT_RECORDED,
-                  label: "لم يسجل",
+                  label: t("لم يسجل"),
                 },
               ]}
-              placeholder="الحالة"
+              placeholder={t("الحالة")}
             />
           </div>
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink-700">
-              وقت الحضور الافتراضي
+              {t("وقت الحضور الافتراضي")}
             </label>
 
             <div className="relative">
@@ -759,7 +761,7 @@ const AttendanceTakingPage = () => {
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink-700">
-              وقت الانصراف الافتراضي
+              {t("وقت الانصراف الافتراضي")}
             </label>
 
             <div className="relative">
@@ -787,7 +789,7 @@ const AttendanceTakingPage = () => {
             disabled={!filteredRows.length}
           >
             <Check size={15} />
-            تحديد الظاهر
+            {t("تحديد الظاهر")}
           </Button>
 
           <Button
@@ -798,7 +800,7 @@ const AttendanceTakingPage = () => {
             disabled={!selectedIds.size}
           >
             <X size={15} />
-            إلغاء التحديد
+            {t("إلغاء التحديد")}
           </Button>
 
           <Button
@@ -809,7 +811,7 @@ const AttendanceTakingPage = () => {
             disabled={!selectedIds.size}
           >
             <UserCheck size={15} />
-            المحدد حاضر
+            {t("المحدد حاضر")}
           </Button>
 
           <Button
@@ -820,7 +822,7 @@ const AttendanceTakingPage = () => {
             disabled={!selectedIds.size}
           >
             <UserX size={15} />
-            المحدد غائب
+            {t("المحدد غائب")}
           </Button>
 
           <Button
@@ -830,7 +832,7 @@ const AttendanceTakingPage = () => {
             onClick={markAllPresent}
             disabled={!filteredRows.length}
           >
-            الكل حاضر
+            {t("الكل حاضر")}
           </Button>
 
           <Button
@@ -840,7 +842,7 @@ const AttendanceTakingPage = () => {
             onClick={markAllAbsent}
             disabled={!filteredRows.length}
           >
-            الكل غائب
+            {t("الكل غائب")}
           </Button>
 
           <Button
@@ -851,11 +853,11 @@ const AttendanceTakingPage = () => {
             disabled={!filteredRows.length}
           >
             <Clock3 size={15} />
-            تطبيق الأوقات
+            {t("تطبيق الأوقات")}
           </Button>
 
           <div className="mr-auto text-sm text-ink-500">
-            المحدد:{" "}
+            {t("المحدد:")}{" "}
             <span className="font-semibold text-ink-800">
               {selectedIds.size}
             </span>
@@ -869,21 +871,21 @@ const AttendanceTakingPage = () => {
             <div className="grid grid-cols-[52px_minmax(220px,1.5fr)_140px_130px_130px_180px_170px_180px_minmax(220px,1fr)] items-center gap-0 bg-ink-50 px-3 py-3 text-xs font-semibold text-ink-600">
               <div />
 
-              <div>الموظف</div>
+              <div>{t("الموظف")}</div>
 
-              <div>الحالة</div>
+              <div>{t("الحالة")}</div>
 
-              <div>الحضور</div>
+              <div>{t("الحضور")}</div>
 
-              <div>الانصراف</div>
+              <div>{t("الانصراف")}</div>
 
-              <div>نسبة اليوم</div>
+              <div>{t("نسبة اليوم")}</div>
 
-              <div>الإضافي</div>
+              <div>{t("الإضافي")}</div>
 
-              <div>الخصم</div>
+              <div>{t("الخصم")}</div>
 
-              <div>ملاحظات</div>
+              <div>{t("ملاحظات")}</div>
             </div>
           </div>
         </div>
@@ -896,7 +898,7 @@ const AttendanceTakingPage = () => {
           ) : !filteredRows.length ? (
             <div className="flex h-64 flex-col items-center justify-center gap-2 text-ink-500">
               <Users size={32} />
-              <p className="text-sm">لا توجد بيانات مطابقة</p>
+              <p className="text-sm">{t("لا توجد بيانات مطابقة")}</p>
             </div>
           ) : (
             <div
@@ -951,18 +953,18 @@ const AttendanceTakingPage = () => {
                         options={[
                           {
                             value: STATUS.PRESENT,
-                            label: "حاضر",
+                            label: t("حاضر"),
                           },
                           {
                             value: STATUS.ABSENT,
-                            label: "غائب",
+                            label: t("غائب"),
                           },
                           {
                             value: STATUS.NOT_RECORDED,
-                            label: "لم يسجل",
+                            label: t("لم يسجل"),
                           },
                         ]}
-                        placeholder="الحالة"
+                        placeholder={t("الحالة")}
                       />
                     </div>
 
@@ -1003,7 +1005,7 @@ const AttendanceTakingPage = () => {
                           })
                         }
                         options={dayRatioOptions}
-                        placeholder="نسبة اليوم"
+                        placeholder={t("نسبة اليوم")}
                         isDisabled={!present}
                       />
                     </div>
@@ -1019,11 +1021,11 @@ const AttendanceTakingPage = () => {
                         options={[
                           {
                             value: "",
-                            label: "بدون",
+                            label: t("بدون"),
                           },
                           ...dayRatioOptions,
                         ]}
-                        placeholder="الإضافي"
+                        placeholder={t("الإضافي")}
                       />
                     </div>
 
@@ -1038,11 +1040,11 @@ const AttendanceTakingPage = () => {
                         options={[
                           {
                             value: "",
-                            label: "بدون",
+                            label: t("بدون"),
                           },
                           ...dayRatioOptions,
                         ]}
-                        placeholder="الخصم"
+                        placeholder={t("الخصم")}
                         isDisabled={!present}
                       />
                     </div>
@@ -1056,7 +1058,7 @@ const AttendanceTakingPage = () => {
                             notes: event.target.value,
                           })
                         }
-                        placeholder="ملاحظات..."
+                        placeholder={t("ملاحظات...")}
                         className="h-9 w-full rounded-lg border border-ink-200 bg-white px-3 text-sm outline-none transition placeholder:text-ink-400 focus:border-primary-500"
                       />
                     </div>
@@ -1069,21 +1071,21 @@ const AttendanceTakingPage = () => {
 
         <div className="flex items-center justify-between border-t border-ink-100 bg-ink-50/50 px-4 py-3 text-xs text-ink-500">
           <div>
-            عرض{" "}
+            {t("عرض")}{" "}
             <span className="font-semibold text-ink-800">
               {filteredRows.length}
             </span>{" "}
-            من{" "}
+            {t("من")}{" "}
             <span className="font-semibold text-ink-800">
               {employeeRows.length}
             </span>{" "}
-            موظف
+            {t("موظف")}
           </div>
 
           {isFetching && (
             <div className="flex items-center gap-1.5">
               <Loader2 size={14} className="animate-spin" />
-              جاري تحديث البيانات...
+              {t("جاري تحديث البيانات...")}
             </div>
           )}
         </div>

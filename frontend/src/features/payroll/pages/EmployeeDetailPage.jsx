@@ -25,11 +25,12 @@ import Button from "../../../shared/components/ui/Button";
 import EmployeeFormModal from "../components/EmployeeFormModal";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
 const TABS = [
-  { key: "basic", label: "البيانات الأساسية" },
-  { key: "attendance", label: "الحضور" },
-  { key: "movements", label: "الحركات (سلف، خصومات، مكافآت، سحوبات)" },
-  { key: "history", label: "سجل المرتبات" },
+  { key: "basic", label: t("البيانات الأساسية") },
+  { key: "attendance", label: t("الحضور") },
+  { key: "movements", label: t("الحركات (سلف، خصومات، مكافآت، سحوبات)") },
+  { key: "history", label: t("سجل المرتبات") },
 ];
 
 export default function EmployeeDetailPage() {
@@ -47,28 +48,28 @@ export default function EmployeeDetailPage() {
 
   const handleDelete = () => {
     if (!employee) return;
-    toast(`حذف "${employee.name}"؟`, {
-      description: "الإجراء ده لا يمكن التراجع عنه",
+    toast(t("حذف \"{0}\"؟", { 0: employee.name }), {
+      description: t("الإجراء ده لا يمكن التراجع عنه"),
       action: {
-        label: "تأكيد الحذف",
+        label: t("تأكيد الحذف"),
         onClick: async () => {
           try {
             await deleteEmployee(employee.id).unwrap();
-            toast.success("تم الحذف بنجاح");
+            toast.success(t("تم الحذف بنجاح"));
             navigate("/dashboard/payroll/employees");
           } catch {
-            toast.error("حصل خطأ أثناء الحذف، حاول تاني");
+            toast.error(t("حصل خطأ أثناء الحذف، حاول تاني"));
           }
         },
       },
-      cancel: { label: "إلغاء" },
+      cancel: { label: t("إلغاء") },
       duration: 6000,
     });
   };
 
-  if (isLoading) return <div className="p-6 text-ink-400">جاري التحميل...</div>;
+  if (isLoading) return <div className="p-6 text-ink-400">{t("جاري التحميل...")}</div>;
   if (isError || !employee)
-    return <div className="p-6 text-red-500">تعذر تحميل بيانات الموظف</div>;
+    return <div className="p-6 text-red-500">{t("تعذر تحميل بيانات الموظف")}</div>;
 
   return (
     <div className="animate-fadeUp space-y-6">
@@ -77,7 +78,7 @@ export default function EmployeeDetailPage() {
         className="flex items-center gap-1.5 text-sm text-emerald-700 hover:underline"
       >
         <ArrowRight size={14} />
-        رجوع لقائمة الموظفين
+        {t("رجوع لقائمة الموظفين")}
       </button>
 
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
@@ -96,17 +97,17 @@ export default function EmployeeDetailPage() {
                   : "inline-block mt-2 text-red-500 text-xs font-semibold bg-red-500/10 px-2 py-0.5 rounded-full"
               }
             >
-              {employee.isActive ? "نشط" : "غير نشط"}
+              {employee.isActive ? t("نشط") : t("غير نشط")}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => setShowFormModal(true)}>
               <Pencil size={14} />
-              تعديل
+              {t("تعديل")}
             </Button>
             <Button variant="outline" onClick={handleDelete}>
               <Trash2 size={14} className="text-red-600" />
-              حذف
+              {t("حذف")}
             </Button>
           </div>
         </div>
@@ -161,31 +162,31 @@ function BasicInfoTab({ employee }) {
     <div className="space-y-6">
       <div>
         <h3 className="text-sm font-semibold text-ink-900 mb-3">
-          البيانات الأساسية
+          {t("البيانات الأساسية")}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          <Field label="الوظيفة" value={employee.jobTitle} />
-          <Field label="رقم الهاتف" value={employee.phoneNumber} />
-          <Field label="البريد الإلكتروني" value={employee.email} />
-          <Field label="العنوان" value={employee.address} />
+          <Field label={t("الوظيفة")} value={employee.jobTitle} />
+          <Field label={t("رقم الهاتف")} value={employee.phoneNumber} />
+          <Field label={t("البريد الإلكتروني")} value={employee.email} />
+          <Field label={t("العنوان")} value={employee.address} />
         </div>
       </div>
       <div className="pt-4 border-t border-ink-400/10">
         <h3 className="text-sm font-semibold text-ink-900 mb-3">
-          بيانات الراتب
+          {t("بيانات الراتب")}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           <Field
-            label="نوع الأجر"
-            value={employee.employeeType === "Daily" ? "يومي" : "شهري"}
+            label={t("نوع الأجر")}
+            value={employee.employeeType === "Daily" ? t("يومي") : t("شهري")}
           />
-          <Field label="الراتب الأساسي" value={fmtMoney(employee.salary)} />
+          <Field label={t("الراتب الأساسي")} value={fmtMoney(employee.salary)} />
           <Field
-            label="أيام العمل المطلوبة بالشهر"
+            label={t("أيام العمل المطلوبة بالشهر")}
             value={employee.requiredWorkingDaysPerMonth}
           />
           <Field
-            label="آخر يوم استحقاق مرتب"
+            label={t("آخر يوم استحقاق مرتب")}
             value={employee.lastDayOfReceivingSalary}
           />
         </div>
@@ -202,10 +203,10 @@ function AttendanceTab({ employeeId }) {
   const rows = data?.items || [];
 
   if (isLoading)
-    return <div className="text-ink-400 text-sm py-6">جارِ التحميل...</div>;
+    return <div className="text-ink-400 text-sm py-6">{t("جارِ التحميل...")}</div>;
   if (rows.length === 0)
     return (
-      <p className="text-sm text-ink-400 py-6 text-center">لا يوجد سجل حضور</p>
+      <p className="text-sm text-ink-400 py-6 text-center">{t("لا يوجد سجل حضور")}</p>
     );
 
   return (
@@ -214,15 +215,15 @@ function AttendanceTab({ employeeId }) {
         <thead>
           <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              التاريخ
+              {t("التاريخ")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              الحضور
+              {t("الحضور")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              الانصراف
+              {t("الانصراف")}
             </th>
-            <th className="p-2.5 font-medium">الحالة</th>
+            <th className="p-2.5 font-medium">{t("الحالة")}</th>
           </tr>
         </thead>
         <tbody>
@@ -254,10 +255,10 @@ function MovementsTab({ employeeId }) {
   const rows = data?.items || [];
 
   if (isLoading)
-    return <div className="text-ink-400 text-sm py-6">جارِ التحميل...</div>;
+    return <div className="text-ink-400 text-sm py-6">{t("جارِ التحميل...")}</div>;
   if (rows.length === 0)
     return (
-      <p className="text-sm text-ink-400 py-6 text-center">لا توجد حركات</p>
+      <p className="text-sm text-ink-400 py-6 text-center">{t("لا توجد حركات")}</p>
     );
 
   return (
@@ -266,24 +267,24 @@ function MovementsTab({ employeeId }) {
         <thead>
           <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              التاريخ
+              {t("التاريخ")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              النوع
+              {t("النوع")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5 text-positive">
-              مدين
+              {t("مدين")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5 text-negative">
-              دائن
+              {t("دائن")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              العملة
+              {t("العملة")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              رقم السند
+              {t("رقم السند")}
             </th>
-            <th className="p-2.5 font-medium">ملاحظات</th>
+            <th className="p-2.5 font-medium">{t("ملاحظات")}</th>
           </tr>
         </thead>
         <tbody>
@@ -330,11 +331,11 @@ function PayrollHistoryTab({ employeeId }) {
   const rows = data?.items || [];
 
   if (isLoading)
-    return <div className="text-ink-400 text-sm py-6">جارِ التحميل...</div>;
+    return <div className="text-ink-400 text-sm py-6">{t("جارِ التحميل...")}</div>;
   if (rows.length === 0)
     return (
       <p className="text-sm text-ink-400 py-6 text-center">
-        لا يوجد سجل مرتبات
+        {t("لا يوجد سجل مرتبات")}
       </p>
     );
 
@@ -344,18 +345,18 @@ function PayrollHistoryTab({ employeeId }) {
         <thead>
           <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              الفترة
+              {t("الفترة")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              المكافآت
+              {t("المكافآت")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              الخصومات
+              {t("الخصومات")}
             </th>
             <th className="p-2.5 font-medium border-l border-ink-400/5">
-              إجمالي المرتب
+              {t("إجمالي المرتب")}
             </th>
-            <th className="p-2.5 font-medium">صافي المرتب</th>
+            <th className="p-2.5 font-medium">{t("صافي المرتب")}</th>
           </tr>
         </thead>
         <tbody>

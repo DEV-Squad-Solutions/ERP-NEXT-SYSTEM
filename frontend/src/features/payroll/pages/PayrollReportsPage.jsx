@@ -34,6 +34,8 @@ import { usePayrollReportPrint } from "../../../shared/hooks/usePayrollReportPri
 import PayrollReportPrintTemplate from "../../../shared/components/print/PayrollReportPrintTemplate";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const getToday = () => {
   const date = new Date();
 
@@ -113,7 +115,7 @@ function SectionHeader({ icon: Icon, title, description, count }) {
 
       {count !== undefined && (
         <span className="w-fit rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
-          {count} موظف
+          {count} {t("موظف")}
         </span>
       )}
     </div>
@@ -127,10 +129,10 @@ function EmptyState() {
         <ReceiptText size={21} />
       </div>
 
-      <p className="text-sm font-semibold text-slate-700">لا توجد بيانات</p>
+      <p className="text-sm font-semibold text-slate-700">{t("لا توجد بيانات")}</p>
 
       <p className="mt-1 max-w-md text-xs text-slate-500">
-        لا توجد كشوف رواتب أو بيانات موظفين ضمن الفترة المحددة.
+        {t("لا توجد كشوف رواتب أو بيانات موظفين ضمن الفترة المحددة.")}
       </p>
     </div>
   );
@@ -188,7 +190,7 @@ export default function PayrollReportsPage() {
     useGetPayrollReportQuery(params);
 
   const { printReport, printRef } = usePayrollReportPrint({
-    title: "تقرير الأجور والمرتبات",
+    title: t("تقرير الأجور والمرتبات"),
   });
 
   const summary = data?.summary ?? {};
@@ -217,14 +219,14 @@ export default function PayrollReportsPage() {
 
   if (isLoading) {
     return (
-      <div dir="rtl" className="space-y-6">
+      <div dir={getDir()} className="space-y-6">
         <div>
           <h1 className="text-xl font-bold text-slate-900">
-            تقارير الأجور والمرتبات
+            {t("تقارير الأجور والمرتبات")}
           </h1>
 
           <p className="mt-1 text-sm text-slate-500">
-            تقرير تفصيلي للرواتب والموظفين والحضور والاستحقاقات
+            {t("تقرير تفصيلي للرواتب والموظفين والحضور والاستحقاقات")}
           </p>
         </div>
 
@@ -234,7 +236,7 @@ export default function PayrollReportsPage() {
   }
 
   return (
-    <div dir="rtl" className="space-y-6">
+    <div dir={getDir()} className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
@@ -245,11 +247,11 @@ export default function PayrollReportsPage() {
 
             <div>
               <h1 className="text-xl font-bold tracking-tight text-slate-900">
-                تقارير الأجور والمرتبات
+                {t("تقارير الأجور والمرتبات")}
               </h1>
 
               <p className="mt-1 text-sm text-slate-500">
-                تقرير تفصيلي للرواتب والموظفين والحضور والاستحقاقات
+                {t("تقرير تفصيلي للرواتب والموظفين والحضور والاستحقاقات")}
               </p>
             </div>
           </div>
@@ -258,7 +260,7 @@ export default function PayrollReportsPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" onClick={refetch} disabled={isFetching}>
             <RefreshCw size={15} className={isFetching ? "animate-spin" : ""} />
-            تحديث
+            {t("تحديث")}
           </Button>
 
           <Button
@@ -267,7 +269,7 @@ export default function PayrollReportsPage() {
             disabled={isFetching || isError || !data}
           >
             <Printer size={15} />
-            طباعة
+            {t("طباعة")}
           </Button>
         </div>
       </div>
@@ -278,10 +280,10 @@ export default function PayrollReportsPage() {
           <CalendarDays size={17} className="text-slate-500" />
 
           <div>
-            <h2 className="text-sm font-bold text-slate-900">فترة التقرير</h2>
+            <h2 className="text-sm font-bold text-slate-900">{t("فترة التقرير")}</h2>
 
             <p className="mt-0.5 text-xs text-slate-500">
-              حدد الفترة المطلوب استخراج تقرير الرواتب عنها
+              {t("حدد الفترة المطلوب استخراج تقرير الرواتب عنها")}
             </p>
           </div>
         </div>
@@ -289,7 +291,7 @@ export default function PayrollReportsPage() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-600">
-              من تاريخ
+              {t("من تاريخ")}
             </label>
 
             <DateInput
@@ -304,7 +306,7 @@ export default function PayrollReportsPage() {
 
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-600">
-              إلى تاريخ
+              {t("إلى تاريخ")}
             </label>
 
             <DateInput
@@ -322,37 +324,37 @@ export default function PayrollReportsPage() {
       {/* Error */}
       {isError && (
         <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          حدث خطأ أثناء تحميل تقرير الأجور والمرتبات.
+          {t("حدث خطأ أثناء تحميل تقرير الأجور والمرتبات.")}
         </div>
       )}
 
       {/* Summary */}
       <div>
         <div className="mb-4">
-          <h2 className="text-sm font-bold text-slate-900">ملخص التقرير</h2>
+          <h2 className="text-sm font-bold text-slate-900">{t("ملخص التقرير")}</h2>
 
           <p className="mt-1 text-xs text-slate-500">
-            إجمالي المؤشرات المالية والتشغيلية للفترة المحددة
+            {t("إجمالي المؤشرات المالية والتشغيلية للفترة المحددة")}
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
-            title="إجمالي كشوف الرواتب"
+            title={t("إجمالي كشوف الرواتب")}
             value={summary.totalEntries ?? 0}
             icon={ReceiptText}
             iconClassName="text-slate-600"
           />
 
           <StatCard
-            title="عدد الموظفين"
+            title={t("عدد الموظفين")}
             value={summary.totalEmployees ?? 0}
             icon={Users}
             iconClassName="text-violet-600"
           />
 
           <StatCard
-            title="إجمالي الإجمالي"
+            title={t("إجمالي الإجمالي")}
             value={fmtMoney(summary.totalGrossSalary ?? 0)}
             icon={Wallet}
             iconClassName="text-blue-600"
@@ -360,7 +362,7 @@ export default function PayrollReportsPage() {
           />
 
           <StatCard
-            title="إجمالي الراتب المحسوب"
+            title={t("إجمالي الراتب المحسوب")}
             value={fmtMoney(summary.totalCalculatedSalary ?? 0)}
             icon={TrendingUp}
             iconClassName="text-indigo-600"
@@ -368,7 +370,7 @@ export default function PayrollReportsPage() {
           />
 
           <StatCard
-            title="إجمالي المكافآت"
+            title={t("إجمالي المكافآت")}
             value={fmtMoney(summary.totalBonus ?? 0)}
             icon={TrendingUp}
             iconClassName="text-emerald-600"
@@ -376,7 +378,7 @@ export default function PayrollReportsPage() {
           />
 
           <StatCard
-            title="إجمالي الخصومات"
+            title={t("إجمالي الخصومات")}
             value={fmtMoney(summary.totalDeduction ?? 0)}
             icon={TrendingDown}
             iconClassName="text-red-600"
@@ -384,7 +386,7 @@ export default function PayrollReportsPage() {
           />
 
           <StatCard
-            title="صافي الرواتب"
+            title={t("صافي الرواتب")}
             value={fmtMoney(summary.totalNetSalary ?? 0)}
             icon={CircleDollarSign}
             iconClassName="text-emerald-600"
@@ -392,7 +394,7 @@ export default function PayrollReportsPage() {
           />
 
           <StatCard
-            title="المبلغ المدفوع"
+            title={t("المبلغ المدفوع")}
             value={fmtMoney(summary.paidAmount ?? 0)}
             icon={Banknote}
             iconClassName="text-blue-600"
@@ -400,7 +402,7 @@ export default function PayrollReportsPage() {
           />
 
           <StatCard
-            title="المبلغ المعلق"
+            title={t("المبلغ المعلق")}
             value={fmtMoney(summary.pendingAmount ?? 0)}
             icon={Clock3}
             iconClassName="text-amber-600"
@@ -408,7 +410,7 @@ export default function PayrollReportsPage() {
           />
 
           <StatCard
-            title="أيام الحضور"
+            title={t("أيام الحضور")}
             value={summary.totalPresentDays ?? 0}
             icon={UserCheck}
             iconClassName="text-emerald-600"
@@ -416,7 +418,7 @@ export default function PayrollReportsPage() {
           />
 
           <StatCard
-            title="أيام الغياب"
+            title={t("أيام الغياب")}
             value={summary.totalAbsentDays ?? 0}
             icon={UserX}
             iconClassName="text-red-600"
@@ -424,7 +426,7 @@ export default function PayrollReportsPage() {
           />
 
           <StatCard
-            title="إجمالي وحدات العمل"
+            title={t("إجمالي وحدات العمل")}
             value={summary.totalWorkedUnits ?? 0}
             icon={Timer}
             iconClassName="text-violet-600"
@@ -441,10 +443,10 @@ export default function PayrollReportsPage() {
             </div>
 
             <div>
-              <h2 className="text-sm font-bold text-slate-900">حالة السداد</h2>
+              <h2 className="text-sm font-bold text-slate-900">{t("حالة السداد")}</h2>
 
               <p className="mt-0.5 text-xs text-slate-500">
-                توزيع كشوف الرواتب بين المدفوع والمعلق
+                {t("توزيع كشوف الرواتب بين المدفوع والمعلق")}
               </p>
             </div>
           </div>
@@ -466,7 +468,7 @@ export default function PayrollReportsPage() {
         <div className="mt-3 grid grid-cols-2 gap-4">
           <div className="rounded-xl bg-emerald-50 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-emerald-700">مدفوع</span>
+              <span className="text-xs text-emerald-700">{t("مدفوع")}</span>
 
               <CheckCircle2 size={15} className="text-emerald-600" />
             </div>
@@ -482,7 +484,7 @@ export default function PayrollReportsPage() {
 
           <div className="rounded-xl bg-amber-50 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-amber-700">معلق</span>
+              <span className="text-xs text-amber-700">{t("معلق")}</span>
 
               <Clock3 size={15} className="text-amber-600" />
             </div>
@@ -503,8 +505,8 @@ export default function PayrollReportsPage() {
         <div className="p-4 pb-0">
           <SectionHeader
             icon={Users}
-            title="تفاصيل الموظفين"
-            description="تفاصيل كشوف الرواتب والحضور لكل موظف"
+            title={t("تفاصيل الموظفين")}
+            description={t("تفاصيل كشوف الرواتب والحضور لكل موظف")}
             count={employees.length}
           />
         </div>
@@ -519,59 +521,59 @@ export default function PayrollReportsPage() {
               <thead>
                 <tr className="border-y border-slate-200 bg-slate-50">
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    الموظف
+                    {t("الموظف")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    النوع
+                    {t("النوع")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    الفترة
+                    {t("الفترة")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    الحضور
+                    {t("الحضور")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    الغياب
+                    {t("الغياب")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    وحدات العمل
+                    {t("وحدات العمل")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    إضافي
+                    {t("إضافي")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    الخصم
+                    {t("الخصم")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    الإجمالي
+                    {t("الإجمالي")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    المكافأة
+                    {t("المكافأة")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    الخصم المالي
+                    {t("الخصم المالي")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    الصافي
+                    {t("الصافي")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    الحالة
+                    {t("الحالة")}
                   </th>
 
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">
-                    التفاصيل
+                    {t("التفاصيل")}
                   </th>
                 </tr>
               </thead>
@@ -596,7 +598,7 @@ export default function PayrollReportsPage() {
 
                     <td className="px-4 py-3">
                       <span className="rounded-lg bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600">
-                        {employee.employeeType === "Daily" ? "يومي" : "شهري"}
+                        {employee.employeeType === "Daily" ? t("يومي") : t("شهري")}
                       </span>
                     </td>
 
@@ -648,12 +650,12 @@ export default function PayrollReportsPage() {
                       {employee.isPaid ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
                           <CheckCircle2 size={12} />
-                          مدفوع
+                          {t("مدفوع")}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-bold text-amber-700">
                           <Clock3 size={12} />
-                          معلق
+                          {t("معلق")}
                         </span>
                       )}
                     </td>
@@ -666,7 +668,7 @@ export default function PayrollReportsPage() {
                         }
                         className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
                       >
-                        عرض
+                        {t("عرض")}
                         <ArrowUpRight size={13} />
                       </button>
                     </td>
@@ -684,11 +686,11 @@ export default function PayrollReportsPage() {
           <CalendarDays size={14} />
 
           <span>
-            الفترة: {formatDate(startDate)} — {formatDate(endDate)}
+            {t("الفترة:")} {formatDate(startDate)} — {formatDate(endDate)}
           </span>
         </div>
 
-        <span>إجمالي الموظفين: {summary.totalEmployees ?? 0}</span>
+        <span>{t("إجمالي الموظفين:")} {summary.totalEmployees ?? 0}</span>
       </div>
 
       {/* Print */}

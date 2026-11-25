@@ -11,6 +11,8 @@ import {
 import { useLoginMutation } from "../authApi";
 import { useDispatch } from "react-redux";
 import { baseApi } from "../../../lib/baseApi";
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function LoginForm() {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
@@ -39,11 +41,11 @@ export default function LoginForm() {
     if (error?.data?.message) return error.data.message;
     if (error?.data?.title) return error.data.title;
 
-    return "تعذر تسجيل الدخول، يرجى التأكد من البيانات والمحاولة مرة أخرى.";
+    return t("تعذر تسجيل الدخول، يرجى التأكد من البيانات والمحاولة مرة أخرى.");
   };
 
   return (
-    <div dir="rtl" className="w-full min-w-0">
+    <div dir={getDir()} className="w-full min-w-0">
       {/* Header */}
       <div className="mb-5 text-center">
         <div
@@ -62,11 +64,11 @@ export default function LoginForm() {
         </div>
 
         <h2 className="font-display text-lg font-bold tracking-tight text-ink-800">
-          تسجيل الدخول
+          {t("تسجيل الدخول")}
         </h2>
 
         <p className="mt-1.5 text-[11px] leading-5 text-ink-400">
-          أدخل بياناتك للوصول إلى حسابك
+          {t("أدخل بياناتك للوصول إلى حسابك")}
         </p>
       </div>
 
@@ -83,7 +85,7 @@ export default function LoginForm() {
               text-ink-600
             "
           >
-            اسم المستخدم
+            {t("اسم المستخدم")}
           </label>
 
           <div className="group relative">
@@ -152,7 +154,7 @@ export default function LoginForm() {
               text-ink-600
             "
           >
-            كلمة المرور
+            {t("كلمة المرور")}
           </label>
 
           <div className="group relative">
@@ -212,7 +214,7 @@ export default function LoginForm() {
               onClick={() => setShowPassword((value) => !value)}
               disabled={isLoading}
               aria-label={
-                showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"
+                showPassword ? t("إخفاء كلمة المرور") : t("إظهار كلمة المرور")
               }
               className="
                 absolute left-2 top-1/2
@@ -329,11 +331,11 @@ export default function LoginForm() {
             <>
               <Loader2 size={17} className="animate-spin" />
 
-              <span>جاري تسجيل الدخول...</span>
+              <span>{t("جاري تسجيل الدخول...")}</span>
             </>
           ) : (
             <>
-              <span>دخول</span>
+              <span>{t("دخول")}</span>
 
               <LogIn
                 size={16}

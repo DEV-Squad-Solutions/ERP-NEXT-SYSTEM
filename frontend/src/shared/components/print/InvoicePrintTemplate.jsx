@@ -1,19 +1,21 @@
 import { useSelector } from "react-redux";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const typeLabels = {
-  Sales: "فاتورة بيع",
-  Purchase: "فاتورة شراء",
-  SalesReturn: "مرتجع بيع",
-  PurchaseReturn: "مرتجع شراء",
+  Sales: t("فاتورة بيع"),
+  Purchase: t("فاتورة شراء"),
+  SalesReturn: t("مرتجع بيع"),
+  PurchaseReturn: t("مرتجع شراء"),
 };
 
 const paymentLabels = {
-  Cash: "نقدي",
-  Credit: "آجل",
+  Cash: t("نقدي"),
+  Credit: t("آجل"),
 };
 
-const fmt = (v) => Number(v || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+const fmt = (v) => Number(v || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 /**
  * @param {{ invoice: Object }} props
@@ -27,7 +29,7 @@ export default function InvoicePrintTemplate({ invoice }) {
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       style={{
         width: "210mm",
         minHeight: "297mm",
@@ -73,7 +75,7 @@ export default function InvoicePrintTemplate({ invoice }) {
             {typeLabels[invoice.invoiceType] || invoice.invoiceType}
           </h2>
           <p style={{ fontSize: "12px", margin: "4px 0 0" }}>
-            رقم الفاتورة:{" "}
+            {t("رقم الفاتورة:")}{" "}
             <strong style={{ fontVariantNumeric: "tabular-nums" }}>
               {invoice.invoiceNumber}
             </strong>
@@ -98,12 +100,12 @@ export default function InvoicePrintTemplate({ invoice }) {
             padding: "10px",
           }}
         >
-          <p style={{ fontWeight: 700, marginBottom: "6px" }}>بيانات العميل</p>
+          <p style={{ fontWeight: 700, marginBottom: "6px" }}>{t("بيانات العميل")}</p>
           <p style={{ margin: "2px 0" }}>
-            الاسم: {invoice.businessPartnerName || "—"}
+            {t("الاسم:")} {invoice.businessPartnerName || "—"}
           </p>
           <p style={{ margin: "2px 0" }}>
-            الدولة: {invoice.countryName || "—"}
+            {t("الدولة:")} {invoice.countryName || "—"}
           </p>
         </div>
         <div
@@ -114,22 +116,22 @@ export default function InvoicePrintTemplate({ invoice }) {
           }}
         >
           <p style={{ fontWeight: 700, marginBottom: "6px" }}>
-            بيانات الفاتورة
+            {t("بيانات الفاتورة")}
           </p>
-          <p style={{ margin: "2px 0" }}>التاريخ: {formatDate(invoice.invoiceDate)}</p>
-          <p style={{ margin: "2px 0" }}>تاريخ الاستحقاق: {formatDate(invoice.dueDate)}</p>
+          <p style={{ margin: "2px 0" }}>{t("التاريخ:")} {formatDate(invoice.invoiceDate)}</p>
+          <p style={{ margin: "2px 0" }}>{t("تاريخ الاستحقاق:")} {formatDate(invoice.dueDate)}</p>
           <p style={{ margin: "2px 0" }}>
-            طريقة الدفع: {paymentLabels[invoice.paymentTerm] || "—"}
+            {t("طريقة الدفع:")} {paymentLabels[invoice.paymentTerm] || "—"}
           </p>
-          <p style={{ margin: "2px 0" }}>المخزن: {invoice.storeName || "—"}</p>
+          <p style={{ margin: "2px 0" }}>{t("المخزن:")} {invoice.storeName || "—"}</p>
           {invoice.vehicleNumber && (
             <p style={{ margin: "2px 0" }}>
-              رقم السيارة: {invoice.vehicleNumber}
+              {t("رقم السيارة:")} {invoice.vehicleNumber}
             </p>
           )}
           {(invoice.driverName || invoice.externalDriverName) && (
             <p style={{ margin: "2px 0" }}>
-              السائق: {invoice.driverName || invoice.externalDriverName}
+              {t("السائق:")} {invoice.driverName || invoice.externalDriverName}
             </p>
           )}
         </div>
@@ -147,13 +149,13 @@ export default function InvoicePrintTemplate({ invoice }) {
           <tr style={{ background: "#EFF2F0" }}>
             {[
               "#",
-              "الصنف",
-              "العدد",
-              "الوزن",
-              "الكمية",
-              "السعر",
-              "الإجمالي",
-              "ملاحظات",
+              t("الصنف"),
+              t("العدد"),
+              t("الوزن"),
+              t("الكمية"),
+              t("السعر"),
+              t("الإجمالي"),
+              t("ملاحظات"),
             ].map((h) => (
               <th
                 key={h}
@@ -196,7 +198,7 @@ export default function InvoicePrintTemplate({ invoice }) {
         >
           <thead>
             <tr style={{ background: "#EFF2F0" }}>
-              {["#", "العبوة", "صادر", "وارد"].map((h) => (
+              {["#", t("العبوة"), t("صادر"), t("وارد")].map((h) => (
                 <th
                   key={h}
                   style={{
@@ -227,16 +229,16 @@ export default function InvoicePrintTemplate({ invoice }) {
       <div style={{ display: "flex", justifyContent: "flex-start" }}>
         <table style={{ fontSize: "12px", minWidth: "260px" }}>
           <tbody>
-            <SummaryRow label="الإجمالي الفرعي" value={fmt(invoice.subtotal)} />
-            <SummaryRow label="الخصم" value={fmt(invoice.discountAmount)} />
+            <SummaryRow label={t("الإجمالي الفرعي")} value={fmt(invoice.subtotal)} />
+            <SummaryRow label={t("الخصم")} value={fmt(invoice.discountAmount)} />
             <SummaryRow
-              label="الإجمالي"
+              label={t("الإجمالي")}
               value={`${fmt(invoice.total)} ${invoice.currency}`}
               bold
             />
-            <SummaryRow label="المدفوع" value={fmt(invoice.paidAmount)} />
+            <SummaryRow label={t("المدفوع")} value={fmt(invoice.paidAmount)} />
             <SummaryRow
-              label="المتبقي"
+              label={t("المتبقي")}
               value={`${fmt(invoice.remainingAmount)} ${invoice.currency}`}
               bold
             />
@@ -246,7 +248,7 @@ export default function InvoicePrintTemplate({ invoice }) {
 
       {invoice.notes && (
         <div style={{ marginTop: "16px", fontSize: "12px" }}>
-          <p style={{ fontWeight: 700, marginBottom: "4px" }}>ملاحظات:</p>
+          <p style={{ fontWeight: 700, marginBottom: "4px" }}>{t("ملاحظات:")}</p>
           <p style={{ margin: 0 }}>{invoice.notes}</p>
         </div>
       )}
@@ -261,12 +263,12 @@ export default function InvoicePrintTemplate({ invoice }) {
       >
         <div style={{ textAlign: "center", width: "200px" }}>
           <div style={{ borderTop: "1px solid #0A2540", paddingTop: "6px" }}>
-            توقيع المستلم
+            {t("توقيع المستلم")}
           </div>
         </div>
         <div style={{ textAlign: "center", width: "200px" }}>
           <div style={{ borderTop: "1px solid #0A2540", paddingTop: "6px" }}>
-            توقيع المسؤول
+            {t("توقيع المسؤول")}
           </div>
         </div>
       </div>

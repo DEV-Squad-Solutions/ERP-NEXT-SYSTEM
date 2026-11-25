@@ -1,6 +1,7 @@
 import { Home, ArrowLeft, SearchX } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { t } from "../../i18n";
 export default function Error404() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-paper px-6 font-body">
@@ -20,12 +21,11 @@ export default function Error404() {
         </h1>
 
         <h2 className="mt-4 font-display text-3xl font-bold text-ink-900">
-          الصفحة غير موجودة
+          {t("الصفحة غير موجودة")}
         </h2>
 
         <p className="mt-4 leading-8 text-ink-400">
-          يبدو أن الصفحة التي تبحث عنها قد تم نقلها أو حذفها أو أن الرابط غير
-          صحيح.
+          {t("يبدو أن الصفحة التي تبحث عنها قد تم نقلها أو حذفها أو أن الرابط غير صحيح.")}
         </p>
 
         {/* Buttons */}
@@ -35,7 +35,7 @@ export default function Error404() {
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-500 px-6 py-3 font-semibold text-white transition hover:bg-primary-600"
           >
             <Home size={18} />
-            الصفحة الرئيسية
+            {t("الصفحة الرئيسية")}
           </Link>
 
           <button
@@ -43,7 +43,7 @@ export default function Error404() {
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-gold-400 px-6 py-3 font-semibold text-gold-600 transition hover:bg-gold-50"
           >
             <ArrowLeft size={18} />
-            رجوع
+            {t("رجوع")}
           </button>
         </div>
 

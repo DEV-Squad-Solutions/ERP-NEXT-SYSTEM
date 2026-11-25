@@ -38,37 +38,39 @@ import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFisc
 import InvoiceLineRow from "../components/createComponents/NewInvoiceLineRow";
 import ContainerLineRow from "../components/editComponents/ContainerLineRow";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const paymentTermOptions = [
-  { value: "Cash", label: "نقدي" },
-  { value: "Credit", label: "آجل" },
+  { value: "Cash", label: t("نقدي") },
+  { value: "Credit", label: t("آجل") },
 ];
 
 const invoiceTypeOptions = [
-  { value: "Sales", label: "بيع" },
-  { value: "Purchase", label: "شراء" },
-  { value: "SalesReturn", label: "مرتجع بيع" },
-  { value: "PurchaseReturn", label: "مرتجع شراء" },
+  { value: "Sales", label: t("بيع") },
+  { value: "Purchase", label: t("شراء") },
+  { value: "SalesReturn", label: t("مرتجع بيع") },
+  { value: "PurchaseReturn", label: t("مرتجع شراء") },
 ];
 
 const invoiceContentTypeOptions = [
-  { value: "Items", label: "أصناف" },
-  { value: "Containers", label: "عبوات" },
+  { value: "Items", label: t("أصناف") },
+  { value: "Containers", label: t("عبوات") },
 ];
 
 const paymentStatusLabels = {
-  Unpaid: "غير مدفوعة",
-  PartiallyPaid: "مدفوعة جزئيًا",
-  Paid: "مدفوعة بالكامل",
+  Unpaid: t("غير مدفوعة"),
+  PartiallyPaid: t("مدفوعة جزئيًا"),
+  Paid: t("مدفوعة بالكامل"),
 };
 
 const currencyLabels = {
-  EGP: "جنيه مصري",
-  USD: "دولار أمريكي",
-  EUR: "يورو",
-  GBP: "جنيه إسترليني",
-  SAR: "ريال سعودي",
-  AED: "درهم إماراتي",
-  KWD: "دينار كويتي",
+  EGP: t("جنيه مصري"),
+  USD: t("دولار أمريكي"),
+  EUR: t("يورو"),
+  GBP: t("جنيه إسترليني"),
+  SAR: t("ريال سعودي"),
+  AED: t("درهم إماراتي"),
+  KWD: t("دينار كويتي"),
 };
 
 const emptyLine = () => ({
@@ -425,7 +427,7 @@ export default function InvoiceEditPage() {
 
       setContainerStoreName(store.name || "");
 
-      toast.info(`تم تحديد مخزن العبوات تلقائيًا: ${store.name || "—"}`);
+      toast.info(t("تم تحديد مخزن العبوات تلقائيًا: {0}", { 0: store.name || "—" }));
     } else {
       setForm((prev) => ({
         ...prev,
@@ -436,7 +438,7 @@ export default function InvoiceEditPage() {
 
       setContainerStoreName("");
 
-      toast.warning("العميل ده مالوش مخزن عبوات مرتبط");
+      toast.warning(t("العميل ده مالوش مخزن عبوات مرتبط"));
     }
   }, [partyContainerStoreData, form?.businessPartnerId]);
 
@@ -632,7 +634,7 @@ export default function InvoiceEditPage() {
     if (isContainersInvoice) {
       if (!form.containerStoreId) {
         toast.error(
-          "العميل/المورد مالوش مخزن عبوات مرتبط — اختر طرفًا له مخزن عبوات أولًا",
+          t("العميل/المورد مالوش مخزن عبوات مرتبط — اختر طرفًا له مخزن عبوات أولًا"),
         );
         return;
       }
@@ -645,12 +647,12 @@ export default function InvoiceEditPage() {
       );
 
       if (validContainerLines.length === 0) {
-        toast.error("أضف حركة عبوة واحدة على الأقل (صادر أو وارد)");
+        toast.error(t("أضف حركة عبوة واحدة على الأقل (صادر أو وارد)"));
         return;
       }
     } else {
       if (!form.storeId || !Number(form.storeId)) {
-        toast.error("اختر المخزن قبل الحفظ");
+        toast.error(t("اختر المخزن قبل الحفظ"));
         return;
       }
 
@@ -671,7 +673,7 @@ export default function InvoiceEditPage() {
 
       if (hasInvalidLine) {
         toast.error(
-          "في سطر ناقص بيانات (العدد أو الوزن لازم يكونوا أكبر من صفر)",
+          t("في سطر ناقص بيانات (العدد أو الوزن لازم يكونوا أكبر من صفر)"),
         );
         return;
       }
@@ -690,14 +692,14 @@ export default function InvoiceEditPage() {
         ...body,
       }).unwrap();
 
-      toast.success("تم حفظ التعديلات بنجاح");
+      toast.success(t("تم حفظ التعديلات بنجاح"));
 
       navigate(`/dashboard/sales/${id}`);
     } catch (error) {
       toast.error(
         error?.data?.detail ||
           error?.data?.title ||
-          "حدث خطأ أثناء حفظ التعديلات، حاول تاني",
+          t("حدث خطأ أثناء حفظ التعديلات، حاول تاني"),
       );
     }
   };
@@ -727,10 +729,10 @@ export default function InvoiceEditPage() {
       <div className="text-center py-14 border border-dashed border-negative/25 bg-negative/[0.02] rounded-2xl">
         <AlertCircle size={32} className="mx-auto text-negative/70 mb-3" />
 
-        <p className="text-ink-900 font-medium mb-1">تعذر تحميل الفاتورة</p>
+        <p className="text-ink-900 font-medium mb-1">{t("تعذر تحميل الفاتورة")}</p>
 
         <Button variant="outline" onClick={refetch}>
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </Button>
       </div>
     );
@@ -741,7 +743,7 @@ export default function InvoiceEditPage() {
   // =========================================================
 
   return (
-    <div className="animate-fadeUp pb-24" dir="rtl">
+    <div className="animate-fadeUp pb-24" dir={getDir()}>
       {/* =====================================================
           Header — sticky عشان زرار الحفظ يفضل ظاهر مع الاسكرول
           في فاتورة طويلة (أداء/UX)
@@ -758,7 +760,7 @@ export default function InvoiceEditPage() {
 
           <div>
             <h2 className="font-display text-2xl font-bold text-ink-900">
-              تعديل الفاتورة #{invoice.invoiceNumber}
+              {t("تعديل الفاتورة #")}{invoice.invoiceNumber}
             </h2>
 
             {invoice.paymentStatus && (
@@ -766,9 +768,9 @@ export default function InvoiceEditPage() {
                 {paymentStatusLabels[invoice.paymentStatus] ||
                   invoice.paymentStatus}
                 {" · "}
-                متبقي:{" "}
+                {t("متبقي:")}{" "}
                 {Number(invoice.remainingAmount || 0).toLocaleString(
-                  "ar-EG",
+                  getLocale(),
                 )}{" "}
                 {invoice.currency}
               </span>
@@ -782,7 +784,7 @@ export default function InvoiceEditPage() {
         >
           <Save size={16} />
 
-          {isSaving ? "جاري الحفظ..." : "حفظ التعديلات"}
+          {isSaving ? t("جاري الحفظ...") : t("حفظ التعديلات")}
         </Button>
       </div>
 
@@ -799,7 +801,7 @@ export default function InvoiceEditPage() {
           {/* نوع الفاتورة */}
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              نوع الفاتورة
+              {t("نوع الفاتورة")}
             </label>
 
             <CompactSelect
@@ -812,7 +814,7 @@ export default function InvoiceEditPage() {
           {/* طريقة الدفع */}
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              طريقة الدفع
+              {t("طريقة الدفع")}
             </label>
 
             <CompactSelect
@@ -825,7 +827,7 @@ export default function InvoiceEditPage() {
           {/* تاريخ الفاتورة */}
           <Input
             type="date"
-            label="تاريخ الفاتورة"
+            label={t("تاريخ الفاتورة")}
             value={form.invoiceDate}
             onChange={(e) => setField("invoiceDate", e.target.value)}
           />
@@ -833,7 +835,7 @@ export default function InvoiceEditPage() {
           {/* تاريخ الاستحقاق */}
           <Input
             type="date"
-            label="تاريخ الاستحقاق"
+            label={t("تاريخ الاستحقاق")}
             value={form.dueDate}
             onChange={(e) => setField("dueDate", e.target.value)}
           />
@@ -841,7 +843,7 @@ export default function InvoiceEditPage() {
           {/* العميل / المورد */}
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              العميل / المورد
+              {t("العميل / المورد")}
             </label>
 
             <CompactSelect
@@ -855,7 +857,7 @@ export default function InvoiceEditPage() {
           {/* المخزن */}
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              {isContainersInvoice ? "مخزن العبوات" : "المخزن"}
+              {isContainersInvoice ? t("مخزن العبوات") : t("المخزن")}
             </label>
 
             {isContainersInvoice ? (
@@ -880,7 +882,7 @@ export default function InvoiceEditPage() {
           {!isContainersInvoice && (
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              مخزن العبوات
+              {t("مخزن العبوات")}
             </label>
 
             <div className="w-full rounded-lg border border-ink-400/10 px-3 py-2 text-sm bg-ink-400/5 text-ink-700 min-h-[38px] flex items-center">
@@ -892,7 +894,7 @@ export default function InvoiceEditPage() {
             </div>
 
             <p className="text-[11px] text-ink-400 mt-1">
-              بيتحدد تلقائيًا حسب العميل المختار
+              {t("بيتحدد تلقائيًا حسب العميل المختار")}
             </p>
           </div>
           )}
@@ -900,7 +902,7 @@ export default function InvoiceEditPage() {
           {/* البلد */}
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              البلد
+              {t("البلد")}
             </label>
 
             <CompactSelect
@@ -914,7 +916,7 @@ export default function InvoiceEditPage() {
           {/* السائق الأساسي */}
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              السائق
+              {t("السائق")}
             </label>
 
             <CompactSelect
@@ -927,29 +929,29 @@ export default function InvoiceEditPage() {
 
           {/* السائق الفعلي */}
           <Input
-            label="السائق الفعلي"
+            label={t("السائق الفعلي")}
             value={form.actualDriverName}
             onChange={(e) => setField("actualDriverName", e.target.value)}
-            placeholder="اسم السائق الفعلي"
+            placeholder={t("اسم السائق الفعلي")}
           />
 
           {/* رقم السيارة */}
           <Input
-            label="رقم السيارة"
+            label={t("رقم السيارة")}
             value={form.vehicleNumber}
             onChange={(e) => setField("vehicleNumber", e.target.value)}
           />
 
           {/* كود فاتورة التصدير */}
           <Input
-            label="كود فاتورة التصدير"
+            label={t("كود فاتورة التصدير")}
             value={form.exportInvoiceCode}
             onChange={(e) => setField("exportInvoiceCode", e.target.value)}
           />
 
           {/* رقم فاتورة الشريك */}
           <Input
-            label="رقم فاتورة الشريك"
+            label={t("رقم فاتورة الشريك")}
             value={form.partnerInvoiceNo}
             onChange={(e) => setField("partnerInvoiceNo", e.target.value)}
           />
@@ -957,7 +959,7 @@ export default function InvoiceEditPage() {
           {/* تصنيف الأصناف */}
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              تصنيف الأصناف
+              {t("تصنيف الأصناف")}
             </label>
 
             <CompactSelect
@@ -965,14 +967,14 @@ export default function InvoiceEditPage() {
               value={form.itemsCategoryId}
               onChange={(v) => setField("itemsCategoryId", v)}
               isLoading={isLoadingCategories}
-              placeholder="اختياري"
+              placeholder={t("اختياري")}
             />
           </div>
 
           {/* محتوى الفاتورة */}
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              محتوى الفاتورة
+              {t("محتوى الفاتورة")}
             </label>
 
             <CompactSelect
@@ -985,7 +987,7 @@ export default function InvoiceEditPage() {
           {/* سعر الصرف */}
           <Input
             type="number"
-            label="سعر الصرف"
+            label={t("سعر الصرف")}
             value={form.exchangeRate}
             onChange={(e) => setField("exchangeRate", e.target.value)}
           />
@@ -993,7 +995,7 @@ export default function InvoiceEditPage() {
           {/* العملة */}
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              العملة
+              {t("العملة")}
             </label>
 
             <div className="w-full rounded-lg border border-ink-400/10 px-3 py-2 text-sm bg-ink-400/5 text-ink-700 min-h-[38px] flex items-center">
@@ -1008,21 +1010,21 @@ export default function InvoiceEditPage() {
             {/* الخزنة */}
             <div>
               <label className="block mb-1.5 text-sm font-medium text-ink-900">
-                الخزنة <span className="text-negative">*</span>
+                {t("الخزنة")} <span className="text-negative">*</span>
               </label>
 
               <CompactSelect
                 options={cashboxOptions}
                 value={form.cashboxId}
                 onChange={handleCashboxChange}
-                placeholder="اختر الخزنة"
+                placeholder={t("اختر الخزنة")}
               />
             </div>
 
             {/* سعر صرف الخزنة */}
             <Input
               type="number"
-              label="سعر صرف الخزنة"
+              label={t("سعر صرف الخزنة")}
               value={form.cashboxExchangeRate}
               onChange={(e) => setField("cashboxExchangeRate", e.target.value)}
             />
@@ -1032,7 +1034,7 @@ export default function InvoiceEditPage() {
         {/* الملاحظات */}
         <div className="mt-3">
           <Input
-            label="ملاحظات عامة"
+            label={t("ملاحظات عامة")}
             value={form.notes}
             onChange={(e) => setField("notes", e.target.value)}
           />
@@ -1042,35 +1044,35 @@ export default function InvoiceEditPage() {
         <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
           <Input
             type="number"
-            label="وزن البسكال"
+            label={t("وزن البسكال")}
             value={form.wbWeight}
             onChange={(e) => setField("wbWeight", e.target.value)}
           />
 
           <Input
             type="number"
-            label="فرق الميزان"
+            label={t("فرق الميزان")}
             value={form.wbScaleDifference}
             onChange={(e) => setField("wbScaleDifference", e.target.value)}
           />
 
           <Input
             type="number"
-            label="الخصم"
+            label={t("الخصم")}
             value={form.wbDiscount}
             onChange={(e) => setField("wbDiscount", e.target.value)}
           />
 
           <div>
             <label className="block mb-1.5 text-sm font-medium text-ink-900">
-              الإجمالي
+              {t("الإجمالي")}
             </label>
 
             <div className="w-full rounded-lg border border-ink-400/10 px-3 py-2 text-sm num bg-ink-400/5 text-ink-700 min-h-[38px] flex items-center">
-              {displayWbTotal.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+              {displayWbTotal.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
             </div>
 
-            <p className="text-[11px] text-ink-400 mt-1">بيتحسب تلقائيًا</p>
+            <p className="text-[11px] text-ink-400 mt-1">{t("بيتحسب تلقائيًا")}</p>
           </div>
         </div>
       </div>
@@ -1083,17 +1085,16 @@ export default function InvoiceEditPage() {
       <div className="bg-white rounded-2xl border border-ink-400/10 shadow-card p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="font-display font-bold text-ink-900">الأصناف</h3>
+            <h3 className="font-display font-bold text-ink-900">{t("الأصناف")}</h3>
 
             <p className="text-[11px] text-ink-400 mt-1">
-              يمكن أن يكون السطر مرتبطًا بصنف من المخزون أو صنفًا يدويًا غير
-              موجود بالمخزون.
+              {t("يمكن أن يكون السطر مرتبطًا بصنف من المخزون أو صنفًا يدويًا غير موجود بالمخزون.")}
             </p>
           </div>
 
           <Button variant="outline" onClick={addLine} disabled={isSaving}>
             <Plus size={15} />
-            إضافة صنف
+            {t("إضافة صنف")}
           </Button>
         </div>
 
@@ -1103,23 +1104,23 @@ export default function InvoiceEditPage() {
               <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
                 <th className="p-2.5 font-medium">#</th>
 
-                <th className="p-2.5 font-medium">الصنف</th>
+                <th className="p-2.5 font-medium">{t("الصنف")}</th>
 
-                <th className="p-2.5 font-medium">العدد بالمخزن</th>
+                <th className="p-2.5 font-medium">{t("العدد بالمخزن")}</th>
 
-                <th className="p-2.5 font-medium">الوحدة</th>
+                <th className="p-2.5 font-medium">{t("الوحدة")}</th>
 
-                <th className="p-2.5 font-medium">العدد</th>
+                <th className="p-2.5 font-medium">{t("العدد")}</th>
 
-                <th className="p-2.5 font-medium">وزن الوحدة</th>
+                <th className="p-2.5 font-medium">{t("وزن الوحدة")}</th>
 
-                <th className="p-2.5 font-medium">الكمية</th>
+                <th className="p-2.5 font-medium">{t("الكمية")}</th>
 
-                <th className="p-2.5 font-medium">سعر الكيلو</th>
+                <th className="p-2.5 font-medium">{t("سعر الكيلو")}</th>
 
-                <th className="p-2.5 font-medium">القيمة</th>
+                <th className="p-2.5 font-medium">{t("القيمة")}</th>
 
-                <th className="p-2.5 font-medium">ملاحظات</th>
+                <th className="p-2.5 font-medium">{t("ملاحظات")}</th>
 
                 <th className="p-2.5"></th>
               </tr>
@@ -1161,8 +1162,7 @@ export default function InvoiceEditPage() {
 
         {isReturnInvoice && (
           <p className="text-xs text-gold-600 bg-gold-50 rounded-lg px-3 py-2 mt-3">
-            فاتورة مرتجع — كل سطر محتاج يتربط بسطر الفاتورة الأصلي لو كان
-            مرتجعًا من فاتورة سابقة.
+            {t("فاتورة مرتجع — كل سطر محتاج يتربط بسطر الفاتورة الأصلي لو كان مرتجعًا من فاتورة سابقة.")}
           </p>
         )}
       </div>
@@ -1175,7 +1175,7 @@ export default function InvoiceEditPage() {
       <div className="bg-white rounded-2xl border border-ink-400/10 shadow-card p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-display font-bold text-ink-900">
-            {isContainersInvoice ? "حركات العبوات" : "العبوات"}
+            {isContainersInvoice ? t("حركات العبوات") : t("العبوات")}
           </h3>
 
           <Button
@@ -1184,14 +1184,13 @@ export default function InvoiceEditPage() {
             disabled={isSaving}
           >
             <Plus size={15} />
-            إضافة عبوة
+            {t("إضافة عبوة")}
           </Button>
         </div>
 
         {isContainersInvoice && (
           <p className="text-xs text-primary-700 bg-primary-50/60 rounded-lg px-3 py-2 mb-3">
-            فاتورة عبوات فقط: مطلوب حركة عبوة واحدة على الأقل (صادر أو وارد)،
-            ومفيش أصناف ولا قيمة مالية.
+            {t("فاتورة عبوات فقط: مطلوب حركة عبوة واحدة على الأقل (صادر أو وارد)، ومفيش أصناف ولا قيمة مالية.")}
           </p>
         )}
 
@@ -1202,11 +1201,11 @@ export default function InvoiceEditPage() {
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
                   <th className="p-2.5 font-medium">#</th>
 
-                  <th className="p-2.5 font-medium">العبوة</th>
+                  <th className="p-2.5 font-medium">{t("العبوة")}</th>
 
-                  <th className="p-2.5 font-medium">صادر</th>
+                  <th className="p-2.5 font-medium">{t("صادر")}</th>
 
-                  <th className="p-2.5 font-medium">وارد</th>
+                  <th className="p-2.5 font-medium">{t("وارد")}</th>
 
                   <th className="p-2.5"></th>
                 </tr>
@@ -1238,12 +1237,12 @@ export default function InvoiceEditPage() {
 
       <div className="bg-white rounded-2xl border border-ink-400/10 shadow-card p-4">
         <h3 className="font-display font-bold text-ink-900 mb-3">
-          الملخص المالي
+          {t("الملخص المالي")}
         </h3>
 
         {isContainersInvoice && (
           <p className="text-xs text-primary-700 bg-primary-50/60 rounded-lg px-3 py-2 mb-3">
-            فاتورة عبوات فقط — بدون قيمة مالية، عشان كده مفيش خصم أو مدفوع.
+            {t("فاتورة عبوات فقط — بدون قيمة مالية، عشان كده مفيش خصم أو مدفوع.")}
           </p>
         )}
 
@@ -1253,7 +1252,7 @@ export default function InvoiceEditPage() {
               {/* الخصم */}
               <Input
                 type="number"
-                label="الخصم"
+                label={t("الخصم")}
                 value={form.discountAmount}
                 onChange={(e) =>
                   setField("discountAmount", Number(e.target.value) || 0)
@@ -1263,7 +1262,7 @@ export default function InvoiceEditPage() {
               {/* المدفوع */}
               <Input
                 type="number"
-                label="المدفوع"
+                label={t("المدفوع")}
                 value={form.paidAmount}
                 onChange={(e) =>
                   setField("paidAmount", Number(e.target.value) || 0)
@@ -1274,30 +1273,29 @@ export default function InvoiceEditPage() {
 
           {/* الإجمالي */}
           <div>
-            <p className="text-xs text-ink-400 mb-1">الإجمالي (تقديري)</p>
+            <p className="text-xs text-ink-400 mb-1">{t("الإجمالي (تقديري)")}</p>
 
             <p className="num font-bold text-ink-900">
-              {displayTotal.toLocaleString("ar-EG", { maximumFractionDigits: 2 })} {invoice.currency}
+              {displayTotal.toLocaleString(getLocale(), { maximumFractionDigits: 2 })} {invoice.currency}
             </p>
           </div>
 
           {/* المتبقي */}
           <div>
-            <p className="text-xs text-ink-400 mb-1">المتبقي (تقديري)</p>
+            <p className="text-xs text-ink-400 mb-1">{t("المتبقي (تقديري)")}</p>
 
             <p
               className={`num font-bold ${
                 displayRemaining > 0 ? "text-negative" : "text-positive"
               }`}
             >
-              {displayRemaining.toLocaleString("ar-EG", { maximumFractionDigits: 2 })} {invoice.currency}
+              {displayRemaining.toLocaleString(getLocale(), { maximumFractionDigits: 2 })} {invoice.currency}
             </p>
           </div>
         </div>
 
         <p className="text-[11px] text-ink-400 mt-2">
-          القيم دي تقديرية للعرض بس — القيم الفعلية زي المخزون والتكاليف بيحسبها
-          السيرفر بعد الحفظ.
+          {t("القيم دي تقديرية للعرض بس — القيم الفعلية زي المخزون والتكاليف بيحسبها السيرفر بعد الحفظ.")}
         </p>
       </div>
     </div>

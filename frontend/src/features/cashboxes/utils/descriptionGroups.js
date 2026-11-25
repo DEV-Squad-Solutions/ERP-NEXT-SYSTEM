@@ -1,3 +1,4 @@
+import { t } from "../../../i18n";
 /**
  * =========================================================
  * توصيف حركات الخزنة (Cash Voucher Description)
@@ -68,7 +69,7 @@ export function buildDescriptionGroups(partySelect, { direction } = {}) {
   if (partners.length) {
     groups.push({
       key: "partners",
-      label: "عملاء وموردين",
+      label: t("عملاء وموردين"),
       options: partners.map((p) => ({
         value: makeValue(PREFIX.partner, p.id),
         label: p.name,
@@ -82,7 +83,7 @@ export function buildDescriptionGroups(partySelect, { direction } = {}) {
   if (drivers.length) {
     groups.push({
       key: "drivers",
-      label: "سائقين",
+      label: t("سائقين"),
       options: drivers.map((d) => ({
         value: makeValue(PREFIX.driver, d.id),
         label: d.name,
@@ -97,7 +98,7 @@ export function buildDescriptionGroups(partySelect, { direction } = {}) {
   if (employees.length) {
     groups.push({
       key: "employeeSalary",
-      label: "رواتب وأجور",
+      label: t("رواتب وأجور"),
       options: employees.map((e) => ({
         value: makeValue(PREFIX.employeeSalary, e.id),
         label: e.name,
@@ -107,7 +108,7 @@ export function buildDescriptionGroups(partySelect, { direction } = {}) {
 
     groups.push({
       key: "employeeAdvance",
-      label: "سلف",
+      label: t("سلف"),
       options: employees.map((e) => ({
         value: makeValue(PREFIX.employeeAdvance, e.id),
         label: e.name,
@@ -122,7 +123,7 @@ export function buildDescriptionGroups(partySelect, { direction } = {}) {
   if (revenues.length && direction !== "Payment") {
     groups.push({
       key: "revenue",
-      label: "إيرادات",
+      label: t("إيرادات"),
       options: revenues.map((t) => ({
         value: makeValue(PREFIX.revenue, t.id),
         label: t.name,
@@ -137,7 +138,7 @@ export function buildDescriptionGroups(partySelect, { direction } = {}) {
   if (expenses.length && direction !== "Receipt") {
     groups.push({
       key: "expense",
-      label: "مصاريف",
+      label: t("مصاريف"),
       options: expenses.map((t) => ({
         value: makeValue(PREFIX.expense, t.id),
         label: t.name,

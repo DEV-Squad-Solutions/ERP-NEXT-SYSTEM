@@ -17,6 +17,7 @@ import Input from "../../../shared/components/ui/Input";
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import Button from "../../../shared/components/ui/Button";
 
+import { t } from "../../../i18n";
 function getToday() {
   const date = new Date();
   const year = date.getFullYear();
@@ -91,17 +92,17 @@ export default function EmployeeOpeningBalanceFormModal({
     }
 
     if (!form.employeeId) {
-      toast.error("اختر الموظف أولاً");
+      toast.error(t("اختر الموظف أولاً"));
       return;
     }
 
     if (!form.documentDate) {
-      toast.error("حدد تاريخ المستند");
+      toast.error(t("حدد تاريخ المستند"));
       return;
     }
 
     if (!form.amount || Number(form.amount) <= 0) {
-      toast.error("أدخل قيمة صحيحة للرصيد");
+      toast.error(t("أدخل قيمة صحيحة للرصيد"));
       return;
     }
 
@@ -124,11 +125,11 @@ export default function EmployeeOpeningBalanceFormModal({
           ...payload,
         }).unwrap();
 
-        toast.success("تم تعديل الرصيد الافتتاحي بنجاح");
+        toast.success(t("تم تعديل الرصيد الافتتاحي بنجاح"));
       } else {
         await createBalance(payload).unwrap();
 
-        toast.success("تم إنشاء الرصيد الافتتاحي بنجاح");
+        toast.success(t("تم إنشاء الرصيد الافتتاحي بنجاح"));
       }
 
       onSaved?.();
@@ -138,7 +139,7 @@ export default function EmployeeOpeningBalanceFormModal({
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "حدث خطأ أثناء الحفظ، حاول تاني",
+          t("حدث خطأ أثناء الحفظ، حاول تاني"),
       );
     }
   };
@@ -147,13 +148,13 @@ export default function EmployeeOpeningBalanceFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? "تعديل رصيد افتتاحي" : "رصيد افتتاحي جديد"}
+      title={isEditing ? t("تعديل رصيد افتتاحي") : t("رصيد افتتاحي جديد")}
     >
       <div className="space-y-3">
         {/* الموظف */}
         <div>
           <label className="block text-xs font-medium text-ink-400 mb-1">
-            الموظف
+            {t("الموظف")}
           </label>
 
           <CompactSelect
@@ -165,7 +166,7 @@ export default function EmployeeOpeningBalanceFormModal({
             }
             value={form.employeeId}
             onChange={(value) => setField("employeeId", value)}
-            placeholder="اختر موظف"
+            placeholder={t("اختر موظف")}
             disabled={isEditing}
           />
         </div>
@@ -173,7 +174,7 @@ export default function EmployeeOpeningBalanceFormModal({
         {/* التاريخ + نوع الرصيد */}
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="تاريخ المستند"
+            label={t("تاريخ المستند")}
             type="date"
             min={selectedFiscalYear?.startDate}
             max={selectedFiscalYear?.endDate}
@@ -183,7 +184,7 @@ export default function EmployeeOpeningBalanceFormModal({
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              نوع الرصيد
+              {t("نوع الرصيد")}
             </label>
 
             <CompactSelect
@@ -196,7 +197,7 @@ export default function EmployeeOpeningBalanceFormModal({
 
         {/* القيمة */}
         <Input
-          label="القيمة بالجنيه المصري"
+          label={t("القيمة بالجنيه المصري")}
           type="number"
           min="0"
           step="0.01"
@@ -208,10 +209,10 @@ export default function EmployeeOpeningBalanceFormModal({
         {/* العملة ثابتة */}
         <div className="rounded-lg bg-ink-50 border border-ink-100 px-3 py-2.5">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-xs text-ink-500">العملة</span>
+            <span className="text-xs text-ink-500">{t("العملة")}</span>
 
             <span className="text-sm font-semibold text-ink-900">
-              جنيه مصري (EGP)
+              {t("جنيه مصري (EGP)")}
             </span>
           </div>
         </div>
@@ -219,7 +220,7 @@ export default function EmployeeOpeningBalanceFormModal({
         {/* الملاحظات */}
         <div>
           <label className="block text-xs font-medium text-ink-400 mb-1">
-            ملاحظات
+            {t("ملاحظات")}
           </label>
 
           <textarea
@@ -227,14 +228,14 @@ export default function EmployeeOpeningBalanceFormModal({
             onChange={(event) => setField("notes", event.target.value)}
             rows={2}
             className="w-full rounded-lg border border-ink-400/15 bg-white px-3 py-2 text-sm outline-none focus:border-primary-500 transition-colors resize-none"
-            placeholder="ملاحظات اختيارية..."
+            placeholder={t("ملاحظات اختيارية...")}
           />
         </div>
 
         {/* الأزرار */}
         <div className="flex items-center justify-end gap-2 pt-2">
           <Button variant="outline" onClick={onClose} disabled={isSaving}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button onClick={handleSubmit} disabled={isSaving}>
@@ -244,7 +245,7 @@ export default function EmployeeOpeningBalanceFormModal({
               <Save size={14} />
             )}
 
-            {isSaving ? "جارِ الحفظ..." : "حفظ"}
+            {isSaving ? t("جارِ الحفظ...") : t("حفظ")}
           </Button>
         </div>
       </div>

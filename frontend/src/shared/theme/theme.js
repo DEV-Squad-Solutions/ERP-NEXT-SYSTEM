@@ -1,10 +1,11 @@
+import { t } from "../../i18n";
 export const COLOR_THEMES = [
-  { id: "default", label: "الأخضر الكلاسيكي", swatch: "#0C4A3E" },
-  { id: "ocean", label: "المحيط", swatch: "#0E5A8A" },
-  { id: "royal", label: "الملكي", swatch: "#4B3A9A" },
-  { id: "sunset", label: "الغروب", swatch: "#B5471F" },
-  { id: "rose", label: "الورد", swatch: "#9B2C5A" },
-  { id: "graphite", label: "الجرافيت", swatch: "#374151" },
+  { id: "default", label: t("الأخضر الكلاسيكي"), swatch: "#0C4A3E" },
+  { id: "ocean", label: t("المحيط"), swatch: "#0E5A8A" },
+  { id: "royal", label: t("الملكي"), swatch: "#4B3A9A" },
+  { id: "sunset", label: t("الغروب"), swatch: "#B5471F" },
+  { id: "rose", label: t("الورد"), swatch: "#9B2C5A" },
+  { id: "graphite", label: t("الجرافيت"), swatch: "#374151" },
 ];
 
 const MODE_KEY = "theme";

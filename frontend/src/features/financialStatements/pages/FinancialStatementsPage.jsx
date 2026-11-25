@@ -29,18 +29,19 @@ import FinancialStatementLineDeleteModal from "../components/FinancialStatementL
 
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
 
+import { t } from "../../../i18n";
 const STATEMENT_TYPES = [
   {
     value: "FinancialPosition",
-    label: "قائمة المركز المالي",
+    label: t("قائمة المركز المالي"),
   },
   {
     value: "IncomeStatement",
-    label: "قائمة الدخل",
+    label: t("قائمة الدخل"),
   },
   {
     value: "CashFlow",
-    label: "قائمة التدفقات النقدية",
+    label: t("قائمة التدفقات النقدية"),
   },
 ];
 
@@ -177,24 +178,24 @@ const TreeNode = ({
             )}
 
             <span className="text-sm font-semibold text-ink-900 truncate">
-              {name || "بدون اسم"}
+              {name || t("بدون اسم")}
             </span>
 
             {!isAssignable && (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-ink-400/10 text-ink-500">
-                رئيسي
+                {t("رئيسي")}
               </span>
             )}
 
             {isAssignable && (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary-500/10 text-primary-600">
-                قابل للربط
+                {t("قابل للربط")}
               </span>
             )}
 
             {!isActive && (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-600">
-                غير نشط
+                {t("غير نشط")}
               </span>
             )}
           </div>
@@ -210,7 +211,7 @@ const TreeNode = ({
               type="button"
               onClick={() => onAddChild(node)}
               className="w-8 h-8 rounded-lg flex items-center justify-center text-primary-600 hover:bg-primary-500/10 transition-colors"
-              title="إضافة بند فرعي"
+              title={t("إضافة بند فرعي")}
             >
               <Plus size={16} />
             </button>
@@ -220,7 +221,7 @@ const TreeNode = ({
             type="button"
             onClick={() => onEdit(node)}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-ink-500 hover:bg-ink-400/10 hover:text-ink-900 transition-colors"
-            title="تعديل"
+            title={t("تعديل")}
           >
             <Pencil size={15} />
           </button>
@@ -229,7 +230,7 @@ const TreeNode = ({
             type="button"
             onClick={() => onDelete(node)}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-red-500 hover:bg-red-500/10 transition-colors"
-            title="حذف"
+            title={t("حذف")}
           >
             <Trash2 size={15} />
           </button>
@@ -409,7 +410,7 @@ export default function FinancialStatementsPage() {
 
   const openCreate = () => {
     if (!fiscalYearId) {
-      toast.error("اختر السنة المالية أولاً");
+      toast.error(t("اختر السنة المالية أولاً"));
       return;
     }
 
@@ -427,12 +428,12 @@ export default function FinancialStatementsPage() {
 
   const openCreateChild = (parent) => {
     if (!fiscalYearId) {
-      toast.error("اختر السنة المالية أولاً");
+      toast.error(t("اختر السنة المالية أولاً"));
       return;
     }
 
     if (parent?.isAssignable) {
-      toast.error("لا يمكن إضافة بند فرعي تحت بند قابل للربط");
+      toast.error(t("لا يمكن إضافة بند فرعي تحت بند قابل للربط"));
       return;
     }
 
@@ -504,7 +505,7 @@ export default function FinancialStatementsPage() {
           },
         }).unwrap();
 
-        toast.success("تم تعديل البند بنجاح");
+        toast.success(t("تم تعديل البند بنجاح"));
       } else {
         await createFinancialStatementLine({
           fiscalYearId: Number(form.fiscalYearId),
@@ -517,7 +518,7 @@ export default function FinancialStatementsPage() {
           isActive: Boolean(form.isActive),
         }).unwrap();
 
-        toast.success("تم إضافة البند بنجاح");
+        toast.success(t("تم إضافة البند بنجاح"));
       }
 
       closeModal();
@@ -525,7 +526,7 @@ export default function FinancialStatementsPage() {
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "حدث خطأ أثناء تنفيذ العملية",
+          t("حدث خطأ أثناء تنفيذ العملية"),
       );
     }
   };
@@ -536,11 +537,11 @@ export default function FinancialStatementsPage() {
     try {
       await deleteFinancialStatementLine(getNodeId(deleteModal.line)).unwrap();
 
-      toast.success("تم حذف البند بنجاح");
+      toast.success(t("تم حذف البند بنجاح"));
       closeDeleteModal();
     } catch (error) {
       toast.error(
-        error?.data?.message || error?.data?.title || "تعذر حذف البند",
+        error?.data?.message || error?.data?.title || t("تعذر حذف البند"),
       );
     }
   };
@@ -571,11 +572,11 @@ export default function FinancialStatementsPage() {
 
             <div>
               <h1 className="text-xl font-bold text-ink-900">
-                تشكيل القوائم المالية
+                {t("تشكيل القوائم المالية")}
               </h1>
 
               <p className="text-sm text-ink-500 mt-0.5">
-                إدارة وتصنيف بنود القوائم المالية
+                {t("إدارة وتصنيف بنود القوائم المالية")}
               </p>
             </div>
           </div>
@@ -588,7 +589,7 @@ export default function FinancialStatementsPage() {
           className="h-10 px-4 rounded-xl bg-primary-600 text-white hover:bg-primary-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus size={17} />
-          إضافة بند
+          {t("إضافة بند")}
         </button>
       </div>
 
@@ -596,7 +597,7 @@ export default function FinancialStatementsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-ink-700 mb-2">
-              السنة المالية
+              {t("السنة المالية")}
             </label>
 
             <CompactSelect
@@ -604,20 +605,20 @@ export default function FinancialStatementsPage() {
               value={fiscalYearId}
               onChange={handleFiscalYearChange}
               isLoading={isFiscalYearsLoading}
-              placeholder="اختر السنة المالية"
+              placeholder={t("اختر السنة المالية")}
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-ink-700 mb-2">
-              نوع القائمة المالية
+              {t("نوع القائمة المالية")}
             </label>
 
             <CompactSelect
               options={STATEMENT_TYPES}
               value={statementType}
               onChange={handleStatementTypeChange}
-              placeholder="اختر نوع القائمة"
+              placeholder={t("اختر نوع القائمة")}
             />
           </div>
         </div>
@@ -629,7 +630,7 @@ export default function FinancialStatementsPage() {
             <div className=" rounded-2xl shadow-card border border-ink-400/10 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-ink-500">إجمالي البنود</p>
+                  <p className="text-xs text-ink-500">{t("إجمالي البنود")}</p>
 
                   <p className="text-2xl font-bold text-ink-900 mt-1">
                     {totals.total}
@@ -645,7 +646,7 @@ export default function FinancialStatementsPage() {
             <div className=" rounded-2xl shadow-card border border-ink-400/10 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-ink-500">البنود الرئيسية</p>
+                  <p className="text-xs text-ink-500">{t("البنود الرئيسية")}</p>
 
                   <p className="text-2xl font-bold text-ink-900 mt-1">
                     {totals.main}
@@ -661,7 +662,7 @@ export default function FinancialStatementsPage() {
             <div className=" rounded-2xl shadow-card border border-ink-400/10 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-ink-500">البنود القابلة للربط</p>
+                  <p className="text-xs text-ink-500">{t("البنود القابلة للربط")}</p>
 
                   <p className="text-2xl font-bold text-ink-900 mt-1">
                     {totals.sub}
@@ -688,7 +689,7 @@ export default function FinancialStatementsPage() {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="بحث بالكود أو اسم البند..."
+                    placeholder={t("بحث بالكود أو اسم البند...")}
                     className="w-full h-10 rounded-xl border border-ink-400/20  pr-10 pl-3 text-sm outline-none focus:border-primary-500"
                   />
                 </div>
@@ -700,7 +701,7 @@ export default function FinancialStatementsPage() {
                     disabled={!flatTree.length}
                     className="h-10 px-3 rounded-xl border border-ink-400/20 text-sm text-ink-600 hover:bg-ink-400/5 transition-colors disabled:opacity-50"
                   >
-                    فتح الكل
+                    {t("فتح الكل")}
                   </button>
 
                   <button
@@ -709,7 +710,7 @@ export default function FinancialStatementsPage() {
                     disabled={!expanded.size}
                     className="h-10 px-3 rounded-xl border border-ink-400/20 text-sm text-ink-600 hover:bg-ink-400/5 transition-colors disabled:opacity-50"
                   >
-                    غلق الكل
+                    {t("غلق الكل")}
                   </button>
 
                   <button
@@ -717,7 +718,7 @@ export default function FinancialStatementsPage() {
                     onClick={() => refetch()}
                     disabled={isFetching}
                     className="w-10 h-10 rounded-xl border border-ink-400/20 text-ink-600 hover:bg-ink-400/5 transition-colors flex items-center justify-center disabled:opacity-50"
-                    title="تحديث"
+                    title={t("تحديث")}
                   >
                     <RefreshCw
                       size={16}
@@ -737,7 +738,7 @@ export default function FinancialStatementsPage() {
                 <div className="min-h-[280px] flex items-center justify-center">
                   <div className="flex items-center gap-2 text-ink-500">
                     <Loader2 size={20} className="animate-spin" />
-                    جاري تحميل البنود...
+                    {t("جاري تحميل البنود...")}
                   </div>
                 </div>
               ) : filteredTree.length === 0 ? (
@@ -746,12 +747,12 @@ export default function FinancialStatementsPage() {
                     <FolderTree size={25} />
                   </div>
 
-                  <h3 className="font-bold text-ink-800">لا توجد بنود</h3>
+                  <h3 className="font-bold text-ink-800">{t("لا توجد بنود")}</h3>
 
                   <p className="text-sm text-ink-500 mt-1">
                     {search
-                      ? "لا توجد نتائج مطابقة للبحث"
-                      : "لم يتم إنشاء بنود لهذه القائمة بعد"}
+                      ? t("لا توجد نتائج مطابقة للبحث")
+                      : t("لم يتم إنشاء بنود لهذه القائمة بعد")}
                   </p>
 
                   {!search && (
@@ -761,7 +762,7 @@ export default function FinancialStatementsPage() {
                       className="mt-4 h-9 px-4 rounded-xl bg-primary-600 text-white text-sm hover:bg-primary-700 transition-colors flex items-center gap-2"
                     >
                       <Plus size={15} />
-                      إضافة أول بند
+                      {t("إضافة أول بند")}
                     </button>
                   )}
                 </div>
@@ -792,10 +793,10 @@ export default function FinancialStatementsPage() {
             <FolderTree size={28} />
           </div>
 
-          <h2 className="text-lg font-bold text-ink-900">اختر السنة المالية</h2>
+          <h2 className="text-lg font-bold text-ink-900">{t("اختر السنة المالية")}</h2>
 
           <p className="text-sm text-ink-500 mt-1 max-w-md">
-            اختر السنة المالية ونوع القائمة لعرض وتشكيل البنود الخاصة بها.
+            {t("اختر السنة المالية ونوع القائمة لعرض وتشكيل البنود الخاصة بها.")}
           </p>
         </div>
       )}

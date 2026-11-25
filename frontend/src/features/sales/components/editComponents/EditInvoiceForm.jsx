@@ -8,6 +8,8 @@ import {
 import { useGetItemUnitsSelectQuery } from "../../../units/itemUnitsApi";
 import CompactSelect from "../../../../shared/components/ui/CompactSelect";
 
+import { t } from "../../../../i18n";
+import { getLocale } from "../../../../i18n";
 /* =========================================================
    Helpers — نفس المنطق المستخدم في نسخة التعديل (NewInvoiceLineRow)
    عشان الحسابات والـ payload يتصرفوا بنفس الطريقة في الإنشاء والتعديل
@@ -235,8 +237,8 @@ function InvoiceLineRow({ line, updateLine, removeLine, index }) {
   const handleRemove = useCallback(() => {
     onRemove();
 
-    toast.success("تم حذف الصنف من الفاتورة", {
-      description: line.itemName || "صنف بدون اسم",
+    toast.success(t("تم حذف الصنف من الفاتورة"), {
+      description: line.itemName || t("صنف بدون اسم"),
     });
   }, [line.itemName, onRemove]);
 
@@ -279,7 +281,7 @@ function InvoiceLineRow({ line, updateLine, removeLine, index }) {
         {isItemsError ? (
           <div className="flex items-center gap-1.5 text-xs text-negative px-2 py-2 bg-negative/5 rounded-lg">
             <AlertCircle size={13} />
-            تعذر التحميل
+            {t("تعذر التحميل")}
           </div>
         ) : (
           <CompactSelect
@@ -287,7 +289,7 @@ function InvoiceLineRow({ line, updateLine, removeLine, index }) {
             value={line.itemId}
             onChange={(value) => set("itemId", value)}
             isLoading={isLoadingItems}
-            placeholder="اختر الصنف"
+            placeholder={t("اختر الصنف")}
           />
         )}
       </td>
@@ -300,7 +302,7 @@ function InvoiceLineRow({ line, updateLine, removeLine, index }) {
           onChange={(value) => set("itemUnitId", value)}
           isLoading={isLoadingUnits}
           isDisabled={!line.itemId}
-          placeholder={line.itemId ? "الوحدة" : "اختر الصنف أولاً"}
+          placeholder={line.itemId ? t("الوحدة") : t("اختر الصنف أولاً")}
         />
       </td>
 
@@ -329,7 +331,7 @@ function InvoiceLineRow({ line, updateLine, removeLine, index }) {
       {/* الكمية محسوبة */}
       <td className="p-2 w-24">
         <div className={`${readonlyCls} font-medium text-ink-900`}>
-          {(line.quantity || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+          {(line.quantity || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
         </div>
       </td>
 
@@ -342,7 +344,7 @@ function InvoiceLineRow({ line, updateLine, removeLine, index }) {
             set("price", e.target.value === "" ? "" : Number(e.target.value))
           }
           className={inputCls}
-          placeholder="بدون سعر"
+          placeholder={t("بدون سعر")}
         />
       </td>
 
@@ -350,11 +352,11 @@ function InvoiceLineRow({ line, updateLine, removeLine, index }) {
       <td className="p-2 w-28 text-center">
         {Number(line.price) > 0 ? (
           <span className="num font-semibold text-ink-900">
-            {total.toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+            {total.toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
           </span>
         ) : (
           <span className="inline-flex items-center text-xs text-gold-600 bg-gold-50 px-2 py-1 rounded-full">
-            بانتظار التسعير
+            {t("بانتظار التسعير")}
           </span>
         )}
       </td>
@@ -364,7 +366,7 @@ function InvoiceLineRow({ line, updateLine, removeLine, index }) {
         <input
           value={line.notes || ""}
           onChange={(e) => set("notes", e.target.value)}
-          placeholder="ملاحظة اختيارية"
+          placeholder={t("ملاحظة اختيارية")}
           className="w-full rounded-lg border border-ink-400/15 px-2.5 py-2 text-sm bg-white focus:outline-none"
         />
       </td>
@@ -375,7 +377,7 @@ function InvoiceLineRow({ line, updateLine, removeLine, index }) {
           type="button"
           onClick={handleRemove}
           className="p-2 rounded-lg text-ink-400 opacity-60 group-hover:opacity-100 hover:text-negative hover:bg-negative/10 transition-all"
-          title="حذف الصنف"
+          title={t("حذف الصنف")}
         >
           <Trash2 size={15} />
         </button>

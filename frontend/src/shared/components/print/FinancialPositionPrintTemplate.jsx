@@ -3,8 +3,10 @@ import { Fragment } from "react";
 import { formatDateTime } from "../../../lib/date.js";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 function fmt(n) {
-  return new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 }).format(
+  return new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 2 }).format(
     n ?? 0,
   );
 }
@@ -21,43 +23,43 @@ export default function FinancialPositionPrintTemplate({
   const { totalAssets, totalLE, difference, balanced } = summary;
 
   return (
-    <div className="p-8 text-ink-900" dir="rtl">
+    <div className="p-8 text-ink-900" dir={getDir()}>
       <div className="flex items-center justify-between border-b border-ink-900/20 pb-4 mb-6">
         <div>
           {companyName && <p className="text-sm font-bold">{companyName}</p>}
-          <h1 className="text-xl font-bold">قائمة المركز المالي</h1>
+          <h1 className="text-xl font-bold">{t("قائمة المركز المالي")}</h1>
           <p className="text-xs text-ink-400 mt-1">
-            تاريخ الطباعة: {printedAt}
+            {t("تاريخ الطباعة:")} {printedAt}
           </p>
         </div>
         <div className="text-sm text-ink-400 text-left">
-          {data?.fiscalYearName && <p>السنة المالية: {data.fiscalYearName}</p>}
+          {data?.fiscalYearName && <p>{t("السنة المالية:")} {data.fiscalYearName}</p>}
           <p>
-            من {formatDate(filters.fromDate)} إلى {formatDate(filters.toDate)}
+            {t("من")} {formatDate(filters.fromDate)} {t("إلى")} {formatDate(filters.toDate)}
           </p>
         </div>
       </div>
 
       <div className="mb-4 text-xs text-ink-400 space-x-3 space-x-reverse">
         <span>
-          طريقة العرض: {filters.viewMode === "Detailed" ? "تفصيلي" : "ملخص"}
+          {t("طريقة العرض:")} {filters.viewMode === "Detailed" ? t("تفصيلي") : t("ملخص")}
         </span>
         <span>
-          | التسويات:{" "}
+          {t("| التسويات:")}{" "}
           {filters.adjustmentView === "BeforeAdjustments"
-            ? "قبل التسوية"
-            : "بعد التسوية"}
+            ? t("قبل التسوية")
+            : t("بعد التسوية")}
         </span>
-        <span>| العملة: {data?.baseCurrency || "EGP"}</span>
+        <span>{t("| العملة:")} {data?.baseCurrency || "EGP"}</span>
       </div>
 
       <table className="w-full text-right text-sm border-collapse">
         <thead>
           <tr className="border-b-2 border-ink-900">
-            <th className="py-2 px-2">{isDetailed ? "الحساب" : "البند"}</th>
-            <th className="py-2 px-2">رصيد أول المدة</th>
-            <th className="py-2 px-2">حركة الفترة</th>
-            <th className="py-2 px-2">رصيد آخر المدة</th>
+            <th className="py-2 px-2">{isDetailed ? t("الحساب") : t("البند")}</th>
+            <th className="py-2 px-2">{t("رصيد أول المدة")}</th>
+            <th className="py-2 px-2">{t("حركة الفترة")}</th>
+            <th className="py-2 px-2">{t("رصيد آخر المدة")}</th>
           </tr>
         </thead>
         <tbody>
@@ -111,7 +113,7 @@ export default function FinancialPositionPrintTemplate({
               })}
 
               <tr className="border-b-2 border-ink-900/30 font-bold">
-                <td className="py-2 px-2">إجمالي {section.title}</td>
+                <td className="py-2 px-2">{t("إجمالي")} {section.title}</td>
                 <td className="py-2 px-2">{fmt(section.sum.opening)}</td>
                 <td className="py-2 px-2">{fmt(section.sum.movement)}</td>
                 <td className="py-2 px-2">{fmt(section.sum.closing)}</td>
@@ -124,19 +126,19 @@ export default function FinancialPositionPrintTemplate({
           <tfoot>
             <tr className="font-bold">
               <td className="py-2 px-2" colSpan={3}>
-                إجمالي الأصول
+                {t("إجمالي الأصول")}
               </td>
               <td className="py-2 px-2">{fmt(totalAssets)}</td>
             </tr>
             <tr className="font-bold">
               <td className="py-2 px-2" colSpan={3}>
-                إجمالي الالتزامات وحقوق الملكية
+                {t("إجمالي الالتزامات وحقوق الملكية")}
               </td>
               <td className="py-2 px-2">{fmt(totalLE)}</td>
             </tr>
             <tr className="font-bold border-t-2 border-ink-900">
               <td className="py-2 px-2" colSpan={3}>
-                {balanced ? "الميزانية متوازنة" : "الفرق بين الطرفين"}
+                {balanced ? t("الميزانية متوازنة") : t("الفرق بين الطرفين")}
               </td>
               <td className="py-2 px-2">{balanced ? "✓" : fmt(difference)}</td>
             </tr>
@@ -145,7 +147,7 @@ export default function FinancialPositionPrintTemplate({
       </table>
 
       {sections.length === 0 && (
-        <p className="text-center text-ink-400 py-10">لا توجد بيانات للطباعة</p>
+        <p className="text-center text-ink-400 py-10">{t("لا توجد بيانات للطباعة")}</p>
       )}
     </div>
   );

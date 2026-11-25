@@ -16,10 +16,11 @@ import {
 } from "../exchangeRatesApi";
 import { useGetCurrenciesSelectQuery } from "../../currencies/currenciesApi";
 
+import { t } from "../../../i18n";
 const schema = z.object({
-  currency: z.string().min(1, "اختر العملة"),
-  rate: z.coerce.number().positive("السعر لازم يكون أكبر من صفر"),
-  rateDate: z.string().min(1, "التاريخ مطلوب"),
+  currency: z.string().min(1, t("اختر العملة")),
+  rate: z.coerce.number().positive(t("السعر لازم يكون أكبر من صفر")),
+  rateDate: z.string().min(1, t("التاريخ مطلوب")),
   notes: z.string().optional(),
   updateLinkedTransactions: z.boolean().optional(),
 });
@@ -102,7 +103,7 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
           rowVersion: rate.rowVersion,
         }).unwrap();
 
-        toast.success("تم تحديث سعر العملة بنجاح");
+        toast.success(t("تم تحديث سعر العملة بنجاح"));
       } else {
         await createExchangeRate({
           currency: data.currency,
@@ -112,7 +113,7 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
           notes: data.notes,
         }).unwrap();
 
-        toast.success("تمت إضافة سعر العملة بنجاح");
+        toast.success(t("تمت إضافة سعر العملة بنجاح"));
       }
 
       onSaved();
@@ -120,7 +121,7 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
       const message =
         error?.data?.detail ||
         error?.data?.title ||
-        "حصل خطأ أثناء الحفظ، حاول تاني";
+        t("حصل خطأ أثناء الحفظ، حاول تاني");
 
       toast.error(message);
     }
@@ -130,12 +131,12 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? `تعديل سعر ${rate.currency}` : "إضافة سعر عملة"}
+      title={isEdit ? t("تعديل سعر {0}", { 0: rate.currency }) : t("إضافة سعر عملة")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label className="block text-xs font-medium text-ink-400 mb-1">
-            العملة
+            {t("العملة")}
           </label>
 
           <Controller
@@ -153,7 +154,7 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
                 }
                 value={field.value}
                 onChange={field.onChange}
-                placeholder="اختر العملة"
+                placeholder={t("اختر العملة")}
                 disabled={isEdit}
               />
             )}
@@ -167,7 +168,7 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
         </div>
 
         <Input
-          label="السعر"
+          label={t("السعر")}
           type="number"
           step="0.01"
           {...register("rate")}
@@ -175,7 +176,7 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
         />
 
         <Input
-          label="تاريخ السعر"
+          label={t("تاريخ السعر")}
           type="date"
           min={selectedFiscalYear?.startDate}
           max={selectedFiscalYear?.endDate}
@@ -184,7 +185,7 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
         />
 
         <Input
-          label="ملاحظات (اختياري)"
+          label={t("ملاحظات (اختياري)")}
           {...register("notes")}
           error={errors.notes?.message}
         />
@@ -198,11 +199,9 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
             />
 
             <span>
-              تحديث كل الفواتير والسندات وتحويلات الخزائن والأرصدة المرتبطة بنفس
-              سعر الصرف
+              {t("تحديث كل الفواتير والسندات وتحويلات الخزائن والأرصدة المرتبطة بنفس سعر الصرف")}
               <span className="mt-0.5 block text-xs text-amber-600">
-                تنبيه: ده هيعيد حساب حركات قديمة مرتبطة بالسعر ده — استخدمه
-                بحذر.
+                {t("تنبيه: ده هيعيد حساب حركات قديمة مرتبطة بالسعر ده — استخدمه بحذر.")}
               </span>
             </span>
           </label>
@@ -210,11 +209,11 @@ export default function CurrencyFormModal({ isOpen, rate, onClose, onSaved }) {
 
         <div className="flex justify-end gap-2 pt-2 border-t border-ink-400/10">
           <Button type="button" variant="outline" onClick={onClose}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "جارِ الحفظ..." : "حفظ"}
+            {isSubmitting ? t("جارِ الحفظ...") : t("حفظ")}
           </Button>
         </div>
       </form>

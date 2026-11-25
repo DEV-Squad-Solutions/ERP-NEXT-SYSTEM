@@ -16,6 +16,7 @@ import {
   getMode,
 } from "../../theme/theme";
 
+import { t } from "../../../i18n";
 export default function ThemePicker() {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState(getMode);
@@ -67,7 +68,7 @@ export default function ThemePicker() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex h-9 w-9 items-center justify-center rounded-lg border border-ink-100 text-ink-400 transition hover:bg-primary-50 hover:text-primary-500 dark:border-white/10 dark:text-slate-300"
-        aria-label="المظهر"
+        aria-label={t("المظهر")}
         aria-expanded={open}
       >
         <Palette size={18} />
@@ -85,7 +86,7 @@ export default function ThemePicker() {
                   : "border-ink-100 text-ink-400 dark:border-white/10 dark:text-slate-300"
               }`}
             >
-              <Sun size={14} /> فاتح
+              <Sun size={14} /> {t("فاتح")}
             </button>
             <button
               type="button"
@@ -96,7 +97,7 @@ export default function ThemePicker() {
                   : "border-ink-100 text-ink-400 dark:border-white/10 dark:text-slate-300"
               }`}
             >
-              <Moon size={14} /> داكن
+              <Moon size={14} /> {t("داكن")}
             </button>
           </div>
 
@@ -130,11 +131,11 @@ export default function ThemePicker() {
                 onClick={() => setMyTheme({ colorTheme: null, mode: null })}
                 className="w-full rounded-lg border border-ink-100 px-2 py-1.5 text-ink-500 hover:bg-ink-50 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/5"
               >
-                استخدام افتراضي الشركة
+                {t("استخدام افتراضي الشركة")}
               </button>
             ) : (
               <p className="text-ink-400 dark:text-slate-400">
-                بتستخدم الافتراضي اللي حدده الأدمن للشركة.
+                {t("بتستخدم الافتراضي اللي حدده الأدمن للشركة.")}
               </p>
             )}
             {isAdmin && (
@@ -144,7 +145,7 @@ export default function ThemePicker() {
                 onClick={() => setCompanyTheme({ colorTheme: color, mode })}
                 className="w-full rounded-lg bg-primary-500 px-2 py-1.5 font-semibold text-white disabled:opacity-60"
               >
-                {savingCompany ? "جارٍ الحفظ..." : "تعيين كافتراضي للشركة"}
+                {savingCompany ? t("جارٍ الحفظ...") : t("تعيين كافتراضي للشركة")}
               </button>
             )}
           </div>

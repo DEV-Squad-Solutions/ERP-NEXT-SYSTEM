@@ -31,6 +31,7 @@ import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import Button from "../../../shared/components/ui/Button";
 import Pagination from "../../../shared/components/ui/Pagination";
 
+import { t } from "../../../i18n";
 const emptyFilters = {
   search: "",
   employeeType: "",
@@ -89,18 +90,18 @@ export default function EmployeesPage() {
   };
 
   const handleDelete = (employee) => {
-    toast(`حذف "${employee.name}"؟`, {
-      description: "الإجراء ده لا يمكن التراجع عنه",
+    toast(t("حذف \"{0}\"؟", { 0: employee.name }), {
+      description: t("الإجراء ده لا يمكن التراجع عنه"),
       action: {
-        label: "تأكيد الحذف",
+        label: t("تأكيد الحذف"),
         onClick: async () => {
           try {
             await deleteEmployee(employee.id).unwrap();
-            toast.success("تم الحذف بنجاح");
+            toast.success(t("تم الحذف بنجاح"));
           } catch {}
         },
       },
-      cancel: { label: "إلغاء" },
+      cancel: { label: t("إلغاء") },
       duration: 6000,
     });
   };
@@ -118,40 +119,40 @@ export default function EmployeesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-2xl font-bold text-ink-900">
-            الموظفين
+            {t("الموظفين")}
           </h2>
           <p className="text-sm text-ink-400 mt-1">
-            إدارة بيانات الموظفين والأجور
+            {t("إدارة بيانات الموظفين والأجور")}
           </p>
         </div>
         <Button onClick={openAddModal}>
           <Plus size={16} />
-          إضافة موظف
+          {t("إضافة موظف")}
         </Button>
       </div>
 
       {data?.summary && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
-            <p className="text-xs text-ink-400 mb-1">الموظفين الشهريين</p>
+            <p className="text-xs text-ink-400 mb-1">{t("الموظفين الشهريين")}</p>
             <p className="text-lg font-bold num text-ink-900">
               {data.summary.totalMonthlyEmployees}
             </p>
           </div>
           <div className="rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
-            <p className="text-xs text-ink-400 mb-1">الموظفين اليوميين</p>
+            <p className="text-xs text-ink-400 mb-1">{t("الموظفين اليوميين")}</p>
             <p className="text-lg font-bold num text-ink-900">
               {data.summary.totalDailyEmployees}
             </p>
           </div>
           <div className="rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
-            <p className="text-xs text-ink-400 mb-1">نشطين</p>
+            <p className="text-xs text-ink-400 mb-1">{t("نشطين")}</p>
             <p className="text-lg font-bold num text-emerald-700">
               {data.summary.totalActiveEmployees}
             </p>
           </div>
           <div className="rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
-            <p className="text-xs text-ink-400 mb-1">غير نشطين</p>
+            <p className="text-xs text-ink-400 mb-1">{t("غير نشطين")}</p>
             <p className="text-lg font-bold num text-red-500">
               {data.summary.totalInactiveEmployees}
             </p>
@@ -166,7 +167,7 @@ export default function EmployeesPage() {
             <Input
               value={draft.search}
               onChange={(e) => setField("search", e.target.value)}
-              placeholder="ابحث بالاسم أو الرقم..."
+              placeholder={t("ابحث بالاسم أو الرقم...")}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
           </div>
@@ -175,7 +176,7 @@ export default function EmployeesPage() {
               options={employeeTypeOptions}
               value={draft.employeeType}
               onChange={(val) => setField("employeeType", val)}
-              placeholder="نوع الأجر"
+              placeholder={t("نوع الأجر")}
             />
           </div>
           <div className="w-full sm:w-36">
@@ -183,13 +184,13 @@ export default function EmployeesPage() {
               options={employeeStatusOptions}
               value={draft.isActive}
               onChange={(val) => setField("isActive", val)}
-              placeholder="الحالة"
+              placeholder={t("الحالة")}
             />
           </div>
           <div className="flex gap-2 shrink-0">
             <Button onClick={handleSearch} className="h-9">
               <Search size={14} />
-              بحث
+              {t("بحث")}
             </Button>
             <Button variant="outline" onClick={handleReset} className="h-9">
               <RotateCcw size={14} />
@@ -212,23 +213,23 @@ export default function EmployeesPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3 pt-3 border-t border-ink-400/10">
             <div>
               <label className="block text-xs font-medium text-ink-400 mb-1">
-                مكان العمل
+                {t("مكان العمل")}
               </label>
               <CompactSelect
                 options={workPlaceStatusOptions}
                 value={draft.workPlaceStatus}
                 onChange={(val) => setField("workPlaceStatus", val)}
-                placeholder="الكل"
+                placeholder={t("الكل")}
               />
             </div>
             <Input
-              label="أقل راتب"
+              label={t("أقل راتب")}
               type="number"
               value={draft.minSalary}
               onChange={(e) => setField("minSalary", e.target.value)}
             />
             <Input
-              label="أعلى راتب"
+              label={t("أعلى راتب")}
               type="number"
               value={draft.maxSalary}
               onChange={(e) => setField("maxSalary", e.target.value)}
@@ -238,7 +239,7 @@ export default function EmployeesPage() {
 
         {activeFiltersCount > 0 && (
           <p className="text-[11px] text-ink-400 mt-2">
-            {activeFiltersCount} فلتر مفعّل
+            {activeFiltersCount} {t("فلتر مفعّل")}
           </p>
         )}
       </div>
@@ -267,14 +268,14 @@ export default function EmployeesPage() {
             strokeWidth={1.6}
           />
           <p className="text-ink-900 font-medium text-sm mb-1">
-            حدث خطأ في تحميل بيانات الموظفين
+            {t("حدث خطأ في تحميل بيانات الموظفين")}
           </p>
           <button
             onClick={refetch}
             className="inline-flex items-center gap-2 text-xs font-medium text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-lg transition-colors mt-2"
           >
             <RefreshCw size={13} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : employees.length === 0 ? (
@@ -283,14 +284,14 @@ export default function EmployeesPage() {
             <Users size={24} className="text-ink-400/50" strokeWidth={1.6} />
           </div>
           <p className="text-ink-900 font-medium text-sm mb-1">
-            لا يوجد موظفين
+            {t("لا يوجد موظفين")}
           </p>
           <p className="text-xs text-ink-400 mb-4">
-            جرّب تعديل الفلاتر أو أضف موظف جديد
+            {t("جرّب تعديل الفلاتر أو أضف موظف جديد")}
           </p>
           <Button onClick={openAddModal} variant="outline">
             <Plus size={14} />
-            إضافة موظف
+            {t("إضافة موظف")}
           </Button>
         </div>
       ) : (
@@ -302,30 +303,30 @@ export default function EmployeesPage() {
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    رقم الموظف
+                    {t("رقم الموظف")}
                   </th>
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الموظف
+                    {t("الموظف")}
                   </th>
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الوظيفة
+                    {t("الوظيفة")}
                   </th>
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    التواصل
+                    {t("التواصل")}
                   </th>
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    مكان العمل
+                    {t("مكان العمل")}
                   </th>
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    نوع الأجر
+                    {t("نوع الأجر")}
                   </th>
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الراتب الأساسي
+                    {t("الراتب الأساسي")}
                   </th>
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الحالة
+                    {t("الحالة")}
                   </th>
-                  <th className="p-2.5 font-medium">الإجراءات</th>
+                  <th className="p-2.5 font-medium">{t("الإجراءات")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -367,8 +368,8 @@ export default function EmployeesPage() {
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-ink-700">
                           {emp.workPlaceStatus === "OutCompany"
-                            ? "خارج الشركة"
-                            : "داخل الشركة"}
+                            ? t("خارج الشركة")
+                            : t("داخل الشركة")}
                         </span>
                         {emp.placeName && (
                           <span className="flex items-center gap-1 text-[11px] text-ink-400">
@@ -381,12 +382,12 @@ export default function EmployeesPage() {
                     <td className="p-2.5 border-l border-ink-400/5">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-ink-700">
-                          {emp.employeeType === "Daily" ? "يومي" : "شهري"}
+                          {emp.employeeType === "Daily" ? t("يومي") : t("شهري")}
                         </span>
                         {emp.employeeType === "Monthly" &&
                           emp.requiredWorkingDaysPerMonth > 0 && (
                             <span className="text-[11px] text-ink-400 num">
-                              {emp.requiredWorkingDaysPerMonth} يوم/شهر
+                              {emp.requiredWorkingDaysPerMonth} {t("يوم/شهر")}
                             </span>
                           )}
                       </div>
@@ -402,7 +403,7 @@ export default function EmployeesPage() {
                             : "inline-block text-red-500 text-xs font-semibold bg-red-500/10 px-2 py-0.5 rounded-full"
                         }
                       >
-                        {emp.isActive ? "نشط" : "غير نشط"}
+                        {emp.isActive ? t("نشط") : t("غير نشط")}
                       </span>
                     </td>
                     <td className="p-2.5">
@@ -412,21 +413,21 @@ export default function EmployeesPage() {
                             navigate(`/dashboard/payroll/employees/${emp.id}`)
                           }
                           className="p-1.5 rounded-lg text-ink-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
-                          title="عرض"
+                          title={t("عرض")}
                         >
                           <Eye size={15} />
                         </button>
                         <button
                           onClick={() => openEditModal(emp)}
                           className="p-1.5 rounded-lg text-ink-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
-                          title="تعديل"
+                          title={t("تعديل")}
                         >
                           <Pencil size={15} />
                         </button>
                         <button
                           onClick={() => handleDelete(emp)}
                           className="p-1.5 rounded-lg text-ink-400 hover:text-negative hover:bg-negative/10 transition-colors"
-                          title="حذف"
+                          title={t("حذف")}
                         >
                           <Trash2 size={15} />
                         </button>

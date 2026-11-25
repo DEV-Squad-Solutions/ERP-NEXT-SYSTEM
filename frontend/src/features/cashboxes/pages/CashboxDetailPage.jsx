@@ -55,14 +55,16 @@ import { selectIsAdmin, selectIsAdminOrAccountant } from "../../auth/authSlice";
 import { selectSelectedFiscalYearId } from "../../fiscalYears/fiscalYearSlice";
 import CashHandoverReportModal from "../components/CashHandoverReportModal";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const currencySymbols = {
-  EGP: "ج.م",
+  EGP: t("ج.م"),
   USD: "$",
   EUR: "€",
   GBP: "£",
   SAR: "﷼",
-  AED: "د.إ",
-  KWD: "د.ك",
+  AED: t("د.إ"),
+  KWD: t("د.ك"),
 };
 
 const emptyFilters = {
@@ -88,64 +90,64 @@ const emptyFilters = {
 const directionOptions = [
   {
     value: "Receipt",
-    label: "وارد",
+    label: t("وارد"),
   },
   {
     value: "Payment",
-    label: "صادر",
+    label: t("صادر"),
   },
 ];
 
 const classificationOptions = [
   {
     value: "PartnerSettlement",
-    label: "تسوية طرف",
+    label: t("تسوية طرف"),
   },
   {
     value: "Expense",
-    label: "مصروف",
+    label: t("مصروف"),
   },
   {
     value: "Revenue",
-    label: "إيراد",
+    label: t("إيراد"),
   },
   {
     value: "Other",
-    label: "أخرى",
+    label: t("أخرى"),
   },
 ];
 
 const partyTypeOptions = [
   {
     value: "None",
-    label: "بدون طرف",
+    label: t("بدون طرف"),
   },
   {
     value: "Partner",
-    label: "شريك",
+    label: t("شريك"),
   },
   {
     value: "Driver",
-    label: "سائق",
+    label: t("سائق"),
   },
   {
     value: "Other",
-    label: "طرف آخر",
+    label: t("طرف آخر"),
   },
   {
     value: "Employee",
-    label: "موظف",
+    label: t("موظف"),
   },
 ];
 
 const draftOptions = [
   {
     value: "true",
-    label: "مسودة",
+    label: t("مسودة"),
   },
   {
     value: "false",
-    label: "مرحل",
+    label: t("مرحل"),
   },
 ];
 
@@ -308,7 +310,7 @@ export default function CashboxDetailPage() {
   const isForeignCashbox = cashboxCurrency !== cashboxBaseCurrency;
 
   const fmt = (number) =>
-    Number(number ?? 0).toLocaleString("ar-EG", {
+    Number(number ?? 0).toLocaleString(getLocale(), {
       maximumFractionDigits: 2,
     });
 
@@ -407,11 +409,11 @@ export default function CashboxDetailPage() {
   // الباك بيرفض لو فيه سندات على الخزنة (OpeningOrCurrencyChangeNotAllowed).
   async function handleDeleteOpeningBalance() {
     if (!isAdmin) {
-      throw new Error("ليس لديك صلاحية حذف الرصيد الافتتاحي");
+      throw new Error(t("ليس لديك صلاحية حذف الرصيد الافتتاحي"));
     }
 
     if (!cashbox) {
-      throw new Error("بيانات الخزنة غير متاحة");
+      throw new Error(t("بيانات الخزنة غير متاحة"));
     }
 
     await updateCashbox({
@@ -437,7 +439,7 @@ export default function CashboxDetailPage() {
   };
 
   const { printList, printRef } = useCashboxLedgerPrint({
-    title: `كشف حركة ${cashbox?.name || "الخزنة"}`,
+    title: t("كشف حركة {0}", { 0: cashbox?.name || "الخزنة" }),
   });
 
   return (
@@ -447,7 +449,7 @@ export default function CashboxDetailPage() {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-bold text-ink-900">
-                {cashbox?.name || "الخزنة"}
+                {cashbox?.name || t("الخزنة")}
               </h1>
 
               {cashbox && (
@@ -464,7 +466,7 @@ export default function CashboxDetailPage() {
             </div>
 
             <p className="mt-2 text-sm text-ink-400">
-              سجل حركة الخزنة اليومية — وارد، صادر، ورصيد تراكمي
+              {t("سجل حركة الخزنة اليومية — وارد، صادر، ورصيد تراكمي")}
             </p>
           </div>
 
@@ -473,7 +475,7 @@ export default function CashboxDetailPage() {
               <div className="rounded-xl border border-ink-400/10 bg-ink-900/[0.02] px-3.5 py-2">
                 <p className="flex items-center gap-1 text-[11px] text-ink-400">
                   <Wallet size={12} className="shrink-0" />
-                  الرصيد الحالي
+                  {t("الرصيد الحالي")}
                 </p>
 
                 <p className="num mt-0.5 text-xl font-bold leading-6 text-ink-900">
@@ -494,7 +496,7 @@ export default function CashboxDetailPage() {
                     )}
                     {cashboxBaseCurrency}
                     <span className="mx-0.5 text-ink-300">•</span>
-                    <span title="سعر الصرف">
+                    <span title={t("سعر الصرف")}>
                       {fmt(
                         cashbox.currentExchangeRate ??
                           cashbox.openingExchangeRate ??
@@ -508,34 +510,34 @@ export default function CashboxDetailPage() {
 
             <div className="flex flex-wrap items-center gap-2">
               {canExecute && (
-                <Button onClick={() => setShowCreateVoucher(true)} title="سند جديد">
+                <Button onClick={() => setShowCreateVoucher(true)} title={t("سند جديد")}>
                   <Plus size={16} />
-                  سند جديد
+                  {t("سند جديد")}
                 </Button>
               )}
 
               <Button
                 variant="outline"
                 onClick={() => setShowHandover(true)}
-                title="تسليم وردية"
+                title={t("تسليم وردية")}
               >
                 <HandCoins size={16} />
-                تسليم وردية
+                {t("تسليم وردية")}
               </Button>
 
-              <Button variant="outline" onClick={printList} title="طباعة الكشف">
+              <Button variant="outline" onClick={printList} title={t("طباعة الكشف")}>
                 <Printer size={16} />
-                طباعة
+                {t("طباعة")}
               </Button>
 
-              <Button variant="outline" onClick={refetch} title="تحديث البيانات">
+              <Button variant="outline" onClick={refetch} title={t("تحديث البيانات")}>
                 <RefreshCw
                   size={16}
                   className={
                     isFetching || isFetchingCashbox ? "animate-spin" : ""
                   }
                 />
-                تحديث
+                {t("تحديث")}
               </Button>
             </div>
           </div>
@@ -553,10 +555,10 @@ export default function CashboxDetailPage() {
             </div>
 
             <div className="text-right">
-              <h3 className="font-semibold">فلاتر البحث</h3>
+              <h3 className="font-semibold">{t("فلاتر البحث")}</h3>
 
               <span className="text-xs text-gray-500">
-                {activeFilters} فلتر مفعل
+                {activeFilters} {t("فلتر مفعل")}
               </span>
             </div>
           </div>
@@ -596,8 +598,8 @@ export default function CashboxDetailPage() {
               <div className="border-t p-5">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                   <Input
-                    label="بحث عام"
-                    placeholder="رقم السند، البيان، الطرف..."
+                    label={t("بحث عام")}
+                    placeholder={t("رقم السند، البيان، الطرف...")}
                     value={filters.draft.search}
                     onChange={(event) =>
                       setFilter("search", event.target.value)
@@ -605,8 +607,8 @@ export default function CashboxDetailPage() {
                   />
 
                   <Input
-                    label="رقم السند"
-                    placeholder="رقم السند"
+                    label={t("رقم السند")}
+                    placeholder={t("رقم السند")}
                     value={filters.draft.voucherNumber}
                     onChange={(event) =>
                       setFilter("voucherNumber", event.target.value)
@@ -615,20 +617,20 @@ export default function CashboxDetailPage() {
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      اتجاه الحركة
+                      {t("اتجاه الحركة")}
                     </label>
 
                     <CompactSelect
                       options={directionOptions}
                       value={filters.draft.direction}
                       onChange={(value) => setFilter("direction", value)}
-                      placeholder="الكل"
+                      placeholder={t("الكل")}
                     />
                   </div>
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      الخزنة
+                      {t("الخزنة")}
                     </label>
 
                     <Input value={cashbox?.name || ""} disabled />
@@ -636,7 +638,7 @@ export default function CashboxDetailPage() {
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      نوع الحركة
+                      {t("نوع الحركة")}
                     </label>
 
                     <CompactSelect
@@ -646,39 +648,39 @@ export default function CashboxDetailPage() {
                         setFilter("cashMovementTypeId", value)
                       }
                       isLoading={isLoadingMovementTypesFilter}
-                      placeholder="الكل"
+                      placeholder={t("الكل")}
                     />
                   </div>
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      التصنيف
+                      {t("التصنيف")}
                     </label>
 
                     <CompactSelect
                       options={classificationOptions}
                       value={filters.draft.classification}
                       onChange={(value) => setFilter("classification", value)}
-                      placeholder="الكل"
+                      placeholder={t("الكل")}
                     />
                   </div>
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      نوع الطرف
+                      {t("نوع الطرف")}
                     </label>
 
                     <CompactSelect
                       options={partyTypeOptions}
                       value={filters.draft.partyType}
                       onChange={handlePartyTypeChange}
-                      placeholder="الكل"
+                      placeholder={t("الكل")}
                     />
                   </div>
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      الموظف
+                      {t("الموظف")}
                     </label>
 
                     <CompactSelect
@@ -693,13 +695,13 @@ export default function CashboxDetailPage() {
                         filters.draft.partyType !== "" &&
                         filters.draft.partyType !== "Employee"
                       }
-                      placeholder="الكل"
+                      placeholder={t("الكل")}
                     />
                   </div>
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      الشريك
+                      {t("الشريك")}
                     </label>
 
                     <CompactSelect
@@ -716,13 +718,13 @@ export default function CashboxDetailPage() {
                         filters.draft.partyType !== "" &&
                         filters.draft.partyType !== "Partner"
                       }
-                      placeholder="الكل"
+                      placeholder={t("الكل")}
                     />
                   </div>
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      السائق
+                      {t("السائق")}
                     </label>
 
                     <CompactSelect
@@ -737,12 +739,12 @@ export default function CashboxDetailPage() {
                         filters.draft.partyType !== "" &&
                         filters.draft.partyType !== "Driver"
                       }
-                      placeholder="الكل"
+                      placeholder={t("الكل")}
                     />
                   </div>
 
                   <Input
-                    label="رقم رحلة السائق"
+                    label={t("رقم رحلة السائق")}
                     placeholder="Trip ID"
                     value={filters.draft.driverTripId}
                     onChange={(event) =>
@@ -755,8 +757,8 @@ export default function CashboxDetailPage() {
                   />
 
                   <Input
-                    label="رقم الحساب (AccountId)"
-                    placeholder="اختياري"
+                    label={t("رقم الحساب (AccountId)")}
+                    placeholder={t("اختياري")}
                     value={filters.draft.accountId}
                     onChange={(event) =>
                       setFilter("accountId", event.target.value)
@@ -765,39 +767,39 @@ export default function CashboxDetailPage() {
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      تضمين الحسابات الفرعية
+                      {t("تضمين الحسابات الفرعية")}
                     </label>
 
                     <CompactSelect
                       options={[
-                        { value: "true", label: "نعم" },
-                        { value: "false", label: "لا" },
+                        { value: "true", label: t("نعم") },
+                        { value: "false", label: t("لا") },
                       ]}
                       value={filters.draft.includeSubAccounts}
                       onChange={(value) =>
                         setFilter("includeSubAccounts", value)
                       }
                       isDisabled={!filters.draft.accountId}
-                      placeholder="الكل"
+                      placeholder={t("الكل")}
                     />
                   </div>
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium">
-                      حالة السند
+                      {t("حالة السند")}
                     </label>
 
                     <CompactSelect
                       options={draftOptions}
                       value={filters.draft.isDraft}
                       onChange={(value) => setFilter("isDraft", value)}
-                      placeholder="الكل"
+                      placeholder={t("الكل")}
                     />
                   </div>
 
                   <Input
                     type="date"
-                    label="من تاريخ"
+                    label={t("من تاريخ")}
                     value={filters.draft.fromDate}
                     onChange={(event) =>
                       setFilter("fromDate", event.target.value)
@@ -806,7 +808,7 @@ export default function CashboxDetailPage() {
 
                   <Input
                     type="date"
-                    label="إلى تاريخ"
+                    label={t("إلى تاريخ")}
                     value={filters.draft.toDate}
                     onChange={(event) =>
                       setFilter("toDate", event.target.value)
@@ -817,12 +819,12 @@ export default function CashboxDetailPage() {
                 <div className="mt-6 flex justify-end gap-3 border-t border-slate-200 pt-5">
                   <Button type="button" variant="outline" onClick={handleReset}>
                     <RotateCcw size={16} />
-                    إعادة تعيين
+                    {t("إعادة تعيين")}
                   </Button>
 
                   <Button type="submit">
                     <Search size={16} />
-                    بحث
+                    {t("بحث")}
                   </Button>
                 </div>
               </div>
@@ -866,7 +868,7 @@ export default function CashboxDetailPage() {
           isOpen={showHandover}
           onClose={() => setShowHandover(false)}
           cashboxId={cashboxId}
-          cashboxName={cashbox?.name || "الخزنة"}
+          cashboxName={cashbox?.name || t("الخزنة")}
         />
       )}
       <CashVoucherFormModal

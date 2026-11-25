@@ -6,14 +6,16 @@ import { useGetPartiesSelectQuery } from "../../../features/partners/partiesApi"
 import PartnerSetupWizard from "../../../features/partners/components/PartnerSetupWizard";
 import { Printer } from "lucide-react";
 import Button from "../../../shared/components/ui/Button";
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const CURRENCY_LABELS = {
-  EGP: "جنيه مصري",
-  USD: "دولار أمريكي",
-  EUR: "يورو",
-  GBP: "جنيه إسترليني",
-  SAR: "ريال سعودي",
-  AED: "درهم إماراتي",
-  KWD: "دينار كويتي",
+  EGP: t("جنيه مصري"),
+  USD: t("دولار أمريكي"),
+  EUR: t("يورو"),
+  GBP: t("جنيه إسترليني"),
+  SAR: t("ريال سعودي"),
+  AED: t("درهم إماراتي"),
+  KWD: t("دينار كويتي"),
 };
 
 function PartnerSelectHeader({
@@ -49,7 +51,7 @@ function PartnerSelectHeader({
         const name = String(party.name).trim();
         const currency = String(party?.currency || "EGP").toUpperCase();
         const currencyLabel = CURRENCY_LABELS[currency] || currency;
-        const typeLabel = party?.special ? "خاص" : "عام";
+        const typeLabel = party?.special ? t("خاص") : t("عام");
 
         return {
           value: String(party.id),
@@ -84,7 +86,7 @@ function PartnerSelectHeader({
   return (
     <>
       <div
-        dir="rtl"
+        dir={getDir()}
         className="overflow-hidden rounded-2xl border border-ink-400/10 bg-white shadow-card"
       >
         <div className="flex items-center justify-between border-b border-ink-400/[0.07] px-4 py-3">
@@ -99,11 +101,11 @@ function PartnerSelectHeader({
 
             <div>
               <p className="text-sm font-semibold text-ink-900">
-                العميل / المورد
+                {t("العميل / المورد")}
               </p>
 
               <p className="mt-0.5 text-[11px] text-ink-400">
-                اختر الطرف لعرض حسابه
+                {t("اختر الطرف لعرض حسابه")}
               </p>
             </div>
           </div>
@@ -119,7 +121,7 @@ function PartnerSelectHeader({
                 size={13}
                 className={isFetching ? "animate-spin" : ""}
               />
-              إعادة المحاولة
+              {t("إعادة المحاولة")}
             </button>
           )}
         </div>
@@ -129,11 +131,11 @@ function PartnerSelectHeader({
             <div className="flex items-center justify-between gap-3 rounded-xl border border-red-100 bg-red-50/70 px-3.5 py-3">
               <div>
                 <p className="text-sm font-medium text-red-600">
-                  تعذر تحميل العملاء والموردين
+                  {t("تعذر تحميل العملاء والموردين")}
                 </p>
 
                 <p className="mt-0.5 text-xs text-red-500/80">
-                  تحقق من الاتصال وحاول مرة أخرى
+                  {t("تحقق من الاتصال وحاول مرة أخرى")}
                 </p>
               </div>
 
@@ -143,7 +145,7 @@ function PartnerSelectHeader({
                 disabled={isFetching}
                 className="shrink-0 rounded-lg bg-white px-3 py-2 text-xs font-medium text-red-600 shadow-sm transition hover:bg-red-100 disabled:opacity-50"
               >
-                {isFetching ? "جاري المحاولة..." : "إعادة المحاولة"}
+                {isFetching ? t("جاري المحاولة...") : t("إعادة المحاولة")}
               </button>
             </div>
           ) : (
@@ -157,12 +159,12 @@ function PartnerSelectHeader({
                   isSearchable
                   placeholder={
                     isLoading
-                      ? "جاري تحميل العملاء والموردين..."
+                      ? t("جاري تحميل العملاء والموردين...")
                       : options.length > 0
-                        ? "ابحث باسم العميل أو المورد"
-                        : "لا توجد أطراف متاحة"
+                        ? t("ابحث باسم العميل أو المورد")
+                        : t("لا توجد أطراف متاحة")
                   }
-                  searchPlaceholder="ابحث باسم العميل أو المورد..."
+                  searchPlaceholder={t("ابحث باسم العميل أو المورد...")}
                 />
               </div>
               <Button
@@ -171,18 +173,18 @@ function PartnerSelectHeader({
                 onClick={onPrint}
                 disabled={printDisabled}
                 className="h-10 shrink-0"
-                title="طباعة كشف الحساب"
+                title={t("طباعة كشف الحساب")}
               >
                 <Printer size={16} />
-                <span className="hidden sm:inline">طباعة</span>
+                <span className="hidden sm:inline">{t("طباعة")}</span>
               </Button>
               <button
                 type="button"
                 onClick={() => setShowAdd(true)}
                 disabled={isBusy}
                 className="flex h-[38px] w-[40px] shrink-0 items-center justify-center rounded-lg border border-ink-400/15 text-primary-500 transition-all duration-200 hover:border-primary-500/30 hover:bg-primary-500/5 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-                title="إضافة عميل أو مورد"
-                aria-label="إضافة عميل أو مورد"
+                title={t("إضافة عميل أو مورد")}
+                aria-label={t("إضافة عميل أو مورد")}
               >
                 <UserPlus size={18} strokeWidth={1.8} />
               </button>
@@ -208,9 +210,9 @@ function PartnerSelectHeader({
                     : "pointer-events-none border-ink-400/10 text-ink-300 opacity-50",
                 ].join(" ")}
                 title={
-                  normalizedId ? "فتح مخزن العبوات" : "اختر عميل أو مورد أولاً"
+                  normalizedId ? t("فتح مخزن العبوات") : t("اختر عميل أو مورد أولاً")
                 }
-                aria-label="مخزن العبوات"
+                aria-label={t("مخزن العبوات")}
               >
                 <Boxes size={18} strokeWidth={1.8} />
               </Link>
@@ -221,10 +223,10 @@ function PartnerSelectHeader({
         {!isError && options.length > 0 && (
           <div className="flex items-center justify-between border-t border-ink-400/[0.07] bg-ink-400/[0.015] px-4 py-2">
             <span className="text-[11px] text-ink-400">
-              {options.length} طرف متاح
+              {options.length} {t("طرف متاح")}
             </span>
 
-            <span className="text-[11px] text-ink-400">اكتب للبحث السريع</span>
+            <span className="text-[11px] text-ink-400">{t("اكتب للبحث السريع")}</span>
           </div>
         )}
       </div>

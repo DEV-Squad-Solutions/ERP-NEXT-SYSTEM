@@ -1,4 +1,6 @@
 import { formatDate, formatDateTime } from "../../../lib/date.js";
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function StorePrintTemplate({ store, stats }) {
   if (!store) return null;
 
@@ -6,7 +8,7 @@ export default function StorePrintTemplate({ store, stats }) {
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       className="p-8 font-sans text-ink-900"
       style={{ width: "210mm" }}
     >
@@ -16,22 +18,22 @@ export default function StorePrintTemplate({ store, stats }) {
           <p className="text-sm text-ink-500 font-mono mt-1">{store.code}</p>
         </div>
         <div className="text-left text-xs text-ink-400">
-          <p>تاريخ الطباعة</p>
+          <p>{t("تاريخ الطباعة")}</p>
           <p>{printedAt}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
-        <PrintField label="نوع المخزن" value={store.type ?? store.storeType} />
+        <PrintField label={t("نوع المخزن")} value={store.type ?? store.storeType} />
         <PrintField
-          label="الحالة"
+          label={t("الحالة")}
           value={
-            (store.isActive ?? store.status === "Active") ? "نشط" : "غير نشط"
+            (store.isActive ?? store.status === "Active") ? t("نشط") : t("غير نشط")
           }
         />
-        <PrintField label="العنوان" value={store.address} />
+        <PrintField label={t("العنوان")} value={store.address} />
         <PrintField
-          label="تاريخ الإنشاء"
+          label={t("تاريخ الإنشاء")}
           value={
             store.createdOn
               ? formatDate(new Date(store.createdOn))
@@ -42,16 +44,16 @@ export default function StorePrintTemplate({ store, stats }) {
 
       {store.description && (
         <div className="mb-6 text-sm">
-          <p className="text-ink-500 mb-1">الوصف</p>
+          <p className="text-ink-500 mb-1">{t("الوصف")}</p>
           <p>{store.description}</p>
         </div>
       )}
 
       {stats && (
         <div className="grid grid-cols-3 gap-4 border-t border-ink-200 pt-4">
-          <PrintField label="عدد الأصناف" value={stats.itemsCount} />
-          <PrintField label="إجمالي قيمة المخزون" value={stats.totalValue} />
-          <PrintField label="آخر تحديث" value={printedAt} />
+          <PrintField label={t("عدد الأصناف")} value={stats.itemsCount} />
+          <PrintField label={t("إجمالي قيمة المخزون")} value={stats.totalValue} />
+          <PrintField label={t("آخر تحديث")} value={printedAt} />
         </div>
       )}
     </div>

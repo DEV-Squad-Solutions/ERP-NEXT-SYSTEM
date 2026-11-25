@@ -1,15 +1,16 @@
 import * as XLSX from "xlsx";
 
+import { t } from "../../i18n";
 const typeLabels = {
-  Sales: "بيع",
-  Purchase: "شراء",
-  SalesReturn: "مرتجع بيع",
-  PurchaseReturn: "مرتجع شراء",
+  Sales: t("بيع"),
+  Purchase: t("شراء"),
+  SalesReturn: t("مرتجع بيع"),
+  PurchaseReturn: t("مرتجع شراء"),
 };
 
 const paymentLabels = {
-  Cash: "نقدي",
-  Credit: "آجل",
+  Cash: t("نقدي"),
+  Credit: t("آجل"),
 };
 
 /**
@@ -17,7 +18,7 @@ const paymentLabels = {
  * @param {Array} invoices
  * @param {string} fileName
  */
-export function exportInvoicesToExcel(invoices, fileName = "فواتير") {
+export function exportInvoicesToExcel(invoices, fileName = t("فواتير")) {
   if (!invoices?.length) return;
 
   const rows = invoices.map((inv, i) => ({
@@ -33,7 +34,7 @@ export function exportInvoicesToExcel(invoices, fileName = "فواتير") {
     الإجمالي: Number(inv.total || 0),
     المدفوع: Number(inv.paidAmount || 0),
     المتبقي: Number(inv.remainingAmount || 0),
-    "حالة الدفع": inv.paymentStatus === "Unpaid" ? "غير مدفوعة" : "مدفوعة",
+    "حالة الدفع": inv.paymentStatus === "Unpaid" ? t("غير مدفوعة") : t("مدفوعة"),
     العملة: inv.currency || "EGP",
   }));
 
@@ -61,7 +62,7 @@ export function exportInvoicesToExcel(invoices, fileName = "فواتير") {
   worksheet["!dir"] = "rtl";
 
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "الفواتير");
+  XLSX.utils.book_append_sheet(workbook, worksheet, t("الفواتير"));
   workbook.Workbook = { Views: [{ RTL: true }] };
 
   const today = new Date().toISOString().split("T")[0];

@@ -38,6 +38,8 @@ import { useFiscalYearGuard } from "../../../lib/useFiscalYearGuard";
 import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFiscalYearBanner";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const emptyFilters = {
   employeeId: "",
   search: "",
@@ -48,7 +50,7 @@ const emptyFilters = {
 };
 
 function fmt(n) {
-  return new Intl.NumberFormat("ar-EG", {
+  return new Intl.NumberFormat(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(n || 0);
@@ -167,29 +169,29 @@ export default function EmployeeOpeningBalancesPage() {
 
   const handleDelete = (row) => {
     if (row.isReadOnly || row.isCarriedForward) return;
-    toast(`حذف الرصيد الافتتاحي للموظف "${row.employeeName}"؟`, {
-      description: "الإجراء ده لا يمكن التراجع عنه",
+    toast(t("حذف الرصيد الافتتاحي للموظف \"{0}\"؟", { 0: row.employeeName }), {
+      description: t("الإجراء ده لا يمكن التراجع عنه"),
 
       action: {
-        label: "تأكيد الحذف",
+        label: t("تأكيد الحذف"),
 
         onClick: async () => {
           try {
             await deleteBalance(row.id).unwrap();
 
-            toast.success("تم حذف الرصيد الافتتاحي بنجاح");
+            toast.success(t("تم حذف الرصيد الافتتاحي بنجاح"));
 
             await refetch();
           } catch (error) {
             console.error("Delete opening balance error:", error);
 
-            toast.error("حصل خطأ أثناء الحذف، حاول تاني");
+            toast.error(t("حصل خطأ أثناء الحذف، حاول تاني"));
           }
         },
       },
 
       cancel: {
-        label: "إلغاء",
+        label: t("إلغاء"),
       },
 
       duration: 6000,
@@ -236,17 +238,17 @@ export default function EmployeeOpeningBalancesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-2xl font-bold text-ink-900">
-            الأرصدة الافتتاحية للموظفين
+            {t("الأرصدة الافتتاحية للموظفين")}
           </h2>
 
           <p className="text-sm text-ink-400 mt-1">
-            إدارة الأرصدة الافتتاحية لحسابات الموظفين
+            {t("إدارة الأرصدة الافتتاحية لحسابات الموظفين")}
           </p>
         </div>
 
         <Button onClick={openCreate} disabled={isFiscalYearReadOnly}>
           <Plus size={16} />
-          رصيد افتتاحي جديد
+          {t("رصيد افتتاحي جديد")}
         </Button>
       </div>
 
@@ -259,22 +261,22 @@ export default function EmployeeOpeningBalancesPage() {
       ====================================================== */}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <SummaryCard label="عدد السجلات" value={summary.count} />
+        <SummaryCard label={t("عدد السجلات")} value={summary.count} />
 
         <SummaryCard
-          label="إجمالي مدين"
+          label={t("إجمالي مدين")}
           value={fmt(summary.totalDebit)}
           tone="negative"
         />
 
         <SummaryCard
-          label="إجمالي دائن"
+          label={t("إجمالي دائن")}
           value={fmt(summary.totalCredit)}
           tone="positive"
         />
 
         <SummaryCard
-          label="الصافي"
+          label={t("الصافي")}
           value={fmt(summary.net)}
           tone={summary.net >= 0 ? "negative" : "positive"}
         />
@@ -290,7 +292,7 @@ export default function EmployeeOpeningBalancesPage() {
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              الموظف
+              {t("الموظف")}
             </label>
 
             <CompactSelect
@@ -302,31 +304,31 @@ export default function EmployeeOpeningBalancesPage() {
               }
               value={draft.employeeId}
               onChange={(value) => setField("employeeId", value)}
-              placeholder="كل الموظفين"
+              placeholder={t("كل الموظفين")}
             />
           </div>
 
           {/* Search */}
 
           <Input
-            label="بحث"
+            label={t("بحث")}
             value={draft.search}
             onChange={(event) => setField("search", event.target.value)}
-            placeholder="رقم المستند..."
+            placeholder={t("رقم المستند...")}
           />
 
           {/* Currency */}
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              العملة
+              {t("العملة")}
             </label>
 
             <CompactSelect
               options={currencyOptions}
               value={draft.currency}
               onChange={(value) => setField("currency", value)}
-              placeholder="كل العملات"
+              placeholder={t("كل العملات")}
             />
           </div>
 
@@ -334,21 +336,21 @@ export default function EmployeeOpeningBalancesPage() {
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              نوع الرصيد
+              {t("نوع الرصيد")}
             </label>
 
             <CompactSelect
               options={balanceTypeOptions}
               value={draft.balanceType}
               onChange={(value) => setField("balanceType", value)}
-              placeholder="الكل"
+              placeholder={t("الكل")}
             />
           </div>
 
           {/* From */}
 
           <Input
-            label="من تاريخ"
+            label={t("من تاريخ")}
             type="date"
             min={fiscalYear?.startDate}
             max={fiscalYear?.endDate}
@@ -359,7 +361,7 @@ export default function EmployeeOpeningBalancesPage() {
           {/* To */}
 
           <Input
-            label="إلى تاريخ"
+            label={t("إلى تاريخ")}
             type="date"
             min={fiscalYear?.startDate}
             max={fiscalYear?.endDate}
@@ -371,12 +373,12 @@ export default function EmployeeOpeningBalancesPage() {
         <div className="flex justify-end gap-2 mt-3">
           <Button onClick={handleSearch} className="h-9">
             <Search size={14} />
-            بحث
+            {t("بحث")}
           </Button>
 
           <Button variant="outline" onClick={handleReset} className="h-9">
             <RotateCcw size={14} />
-            تصفير
+            {t("تصفير")}
           </Button>
         </div>
       </div>
@@ -412,7 +414,7 @@ export default function EmployeeOpeningBalancesPage() {
           />
 
           <p className="text-ink-900 font-medium text-sm mb-1">
-            حدث خطأ في تحميل الأرصدة الافتتاحية
+            {t("حدث خطأ في تحميل الأرصدة الافتتاحية")}
           </p>
 
           <button
@@ -420,7 +422,7 @@ export default function EmployeeOpeningBalancesPage() {
             className="inline-flex items-center gap-2 text-xs font-medium text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-lg transition-colors mt-2"
           >
             <RefreshCw size={13} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : rows.length === 0 ? (
@@ -434,11 +436,11 @@ export default function EmployeeOpeningBalancesPage() {
           </div>
 
           <p className="text-ink-900 font-medium text-sm mb-1">
-            لا توجد أرصدة افتتاحية
+            {t("لا توجد أرصدة افتتاحية")}
           </p>
 
           <p className="text-xs text-ink-400">
-            جرّب تعديل الفلاتر أو أضف رصيد افتتاحي جديد
+            {t("جرّب تعديل الفلاتر أو أضف رصيد افتتاحي جديد")}
           </p>
         </div>
       ) : (
@@ -464,34 +466,34 @@ export default function EmployeeOpeningBalancesPage() {
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الموظف
+                    {t("الموظف")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    رقم المستند
+                    {t("رقم المستند")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    التاريخ
+                    {t("التاريخ")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    نوع الرصيد
+                    {t("نوع الرصيد")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    القيمة
+                    {t("القيمة")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    العملة
+                    {t("العملة")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    ملاحظات
+                    {t("ملاحظات")}
                   </th>
 
-                  <th className="p-2.5 font-medium">الإجراءات</th>
+                  <th className="p-2.5 font-medium">{t("الإجراءات")}</th>
                 </tr>
               </thead>
 
@@ -552,7 +554,7 @@ export default function EmployeeOpeningBalancesPage() {
 
                       {row.isCarriedForward && (
                         <span className="ms-1.5 inline-block rounded-full bg-ink-400/10 px-2 py-0.5 text-[10px] font-semibold text-ink-500">
-                          مرحل من {row.sourceFiscalYearName || "السنة السابقة"}
+                          {t("مرحل من")} {row.sourceFiscalYearName || t("السنة السابقة")}
                         </span>
                       )}
                     </td>
@@ -593,9 +595,9 @@ export default function EmployeeOpeningBalancesPage() {
                               )
                             }
                             className="rounded-lg px-2 py-1 text-[11px] font-medium text-primary-600 hover:bg-primary-50 transition-colors"
-                            title="عرض القيد المصدر"
+                            title={t("عرض القيد المصدر")}
                           >
-                            عرض القيد
+                            {t("عرض القيد")}
                           </button>
                         )}
 
@@ -609,7 +611,7 @@ export default function EmployeeOpeningBalancesPage() {
                             type="button"
                             onClick={() => openEdit(row)}
                             className="p-1.5 rounded-lg text-ink-400 hover:text-primary-600 hover:bg-primary-50 transition-colors"
-                            title="تعديل"
+                            title={t("تعديل")}
                           >
                             <Pencil size={15} />
                           </button>
@@ -620,7 +622,7 @@ export default function EmployeeOpeningBalancesPage() {
                             type="button"
                             onClick={() => handleDelete(row)}
                             className="p-1.5 rounded-lg text-ink-400 hover:text-negative hover:bg-negative/10 transition-colors"
-                            title="حذف"
+                            title={t("حذف")}
                           >
                             <Trash2 size={15} />
                           </button>

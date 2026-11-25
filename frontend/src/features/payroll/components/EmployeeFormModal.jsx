@@ -22,20 +22,21 @@ import {
   workPlaceStatusOptions,
 } from "../payroll.constants";
 
+import { t } from "../../../i18n";
 const schema = z.object({
-  name: z.string().min(1, "اسم الموظف مطلوب"),
-  jobTitle: z.string().min(1, "الوظيفة مطلوبة"),
+  name: z.string().min(1, t("اسم الموظف مطلوب")),
+  jobTitle: z.string().min(1, t("الوظيفة مطلوبة")),
   phoneNumber: z.string().optional(),
   email: z
     .string()
-    .email("بريد إلكتروني غير صحيح")
+    .email(t("بريد إلكتروني غير صحيح"))
     .optional()
     .or(z.literal("")),
   address: z.string().optional(),
-  type: z.string().min(1, "نوع الأجر مطلوب"),
-  salary: z.coerce.number().min(0, "لازم تكون قيمة موجبة"),
+  type: z.string().min(1, t("نوع الأجر مطلوب")),
+  salary: z.coerce.number().min(0, t("لازم تكون قيمة موجبة")),
   requiredWorkingDaysPerMonth: z.coerce.number().min(0).optional(),
-  workPlaceStatus: z.string().min(1, "مكان العمل مطلوب"),
+  workPlaceStatus: z.string().min(1, t("مكان العمل مطلوب")),
   placeName: z.string().optional(),
   isActive: z.boolean().default(true),
 });
@@ -126,10 +127,10 @@ export default function EmployeeFormModal({
     try {
       if (isEdit) {
         await updateEmployee({ id: employee.id, ...payload }).unwrap();
-        toast.success("تم تحديث بيانات الموظف بنجاح");
+        toast.success(t("تم تحديث بيانات الموظف بنجاح"));
       } else {
         await createEmployee(payload).unwrap();
-        toast.success("تم إضافة الموظف بنجاح");
+        toast.success(t("تم إضافة الموظف بنجاح"));
       }
       onSaved?.();
       onClose();
@@ -140,46 +141,46 @@ export default function EmployeeFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل بيانات الموظف" : "إضافة موظف جديد"}
+      title={isEdit ? t("تعديل بيانات الموظف") : t("إضافة موظف جديد")}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {isEdit && (
           <div className="text-xs text-ink-400">
-            رقم الموظف:{" "}
+            {t("رقم الموظف:")}{" "}
             <span className="font-mono text-ink-700">{employee.code}</span>
           </div>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
-            label="اسم الموظف"
+            label={t("اسم الموظف")}
             {...register("name")}
             error={errors.name?.message}
           />
           <Input
-            label="الوظيفة"
+            label={t("الوظيفة")}
             {...register("jobTitle")}
             error={errors.jobTitle?.message}
           />
           <Input
-            label="رقم الهاتف"
+            label={t("رقم الهاتف")}
             {...register("phoneNumber")}
             error={errors.phoneNumber?.message}
           />
           <Input
-            label="البريد الإلكتروني"
+            label={t("البريد الإلكتروني")}
             {...register("email")}
             error={errors.email?.message}
           />
           <Input
-            label="العنوان"
+            label={t("العنوان")}
             {...register("address")}
             error={errors.address?.message}
           />
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              نوع الأجر
+              {t("نوع الأجر")}
             </label>
             <Controller
               name="type"
@@ -200,7 +201,7 @@ export default function EmployeeFormModal({
           </div>
 
           <Input
-            label="الراتب الأساسي"
+            label={t("الراتب الأساسي")}
             type="number"
             step="0.01"
             {...register("salary")}
@@ -209,7 +210,7 @@ export default function EmployeeFormModal({
 
           <div>
             <Input
-              label="أيام العمل المطلوبة بالشهر"
+              label={t("أيام العمل المطلوبة بالشهر")}
               type="number"
               disabled={isDaily}
               {...register("requiredWorkingDaysPerMonth")}
@@ -218,14 +219,14 @@ export default function EmployeeFormModal({
             />
             {isDaily && (
               <p className="text-[11px] text-ink-400 mt-1">
-                غير مطلوب للموظف اليومي
+                {t("غير مطلوب للموظف اليومي")}
               </p>
             )}
           </div>
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              مكان العمل
+              {t("مكان العمل")}
             </label>
             <Controller
               name="workPlaceStatus"
@@ -246,7 +247,7 @@ export default function EmployeeFormModal({
           </div>
 
           <Input
-            label="اسم المكان"
+            label={t("اسم المكان")}
             {...register("placeName")}
             error={errors.placeName?.message}
           />
@@ -258,15 +259,15 @@ export default function EmployeeFormModal({
             {...register("isActive")}
             className="rounded border-ink-400/30 accent-primary-500"
           />
-          موظف نشط
+          {t("موظف نشط")}
         </label>
 
         <div className="flex justify-end gap-2 pt-2 border-t border-ink-400/10">
           <Button type="button" variant="outline" onClick={onClose}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "جارِ الحفظ..." : "حفظ"}
+            {isSubmitting ? t("جارِ الحفظ...") : t("حفظ")}
           </Button>
         </div>
       </form>

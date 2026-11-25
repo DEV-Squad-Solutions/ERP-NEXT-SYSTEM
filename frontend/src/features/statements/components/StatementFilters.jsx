@@ -6,19 +6,20 @@ import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import Input from "../../../shared/components/ui/Input";
 import Button from "../../../shared/components/ui/Button";
 
+import { t } from "../../../i18n";
 const sourceTypeOptions = [
-  { value: "OpeningBalance", label: "رصيد افتتاحي" },
-  { value: "Invoice", label: "فاتورة" },
-  { value: "CashVoucher", label: "سند نقدي" },
+  { value: "OpeningBalance", label: t("رصيد افتتاحي") },
+  { value: "Invoice", label: t("فاتورة") },
+  { value: "CashVoucher", label: t("سند نقدي") },
 ];
 
 const movementTypeOptions = [
-  { value: "Sales", label: "بيع" },
-  { value: "SalesReturn", label: "مرتجع بيع" },
-  { value: "Purchase", label: "شراء" },
-  { value: "PurchaseReturn", label: "مرتجع شراء" },
-  { value: "CashReceipt", label: "سند قبض" },
-  { value: "CashPayment", label: "سند صرف" },
+  { value: "Sales", label: t("بيع") },
+  { value: "SalesReturn", label: t("مرتجع بيع") },
+  { value: "Purchase", label: t("شراء") },
+  { value: "PurchaseReturn", label: t("مرتجع شراء") },
+  { value: "CashReceipt", label: t("سند قبض") },
+  { value: "CashPayment", label: t("سند صرف") },
 ];
 
 /**
@@ -62,10 +63,10 @@ export default function StatementFilters({
           </div>
 
           <div className="text-right">
-            <h3 className="font-semibold">فلاتر كشف الحساب</h3>
+            <h3 className="font-semibold">{t("فلاتر كشف الحساب")}</h3>
 
             <span className="text-xs text-gray-500">
-              {activeFilters} فلتر مفعل
+              {activeFilters} {t("فلتر مفعل")}
             </span>
           </div>
         </div>
@@ -94,48 +95,48 @@ export default function StatementFilters({
             <div className="border-t p-5">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <Input
-                  label="بحث"
+                  label={t("بحث")}
                   value={draft.Search}
                   onChange={(e) => set("Search", e.target.value)}
                 />
 
                 <Input
                   type="date"
-                  label="من تاريخ"
+                  label={t("من تاريخ")}
                   value={draft.FromDate}
                   onChange={(e) => set("FromDate", e.target.value)}
                 />
 
                 <Input
                   type="date"
-                  label="إلى تاريخ"
+                  label={t("إلى تاريخ")}
                   value={draft.ToDate}
                   onChange={(e) => set("ToDate", e.target.value)}
                 />
 
                 <div>
                   <label className="mb-1.5 block text-sm font-medium">
-                    مصدر الحركة
+                    {t("مصدر الحركة")}
                   </label>
 
                   <CompactSelect
                     options={sourceTypeOptions}
                     value={draft.SourceType}
                     onChange={(v) => set("SourceType", v)}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
 
                 <div>
                   <label className="mb-1.5 block text-sm font-medium">
-                    نوع الحركة
+                    {t("نوع الحركة")}
                   </label>
 
                   <CompactSelect
                     options={movementTypeOptions}
                     value={draft.MovementType}
                     onChange={(v) => set("MovementType", v)}
-                    placeholder="الكل"
+                    placeholder={t("الكل")}
                   />
                 </div>
               </div>
@@ -143,12 +144,12 @@ export default function StatementFilters({
               <div className="mt-6 flex justify-end gap-3 border-t border-slate-200 pt-5">
                 <Button type="button" variant="outline" onClick={onReset}>
                   <RotateCcw size={16} />
-                  إعادة تعيين
+                  {t("إعادة تعيين")}
                 </Button>
 
                 <Button type="submit">
                   <Search size={16} />
-                  بحث
+                  {t("بحث")}
                 </Button>
               </div>
             </div>

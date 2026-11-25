@@ -25,6 +25,8 @@ import { useFiscalYearGuard } from "../../../lib/useFiscalYearGuard";
 import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFiscalYearBanner";
 import { formatDate } from "../../../lib/date";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function StockAdjustmentsListPage() {
   const navigate = useNavigate();
   const isAdmin = useSelector((state) => state.auth.roles?.includes("Admin"));
@@ -53,29 +55,29 @@ export default function StockAdjustmentsListPage() {
 
   const handleDelete = async (adj) => {
     if (adj.sourceInventoryCountId) {
-      toast.error("التسوية دي ناتجة عن جرد ومش قابلة للحذف يدويًا");
+      toast.error(t("التسوية دي ناتجة عن جرد ومش قابلة للحذف يدويًا"));
       return;
     }
     if (
       !window.confirm(
-        `هل أنت متأكد من حذف التسوية "${adj.documentNumber}"؟ هيتم عكس تأثيرها على رصيد المخزن.`,
+        t("هل أنت متأكد من حذف التسوية \"{0}\"؟ هيتم عكس تأثيرها على رصيد المخزن.", { 0: adj.documentNumber }),
       )
     )
       return;
 
     try {
       await deleteStockAdjustment(adj.id).unwrap();
-      toast.success("تم حذف التسوية بنجاح");
+      toast.success(t("تم حذف التسوية بنجاح"));
     } catch (err) {
-      toast.error(err?.data?.title || "فشل حذف التسوية");
+      toast.error(err?.data?.title || t("فشل حذف التسوية"));
     }
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto" dir="rtl">
+    <div className="p-6 max-w-7xl mx-auto" dir={getDir()}>
       <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
         <h1 className="font-display text-xl font-bold text-ink-900">
-          تسويات المخزون
+          {t("تسويات المخزون")}
         </h1>
         {isAdmin && !isFiscalYearReadOnly && (
           <button
@@ -83,7 +85,7 @@ export default function StockAdjustmentsListPage() {
             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-medium text-white bg-ink-900 hover:bg-ink-800 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            تسوية جديدة
+            {t("تسوية جديدة")}
           </button>
         )}
       </div>
@@ -100,7 +102,7 @@ export default function StockAdjustmentsListPage() {
             setDocumentNumber(e.target.value);
             setPageNumber(1);
           }}
-          placeholder="بحث برقم المستند..."
+          placeholder={t("بحث برقم المستند...")}
           className="flex-1 min-w-[200px] px-3.5 py-2 text-sm rounded-xl border border-ink-100 focus:outline-none focus:ring-2 focus:ring-ink-200"
         />
 
@@ -112,7 +114,7 @@ export default function StockAdjustmentsListPage() {
           }}
           className="px-3.5 py-2 text-sm rounded-xl border border-ink-100 bg-white"
         >
-          <option value="">كل المخازن</option>
+          <option value="">{t("كل المخازن")}</option>
           {stores?.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
@@ -122,9 +124,9 @@ export default function StockAdjustmentsListPage() {
 
         <div className="flex items-center gap-1 bg-ink-50 rounded-xl p-1">
           {[
-            { label: "الكل", value: "" },
-            { label: "زيادة", value: "Increase" },
-            { label: "نقص", value: "Decrease" },
+            { label: t("الكل"), value: "" },
+            { label: t("زيادة"), value: "Increase" },
+            { label: t("نقص"), value: "Decrease" },
           ].map((opt) => (
             <button
               key={opt.label}
@@ -146,7 +148,7 @@ export default function StockAdjustmentsListPage() {
 
       {isLoading && (
         <div className="py-20 text-center text-sm text-ink-400">
-          جاري تحميل التسويات...
+          {t("جاري تحميل التسويات...")}
         </div>
       )}
 
@@ -154,14 +156,14 @@ export default function StockAdjustmentsListPage() {
         <div className="text-center py-14 border border-dashed border-rose-200 bg-rose-50/40 rounded-2xl">
           <AlertCircle size={28} className="mx-auto text-rose-400 mb-3" />
           <p className="text-ink-900 font-medium text-sm mb-3">
-            حدث خطأ في تحميل التسويات
+            {t("حدث خطأ في تحميل التسويات")}
           </p>
           <button
             onClick={refetch}
             className="inline-flex items-center gap-2 text-xs font-medium text-ink-600 hover:text-ink-900 bg-ink-50 hover:bg-ink-100 px-4 py-2 rounded-lg transition-colors"
           >
             <RefreshCw size={13} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       )}
@@ -179,34 +181,34 @@ export default function StockAdjustmentsListPage() {
                   <FileSearch size={22} className="text-ink-300" />
                 </div>
                 <p className="text-ink-900 font-medium text-sm mb-1">
-                  لا توجد تسويات مطابقة
+                  {t("لا توجد تسويات مطابقة")}
                 </p>
-                <p className="text-xs text-ink-400">جرّب تعديل الفلاتر</p>
+                <p className="text-xs text-ink-400">{t("جرّب تعديل الفلاتر")}</p>
               </div>
             ) : (
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-ink-500 text-xs bg-ink-50/60">
                     <th className="py-2.5 px-3 text-right font-medium">
-                      رقم المستند
+                      {t("رقم المستند")}
                     </th>
                     <th className="py-2.5 px-3 text-right font-medium">
-                      التاريخ
+                      {t("التاريخ")}
                     </th>
                     <th className="py-2.5 px-3 text-right font-medium">
-                      المخزن
+                      {t("المخزن")}
                     </th>
                     <th className="py-2.5 px-3 text-right font-medium">
-                      الاتجاه
+                      {t("الاتجاه")}
                     </th>
                     <th className="py-2.5 px-3 text-right font-medium">
-                      السبب
+                      {t("السبب")}
                     </th>
                     <th className="py-2.5 px-3 text-right font-medium">
-                      عدد السطور
+                      {t("عدد السطور")}
                     </th>
                     <th className="py-2.5 px-3 text-right font-medium">
-                      إجراءات
+                      {t("إجراءات")}
                     </th>
                   </tr>
                 </thead>
@@ -252,7 +254,7 @@ export default function StockAdjustmentsListPage() {
                             ) : (
                               <ArrowDownCircle size={12} />
                             )}
-                            {isIncrease ? "زيادة" : "نقص"}
+                            {isIncrease ? t("زيادة") : t("نقص")}
                           </span>
                         </td>
                         <td className="py-2.5 px-3 text-ink-600 max-w-[180px] truncate">
@@ -270,7 +272,7 @@ export default function StockAdjustmentsListPage() {
                                 )
                               }
                               className="p-1.5 rounded-lg text-ink-500 hover:bg-ink-100"
-                              title="عرض"
+                              title={t("عرض")}
                             >
                               <Eye size={14} />
                             </button>
@@ -284,14 +286,14 @@ export default function StockAdjustmentsListPage() {
                                     )
                                   }
                                   className="p-1.5 rounded-lg text-ink-500 hover:bg-ink-100"
-                                  title="تعديل"
+                                  title={t("تعديل")}
                                 >
                                   <Pencil size={14} />
                                 </button>
                                 <button
                                   onClick={() => handleDelete(adj)}
                                   className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50"
-                                  title="حذف"
+                                  title={t("حذف")}
                                 >
                                   <Trash2 size={14} />
                                 </button>
@@ -301,7 +303,7 @@ export default function StockAdjustmentsListPage() {
                             {isLocked && (
                               <span
                                 className="p-1.5 text-ink-300"
-                                title="ناتجة عن جرد - غير قابلة للتعديل"
+                                title={t("ناتجة عن جرد - غير قابلة للتعديل")}
                               >
                                 <Lock size={14} />
                               </span>
@@ -326,7 +328,7 @@ export default function StockAdjustmentsListPage() {
                 setPageSize(size);
                 setPageNumber(1);
               }}
-              label="تسوية"
+              label={t("تسوية")}
             />
           )}
         </>

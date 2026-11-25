@@ -31,6 +31,8 @@ import CashboxTransferFormModal from "../components/CashboxTransferFormModal";
 import { useCashboxScope } from "../hooks/useCashboxScope";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const emptyFilters = {
   Search: "",
   SourceCashboxId: "",
@@ -44,7 +46,7 @@ function fmtAmount(value, currency) {
     return "—";
   }
 
-  return `${Number(value).toLocaleString("ar-EG", {
+  return `${Number(value).toLocaleString(getLocale(), {
     maximumFractionDigits: 2,
   })} ${currency ?? ""}`;
 }
@@ -180,7 +182,7 @@ export default function CashboxTransfersPage() {
     try {
       await deleteTransfer(pendingDelete.id).unwrap();
 
-      toast.success("تم حذف التحويل بنجاح");
+      toast.success(t("تم حذف التحويل بنجاح"));
 
       setPendingDelete(null);
 
@@ -193,7 +195,7 @@ export default function CashboxTransfersPage() {
       }
     } catch (err) {
       toast.error(
-        err?.data?.message ?? err?.data?.detail ?? "تعذر حذف التحويل",
+        err?.data?.message ?? err?.data?.detail ?? t("تعذر حذف التحويل"),
       );
     }
   };
@@ -206,7 +208,7 @@ export default function CashboxTransfersPage() {
     filters.applied.ToDate;
 
   return (
-    <div dir="rtl" className="animate-fadeUp">
+    <div dir={getDir()} className="animate-fadeUp">
       {/* =========================
           Header
       ========================== */}
@@ -214,11 +216,11 @@ export default function CashboxTransfersPage() {
         <div>
           <h2 className="flex items-center gap-2 text-2xl font-bold text-ink-900">
             <ArrowLeftRight size={20} className="text-primary-500" />
-            التحويلات بين الخزائن
+            {t("التحويلات بين الخزائن")}
           </h2>
 
           <p className="mt-1 text-sm text-ink-400">
-            سجل التحويلات المالية بين خزائن الشركة
+            {t("سجل التحويلات المالية بين خزائن الشركة")}
           </p>
         </div>
 
@@ -232,7 +234,7 @@ export default function CashboxTransfersPage() {
           disabled={isFiscalYearReadOnly || !canTransfer}
         >
           <Plus size={16} />
-          تحويل جديد
+          {t("تحويل جديد")}
         </Button>
       </div>
 
@@ -247,8 +249,8 @@ export default function CashboxTransfersPage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {/* Search */}
           <Input
-            label="بحث"
-            placeholder="رقم التحويل"
+            label={t("بحث")}
+            placeholder={t("رقم التحويل")}
             value={filters.draft.Search}
             onChange={setDraft("Search")}
           />
@@ -256,7 +258,7 @@ export default function CashboxTransfersPage() {
           {/* Source */}
           <div>
             <label className="mb-1 block text-sm font-medium text-ink-700">
-              من خزينة
+              {t("من خزينة")}
             </label>
 
             <select
@@ -264,7 +266,7 @@ export default function CashboxTransfersPage() {
               value={filters.draft.SourceCashboxId}
               onChange={setDraft("SourceCashboxId")}
             >
-              <option value="">كل الخزائن</option>
+              <option value="">{t("كل الخزائن")}</option>
 
               {cashboxes.map((cashbox) => (
                 <option key={cashbox.id} value={cashbox.id}>
@@ -277,7 +279,7 @@ export default function CashboxTransfersPage() {
           {/* Destination */}
           <div>
             <label className="mb-1 block text-sm font-medium text-ink-700">
-              إلى خزينة
+              {t("إلى خزينة")}
             </label>
 
             <select
@@ -285,7 +287,7 @@ export default function CashboxTransfersPage() {
               value={filters.draft.DestinationCashboxId}
               onChange={setDraft("DestinationCashboxId")}
             >
-              <option value="">كل الخزائن</option>
+              <option value="">{t("كل الخزائن")}</option>
 
               {cashboxes.map((cashbox) => (
                 <option key={cashbox.id} value={cashbox.id}>
@@ -297,7 +299,7 @@ export default function CashboxTransfersPage() {
 
           {/* From Date */}
           <Input
-            label="من تاريخ"
+            label={t("من تاريخ")}
             type="date"
             value={filters.draft.FromDate}
             onChange={setDraft("FromDate")}
@@ -305,7 +307,7 @@ export default function CashboxTransfersPage() {
 
           {/* To Date */}
           <Input
-            label="إلى تاريخ"
+            label={t("إلى تاريخ")}
             type="date"
             value={filters.draft.ToDate}
             onChange={setDraft("ToDate")}
@@ -321,13 +323,13 @@ export default function CashboxTransfersPage() {
               className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-ink-500 hover:bg-ink-400/5 hover:text-ink-900"
             >
               <RotateCcw size={14} />
-              إعادة تعيين
+              {t("إعادة تعيين")}
             </button>
           )}
 
           <Button onClick={handleSearch}>
             <Search size={15} />
-            بحث
+            {t("بحث")}
           </Button>
         </div>
       </div>
@@ -337,7 +339,7 @@ export default function CashboxTransfersPage() {
       ========================== */}
       {isLoading && (
         <div className="rounded-2xl border border-dashed border-ink-400/20 py-16 text-center text-ink-400">
-          جاري تحميل التحويلات...
+          {t("جاري تحميل التحويلات...")}
         </div>
       )}
 
@@ -346,10 +348,10 @@ export default function CashboxTransfersPage() {
       ========================== */}
       {isError && !isLoading && (
         <div className="flex items-center justify-between rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-          <span>حدث خطأ أثناء تحميل التحويلات.</span>
+          <span>{t("حدث خطأ أثناء تحميل التحويلات.")}</span>
 
           <Button variant="outline" onClick={refetch}>
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </Button>
         </div>
       )}
@@ -368,22 +370,22 @@ export default function CashboxTransfersPage() {
               <thead>
                 <tr className="bg-ink-900/[0.025] text-ink-500">
                   <th className="px-4 py-3 text-right font-medium">
-                    رقم التحويل
+                    {t("رقم التحويل")}
                   </th>
 
-                  <th className="px-4 py-3 text-right font-medium">التاريخ</th>
+                  <th className="px-4 py-3 text-right font-medium">{t("التاريخ")}</th>
 
-                  <th className="px-4 py-3 text-right font-medium">من خزينة</th>
+                  <th className="px-4 py-3 text-right font-medium">{t("من خزينة")}</th>
 
                   <th className="px-4 py-3 text-right font-medium">
-                    إلى خزينة
+                    {t("إلى خزينة")}
                   </th>
 
-                  <th className="px-4 py-3 text-right font-medium">المبلغ</th>
+                  <th className="px-4 py-3 text-right font-medium">{t("المبلغ")}</th>
 
-                  <th className="px-4 py-3 text-right font-medium">الوصف</th>
+                  <th className="px-4 py-3 text-right font-medium">{t("الوصف")}</th>
 
-                  <th className="px-4 py-3 text-right font-medium">إجراءات</th>
+                  <th className="px-4 py-3 text-right font-medium">{t("إجراءات")}</th>
                 </tr>
               </thead>
 
@@ -395,8 +397,8 @@ export default function CashboxTransfersPage() {
                       className="px-4 py-14 text-center text-ink-400"
                     >
                       {hasFilters
-                        ? "لا توجد تحويلات مطابقة للفلاتر"
-                        : "لا توجد تحويلات بعد"}
+                        ? t("لا توجد تحويلات مطابقة للفلاتر")
+                        : t("لا توجد تحويلات بعد")}
                     </td>
                   </tr>
                 ) : (
@@ -449,7 +451,7 @@ export default function CashboxTransfersPage() {
                           <button
                             onClick={() => navigate(`${transfer.id}`)}
                             className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-primary-50 hover:text-primary-500 transition-colors"
-                            title="عرض"
+                            title={t("عرض")}
                           >
                             <Eye size={14} />
                           </button>
@@ -465,7 +467,7 @@ export default function CashboxTransfersPage() {
                                   })
                                 }
                                 className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-primary-50 hover:text-primary-500 transition-colors"
-                                title="تعديل"
+                                title={t("تعديل")}
                               >
                                 <Pencil size={14} />
                               </button>
@@ -474,7 +476,7 @@ export default function CashboxTransfersPage() {
                               <button
                                 onClick={() => setPendingDelete(transfer)}
                                 className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-red-50 hover:text-red-600 transition-colors"
-                                title="حذف"
+                                title={t("حذف")}
                               >
                                 <Trash2 size={14} />
                               </button>
@@ -507,7 +509,7 @@ export default function CashboxTransfersPage() {
                   setPageSize(size);
                   setPage(1);
                 }}
-                label="تحويل"
+                label={t("تحويل")}
               />
             </div>
           )}
@@ -535,25 +537,25 @@ export default function CashboxTransfersPage() {
       <Modal
         isOpen={Boolean(pendingDelete)}
         onClose={() => setPendingDelete(null)}
-        title="تأكيد الحذف"
+        title={t("تأكيد الحذف")}
       >
         <p className="mb-4 text-sm text-ink-500">
-          هل أنت متأكد من حذف التحويل{" "}
+          {t("هل أنت متأكد من حذف التحويل")}{" "}
           <span className="font-medium text-ink-900">
             {pendingDelete?.transferNumber}
           </span>
-          ؟
+          {t("؟")}
           <br />
-          هذا الإجراء لا يمكن التراجع عنه.
+          {t("هذا الإجراء لا يمكن التراجع عنه.")}
         </p>
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => setPendingDelete(null)}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button variant="danger" onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? "جاري الحذف..." : "حذف"}
+            {isDeleting ? t("جاري الحذف...") : t("حذف")}
           </Button>
         </div>
       </Modal>

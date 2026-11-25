@@ -13,6 +13,8 @@ import Pagination from "../../../shared/components/ui/Pagination";
 import { useGetStockTransfersQuery } from "../../inventory/stockTransfersApi";
 import { formatDate as sharedFormatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const formatDate = (value) => {
   if (!value) return "—";
 
@@ -28,7 +30,7 @@ const formatNumber = (value) => {
 
   if (!Number.isFinite(number)) return "—";
 
-  return number.toLocaleString("ar-EG", {
+  return number.toLocaleString(getLocale(), {
     maximumFractionDigits: 2,
   });
 };
@@ -48,7 +50,7 @@ export default function StoreTransfersTab({ storeId }) {
   return (
     <div
       className="bg-white rounded-2xl shadow-card border border-ink-100 overflow-hidden"
-      dir="rtl"
+      dir={getDir()}
     >
       <div className="px-6 py-5 border-b border-ink-100">
         <div className="flex items-center justify-between gap-4">
@@ -60,11 +62,11 @@ export default function StoreTransfersTab({ storeId }) {
 
               <div>
                 <h3 className="text-base font-semibold text-ink-900">
-                  تحويلات المخزن
+                  {t("تحويلات المخزن")}
                 </h3>
 
                 <p className="text-xs text-ink-400 mt-0.5">
-                  سجل التحويلات الواردة والصادرة من وإلى هذا المخزن
+                  {t("سجل التحويلات الواردة والصادرة من وإلى هذا المخزن")}
                 </p>
               </div>
             </div>
@@ -73,7 +75,7 @@ export default function StoreTransfersTab({ storeId }) {
           {data?.totalCount > 0 && (
             <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl bg-ink-50 text-ink-600 text-xs font-medium">
               <Boxes size={15} />
-              <span>{formatNumber(data.totalCount)} تحويل</span>
+              <span>{formatNumber(data.totalCount)} {t("تحويل")}</span>
             </div>
           )}
         </div>
@@ -83,7 +85,7 @@ export default function StoreTransfersTab({ storeId }) {
         <div className="py-16 flex flex-col items-center justify-center gap-3 text-ink-400">
           <Loader2 size={28} className="animate-spin text-primary-500" />
 
-          <span className="text-sm">جاري تحميل التحويلات...</span>
+          <span className="text-sm">{t("جاري تحميل التحويلات...")}</span>
         </div>
       )}
 
@@ -95,11 +97,11 @@ export default function StoreTransfersTab({ storeId }) {
 
           <div className="text-center">
             <p className="text-sm font-medium text-ink-800">
-              تعذر تحميل التحويلات
+              {t("تعذر تحميل التحويلات")}
             </p>
 
             <p className="text-xs text-ink-400 mt-1">
-              حدث خطأ أثناء جلب بيانات تحويلات المخزن.
+              {t("حدث خطأ أثناء جلب بيانات تحويلات المخزن.")}
             </p>
           </div>
         </div>
@@ -113,35 +115,35 @@ export default function StoreTransfersTab({ storeId }) {
                 <thead>
                   <tr className="bg-ink-50/70 border-b border-ink-100 text-xs text-ink-500">
                     <th className="px-5 py-3.5 text-right font-semibold">
-                      رقم التحويل
+                      {t("رقم التحويل")}
                     </th>
 
                     <th className="px-5 py-3.5 text-right font-semibold">
-                      التاريخ
+                      {t("التاريخ")}
                     </th>
 
                     <th className="px-5 py-3.5 text-right font-semibold">
-                      من مخزن
+                      {t("من مخزن")}
                     </th>
 
                     <th className="px-5 py-3.5 text-right font-semibold">
-                      إلى مخزن
+                      {t("إلى مخزن")}
                     </th>
 
                     <th className="px-5 py-3.5 text-center font-semibold">
-                      الأصناف
+                      {t("الأصناف")}
                     </th>
 
                     <th className="px-5 py-3.5 text-center font-semibold">
-                      الكمية
+                      {t("الكمية")}
                     </th>
 
                     <th className="px-5 py-3.5 text-center font-semibold">
-                      الاتجاه
+                      {t("الاتجاه")}
                     </th>
 
                     <th className="px-5 py-3.5 text-center font-semibold">
-                      إجراء
+                      {t("إجراء")}
                     </th>
                   </tr>
                 </thead>
@@ -191,7 +193,7 @@ export default function StoreTransfersTab({ storeId }) {
 
                               {transfer.sourceStoreId && (
                                 <p className="text-[11px] text-ink-400">
-                                  مخزن #{transfer.sourceStoreId}
+                                  {t("مخزن #")}{transfer.sourceStoreId}
                                 </p>
                               )}
                             </div>
@@ -211,7 +213,7 @@ export default function StoreTransfersTab({ storeId }) {
 
                               {transfer.destinationStoreId && (
                                 <p className="text-[11px] text-ink-400">
-                                  مخزن #{transfer.destinationStoreId}
+                                  {t("مخزن #")}{transfer.destinationStoreId}
                                 </p>
                               )}
                             </div>
@@ -234,16 +236,16 @@ export default function StoreTransfersTab({ storeId }) {
                           {isOut ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-rose-50 text-rose-700 text-xs font-semibold">
                               <ArrowUpRight size={14} />
-                              صادر
+                              {t("صادر")}
                             </span>
                           ) : isIn ? (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
                               <ArrowDownLeft size={14} />
-                              وارد
+                              {t("وارد")}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-ink-50 text-ink-500 text-xs font-semibold">
-                              غير محدد
+                              {t("غير محدد")}
                             </span>
                           )}
                         </td>
@@ -252,7 +254,7 @@ export default function StoreTransfersTab({ storeId }) {
                           <button
                             type="button"
                             className="inline-flex items-center justify-center w-9 h-9 rounded-xl text-ink-400 hover:text-primary-600 hover:bg-primary-50 transition-all"
-                            title="عرض التحويل"
+                            title={t("عرض التحويل")}
                           >
                             <Eye size={17} />
                           </button>
@@ -270,11 +272,11 @@ export default function StoreTransfersTab({ storeId }) {
               </div>
 
               <h4 className="text-sm font-semibold text-ink-800">
-                لا توجد تحويلات
+                {t("لا توجد تحويلات")}
               </h4>
 
               <p className="text-xs text-ink-400 mt-1 text-center">
-                لا يوجد سجل تحويلات مرتبط بهذا المخزن حتى الآن.
+                {t("لا يوجد سجل تحويلات مرتبط بهذا المخزن حتى الآن.")}
               </p>
             </div>
           )}
@@ -290,7 +292,7 @@ export default function StoreTransfersTab({ storeId }) {
                   setPageSize(size);
                   setPageNumber(1);
                 }}
-                label="تحويل"
+                label={t("تحويل")}
               />
             </div>
           )}

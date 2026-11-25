@@ -15,6 +15,8 @@ import { useSelectCompanyMutation } from "../authApi";
 import { logout } from "../authSlice";
 import { baseApi } from "../../../lib/baseApi";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function CompanySelect() {
   const dispatch = useDispatch();
 
@@ -86,22 +88,22 @@ export default function CompanySelect() {
       return error.data.title;
     }
 
-    return "حدث خطأ أثناء اختيار الشركة، حاول مرة أخرى";
+    return t("حدث خطأ أثناء اختيار الشركة، حاول مرة أخرى");
   };
 
   return (
-    <div dir="rtl" className="w-full min-w-0">
+    <div dir={getDir()} className="w-full min-w-0">
       <div className="mb-5 text-center">
         <div className="mx-auto mb-3.5 flex h-11 w-11 items-center justify-center rounded-xl bg-primary-500/10 text-primary-500 transition-transform duration-300 hover:scale-105">
           <Building2 size={22} strokeWidth={1.8} />
         </div>
 
         <h2 className="font-display text-lg font-bold text-ink-800">
-          مرحباً {fullName || "بك"}
+          {t("مرحباً")} {fullName || t("بك")}
         </h2>
 
         <p className="mt-1.5 text-[11px] leading-5 text-ink-400">
-          اختر الشركة التي تريد الدخول إليها
+          {t("اختر الشركة التي تريد الدخول إليها")}
         </p>
       </div>
 
@@ -125,7 +127,7 @@ export default function CompanySelect() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="ابحث عن شركة..."
+            placeholder={t("ابحث عن شركة...")}
             disabled={isLoading}
             className="h-10.5 w-full rounded-xl border border-ink-200 bg-ink-400/[0.025] pr-10 pl-10 text-sm text-ink-700 outline-none transition-[border-color,background-color,box-shadow] duration-200 placeholder:text-ink-400/50 hover:border-ink-300 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10 disabled:cursor-not-allowed disabled:opacity-60"
           />
@@ -135,7 +137,7 @@ export default function CompanySelect() {
               type="button"
               onClick={() => setSearch("")}
               disabled={isLoading}
-              aria-label="مسح البحث"
+              aria-label={t("مسح البحث")}
               className="absolute left-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg text-ink-400 transition-all duration-200 hover:bg-ink-400/10 hover:text-ink-600 active:scale-90 disabled:pointer-events-none"
             >
               <X size={14} />
@@ -185,7 +187,7 @@ export default function CompanySelect() {
                     </span>
 
                     <span className="mt-0.5 block truncate text-[10px] text-ink-400">
-                      الدخول إلى الشركة
+                      {t("الدخول إلى الشركة")}
                     </span>
                   </span>
 
@@ -218,10 +220,10 @@ export default function CompanySelect() {
         <div className="rounded-xl border border-dashed border-ink-200 bg-ink-400/[0.02] px-4 py-8 text-center motion-safe:animate-[errorIn_0.25s_ease-out_both]">
           <Search size={25} className="mx-auto mb-2.5 text-ink-400/35" />
 
-          <p className="text-xs font-semibold text-ink-600">لا توجد نتائج</p>
+          <p className="text-xs font-semibold text-ink-600">{t("لا توجد نتائج")}</p>
 
           <p className="mt-1 text-[10px] text-ink-400">
-            لم نجد شركة تطابق "{search}"
+            {t("لم نجد شركة تطابق \"")}{search}"
           </p>
 
           <button
@@ -229,7 +231,7 @@ export default function CompanySelect() {
             onClick={() => setSearch("")}
             className="mt-3 text-[10px] font-semibold text-primary-500 transition-colors hover:text-primary-600"
           >
-            عرض جميع الشركات
+            {t("عرض جميع الشركات")}
           </button>
         </div>
       )}
@@ -242,7 +244,7 @@ export default function CompanySelect() {
           className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-medium text-ink-400 transition-[background-color,color,transform] duration-200 hover:bg-red-50 hover:text-red-500 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <LogOut size={15} />
-          <span>العودة لتسجيل الدخول</span>
+          <span>{t("العودة لتسجيل الدخول")}</span>
         </button>
       </div>
 

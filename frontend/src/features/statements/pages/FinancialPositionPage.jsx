@@ -16,17 +16,19 @@ import { useFinancialPositionPrint } from "../../../shared/hooks/useFinancialPos
 import FinancialPositionPrintTemplate from "../../../shared/components/print/FinancialPositionPrintTemplate";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 function fmt(n) {
-  return new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 }).format(
+  return new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 2 }).format(
     n ?? 0,
   );
 }
 
 const SECTIONS = [
-  { key: "Asset", title: "الأصول", nature: "debit" },
-  { key: "Liability", title: "الالتزامات", nature: "credit" },
-  { key: "Equity", title: "حقوق الملكية", nature: "credit" },
-  { key: "Other", title: "أخرى", nature: "debit" },
+  { key: "Asset", title: t("الأصول"), nature: "debit" },
+  { key: "Liability", title: t("الالتزامات"), nature: "credit" },
+  { key: "Equity", title: t("حقوق الملكية"), nature: "credit" },
+  { key: "Other", title: t("أخرى"), nature: "debit" },
 ];
 
 function sectionKeyOf(accountType) {
@@ -140,16 +142,15 @@ export default function FinancialPositionPage({ companyName = "" }) {
   const colCount = 4;
 
   return (
-    <div className="animate-fadeUp" dir="rtl">
+    <div className="animate-fadeUp" dir={getDir()}>
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-ink-900">
             <Landmark size={20} className="text-primary-500" />
-            قائمة المركز المالي
+            {t("قائمة المركز المالي")}
           </h2>
           <p className="mt-1 text-sm text-ink-400">
-            الأصول والالتزامات وحقوق الملكية حتى تاريخ نهاية الفترة من القيود
-            المرحلة
+            {t("الأصول والالتزامات وحقوق الملكية حتى تاريخ نهاية الفترة من القيود المرحلة")}
           </p>
         </div>
 
@@ -161,7 +162,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
             className="inline-flex items-center gap-2 rounded-xl border border-ink-400/20 px-4 py-2.5 text-sm font-medium text-ink-600 transition hover:bg-ink-400/5 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Printer size={16} />
-            طباعة
+            {t("طباعة")}
           </button>
           <button
             type="button"
@@ -169,7 +170,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
             className="inline-flex items-center gap-2 rounded-xl border border-ink-400/20 px-4 py-2.5 text-sm font-medium text-ink-600 transition hover:bg-ink-400/5"
           >
             <RefreshCw size={16} className={isFetching ? "animate-spin" : ""} />
-            تحديث
+            {t("تحديث")}
           </button>
         </div>
       </div>
@@ -177,7 +178,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
       {/* الفلاتر */}
       <div className="mb-5 flex flex-wrap items-end gap-3 rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">من تاريخ</label>
+          <label className="text-xs text-ink-400">{t("من تاريخ")}</label>
           <DateInput
             type="date"
             value={draft.fromDate}
@@ -189,7 +190,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">إلى تاريخ</label>
+          <label className="text-xs text-ink-400">{t("إلى تاريخ")}</label>
           <DateInput
             type="date"
             value={draft.toDate}
@@ -201,7 +202,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">طريقة العرض</label>
+          <label className="text-xs text-ink-400">{t("طريقة العرض")}</label>
           <select
             value={draft.viewMode}
             onChange={(e) =>
@@ -209,13 +210,13 @@ export default function FinancialPositionPage({ companyName = "" }) {
             }
             className="rounded-xl border border-ink-400/20 bg-white px-3 py-2 text-sm"
           >
-            <option value="Summary">ملخص</option>
-            <option value="Detailed">تفصيلي</option>
+            <option value="Summary">{t("ملخص")}</option>
+            <option value="Detailed">{t("تفصيلي")}</option>
           </select>
         </div>
 
         <div className="flex flex-col gap-1">
-          <label className="text-xs text-ink-400">التسويات</label>
+          <label className="text-xs text-ink-400">{t("التسويات")}</label>
           <select
             value={draft.adjustmentView}
             onChange={(e) =>
@@ -223,8 +224,8 @@ export default function FinancialPositionPage({ companyName = "" }) {
             }
             className="rounded-xl border border-ink-400/20 bg-white px-3 py-2 text-sm"
           >
-            <option value="AfterAdjustments">بعد التسوية</option>
-            <option value="BeforeAdjustments">قبل التسوية</option>
+            <option value="AfterAdjustments">{t("بعد التسوية")}</option>
+            <option value="BeforeAdjustments">{t("قبل التسوية")}</option>
           </select>
         </div>
 
@@ -237,7 +238,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
             }
             className="h-4 w-4 accent-primary-500"
           />
-          عرض الحسابات غير المربوطة
+          {t("عرض الحسابات غير المربوطة")}
         </label>
 
         <button
@@ -245,32 +246,32 @@ export default function FinancialPositionPage({ companyName = "" }) {
           onClick={() => setApplied(draft)}
           className="rounded-xl bg-primary-500 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-primary-600"
         >
-          عرض
+          {t("عرض")}
         </button>
       </div>
 
       {isLoading && (
         <div className="rounded-2xl border border-dashed border-ink-400/20 py-16 text-center text-ink-400">
-          جاري تحميل قائمة المركز المالي...
+          {t("جاري تحميل قائمة المركز المالي...")}
         </div>
       )}
 
       {isError &&
         (error?.status === 403 ? (
           <AccessDeniedState
-            title="غير مصرح بعرض قائمة المركز المالي"
-            message="التقرير ده بيغطي كل خزائن الشركة. مش عندك وصول لكل الخزائن، فمش بنعرض تقرير جزئي. تواصل مع مسؤول النظام لو محتاج الصلاحية."
+            title={t("غير مصرح بعرض قائمة المركز المالي")}
+            message={t("التقرير ده بيغطي كل خزائن الشركة. مش عندك وصول لكل الخزائن، فمش بنعرض تقرير جزئي. تواصل مع مسؤول النظام لو محتاج الصلاحية.")}
             onRetry={() => refetch()}
           />
         ) : (
           <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
-            <span>حدث خطأ أثناء تحميل قائمة المركز المالي.</span>
+            <span>{t("حدث خطأ أثناء تحميل قائمة المركز المالي.")}</span>
             <button
               type="button"
               onClick={() => refetch()}
               className="rounded-lg border border-rose-200 bg-white px-3 py-1 text-xs font-medium transition hover:bg-rose-100"
             >
-              إعادة المحاولة
+              {t("إعادة المحاولة")}
             </button>
           </div>
         ))}
@@ -281,10 +282,9 @@ export default function FinancialPositionPage({ companyName = "" }) {
             <div className="mb-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-700">
               <AlertTriangle size={20} className="mt-0.5 shrink-0" />
               <div>
-                <p className="font-semibold">القائمة غير جاهزة للاعتماد</p>
+                <p className="font-semibold">{t("القائمة غير جاهزة للاعتماد")}</p>
                 <p className="mt-1 text-sm">
-                  قد يكون السبب تكلفة مخزون معلقة أو فرق جرد غير مسوى، أو وجود
-                  حسابات غير مربوطة. فعّل «عرض الحسابات غير المربوطة» للمراجعة.
+                  {t("قد يكون السبب تكلفة مخزون معلقة أو فرق جرد غير مسوى، أو وجود حسابات غير مربوطة. فعّل «عرض الحسابات غير المربوطة» للمراجعة.")}
                 </p>
               </div>
             </div>
@@ -294,7 +294,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
           <div className="mb-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-2xl border border-ink-400/10 bg-white p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-ink-400">إجمالي الأصول</span>
+                <span className="text-sm text-ink-400">{t("إجمالي الأصول")}</span>
                 <Wallet size={20} className="text-primary-500" />
               </div>
               <p className="text-2xl font-bold text-ink-900">
@@ -308,7 +308,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
             <div className="rounded-2xl border border-ink-400/10 bg-white p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm text-ink-400">
-                  الالتزامات وحقوق الملكية
+                  {t("الالتزامات وحقوق الملكية")}
                 </span>
                 <Scale size={20} className="text-gold-500" />
               </div>
@@ -326,7 +326,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
               }`}
             >
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-ink-500">توازن الميزانية</span>
+                <span className="text-sm text-ink-500">{t("توازن الميزانية")}</span>
                 {balanced ? (
                   <CheckCircle2 size={20} className="text-primary-600" />
                 ) : (
@@ -338,10 +338,10 @@ export default function FinancialPositionPage({ companyName = "" }) {
                   balanced ? "text-primary-700" : "text-rose-700"
                 }`}
               >
-                {balanced ? "متوازنة" : fmt(difference)}
+                {balanced ? t("متوازنة") : fmt(difference)}
               </p>
               <span className="text-xs text-ink-400">
-                {balanced ? "الأصول = الالتزامات + الملكية" : "فرق بين الطرفين"}
+                {balanced ? t("الأصول = الالتزامات + الملكية") : t("فرق بين الطرفين")}
               </span>
             </div>
           </div>
@@ -357,16 +357,16 @@ export default function FinancialPositionPage({ companyName = "" }) {
                 <thead>
                   <tr className="bg-ink-400/5 text-xs text-ink-400">
                     <th className="px-3 py-2.5 text-right font-medium">
-                      {isDetailed ? "الحساب" : "بند القائمة"}
+                      {isDetailed ? t("الحساب") : t("بند القائمة")}
                     </th>
                     <th className="px-3 py-2.5 text-right font-medium">
-                      رصيد أول المدة
+                      {t("رصيد أول المدة")}
                     </th>
                     <th className="px-3 py-2.5 text-right font-medium">
-                      حركة الفترة
+                      {t("حركة الفترة")}
                     </th>
                     <th className="px-3 py-2.5 text-right font-medium">
-                      رصيد آخر المدة
+                      {t("رصيد آخر المدة")}
                     </th>
                   </tr>
                 </thead>
@@ -378,7 +378,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
                         colSpan={colCount}
                         className="px-3 py-14 text-center text-ink-400"
                       >
-                        لا توجد بيانات لهذه الفترة
+                        {t("لا توجد بيانات لهذه الفترة")}
                       </td>
                     </tr>
                   ) : (
@@ -445,7 +445,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
 
                         <tr className="border-t border-ink-400/20 bg-ink-400/5 font-bold">
                           <td className="px-3 py-2.5 text-ink-900">
-                            إجمالي {section.title}
+                            {t("إجمالي")} {section.title}
                           </td>
                           <td className="px-3 py-2.5">
                             <Amount value={section.sum.opening} bold />
@@ -465,7 +465,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
                 {sections.length > 0 && (
                   <tfoot>
                     <tr className="border-t-2 border-ink-400/30 font-bold text-ink-900">
-                      <td className="px-3 py-3">إجمالي الأصول</td>
+                      <td className="px-3 py-3">{t("إجمالي الأصول")}</td>
                       <td colSpan={2} />
                       <td className="px-3 py-3">
                         <Amount value={totalAssets} bold />
@@ -473,7 +473,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
                     </tr>
                     <tr className="font-bold text-ink-900">
                       <td className="px-3 py-3">
-                        إجمالي الالتزامات وحقوق الملكية
+                        {t("إجمالي الالتزامات وحقوق الملكية")}
                       </td>
                       <td colSpan={2} />
                       <td className="px-3 py-3">
@@ -482,7 +482,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
                     </tr>
                     {!balanced && (
                       <tr className="bg-rose-50 font-bold text-rose-700">
-                        <td className="px-3 py-3">الفرق</td>
+                        <td className="px-3 py-3">{t("الفرق")}</td>
                         <td colSpan={2} />
                         <td className="px-3 py-3">{fmt(difference)}</td>
                       </tr>
@@ -500,11 +500,11 @@ export default function FinancialPositionPage({ companyName = "" }) {
                 <div className="flex items-center gap-2 text-amber-700">
                   <AlertTriangle size={18} />
                   <h3 className="font-semibold">
-                    حسابات غير مربوطة ببند في قائمة المركز المالي
+                    {t("حسابات غير مربوطة ببند في قائمة المركز المالي")}
                   </h3>
                 </div>
                 <p className="mt-1 text-xs text-amber-600">
-                  هذه الحسابات لها حركة ولكن لم يتم ربطها ببند في القائمة.
+                  {t("هذه الحسابات لها حركة ولكن لم يتم ربطها ببند في القائمة.")}
                 </p>
               </div>
 
@@ -513,16 +513,16 @@ export default function FinancialPositionPage({ companyName = "" }) {
                   <thead>
                     <tr className="bg-ink-400/5 text-xs text-ink-400">
                       <th className="px-4 py-2.5 text-right font-medium">
-                        الحساب
+                        {t("الحساب")}
                       </th>
                       <th className="px-4 py-2.5 text-right font-medium">
-                        رصيد أول المدة
+                        {t("رصيد أول المدة")}
                       </th>
                       <th className="px-4 py-2.5 text-right font-medium">
-                        حركة الفترة
+                        {t("حركة الفترة")}
                       </th>
                       <th className="px-4 py-2.5 text-right font-medium">
-                        رصيد آخر المدة
+                        {t("رصيد آخر المدة")}
                       </th>
                     </tr>
                   </thead>
@@ -569,7 +569,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
           {data.isReadyForReporting && (
             <div className="mt-4 flex items-center gap-2 text-xs text-primary-600">
               <CheckCircle2 size={15} />
-              القائمة جاهزة للاعتماد والتقارير.
+              {t("القائمة جاهزة للاعتماد والتقارير.")}
             </div>
           )}
         </>

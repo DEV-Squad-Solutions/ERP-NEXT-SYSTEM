@@ -23,7 +23,9 @@ import { useGetInvoiceProfitabilityDetailsQuery } from "../profitabilityApi";
 import Button from "../../../shared/components/ui/Button";
 import { formatDate } from "../../../lib/date.js";
 
-const numberFormatter = new Intl.NumberFormat("ar-EG", {
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
+const numberFormatter = new Intl.NumberFormat(getLocale(), {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
@@ -164,7 +166,7 @@ function CostStatusBadge({ status }) {
   if (normalized === "final") {
     return (
       <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-        مكتملة
+        {t("مكتملة")}
       </span>
     );
   }
@@ -173,7 +175,7 @@ function CostStatusBadge({ status }) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">
         <AlertCircle size={13} />
-        معلقة
+        {t("معلقة")}
       </span>
     );
   }
@@ -182,7 +184,7 @@ function CostStatusBadge({ status }) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700">
         <AlertCircle size={13} />
-        جزئية
+        {t("جزئية")}
       </span>
     );
   }
@@ -203,29 +205,29 @@ function InvoiceProfitabilityPrint({ invoice }) {
 
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       className="invoice-profitability-print bg-white p-8 text-slate-900"
     >
       {/* Print Header */}
       <div className="mb-6 flex items-start justify-between border-b-2 border-slate-800 pb-5">
         <div>
-          <h1 className="text-2xl font-bold">تقرير ربحية الفاتورة</h1>
+          <h1 className="text-2xl font-bold">{t("تقرير ربحية الفاتورة")}</h1>
 
           <p className="mt-2 text-sm text-slate-600">
-            رقم الفاتورة: <strong>{invoice.invoiceNumber || "—"}</strong>
+            {t("رقم الفاتورة:")} <strong>{invoice.invoiceNumber || "—"}</strong>
           </p>
         </div>
 
         <div className="text-left text-sm text-slate-600">
           <p>
-            التاريخ:{" "}
+            {t("التاريخ:")}{" "}
             <strong>
               {invoice.invoiceDate ? formatDate(invoice.invoiceDate) : "—"}
             </strong>
           </p>
 
           <p className="mt-1">
-            العملة: <strong>{invoice.baseCurrency || "EGP"}</strong>
+            {t("العملة:")} <strong>{invoice.baseCurrency || "EGP"}</strong>
           </p>
         </div>
       </div>
@@ -233,26 +235,26 @@ function InvoiceProfitabilityPrint({ invoice }) {
       {/* Invoice Information */}
       <div className="mb-6 grid grid-cols-4 gap-3">
         <div className="rounded-lg border border-slate-200 p-3">
-          <p className="text-xs text-slate-500">العميل</p>
+          <p className="text-xs text-slate-500">{t("العميل")}</p>
           <p className="mt-1 font-semibold">
             {invoice.businessPartnerName || "—"}
           </p>
         </div>
 
         <div className="rounded-lg border border-slate-200 p-3">
-          <p className="text-xs text-slate-500">المخزن</p>
+          <p className="text-xs text-slate-500">{t("المخزن")}</p>
           <p className="mt-1 font-semibold">{invoice.storeName || "—"}</p>
         </div>
 
         <div className="rounded-lg border border-slate-200 p-3">
-          <p className="text-xs text-slate-500">عدد السطور</p>
+          <p className="text-xs text-slate-500">{t("عدد السطور")}</p>
           <p className="mt-1 font-semibold">
             {invoice.lineCount ?? lines.length}
           </p>
         </div>
 
         <div className="rounded-lg border border-slate-200 p-3">
-          <p className="text-xs text-slate-500">حالة التكلفة</p>
+          <p className="text-xs text-slate-500">{t("حالة التكلفة")}</p>
           <p className="mt-1 font-semibold">{invoice.costStatus || "—"}</p>
         </div>
       </div>
@@ -260,28 +262,28 @@ function InvoiceProfitabilityPrint({ invoice }) {
       {/* Financial Summary */}
       <div className="mb-6 grid grid-cols-4 gap-3">
         <div className="rounded-lg border border-slate-200 p-3">
-          <p className="text-xs text-slate-500">الإيراد الإجمالي</p>
+          <p className="text-xs text-slate-500">{t("الإيراد الإجمالي")}</p>
           <p className="mt-1 text-lg font-bold">
             {formatNumber(invoice.grossRevenue)}
           </p>
         </div>
 
         <div className="rounded-lg border border-slate-200 p-3">
-          <p className="text-xs text-slate-500">الخصم</p>
+          <p className="text-xs text-slate-500">{t("الخصم")}</p>
           <p className="mt-1 text-lg font-bold">
             {formatNumber(invoice.discountAmount)}
           </p>
         </div>
 
         <div className="rounded-lg border border-slate-200 p-3">
-          <p className="text-xs text-slate-500">صافي الإيراد</p>
+          <p className="text-xs text-slate-500">{t("صافي الإيراد")}</p>
           <p className="mt-1 text-lg font-bold">
             {formatNumber(invoice.netRevenue)}
           </p>
         </div>
 
         <div className="rounded-lg border border-slate-200 p-3">
-          <p className="text-xs text-slate-500">التكلفة</p>
+          <p className="text-xs text-slate-500">{t("التكلفة")}</p>
           <p className="mt-1 text-lg font-bold">
             {formatNumber(invoice.recognizedCost)}
           </p>
@@ -291,16 +293,16 @@ function InvoiceProfitabilityPrint({ invoice }) {
       {/* Profit Summary */}
       <div className="mb-6 grid grid-cols-2 gap-3">
         <div className="rounded-lg border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">مجمل الربح</p>
+          <p className="text-xs text-slate-500">{t("مجمل الربح")}</p>
           <p className="mt-1 text-xl font-bold">
             {invoice.grossProfit !== null && invoice.grossProfit !== undefined
               ? formatNumber(invoice.grossProfit)
-              : "غير مكتمل"}
+              : t("غير مكتمل")}
           </p>
         </div>
 
         <div className="rounded-lg border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">هامش الربح</p>
+          <p className="text-xs text-slate-500">{t("هامش الربح")}</p>
           <p className="mt-1 text-xl font-bold">
             {formatPercentage(invoice.grossMarginPercentage)}
           </p>
@@ -312,30 +314,30 @@ function InvoiceProfitabilityPrint({ invoice }) {
         <thead>
           <tr className="bg-slate-100">
             <th className="border border-slate-300 px-2 py-2 text-right">
-              الصنف
+              {t("الصنف")}
             </th>
 
-            <th className="border border-slate-300 px-2 py-2">الكود</th>
+            <th className="border border-slate-300 px-2 py-2">{t("الكود")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">الوحدة</th>
+            <th className="border border-slate-300 px-2 py-2">{t("الوحدة")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">الكمية</th>
+            <th className="border border-slate-300 px-2 py-2">{t("الكمية")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">سعر البيع</th>
+            <th className="border border-slate-300 px-2 py-2">{t("سعر البيع")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">الإيراد</th>
+            <th className="border border-slate-300 px-2 py-2">{t("الإيراد")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">الخصم</th>
+            <th className="border border-slate-300 px-2 py-2">{t("الخصم")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">صافي الإيراد</th>
+            <th className="border border-slate-300 px-2 py-2">{t("صافي الإيراد")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">تكلفة الوحدة</th>
+            <th className="border border-slate-300 px-2 py-2">{t("تكلفة الوحدة")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">التكلفة</th>
+            <th className="border border-slate-300 px-2 py-2">{t("التكلفة")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">الربح</th>
+            <th className="border border-slate-300 px-2 py-2">{t("الربح")}</th>
 
-            <th className="border border-slate-300 px-2 py-2">الهامش</th>
+            <th className="border border-slate-300 px-2 py-2">{t("الهامش")}</th>
           </tr>
         </thead>
 
@@ -385,7 +387,7 @@ function InvoiceProfitabilityPrint({ invoice }) {
               <td className="border border-slate-300 px-2 py-2 font-semibold">
                 {line.grossProfit !== null && line.grossProfit !== undefined
                   ? formatNumber(line.grossProfit)
-                  : "غير مكتمل"}
+                  : t("غير مكتمل")}
               </td>
 
               <td className="border border-slate-300 px-2 py-2">
@@ -400,7 +402,7 @@ function InvoiceProfitabilityPrint({ invoice }) {
 
       {/* Footer */}
       <div className="mt-6 border-t border-slate-300 pt-3 text-center text-xs text-slate-500">
-        تم إنشاء التقرير بواسطة نظام الإدارة
+        {t("تم إنشاء التقرير بواسطة نظام الإدارة")}
       </div>
     </div>
   );
@@ -428,7 +430,7 @@ export default function InvoiceProfitabilityDetailsPage() {
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
-    documentTitle: `ربحية الفاتورة - ${invoice?.invoiceNumber || invoiceId}`,
+    documentTitle: t("ربحية الفاتورة - {0}", { 0: invoice?.invoiceNumber || invoiceId }),
   });
 
   /* =========================================================
@@ -437,7 +439,7 @@ export default function InvoiceProfitabilityDetailsPage() {
 
   if (isLoading) {
     return (
-      <div dir="rtl" className="p-4 md:p-6">
+      <div dir={getDir()} className="p-4 md:p-6">
         <div className="space-y-6">
           <div className="h-10 w-72 animate-pulse rounded-xl bg-slate-100" />
 
@@ -465,7 +467,7 @@ export default function InvoiceProfitabilityDetailsPage() {
   if (isError || !invoice) {
     return (
       <div
-        dir="rtl"
+        dir={getDir()}
         className="flex min-h-[450px] flex-col items-center justify-center p-6"
       >
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
@@ -473,20 +475,20 @@ export default function InvoiceProfitabilityDetailsPage() {
         </div>
 
         <h2 className="mt-4 text-lg font-bold text-slate-800">
-          تعذر تحميل تفاصيل الفاتورة
+          {t("تعذر تحميل تفاصيل الفاتورة")}
         </h2>
 
         <p className="mt-1 text-sm text-slate-500">
-          تأكد من أن الفاتورة موجودة وتنتمي للشركة الحالية.
+          {t("تأكد من أن الفاتورة موجودة وتنتمي للشركة الحالية.")}
         </p>
 
         <div className="mt-5 flex flex-wrap justify-center gap-2">
           <Button type="button" variant="outline" onClick={() => refetch()}>
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </Button>
 
           <Button type="button" onClick={() => navigate(-1)}>
-            الرجوع
+            {t("الرجوع")}
           </Button>
         </div>
       </div>
@@ -523,7 +525,7 @@ export default function InvoiceProfitabilityDetailsPage() {
       ===================================================== */}
 
       <motion.div
-        dir="rtl"
+        dir={getDir()}
         variants={containerVariants}
         initial="hidden"
         animate="show"
@@ -540,7 +542,7 @@ export default function InvoiceProfitabilityDetailsPage() {
               type="button"
               onClick={() => navigate(-1)}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary"
-              title="رجوع"
+              title={t("رجوع")}
             >
               <ArrowRight size={19} />
             </button>
@@ -552,7 +554,7 @@ export default function InvoiceProfitabilityDetailsPage() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl font-bold text-slate-900">
-                  ربحية الفاتورة
+                  {t("ربحية الفاتورة")}
                 </h1>
 
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
@@ -561,7 +563,7 @@ export default function InvoiceProfitabilityDetailsPage() {
               </div>
 
               <p className="mt-1 text-sm text-slate-500">
-                تحليل الإيراد والتكلفة والربح لكل صنف داخل الفاتورة
+                {t("تحليل الإيراد والتكلفة والربح لكل صنف داخل الفاتورة")}
               </p>
             </div>
           </div>
@@ -578,12 +580,12 @@ export default function InvoiceProfitabilityDetailsPage() {
                 size={16}
                 className={isFetching ? "animate-spin" : ""}
               />
-              تحديث
+              {t("تحديث")}
             </Button>
 
             <Button type="button" onClick={handlePrint} className="gap-2">
               <Printer size={16} />
-              طباعة
+              {t("طباعة")}
             </Button>
           </div>
         </motion.div>
@@ -595,23 +597,23 @@ export default function InvoiceProfitabilityDetailsPage() {
         >
           <InfoCard
             icon={Receipt}
-            label="رقم الفاتورة"
+            label={t("رقم الفاتورة")}
             value={invoice.invoiceNumber}
           />
 
           <InfoCard
             icon={CalendarDays}
-            label="التاريخ"
+            label={t("التاريخ")}
             value={invoice.invoiceDate}
           />
 
           <InfoCard
             icon={User}
-            label="العميل"
+            label={t("العميل")}
             value={invoice.businessPartnerName}
           />
 
-          <InfoCard icon={Store} label="المخزن" value={invoice.storeName} />
+          <InfoCard icon={Store} label={t("المخزن")} value={invoice.storeName} />
         </motion.div>
 
         {/* Financial Summary */}
@@ -620,30 +622,30 @@ export default function InvoiceProfitabilityDetailsPage() {
           className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
         >
           <FinancialCard
-            title="الإيراد الإجمالي"
+            title={t("الإيراد الإجمالي")}
             value={formatNumber(invoice.grossRevenue)}
             icon={Receipt}
             description={invoice.baseCurrency || "EGP"}
           />
 
           <FinancialCard
-            title="الخصم"
+            title={t("الخصم")}
             value={formatNumber(invoice.discountAmount)}
             icon={Wallet}
             valueClassName="text-red-600"
           />
 
           <FinancialCard
-            title="التكلفة"
+            title={t("التكلفة")}
             value={formatNumber(invoice.recognizedCost)}
             icon={Wallet}
             description={invoice.baseCurrency || "EGP"}
           />
 
           <FinancialCard
-            title="مجمل الربح"
+            title={t("مجمل الربح")}
             value={
-              profitAvailable ? formatNumber(invoice.grossProfit) : "غير مكتمل"
+              profitAvailable ? formatNumber(invoice.grossProfit) : t("غير مكتمل")
             }
             icon={TrendingUp}
             valueClassName={
@@ -659,15 +661,15 @@ export default function InvoiceProfitabilityDetailsPage() {
         >
           <MainMetric
             icon={Receipt}
-            title="صافي الإيراد"
+            title={t("صافي الإيراد")}
             value={formatNumber(invoice.netRevenue)}
           />
 
           <MainMetric
             icon={TrendingUp}
-            title="مجمل الربح"
+            title={t("مجمل الربح")}
             value={
-              profitAvailable ? formatNumber(invoice.grossProfit) : "غير مكتمل"
+              profitAvailable ? formatNumber(invoice.grossProfit) : t("غير مكتمل")
             }
             valueClassName={
               profitAvailable ? "text-emerald-600" : "text-amber-600"
@@ -676,7 +678,7 @@ export default function InvoiceProfitabilityDetailsPage() {
 
           <MainMetric
             icon={Percent}
-            title="هامش الربح"
+            title={t("هامش الربح")}
             value={formatPercentage(invoice.grossMarginPercentage)}
           />
         </motion.div>
@@ -710,8 +712,8 @@ export default function InvoiceProfitabilityDetailsPage() {
                 }`}
               >
                 {hasPendingCost
-                  ? "تكلفة الفاتورة لم تكتمل بالكامل"
-                  : "تكلفة الفاتورة مكتملة"}
+                  ? t("تكلفة الفاتورة لم تكتمل بالكامل")
+                  : t("تكلفة الفاتورة مكتملة")}
               </p>
 
               <p
@@ -720,13 +722,13 @@ export default function InvoiceProfitabilityDetailsPage() {
                 }`}
               >
                 {hasPendingCost
-                  ? "بعض السطور قد تكون بتكلفة معلقة أو جزئية، لذلك لا يتم اعتبار الربح النهائي مكتملًا."
-                  : "تم احتساب تكلفة جميع السطور ويمكن الاعتماد على الربح المعروض."}
+                  ? t("بعض السطور قد تكون بتكلفة معلقة أو جزئية، لذلك لا يتم اعتبار الربح النهائي مكتملًا.")
+                  : t("تم احتساب تكلفة جميع السطور ويمكن الاعتماد على الربح المعروض.")}
               </p>
 
               {hasPendingCost && Number(invoice.pendingCostQuantity) > 0 && (
                 <p className="mt-2 text-xs font-medium text-amber-700">
-                  الكمية المعلقة:{" "}
+                  {t("الكمية المعلقة:")}{" "}
                   <strong>{formatNumber(invoice.pendingCostQuantity)}</strong>
                 </p>
               )}
@@ -747,17 +749,17 @@ export default function InvoiceProfitabilityDetailsPage() {
               </div>
 
               <div>
-                <h2 className="font-bold text-slate-800">تفاصيل الأصناف</h2>
+                <h2 className="font-bold text-slate-800">{t("تفاصيل الأصناف")}</h2>
 
                 <p className="mt-0.5 text-xs text-slate-500">
-                  عدد السطور: {invoice.lineCount ?? lines.length}
+                  {t("عدد السطور:")} {invoice.lineCount ?? lines.length}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 text-xs text-slate-500">
               <ArrowUpRight size={15} />
-              تفاصيل التكلفة والربحية
+              {t("تفاصيل التكلفة والربحية")}
             </div>
           </div>
 
@@ -767,55 +769,55 @@ export default function InvoiceProfitabilityDetailsPage() {
               <thead className="bg-slate-50">
                 <tr className="border-b border-slate-200 text-right">
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    الصنف
+                    {t("الصنف")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    الكود
+                    {t("الكود")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    الوحدة
+                    {t("الوحدة")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    الكمية
+                    {t("الكمية")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    سعر البيع
+                    {t("سعر البيع")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    الإيراد
+                    {t("الإيراد")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    الخصم
+                    {t("الخصم")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    صافي الإيراد
+                    {t("صافي الإيراد")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    تكلفة الوحدة
+                    {t("تكلفة الوحدة")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    التكلفة
+                    {t("التكلفة")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    الربح
+                    {t("الربح")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    الهامش
+                    {t("الهامش")}
                   </th>
 
                   <th className="px-4 py-3 font-semibold text-slate-600">
-                    حالة التكلفة
+                    {t("حالة التكلفة")}
                   </th>
                 </tr>
               </thead>
@@ -827,7 +829,7 @@ export default function InvoiceProfitabilityDetailsPage() {
                       colSpan={13}
                       className="px-4 py-14 text-center text-slate-500"
                     >
-                      لا توجد أصناف في الفاتورة
+                      {t("لا توجد أصناف في الفاتورة")}
                     </td>
                   </tr>
                 ) : (
@@ -913,7 +915,7 @@ export default function InvoiceProfitabilityDetailsPage() {
                         >
                           {lineProfitAvailable
                             ? formatNumber(line.grossProfit)
-                            : "غير مكتمل"}
+                            : t("غير مكتمل")}
                         </td>
 
                         <td className="px-4 py-3">

@@ -46,6 +46,8 @@ import Button from "../../../shared/components/ui/Button";
 import Pagination from "../../../shared/components/ui/Pagination";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 /* =========================================================
    Constants
 ========================================================= */
@@ -61,10 +63,10 @@ const emptyFilters = {
 };
 
 const labels = {
-  Sales: "بيع",
-  Purchase: "شراء",
-  SalesReturn: "مرتجع بيع",
-  PurchaseReturn: "مرتجع شراء",
+  Sales: t("بيع"),
+  Purchase: t("شراء"),
+  SalesReturn: t("مرتجع بيع"),
+  PurchaseReturn: t("مرتجع شراء"),
 };
 
 const badges = {
@@ -75,8 +77,8 @@ const badges = {
 };
 
 const directionLabels = {
-  Outgoing: "خروج",
-  Incoming: "دخول",
+  Outgoing: t("خروج"),
+  Incoming: t("دخول"),
 };
 
 const directionBadges = {
@@ -89,7 +91,7 @@ const directionBadges = {
 ========================================================= */
 
 const fmt = (value) =>
-  new Intl.NumberFormat("ar-EG", {
+  new Intl.NumberFormat(getLocale(), {
     maximumFractionDigits: 2,
   }).format(Number(value) || 0);
 
@@ -118,7 +120,7 @@ const getContainerBalanceStatus = (container) => {
   if (difference > 0) {
     return {
       type: "credit",
-      label: "له",
+      label: t("له"),
       amount: difference,
       className: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20",
       dotClassName: "bg-emerald-500",
@@ -128,7 +130,7 @@ const getContainerBalanceStatus = (container) => {
   if (difference < 0) {
     return {
       type: "debit",
-      label: "عليه",
+      label: t("عليه"),
       amount: Math.abs(difference),
       className: "bg-rose-500/10 text-rose-600 border-rose-500/20",
       dotClassName: "bg-rose-500",
@@ -137,7 +139,7 @@ const getContainerBalanceStatus = (container) => {
 
   return {
     type: "equal",
-    label: "متساوي",
+    label: t("متساوي"),
     amount: 0,
     className: "bg-ink-400/10 text-ink-500 border-ink-400/20",
     dotClassName: "bg-ink-400",
@@ -173,12 +175,12 @@ function StoreModal({ open, onClose, party, store, onSaved }) {
     e.preventDefault();
 
     if (!name.trim()) {
-      toast.error("اسم المخزن مطلوب");
+      toast.error(t("اسم المخزن مطلوب"));
       return;
     }
 
     if (!party?.id && !store?.businessPartnerId) {
-      toast.error("تعذر تحديد العميل أو المورد المرتبط بالمخزن");
+      toast.error(t("تعذر تحديد العميل أو المورد المرتبط بالمخزن"));
       return;
     }
 
@@ -204,13 +206,13 @@ function StoreModal({ open, onClose, party, store, onSaved }) {
       onSaved?.(savedStore);
 
       toast.success(
-        edit ? "تم تعديل بيانات المخزن بنجاح" : "تم إنشاء مخزن العبوات بنجاح",
+        edit ? t("تم تعديل بيانات المخزن بنجاح") : t("تم إنشاء مخزن العبوات بنجاح"),
       );
 
       onClose();
     } catch (error) {
       toast.error(
-        error?.data?.message || error?.data?.title || "تعذر حفظ بيانات المخزن",
+        error?.data?.message || error?.data?.title || t("تعذر حفظ بيانات المخزن"),
       );
     }
   };
@@ -219,23 +221,23 @@ function StoreModal({ open, onClose, party, store, onSaved }) {
     <Modal
       isOpen={open}
       onClose={onClose}
-      title={edit ? "تعديل مخزن العبوات" : "إنشاء مخزن عبوات"}
+      title={edit ? t("تعديل مخزن العبوات") : t("إنشاء مخزن عبوات")}
     >
       <form onSubmit={save} className="space-y-4">
         <Input
-          label="اسم المخزن"
+          label={t("اسم المخزن")}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
 
         <Input
-          label="العنوان"
+          label={t("العنوان")}
           value={address}
           onChange={(e) => setAddress(e.target.value)}
         />
 
         <Input
-          label="الوصف"
+          label={t("الوصف")}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
@@ -247,7 +249,7 @@ function StoreModal({ open, onClose, party, store, onSaved }) {
             onClick={onClose}
             className="flex-1"
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button
@@ -256,10 +258,10 @@ function StoreModal({ open, onClose, party, store, onSaved }) {
             className="flex-1"
           >
             {creating || updating
-              ? "جاري الحفظ..."
+              ? t("جاري الحفظ...")
               : edit
-                ? "حفظ التعديلات"
-                : "إنشاء المخزن"}
+                ? t("حفظ التعديلات")
+                : t("إنشاء المخزن")}
           </Button>
         </div>
       </form>
@@ -349,14 +351,14 @@ function ContainersModal({ open, onClose, storeId }) {
 
       toast.success(
         selected.length === 0
-          ? "تم إلغاء تعيين جميع العبوات"
-          : `تم تعيين ${selected.length} عبوة للمخزن`,
+          ? t("تم إلغاء تعيين جميع العبوات")
+          : t("تم تعيين {0} عبوة للمخزن", { 0: selected.length }),
       );
     } catch (error) {
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "تعذر تحديث حاويات المخزن",
+          t("تعذر تحديث حاويات المخزن"),
       );
     }
   };
@@ -365,7 +367,7 @@ function ContainersModal({ open, onClose, storeId }) {
     e.preventDefault();
 
     if (!newName.trim()) {
-      toast.error("اسم الحاوية مطلوب");
+      toast.error(t("اسم الحاوية مطلوب"));
       return;
     }
 
@@ -390,10 +392,10 @@ function ContainersModal({ open, onClose, storeId }) {
       setNewName("");
       setNewDescription("");
 
-      toast.success("تمت إضافة الحاوية وتحديدها للمخزن");
+      toast.success(t("تمت إضافة الحاوية وتحديدها للمخزن"));
     } catch (error) {
       toast.error(
-        error?.data?.message || error?.data?.title || "تعذر إضافة الحاوية",
+        error?.data?.message || error?.data?.title || t("تعذر إضافة الحاوية"),
       );
     }
   };
@@ -404,7 +406,7 @@ function ContainersModal({ open, onClose, storeId }) {
     <Modal
       isOpen={open}
       onClose={onClose}
-      title="إدارة حاويات المخزن"
+      title={t("إدارة حاويات المخزن")}
       size="lg"
     >
       <div className="space-y-4">
@@ -414,23 +416,23 @@ function ContainersModal({ open, onClose, storeId }) {
         >
           <div className="flex items-center gap-2 text-sm font-bold">
             <Plus size={16} />
-            إضافة حاوية جديدة
+            {t("إضافة حاوية جديدة")}
           </div>
 
           <Input
-            label="اسم الحاوية"
+            label={t("اسم الحاوية")}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
           />
 
           <Input
-            label="الوصف"
+            label={t("الوصف")}
             value={newDescription}
             onChange={(e) => setNewDescription(e.target.value)}
           />
 
           <Button type="submit" disabled={creating}>
-            {creating ? "جاري الإضافة..." : "إضافة حاوية"}
+            {creating ? t("جاري الإضافة...") : t("إضافة حاوية")}
           </Button>
         </form>
 
@@ -438,11 +440,11 @@ function ContainersModal({ open, onClose, storeId }) {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-ink-900">
-                تعيين العبوات
+                {t("تعيين العبوات")}
               </p>
 
               <p className="mt-1 text-xs text-ink-400">
-                محدد {selected.length} من {all.length}
+                {t("محدد")} {selected.length} {t("من")} {all.length}
               </p>
             </div>
 
@@ -453,13 +455,13 @@ function ContainersModal({ open, onClose, storeId }) {
               disabled={isLoading || all.length === 0}
               className="text-xs"
             >
-              {allSelected ? "إلغاء تحديد الكل" : "تحديد كل العبوات"}
+              {allSelected ? t("إلغاء تحديد الكل") : t("تحديد كل العبوات")}
             </Button>
           </div>
 
           {someSelected && (
             <p className="mt-2 text-xs text-primary-600">
-              تم تحديد بعض العبوات
+              {t("تم تحديد بعض العبوات")}
             </p>
           )}
         </div>
@@ -467,11 +469,11 @@ function ContainersModal({ open, onClose, storeId }) {
         <div className="max-h-80 overflow-auto rounded-xl border">
           {isLoading ? (
             <div className="p-8 text-center text-sm text-ink-400">
-              جاري تحميل العبوات...
+              {t("جاري تحميل العبوات...")}
             </div>
           ) : all.length === 0 ? (
             <div className="p-8 text-center text-sm text-ink-400">
-              لا توجد عبوات متاحة حاليًا.
+              {t("لا توجد عبوات متاحة حاليًا.")}
             </div>
           ) : (
             <>
@@ -489,12 +491,12 @@ function ContainersModal({ open, onClose, storeId }) {
                 <div className="flex-1">
                   <div className="text-sm font-semibold">
                     {allSelected
-                      ? "إلغاء تحديد كل العبوات"
-                      : "تحديد كل العبوات"}
+                      ? t("إلغاء تحديد كل العبوات")
+                      : t("تحديد كل العبوات")}
                   </div>
 
                   <div className="mt-0.5 text-xs text-ink-400">
-                    سيتم تعيين جميع العبوات لهذا المخزن
+                    {t("سيتم تعيين جميع العبوات لهذا المخزن")}
                   </div>
                 </div>
 
@@ -544,14 +546,14 @@ function ContainersModal({ open, onClose, storeId }) {
                     {isSelected && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-primary-500/10 px-2 py-1 text-xs text-primary-600">
                         <Check size={12} />
-                        معينة
+                        {t("معينة")}
                       </span>
                     )}
 
                     {isSelected && (
                       <button
                         type="button"
-                        title="إزالة من المخزن"
+                        title={t("إزالة من المخزن")}
                         onClick={() => toggle(container.id)}
                         className="rounded-lg p-2 text-rose-500 hover:bg-rose-500/10"
                       >
@@ -567,11 +569,11 @@ function ContainersModal({ open, onClose, storeId }) {
 
         <div className="flex justify-between gap-2 pt-2">
           <Button variant="secondary" onClick={onClose} disabled={saving}>
-            إغلاق
+            {t("إغلاق")}
           </Button>
 
           <Button onClick={save} disabled={saving || isLoading}>
-            {saving ? "جاري الحفظ..." : `حفظ التعيينات (${selected.length})`}
+            {saving ? t("جاري الحفظ...") : t("حفظ التعيينات ({0})", { 0: selected.length })}
           </Button>
         </div>
       </div>
@@ -734,7 +736,7 @@ export default function ContainerStoreStatementPage() {
   const openInvoice = (invoiceId) => {
     if (!invoiceId) {
       toast.error(
-        "لا يمكن فتح تفاصيل الفاتورة لأن رقم تعريف الفاتورة غير موجود",
+        t("لا يمكن فتح تفاصيل الفاتورة لأن رقم تعريف الفاتورة غير موجود"),
       );
       return;
     }
@@ -795,9 +797,7 @@ export default function ContainerStoreStatementPage() {
   const handleDeleteMovement = async (item) => {
     if (
       !window.confirm(
-        `متأكد من حذف الحركة اليدوية للعبوة "${
-          item.containerName ?? ""
-        }" بتاريخ ${fmtDate(item.movementDate)}؟`,
+        t("متأكد من حذف الحركة اليدوية للعبوة \"{0}\" بتاريخ {1}؟", { 0: item.containerName ?? "", 1: fmtDate(item.movementDate) }),
       )
     ) {
       return;
@@ -809,12 +809,12 @@ export default function ContainerStoreStatementPage() {
         rowVersion: item.rowVersion,
       }).unwrap();
 
-      toast.success("تم حذف الحركة اليدوية بنجاح");
+      toast.success(t("تم حذف الحركة اليدوية بنجاح"));
     } catch (error) {
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "تعذر حذف الحركة اليدوية",
+          t("تعذر حذف الحركة اليدوية"),
       );
     }
   };
@@ -833,7 +833,7 @@ export default function ContainerStoreStatementPage() {
         <button
           onClick={() => navigate(-1)}
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-ink-400/10 bg-white hover:bg-ink-400/5"
-          title="رجوع"
+          title={t("رجوع")}
         >
           <ArrowRight size={16} />
         </button>
@@ -841,11 +841,11 @@ export default function ContainerStoreStatementPage() {
         <div className="flex-1">
           <h2 className="flex items-center gap-2 text-2xl font-bold">
             <Boxes size={20} />
-            مخزن عبوات {partner?.name ?? ""}
+            {t("مخزن عبوات")} {partner?.name ?? ""}
           </h2>
 
           <p className="mt-1 text-sm text-ink-400">
-            إدارة مخزن العبوات والحاويات والحركات.
+            {t("إدارة مخزن العبوات والحاويات والحركات.")}
           </p>
         </div>
 
@@ -853,7 +853,7 @@ export default function ContainerStoreStatementPage() {
           <div className="flex items-center gap-2">
             <Button variant="secondary" onClick={() => setStoreModal(true)}>
               <Pencil size={15} />
-              تعديل المخزن
+              {t("تعديل المخزن")}
             </Button>
 
             <Button
@@ -861,12 +861,12 @@ export default function ContainerStoreStatementPage() {
               onClick={() => setContainersModal(true)}
             >
               <Settings2 size={15} />
-              إدارة الحاويات
+              {t("إدارة الحاويات")}
             </Button>
 
             <Button onClick={openCreateMovement}>
               <Plus size={15} />
-              إضافة حركة يدوية
+              {t("إضافة حركة يدوية")}
             </Button>
           </div>
         )}
@@ -884,17 +884,17 @@ export default function ContainerStoreStatementPage() {
             </div>
 
             <div>
-              <b className="text-sm">لا يوجد مخزن عبوات لهذا الشريك</b>
+              <b className="text-sm">{t("لا يوجد مخزن عبوات لهذا الشريك")}</b>
 
               <p className="mt-1 text-sm text-ink-500">
-                لم يتم العثور على مخزن عبوات مرتبط بهذا العميل أو المورد.
+                {t("لم يتم العثور على مخزن عبوات مرتبط بهذا العميل أو المورد.")}
               </p>
             </div>
           </div>
 
           <Button onClick={() => setStoreModal(true)}>
             <Plus size={15} />
-            إنشاء مخزن عبوات
+            {t("إنشاء مخزن عبوات")}
           </Button>
         </div>
       )}
@@ -927,12 +927,12 @@ export default function ContainerStoreStatementPage() {
 
             <div>
               <span className="text-xs text-ink-400">
-                يتم عرض حركات العبوة:
+                {t("يتم عرض حركات العبوة:")}
               </span>
 
               <span className="mr-2 text-sm font-bold text-primary-700">
                 {selectedContainer?.containerName ||
-                  `عبوة رقم ${selectedContainerId}`}
+                  t("عبوة رقم {0}", { 0: selectedContainerId })}
               </span>
 
               {selectedContainer?.containerCode && (
@@ -949,7 +949,7 @@ export default function ContainerStoreStatementPage() {
             className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-rose-600 transition hover:bg-rose-500/10"
           >
             <X size={14} />
-            إلغاء فلتر العبوة
+            {t("إلغاء فلتر العبوة")}
           </button>
         </div>
       )}
@@ -960,7 +960,7 @@ export default function ContainerStoreStatementPage() {
 
       {isLoading && (
         <div className="py-16 text-center text-ink-400">
-          جاري تحميل كشف مخزن العبوات...
+          {t("جاري تحميل كشف مخزن العبوات...")}
         </div>
       )}
 
@@ -972,10 +972,10 @@ export default function ContainerStoreStatementPage() {
         <div className="mb-5 flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-600">
           <div>
             <div className="font-semibold">
-              حدث خطأ أثناء تحميل تفاصيل مخزن العبوات.
+              {t("حدث خطأ أثناء تحميل تفاصيل مخزن العبوات.")}
             </div>
 
-            <div className="mt-1 text-sm">حاول تحديث البيانات مرة أخرى.</div>
+            <div className="mt-1 text-sm">{t("حاول تحديث البيانات مرة أخرى.")}</div>
           </div>
 
           <Button
@@ -984,7 +984,7 @@ export default function ContainerStoreStatementPage() {
             className="text-rose-600"
           >
             <RefreshCw size={15} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </Button>
         </div>
       )}
@@ -1014,25 +1014,25 @@ export default function ContainerStoreStatementPage() {
               </div>
 
               <span className="rounded-full bg-primary-500/10 px-3 py-1 text-xs font-semibold text-primary-600">
-                مخزن عبوات
+                {t("مخزن عبوات")}
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
               {[
-                ["رصيد افتتاحي", data.summary?.openingUnits, "text-ink-900"],
+                [t("رصيد افتتاحي"), data.summary?.openingUnits, "text-ink-900"],
                 [
-                  "إجمالي الصادر",
+                  t("إجمالي الصادر"),
                   data.summary?.totalOutgoingUnits,
                   "text-rose-600",
                 ],
                 [
-                  "إجمالي الوارد",
+                  t("إجمالي الوارد"),
                   data.summary?.totalIncomingUnits,
                   "text-emerald-600",
                 ],
                 [
-                  "صافي الحركة",
+                  t("صافي الحركة"),
                   data.summary?.netUnits,
                   Number(data.summary?.netUnits) > 0
                     ? "text-emerald-600"
@@ -1041,11 +1041,11 @@ export default function ContainerStoreStatementPage() {
                       : "text-ink-500",
                 ],
                 [
-                  "الرصيد الختامي",
+                  t("الرصيد الختامي"),
                   data.summary?.closingUnits,
                   "text-primary-600",
                 ],
-                ["عدد الحركات", data.summary?.movementCount, "text-ink-900"],
+                [t("عدد الحركات"), data.summary?.movementCount, "text-ink-900"],
               ].map(([label, value, valueClass]) => (
                 <div key={label} className="rounded-xl bg-ink-400/5 px-4 py-3">
                   <div className="text-xs text-ink-400">{label}</div>
@@ -1065,10 +1065,10 @@ export default function ContainerStoreStatementPage() {
           <div className="mb-4 overflow-hidden rounded-2xl border bg-white shadow-card">
             <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
               <div>
-                <b className="text-sm">ملخص العبوات</b>
+                <b className="text-sm">{t("ملخص العبوات")}</b>
 
                 <p className="mt-0.5 text-xs text-ink-400">
-                  اضغط على أي عبوة لعرض جميع حركاتها وفواتيرها
+                  {t("اضغط على أي عبوة لعرض جميع حركاتها وفواتيرها")}
                 </p>
               </div>
 
@@ -1076,7 +1076,7 @@ export default function ContainerStoreStatementPage() {
                 onClick={() => setContainersModal(true)}
                 className="rounded-lg px-3 py-2 text-xs font-semibold text-primary-600 hover:bg-primary-500/10"
               >
-                إدارة الحاويات
+                {t("إدارة الحاويات")}
               </button>
             </div>
 
@@ -1085,14 +1085,14 @@ export default function ContainerStoreStatementPage() {
                 <thead>
                   <tr className="bg-ink-400/5 text-ink-400">
                     {[
-                      "العبوة",
-                      "افتتاحي",
-                      "صادر",
-                      "وارد",
-                      "صافي",
-                      "ختامي",
-                      "له / عليه",
-                      "الإجراء",
+                      t("العبوة"),
+                      t("افتتاحي"),
+                      t("صادر"),
+                      t("وارد"),
+                      t("صافي"),
+                      t("ختامي"),
+                      t("له / عليه"),
+                      t("الإجراء"),
                     ].map((label) => (
                       <th
                         key={label}
@@ -1237,7 +1237,7 @@ export default function ContainerStoreStatementPage() {
                             >
                               <FileText size={14} />
 
-                              {isSelected ? "الحركات المعروضة" : "عرض الحركات"}
+                              {isSelected ? t("الحركات المعروضة") : t("عرض الحركات")}
                             </button>
                           </td>
                         </tr>
@@ -1246,7 +1246,7 @@ export default function ContainerStoreStatementPage() {
                   ) : (
                     <tr>
                       <td colSpan={8} className="p-10 text-center text-ink-400">
-                        لا توجد بيانات حاويات متاحة.
+                        {t("لا توجد بيانات حاويات متاحة.")}
                       </td>
                     </tr>
                   )}
@@ -1264,12 +1264,12 @@ export default function ContainerStoreStatementPage() {
               <div>
                 <h3 className="font-bold">
                   {selectedContainerId
-                    ? `حركات العبوة ${selectedContainer?.containerName ?? ""}`
-                    : "حركات العبوات"}
+                    ? t("حركات العبوة {0}", { 0: selectedContainer?.containerName ?? "" })
+                    : t("حركات العبوات")}
                 </h3>
 
                 <p className="mt-0.5 text-xs text-ink-400">
-                  إجمالي الحركات: {fmt(data.totalCount)}
+                  {t("إجمالي الحركات:")} {fmt(data.totalCount)}
                 </p>
               </div>
 
@@ -1280,7 +1280,7 @@ export default function ContainerStoreStatementPage() {
                   className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-500/10"
                 >
                   <X size={14} />
-                  إلغاء فلتر العبوة
+                  {t("إلغاء فلتر العبوة")}
                 </button>
               )}
             </div>
@@ -1290,18 +1290,18 @@ export default function ContainerStoreStatementPage() {
                 <thead>
                   <tr className="bg-ink-400/5 text-ink-400">
                     {[
-                      "التاريخ",
-                      "الفاتورة",
-                      "نوع الفاتورة",
-                      "المصدر",
-                      "الحركة",
-                      "العبوة",
-                      "صادر",
-                      "وارد",
-                      "صافي الحركة",
-                      "الرصيد الجاري",
-                      "الوصف",
-                      "الإجراء",
+                      t("التاريخ"),
+                      t("الفاتورة"),
+                      t("نوع الفاتورة"),
+                      t("المصدر"),
+                      t("الحركة"),
+                      t("العبوة"),
+                      t("صادر"),
+                      t("وارد"),
+                      t("صافي الحركة"),
+                      t("الرصيد الجاري"),
+                      t("الوصف"),
+                      t("الإجراء"),
                     ].map((label) => (
                       <th
                         key={label}
@@ -1320,7 +1320,7 @@ export default function ContainerStoreStatementPage() {
                         colSpan={12}
                         className="p-10 text-center text-ink-400"
                       >
-                        لا توجد حركات مطابقة للفلاتر
+                        {t("لا توجد حركات مطابقة للفلاتر")}
                       </td>
                     </tr>
                   ) : (
@@ -1351,10 +1351,10 @@ export default function ContainerStoreStatementPage() {
                                 type="button"
                                 onClick={() => openInvoice(item.invoiceId)}
                                 className="group inline-flex items-center gap-1.5 text-right"
-                                title="فتح تفاصيل الفاتورة"
+                                title={t("فتح تفاصيل الفاتورة")}
                               >
                                 <span className="font-bold text-primary-600 underline-offset-2 group-hover:underline">
-                                  {item.invoiceNumber || "بدون رقم"}
+                                  {item.invoiceNumber || t("بدون رقم")}
                                 </span>
 
                                 <ExternalLink
@@ -1366,14 +1366,14 @@ export default function ContainerStoreStatementPage() {
                               <span className="font-bold text-ink-500">
                                 {item.invoiceNumber ||
                                   (item.sourceType === "Manual"
-                                    ? "بدون فاتورة"
-                                    : "بدون رقم")}
+                                    ? t("بدون فاتورة")
+                                    : t("بدون رقم"))}
                               </span>
                             )}
 
                             {item.partnerInvoiceNumber && (
                               <div className="mt-1 text-xs text-ink-400">
-                                فاتورة العميل: {item.partnerInvoiceNumber}
+                                {t("فاتورة العميل:")} {item.partnerInvoiceNumber}
                               </div>
                             )}
                           </td>
@@ -1401,11 +1401,11 @@ export default function ContainerStoreStatementPage() {
                           <td className="px-3 py-3">
                             {item.sourceType === "Manual" ? (
                               <span className="inline-flex items-center rounded-full border border-sky-500/20 bg-sky-500/10 px-2.5 py-1 text-xs font-semibold text-sky-700">
-                                يدوي
+                                {t("يدوي")}
                               </span>
                             ) : (
                               <span className="inline-flex items-center rounded-full border border-ink-400/15 bg-ink-400/5 px-2.5 py-1 text-xs font-semibold text-ink-500">
-                                فاتورة
+                                {t("فاتورة")}
                               </span>
                             )}
                           </td>
@@ -1499,8 +1499,8 @@ export default function ContainerStoreStatementPage() {
                                   type="button"
                                   onClick={() => openEditMovement(item)}
                                   className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-ink-400/15 bg-white text-ink-500 transition hover:border-primary-400/40 hover:bg-primary-50 hover:text-primary-700"
-                                  title="تعديل الحركة اليدوية"
-                                  aria-label="تعديل الحركة اليدوية"
+                                  title={t("تعديل الحركة اليدوية")}
+                                  aria-label={t("تعديل الحركة اليدوية")}
                                 >
                                   <Pencil size={14} />
                                 </button>
@@ -1510,15 +1510,15 @@ export default function ContainerStoreStatementPage() {
                                   onClick={() => handleDeleteMovement(item)}
                                   disabled={deletingMovement}
                                   className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-rose-500/20 bg-white text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60"
-                                  title="حذف الحركة اليدوية"
-                                  aria-label="حذف الحركة اليدوية"
+                                  title={t("حذف الحركة اليدوية")}
+                                  aria-label={t("حذف الحركة اليدوية")}
                                 >
                                   <Trash2 size={14} />
                                 </button>
                               </div>
                             ) : (
                               <span className="text-xs text-ink-300">
-                                للقراءة فقط
+                                {t("للقراءة فقط")}
                               </span>
                             )}
                           </td>
@@ -1541,14 +1541,14 @@ export default function ContainerStoreStatementPage() {
                 totalCount={data.totalCount}
                 onPageChange={onPageChange}
                 onPageSizeChange={onPageSizeChange}
-                label="حركة"
+                label={t("حركة")}
               />
             )}
 
             {isFetching && (
               <div className="flex items-center justify-center gap-2 border-t px-4 py-3 text-xs text-ink-400">
                 <RefreshCw size={13} className="animate-spin" />
-                جاري تحديث البيانات...
+                {t("جاري تحديث البيانات...")}
               </div>
             )}
           </div>

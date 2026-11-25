@@ -1,8 +1,9 @@
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
+import { t } from "../../i18n";
 export function useCashHandoverReportPrint({
-  title = "تقرير تسليم العهدة",
+  title = t("تقرير تسليم العهدة"),
 } = {}) {
   const printRef = useRef(null);
 

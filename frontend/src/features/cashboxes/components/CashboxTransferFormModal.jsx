@@ -25,6 +25,8 @@ import {
 } from "../cashboxTransfersApi";
 import { useLazyResolveExchangeRateQuery } from "../../exchange-rates/exchangeRatesApi";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 const today = todayInCairo();
 
 // ⚠️ افتراض — استبدلها بمصدر عملة الشركة الأساسية الفعلي عندك
@@ -39,23 +41,23 @@ const schema = z
   .object({
     sourceCashboxId: z.coerce
       .number({
-        invalid_type_error: "اختر الخزنة المحوّل منها",
+        invalid_type_error: t("اختر الخزنة المحوّل منها"),
       })
-      .positive("اختر الخزنة المحوّل منها"),
+      .positive(t("اختر الخزنة المحوّل منها")),
 
     destinationCashboxId: z.coerce
       .number({
-        invalid_type_error: "اختر الخزنة المحوّل إليها",
+        invalid_type_error: t("اختر الخزنة المحوّل إليها"),
       })
-      .positive("اختر الخزنة المحوّل إليها"),
+      .positive(t("اختر الخزنة المحوّل إليها")),
 
     amount: z.coerce
       .number({
-        invalid_type_error: "أدخل مبلغ صحيح",
+        invalid_type_error: t("أدخل مبلغ صحيح"),
       })
-      .positive("المبلغ لازم يكون أكبر من صفر"),
+      .positive(t("المبلغ لازم يكون أكبر من صفر")),
 
-    transferDate: z.string().min(1, "التاريخ مطلوب"),
+    transferDate: z.string().min(1, t("التاريخ مطلوب")),
 
     description: z.string().optional(),
 
@@ -69,15 +71,15 @@ const schema = z
       .union([
         z.coerce
           .number({
-            invalid_type_error: "أدخل سعر تحويل صحيح",
+            invalid_type_error: t("أدخل سعر تحويل صحيح"),
           })
-          .positive("سعر التحويل لازم يكون أكبر من صفر"),
+          .positive(t("سعر التحويل لازم يكون أكبر من صفر")),
         z.literal(""),
       ])
       .optional(),
   })
   .refine((data) => data.sourceCashboxId !== data.destinationCashboxId, {
-    message: "لا يمكن التحويل لنفس الخزنة",
+    message: t("لا يمكن التحويل لنفس الخزنة"),
     path: ["destinationCashboxId"],
   });
 
@@ -106,7 +108,7 @@ function formatNumber(value) {
     return "0";
   }
 
-  return number.toLocaleString("ar-EG", {
+  return number.toLocaleString(getLocale(), {
     maximumFractionDigits: 2,
   });
 }
@@ -373,7 +375,7 @@ export default function CashboxTransferFormModal({
       isDifferentCurrency &&
       (!values.conversionRate || Number(values.conversionRate) <= 0)
     ) {
-      toast.error("يجب إدخال سعر التحويل بين العملتين");
+      toast.error(t("يجب إدخال سعر التحويل بين العملتين"));
       return;
     }
 
@@ -425,7 +427,7 @@ export default function CashboxTransferFormModal({
         : await createTransfer(payload).unwrap();
 
       toast.success(
-        isEdit ? "تم تعديل التحويل بنجاح" : "تم التحويل بين الخزائن بنجاح",
+        isEdit ? t("تم تعديل التحويل بنجاح") : t("تم التحويل بين الخزائن بنجاح"),
       );
 
       onSaved?.(saved);
@@ -437,7 +439,7 @@ export default function CashboxTransferFormModal({
         err?.data?.title ||
         err?.data?.detail ||
         err?.data?.errors?.[0] ||
-        "حدث خطأ أثناء تنفيذ التحويل";
+        t("حدث خطأ أثناء تنفيذ التحويل");
 
       toast.error(message);
     }
@@ -451,10 +453,10 @@ export default function CashboxTransferFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "تعديل تحويل بين الخزائن" : "تحويل بين الخزائن"}
+      title={isEdit ? t("تعديل تحويل بين الخزائن") : t("تحويل بين الخزائن")}
       wide
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" dir="rtl">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" dir={getDir()}>
         {/* =====================================================
             Source / Destination
         ====================================================== */}
@@ -468,14 +470,14 @@ export default function CashboxTransferFormModal({
             render={({ field }) => (
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-ink-900">
-                  من خزنة
+                  {t("من خزنة")}
                 </label>
 
                 <select
                   {...field}
                   className="w-full rounded-xl border border-ink-400/15 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10"
                 >
-                  <option value="">اختر الخزنة المحوّل منها</option>
+                  <option value="">{t("اختر الخزنة المحوّل منها")}</option>
 
                   {cashboxOptions.map((cashbox) => (
                     <option
@@ -487,7 +489,7 @@ export default function CashboxTransferFormModal({
                       {cashbox.code ? ` (${cashbox.code})` : ""}
                       {" — "}
                       {formatNumber(getBalance(cashbox))} {getCurrency(cashbox)}
-                      {cashbox.isActive === false ? " — غير نشطة" : ""}
+                      {cashbox.isActive === false ? t(" — غير نشطة") : ""}
                     </option>
                   ))}
                 </select>
@@ -500,7 +502,7 @@ export default function CashboxTransferFormModal({
 
                 {sourceCashbox && (
                   <div className="mt-2 flex items-center justify-between rounded-lg bg-ink-400/5 px-3 py-2 text-xs text-ink-500">
-                    <span>الرصيد الحالي</span>
+                    <span>{t("الرصيد الحالي")}</span>
 
                     <strong className="text-ink-900">
                       {formatNumber(sourceBalance)} {sourceCurrency}
@@ -519,14 +521,14 @@ export default function CashboxTransferFormModal({
             render={({ field }) => (
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-ink-900">
-                  إلى خزنة
+                  {t("إلى خزنة")}
                 </label>
 
                 <select
                   {...field}
                   className="w-full rounded-xl border border-ink-400/15 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10"
                 >
-                  <option value="">اختر الخزنة المحوّل إليها</option>
+                  <option value="">{t("اختر الخزنة المحوّل إليها")}</option>
 
                   {cashboxOptions.map((cashbox) => (
                     <option
@@ -538,7 +540,7 @@ export default function CashboxTransferFormModal({
                       {cashbox.code ? ` (${cashbox.code})` : ""}
                       {" — "}
                       {formatNumber(getBalance(cashbox))} {getCurrency(cashbox)}
-                      {cashbox.isActive === false ? " — غير نشطة" : ""}
+                      {cashbox.isActive === false ? t(" — غير نشطة") : ""}
                     </option>
                   ))}
                 </select>
@@ -551,7 +553,7 @@ export default function CashboxTransferFormModal({
 
                 {destinationCashbox && (
                   <div className="mt-2 flex items-center justify-between rounded-lg bg-ink-400/5 px-3 py-2 text-xs text-ink-500">
-                    <span>الرصيد الحالي</span>
+                    <span>{t("الرصيد الحالي")}</span>
 
                     <strong className="text-ink-900">
                       {formatNumber(getBalance(destinationCashbox))}{" "}
@@ -594,11 +596,11 @@ export default function CashboxTransferFormModal({
 
               {isDifferentCurrency ? (
                 <p className="mt-1 text-xs text-amber-700">
-                  العملات مختلفة، تم تحميل سعر التحويل تلقائيًا — يمكنك تعديله.
+                  {t("العملات مختلفة، تم تحميل سعر التحويل تلقائيًا — يمكنك تعديله.")}
                 </p>
               ) : (
                 <p className="mt-1 text-xs text-emerald-700">
-                  نفس العملة، لا يحتاج التحويل إلى سعر تحويل.
+                  {t("نفس العملة، لا يحتاج التحويل إلى سعر تحويل.")}
                 </p>
               )}
             </div>
@@ -615,7 +617,7 @@ export default function CashboxTransferFormModal({
         >
           <Input
             label={
-              sourceCurrency ? `المبلغ المحوّل (${sourceCurrency})` : "المبلغ"
+              sourceCurrency ? t("المبلغ المحوّل ({0})", { 0: sourceCurrency }) : t("المبلغ")
             }
             type="number"
             step="0.01"
@@ -628,11 +630,11 @@ export default function CashboxTransferFormModal({
           {isDifferentCurrency && (
             <div>
               <Input
-                label={`سعر التحويل (${sourceCurrency} → ${destinationCurrency})`}
+                label={t("سعر التحويل ({0} → {1})", { 0: sourceCurrency, 1: destinationCurrency })}
                 type="number"
                 step="0.01"
                 min="0.01"
-                placeholder="بيتحمّل تلقائيًا حسب تاريخ التحويل"
+                placeholder={t("بيتحمّل تلقائيًا حسب تاريخ التحويل")}
                 error={errors.conversionRate?.message}
                 {...register("conversionRate")}
               />
@@ -640,7 +642,7 @@ export default function CashboxTransferFormModal({
               {isResolvingRateRef.current && (
                 <p className="mt-1 flex items-center gap-1 text-[11px] text-ink-400">
                   <Loader2 size={11} className="animate-spin" />
-                  جاري جلب سعر التحويل...
+                  {t("جاري جلب سعر التحويل...")}
                 </p>
               )}
             </div>
@@ -658,15 +660,15 @@ export default function CashboxTransferFormModal({
 
               <div className="text-sm">
                 <p className="font-medium text-blue-900">
-                  قيمة التحويل المتوقعة
+                  {t("قيمة التحويل المتوقعة")}
                 </p>
 
                 <p className="mt-1 text-blue-700">
-                  سيتم خصم{" "}
+                  {t("سيتم خصم")}{" "}
                   <strong>
                     {formatNumber(amount)} {sourceCurrency}
                   </strong>{" "}
-                  من الخزنة الأولى، وستصل للخزنة الثانية قيمة تقريبية:
+                  {t("من الخزنة الأولى، وستصل للخزنة الثانية قيمة تقريبية:")}
                 </p>
 
                 <div className="mt-2 flex items-center gap-2">
@@ -691,7 +693,7 @@ export default function CashboxTransferFormModal({
         ====================================================== */}
 
         <Input
-          label="تاريخ التحويل"
+          label={t("تاريخ التحويل")}
           type="date"
           error={errors.transferDate?.message}
           min={selectedFiscalYear?.startDate}
@@ -704,8 +706,8 @@ export default function CashboxTransferFormModal({
         ====================================================== */}
 
         <Input
-          label="البيان"
-          placeholder="مثال: تحويل نقدية من الخزنة الرئيسية إلى خزنة المبيعات"
+          label={t("البيان")}
+          placeholder={t("مثال: تحويل نقدية من الخزنة الرئيسية إلى خزنة المبيعات")}
           error={errors.description?.message}
           {...register("description")}
         />
@@ -715,8 +717,8 @@ export default function CashboxTransferFormModal({
         ====================================================== */}
 
         <Input
-          label="ملاحظات"
-          placeholder="ملاحظات إضافية (اختياري)"
+          label={t("ملاحظات")}
+          placeholder={t("ملاحظات إضافية (اختياري)")}
           error={errors.notes?.message}
           {...register("notes")}
         />
@@ -732,15 +734,15 @@ export default function CashboxTransferFormModal({
             onClick={onClose}
             disabled={isLoading}
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isLoading}>
             {isLoading
-              ? "جاري تنفيذ التحويل..."
+              ? t("جاري تنفيذ التحويل...")
               : isEdit
-                ? "حفظ التعديلات"
-                : "تنفيذ التحويل"}
+                ? t("حفظ التعديلات")
+                : t("تنفيذ التحويل")}
           </Button>
         </div>
       </form>

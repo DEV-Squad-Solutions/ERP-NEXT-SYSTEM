@@ -1,3 +1,4 @@
+import { t } from "../../../i18n";
 // features/inventory/components/buildStockOpeningBalancePayload.js
 
 // السيرفر بيحسب quantity = count * weight و total = quantity * price بنفسه
@@ -29,7 +30,7 @@ export function buildCreateStockOpeningBalanceRequest({ header, lines }) {
   const validLines = buildValidLines(lines);
 
   if (validLines.length === 0) {
-    throw new Error("لازم صنف واحد على الأقل بعدد ووزن أكبر من صفر");
+    throw new Error(t("لازم صنف واحد على الأقل بعدد ووزن أكبر من صفر"));
   }
 
   return {
@@ -49,9 +50,9 @@ export function buildStockOpeningBalanceUpdateBody({
 }) {
   const validLines = buildValidLines(lines);
 
-  if (!rowVersion) throw new Error("rowVersion مفقود - أعد تحميل السند");
+  if (!rowVersion) throw new Error(t("rowVersion مفقود - أعد تحميل السند"));
   if (validLines.length === 0) {
-    throw new Error("لازم صنف واحد على الأقل بعدد ووزن أكبر من صفر");
+    throw new Error(t("لازم صنف واحد على الأقل بعدد ووزن أكبر من صفر"));
   }
 
   return {

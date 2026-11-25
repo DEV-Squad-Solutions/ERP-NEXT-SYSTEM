@@ -4,11 +4,13 @@ import Pagination from "../../../shared/components/ui/Pagination";
 import AccessDeniedState from "../../../shared/components/ui/AccessDeniedState";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const SOURCE_TYPE_LABELS = {
-  OpeningBalance: "رصيد افتتاحي",
-  SalaryTransfer: "تحويل راتب",
-  Movement: "حركة",
-  CashVoucher: "سند نقدي",
+  OpeningBalance: t("رصيد افتتاحي"),
+  SalaryTransfer: t("تحويل راتب"),
+  Movement: t("حركة"),
+  CashVoucher: t("سند نقدي"),
 };
 
 export default function EmployeeStatementTable({
@@ -37,8 +39,8 @@ export default function EmployeeStatementTable({
     if (error?.status === 403) {
       return (
         <AccessDeniedState
-          title="غير مصرح بعرض كشف حساب الموظف"
-          message="مش عندك صلاحية عرض كشف الحساب ده. تواصل مع مسؤول النظام لو محتاج الصلاحية."
+          title={t("غير مصرح بعرض كشف حساب الموظف")}
+          message={t("مش عندك صلاحية عرض كشف الحساب ده. تواصل مع مسؤول النظام لو محتاج الصلاحية.")}
           onRetry={refetch}
         />
       );
@@ -53,7 +55,7 @@ export default function EmployeeStatementTable({
         />
 
         <p className="mb-1 font-medium text-ink-900">
-          حدث خطأ في تحميل كشف حساب الموظف
+          {t("حدث خطأ في تحميل كشف حساب الموظف")}
         </p>
 
         <button
@@ -62,7 +64,7 @@ export default function EmployeeStatementTable({
           className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
         >
           <RefreshCw size={15} />
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
@@ -78,7 +80,7 @@ export default function EmployeeStatementTable({
       return "—";
     }
 
-    return Number(value).toLocaleString("ar-EG", {
+    return Number(value).toLocaleString(getLocale(), {
       minimumFractionDigits: 0,
       maximumFractionDigits,
     });
@@ -89,7 +91,7 @@ export default function EmployeeStatementTable({
       return "—";
     }
 
-    return Number(value).toLocaleString("ar-EG", {
+    return Number(value).toLocaleString(getLocale(), {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2,
     });
@@ -127,7 +129,7 @@ export default function EmployeeStatementTable({
           <FileSearch size={26} className="text-ink-400/50" strokeWidth={1.6} />
         </div>
 
-        <p className="font-medium text-ink-900">لا توجد حركات مطابقة</p>
+        <p className="font-medium text-ink-900">{t("لا توجد حركات مطابقة")}</p>
       </div>
     );
   }
@@ -147,36 +149,36 @@ export default function EmployeeStatementTable({
           <thead className="bg-slate-50">
             <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
               <th className="w-48 px-4 py-3 text-center">
-                الرصيد
+                {t("الرصيد")}
                 <div className="mt-0.5 text-[10px] font-normal text-ink-400">
                   {currency}
                 </div>
               </th>
 
               <th className="w-32 px-4 py-3 text-center text-positive">
-                مدين
+                {t("مدين")}
                 <div className="mt-0.5 text-[10px] font-normal text-ink-400">
                   {currency}
                 </div>
               </th>
 
               <th className="w-32 px-4 py-3 text-center text-negative">
-                دائن
+                {t("دائن")}
                 <div className="mt-0.5 text-[10px] font-normal text-ink-400">
                   {currency}
                 </div>
               </th>
 
-              <th className="min-w-[280px] px-4 py-3 text-right">البيان</th>
+              <th className="min-w-[280px] px-4 py-3 text-right">{t("البيان")}</th>
 
-              <th className="w-36 px-4 py-3 text-center">التاريخ</th>
+              <th className="w-36 px-4 py-3 text-center">{t("التاريخ")}</th>
 
-              <th className="w-44 px-4 py-3 text-right">رقم المستند</th>
+              <th className="w-44 px-4 py-3 text-right">{t("رقم المستند")}</th>
 
-              <th className="w-40 px-4 py-3 text-right">رقم المرجع</th>
+              <th className="w-40 px-4 py-3 text-right">{t("رقم المرجع")}</th>
 
               {isForeignCurrency && (
-                <th className="w-32 px-4 py-3 text-center">سعر الصرف</th>
+                <th className="w-32 px-4 py-3 text-center">{t("سعر الصرف")}</th>
               )}
             </tr>
           </thead>
@@ -186,7 +188,7 @@ export default function EmployeeStatementTable({
               const sourceLabel =
                 SOURCE_TYPE_LABELS[item.sourceType] ||
                 item.sourceType ||
-                "حركة";
+                t("حركة");
 
               const movementName = item.movementName?.trim() || null;
 
@@ -228,7 +230,7 @@ export default function EmployeeStatementTable({
                     </div>
 
                     <div className="mt-0.5 text-xs text-ink-500">
-                      {movementName || "بدون توصيف للحركة"}
+                      {movementName || t("بدون توصيف للحركة")}
                     </div>
 
                     {item.description && (
@@ -277,25 +279,25 @@ export default function EmployeeStatementTable({
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h3 className="text-sm font-semibold text-ink-900">
-                ملخص كشف الحساب
+                {t("ملخص كشف الحساب")}
               </h3>
 
               <p className="mt-0.5 text-xs text-ink-400">
-                العملة: {currency}
-                {isForeignCurrency && ` · العملة الأساسية: ${baseCurrency}`}
+                {t("العملة:")} {currency}
+                {isForeignCurrency && t(" · العملة الأساسية: {0}", { 0: baseCurrency })}
               </p>
             </div>
 
             {isForeignCurrency && (
               <div className="rounded-lg border border-ink-400/10 bg-white px-3 py-1.5 text-xs text-ink-500">
-                القيم الأساسية معروضة بالجنيه المصري
+                {t("القيم الأساسية معروضة بالجنيه المصري")}
               </div>
             )}
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-xl border border-ink-400/10 bg-white p-4">
-              <div className="mb-2 text-xs text-ink-400">رصيد أول المدة</div>
+              <div className="mb-2 text-xs text-ink-400">{t("رصيد أول المدة")}</div>
 
               <BalanceBadge
                 amount={data.summary.openingBalanceAmount}
@@ -314,7 +316,7 @@ export default function EmployeeStatementTable({
             </div>
 
             <div className="rounded-xl border border-ink-400/10 bg-white p-4">
-              <div className="mb-2 text-xs text-ink-400">إجمالي المدين</div>
+              <div className="mb-2 text-xs text-ink-400">{t("إجمالي المدين")}</div>
 
               <div className="num text-lg font-semibold text-positive">
                 {formatMoney(data.summary.totalDebits)}
@@ -328,7 +330,7 @@ export default function EmployeeStatementTable({
             </div>
 
             <div className="rounded-xl border border-ink-400/10 bg-white p-4">
-              <div className="mb-2 text-xs text-ink-400">إجمالي الدائن</div>
+              <div className="mb-2 text-xs text-ink-400">{t("إجمالي الدائن")}</div>
 
               <div className="num text-lg font-semibold text-negative">
                 {formatMoney(data.summary.totalCredits)}
@@ -343,7 +345,7 @@ export default function EmployeeStatementTable({
 
             <div className="rounded-xl border border-ink-400/10 bg-white p-4">
               <div className="mb-2 text-xs font-semibold text-ink-900">
-                رصيد آخر المدة
+                {t("رصيد آخر المدة")}
               </div>
 
               <BalanceBadge
@@ -373,7 +375,7 @@ export default function EmployeeStatementTable({
             totalCount={data?.totalCount || 0}
             onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}
-            label="حركة"
+            label={t("حركة")}
           />
         </div>
       )}

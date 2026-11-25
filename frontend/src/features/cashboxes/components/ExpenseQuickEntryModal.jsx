@@ -18,12 +18,13 @@ import Modal from "../../../shared/components/ui/Modal";
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
 const PARTY_TYPES = [
-  { value: "None", label: "بدون طرف" },
-  { value: "Partner", label: "عميل / مورد" },
-  { value: "Driver", label: "سائق" },
-  { value: "Employee", label: "موظف" },
-  { value: "Other", label: "طرف آخر" },
+  { value: "None", label: t("بدون طرف") },
+  { value: "Partner", label: t("عميل / مورد") },
+  { value: "Driver", label: t("سائق") },
+  { value: "Employee", label: t("موظف") },
+  { value: "Other", label: t("طرف آخر") },
 ];
 
 const emptyForm = {
@@ -197,32 +198,32 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
       onSaved?.();
       onClose();
     } catch (err) {
-      console.error("فشل تسجيل المصروف", err);
+      console.error(t("فشل تسجيل المصروف"), err);
     }
   }
 
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="تسجيل مصروف">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("تسجيل مصروف")}>
       <div className="space-y-5">
         {/* الخزينة والتاريخ */}
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              الخزينة
+              {t("الخزينة")}
             </label>
             <CompactSelect
               options={cashboxOptions}
               value={form.cashboxId}
               onChange={(value) => setField("cashboxId", value || "")}
-              placeholder="اختر الخزينة"
+              placeholder={t("اختر الخزينة")}
             />
           </div>
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              التاريخ
+              {t("التاريخ")}
             </label>
             <DateInput
               type="date"
@@ -238,13 +239,13 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
         {isForeignCurrency && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              سعر الصرف (اختياري - يستخدم السعر المسجل لو فاضي)
+              {t("سعر الصرف (اختياري - يستخدم السعر المسجل لو فاضي)")}
             </label>
             <input
               type="number"
               value={form.exchangeRate}
               onChange={(e) => setField("exchangeRate", e.target.value)}
-              placeholder="سعر الصرف"
+              placeholder={t("سعر الصرف")}
               className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition focus:border-emerald-600"
             />
           </div>
@@ -253,7 +254,7 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
         {/* نوع الطرف */}
         <div>
           <label className="mb-2 block text-sm font-medium text-ink">
-            نوع الطرف
+            {t("نوع الطرف")}
           </label>
 
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -287,7 +288,7 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
         {/* نوع المصروف */}
         <div>
           <label className="mb-1.5 block text-sm font-medium text-ink">
-            نوع المصروف
+            {t("نوع المصروف")}
           </label>
 
           <CompactSelect
@@ -298,8 +299,8 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
             isDisabled={loadingTypes}
             placeholder={
               loadingTypes
-                ? "جاري تحميل أنواع المصروفات..."
-                : "اختر نوع المصروف"
+                ? t("جاري تحميل أنواع المصروفات...")
+                : t("اختر نوع المصروف")
             }
           />
         </div>
@@ -307,13 +308,13 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
         {form.partyType === "Partner" && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              العميل / المورد
+              {t("العميل / المورد")}
             </label>
             <CompactSelect
               options={partnerOptions}
               value={form.businessPartnerId}
               onChange={(value) => setField("businessPartnerId", value || "")}
-              placeholder="اختر العميل / المورد"
+              placeholder={t("اختر العميل / المورد")}
             />
           </div>
         )}
@@ -321,13 +322,13 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
         {form.partyType === "Driver" && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              السائق
+              {t("السائق")}
             </label>
             <CompactSelect
               options={driverOptions}
               value={form.driverId}
               onChange={(value) => setField("driverId", value || "")}
-              placeholder="اختر السائق"
+              placeholder={t("اختر السائق")}
             />
           </div>
         )}
@@ -335,13 +336,13 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
         {form.partyType === "Employee" && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              الموظف
+              {t("الموظف")}
             </label>
             <CompactSelect
               options={employeeOptions}
               value={form.employeeId}
               onChange={(value) => setField("employeeId", value || "")}
-              placeholder="اختر الموظف"
+              placeholder={t("اختر الموظف")}
             />
           </div>
         )}
@@ -349,13 +350,13 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
         {form.partyType === "Other" && (
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              اسم الطرف
+              {t("اسم الطرف")}
             </label>
             <input
               type="text"
               value={form.externalPartyName}
               onChange={(e) => setField("externalPartyName", e.target.value)}
-              placeholder="اكتب اسم الطرف"
+              placeholder={t("اكتب اسم الطرف")}
               className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm outline-none transition focus:border-emerald-600"
             />
           </div>
@@ -364,7 +365,7 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
         {/* المبلغ */}
         <div>
           <label className="mb-1.5 block text-sm font-medium text-ink">
-            المبلغ
+            {t("المبلغ")}
           </label>
           <input
             type="number"
@@ -379,7 +380,7 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              رقم مرجعي
+              {t("رقم مرجعي")}
             </label>
             <input
               type="text"
@@ -391,7 +392,7 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink">
-              الوصف
+              {t("الوصف")}
             </label>
             <input
               type="text"
@@ -404,7 +405,7 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
 
         <div>
           <label className="mb-1.5 block text-sm font-medium text-ink">
-            ملاحظات
+            {t("ملاحظات")}
           </label>
           <textarea
             value={form.notes}
@@ -421,7 +422,7 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
             onClick={onClose}
             className="rounded-xl border border-gold/30 px-4 py-2 text-sm text-ink transition hover:bg-ink/5"
           >
-            إلغاء
+            {t("إلغاء")}
           </button>
 
           <button
@@ -430,7 +431,7 @@ export default function ExpenseQuickEntryModal({ isOpen, onClose, onSaved }) {
             disabled={!canSubmit || isSaving}
             className="rounded-xl bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isSaving ? "جاري الحفظ..." : "حفظ المصروف"}
+            {isSaving ? t("جاري الحفظ...") : t("حفظ المصروف")}
           </button>
         </div>
       </div>

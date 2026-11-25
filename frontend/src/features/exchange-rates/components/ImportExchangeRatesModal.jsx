@@ -18,11 +18,13 @@ import { useGetCurrenciesSelectQuery } from "../../currencies/currenciesApi";
 import { formatDate } from "../../../lib/date.js";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const STATUS_STYLES = {
-  Imported: { label: "تم الاستيراد", cls: "bg-positive/10 text-positive" },
-  Updated: { label: "تم التحديث", cls: "bg-primary-500/10 text-primary-600" },
-  Skipped: { label: "تم التجاوز", cls: "bg-amber-500/10 text-amber-600" },
-  Failed: { label: "فشل", cls: "bg-negative/10 text-negative" },
+  Imported: { label: t("تم الاستيراد"), cls: "bg-positive/10 text-positive" },
+  Updated: { label: t("تم التحديث"), cls: "bg-primary-500/10 text-primary-600" },
+  Skipped: { label: t("تم التجاوز"), cls: "bg-amber-500/10 text-amber-600" },
+  Failed: { label: t("فشل"), cls: "bg-negative/10 text-negative" },
 };
 
 function todayISO() {
@@ -80,7 +82,7 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
       setStep("preview");
     } catch (err) {
       toast.error(
-        err?.data?.detail || err?.data?.title || "تعذر جلب معاينة الأسعار",
+        err?.data?.detail || err?.data?.title || t("تعذر جلب معاينة الأسعار"),
       );
     }
   }
@@ -102,10 +104,10 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
         replaceUnreferencedImportedRates: replaceUnreferenced,
       }).unwrap();
       setStep("result");
-      toast.success("تم تنفيذ الاستيراد");
+      toast.success(t("تم تنفيذ الاستيراد"));
     } catch (err) {
       toast.error(
-        err?.data?.detail || err?.data?.title || "تعذر تنفيذ الاستيراد",
+        err?.data?.detail || err?.data?.title || t("تعذر تنفيذ الاستيراد"),
       );
     }
   }
@@ -119,7 +121,7 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="استيراد أسعار الصرف من مصدر خارجي"
+      title={t("استيراد أسعار الصرف من مصدر خارجي")}
     >
       {/* ==================== Step: Form ==================== */}
 
@@ -127,7 +129,7 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
         <div className="space-y-4">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink-900">
-              تاريخ السعر
+              {t("تاريخ السعر")}
             </label>
             <DateInput
               type="date"
@@ -141,11 +143,10 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-ink-900">
-              العملات
+              {t("العملات")}
             </label>
             <p className="mb-2 text-xs text-ink-400">
-              اتركها فارغة عشان يتم استيراد كل العملات المتاحة (ماعدا عملة
-              الشركة الأساسية)
+              {t("اتركها فارغة عشان يتم استيراد كل العملات المتاحة (ماعدا عملة الشركة الأساسية)")}
             </p>
 
             <div className="flex flex-wrap gap-2">
@@ -177,17 +178,16 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
               className="mt-0.5 rounded border-ink-400/30"
             />
             <span>
-              استبدال الأسعار المستوردة الغير مستخدمة بنفس التاريخ
+              {t("استبدال الأسعار المستوردة الغير مستخدمة بنفس التاريخ")}
               <span className="mt-0.5 block text-xs text-amber-600">
-                الأسعار اليدوية (Manual) والأسعار المستوردة المرتبطة بحركات
-                فعلية أبدًا ما بيتم الكتابة فوقها.
+                {t("الأسعار اليدوية (Manual) والأسعار المستوردة المرتبطة بحركات فعلية أبدًا ما بيتم الكتابة فوقها.")}
               </span>
             </span>
           </label>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-ink-400/10">
             <Button type="button" variant="outline" onClick={onClose}>
-              إلغاء
+              {t("إلغاء")}
             </Button>
             <Button
               type="button"
@@ -197,12 +197,12 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
               {isPreviewing ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  جاري الجلب...
+                  {t("جاري الجلب...")}
                 </>
               ) : (
                 <>
                   <Download size={16} />
-                  معاينة
+                  {t("معاينة")}
                 </>
               )}
             </Button>
@@ -217,31 +217,31 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
           <div className="rounded-xl bg-ink-400/5 p-3 text-xs text-ink-600">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
               <span>
-                المصدر: <strong>{previewData.provider}</strong>
+                {t("المصدر:")} <strong>{previewData.provider}</strong>
               </span>
               <span>
-                التاريخ المطلوب:{" "}
+                {t("التاريخ المطلوب:")}{" "}
                 <strong>{formatDate(previewData.requestedDate)}</strong>
               </span>
               <span>
-                العملة الأساسية: <strong>{previewData.baseCurrency}</strong>
+                {t("العملة الأساسية:")} <strong>{previewData.baseCurrency}</strong>
               </span>
               <span>
-                {previewData.receivedCount} من {previewData.requestedCount}
+                {previewData.receivedCount} {t("من")} {previewData.requestedCount}
               </span>
             </div>
           </div>
 
           <div className="overflow-hidden rounded-xl border border-ink-400/10">
-            <table className="w-full text-sm" dir="rtl">
+            <table className="w-full text-sm" dir={getDir()}>
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
-                  <th className="px-3 py-2 text-right font-medium">العملة</th>
-                  <th className="px-3 py-2 text-right font-medium">السعر</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("العملة")}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("السعر")}</th>
                   <th className="px-3 py-2 text-right font-medium">
-                    تاريخ السعر الفعلي
+                    {t("تاريخ السعر الفعلي")}
                   </th>
-                  <th className="px-3 py-2 text-right font-medium">ملاحظة</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("ملاحظة")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -277,7 +277,7 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
               variant="outline"
               onClick={() => setStep("form")}
             >
-              رجوع
+              {t("رجوع")}
             </Button>
             <Button
               type="button"
@@ -287,10 +287,10 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
               {isImporting ? (
                 <>
                   <Loader2 size={16} className="animate-spin" />
-                  جاري الاستيراد...
+                  {t("جاري الاستيراد...")}
                 </>
               ) : (
-                "تأكيد الاستيراد"
+                t("تأكيد الاستيراد")
               )}
             </Button>
           </div>
@@ -306,36 +306,36 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
               <div className="text-lg font-bold text-positive">
                 {importResult.importedCount}
               </div>
-              <div className="text-[11px] text-ink-500">مستورد جديد</div>
+              <div className="text-[11px] text-ink-500">{t("مستورد جديد")}</div>
             </div>
             <div className="rounded-xl bg-primary-500/10 p-3 text-center">
               <div className="text-lg font-bold text-primary-600">
                 {formatDate(importResult.updatedCount)}
               </div>
-              <div className="text-[11px] text-ink-500">تم تحديثه</div>
+              <div className="text-[11px] text-ink-500">{t("تم تحديثه")}</div>
             </div>
             <div className="rounded-xl bg-amber-500/10 p-3 text-center">
               <div className="text-lg font-bold text-amber-600">
                 {importResult.skippedCount}
               </div>
-              <div className="text-[11px] text-ink-500">تم تجاوزه</div>
+              <div className="text-[11px] text-ink-500">{t("تم تجاوزه")}</div>
             </div>
             <div className="rounded-xl bg-negative/10 p-3 text-center">
               <div className="text-lg font-bold text-negative">
                 {importResult.failedCount}
               </div>
-              <div className="text-[11px] text-ink-500">فشل</div>
+              <div className="text-[11px] text-ink-500">{t("فشل")}</div>
             </div>
           </div>
 
           <div className="overflow-hidden rounded-xl border border-ink-400/10">
-            <table className="w-full text-sm" dir="rtl">
+            <table className="w-full text-sm" dir={getDir()}>
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
-                  <th className="px-3 py-2 text-right font-medium">العملة</th>
-                  <th className="px-3 py-2 text-right font-medium">السعر</th>
-                  <th className="px-3 py-2 text-right font-medium">الحالة</th>
-                  <th className="px-3 py-2 text-right font-medium">السبب</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("العملة")}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("السعر")}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("الحالة")}</th>
+                  <th className="px-3 py-2 text-right font-medium">{t("السبب")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -370,7 +370,7 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
 
           <div className="flex justify-end pt-2 border-t border-ink-400/10">
             <Button type="button" onClick={handleFinish}>
-              تم
+              {t("تم")}
             </Button>
           </div>
         </div>

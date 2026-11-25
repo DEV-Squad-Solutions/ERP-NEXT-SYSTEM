@@ -21,12 +21,13 @@ import Input from "../../../shared/components/ui/Input";
 import Button from "../../../shared/components/ui/Button";
 import Pagination from "../../../shared/components/ui/Pagination";
 
+import { t } from "../../../i18n";
 const emptyFilters = { search: "", isActive: "" };
 
 const statusOptions = [
-  { value: "", label: "الكل" },
-  { value: "true", label: "مفعّل" },
-  { value: "false", label: "معطّل" },
+  { value: "", label: t("الكل") },
+  { value: "true", label: t("مفعّل") },
+  { value: "false", label: t("معطّل") },
 ];
 
 function emptyDraft() {
@@ -78,7 +79,7 @@ export default function ItemsCategoriesPage() {
 
   const handleSave = async () => {
     if (!newCategory.name.trim()) {
-      toast.error("اسم التصنيف مطلوب");
+      toast.error(t("اسم التصنيف مطلوب"));
       return;
     }
 
@@ -89,13 +90,13 @@ export default function ItemsCategoriesPage() {
         notes: newCategory.notes || undefined,
       }).unwrap();
 
-      toast.success("تم إضافة التصنيف بنجاح");
+      toast.success(t("تم إضافة التصنيف بنجاح"));
       closeAddRow();
     } catch (err) {
       if (err?.status === 409) {
-        toast.error("فيه تصنيف مفعّل بنفس الاسم موجود بالفعل");
+        toast.error(t("فيه تصنيف مفعّل بنفس الاسم موجود بالفعل"));
       } else {
-        toast.error("تعذر إضافة التصنيف");
+        toast.error(t("تعذر إضافة التصنيف"));
       }
     }
   };
@@ -107,15 +108,15 @@ export default function ItemsCategoriesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-display text-2xl font-bold text-ink-900">
-            تصنيفات الأصناف
+            {t("تصنيفات الأصناف")}
           </h2>
           <p className="text-sm text-ink-400 mt-1">
-            التصنيفات المستخدمة في رأس الفاتورة
+            {t("التصنيفات المستخدمة في رأس الفاتورة")}
           </p>
         </div>
         <Button onClick={openAddRow} disabled={isAdding}>
           <Plus size={16} />
-          تصنيف جديد
+          {t("تصنيف جديد")}
         </Button>
       </div>
 
@@ -123,14 +124,14 @@ export default function ItemsCategoriesPage() {
       <div className="bg-white rounded-2xl border border-ink-400/10 shadow-card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
           <Input
-            label="بحث"
+            label={t("بحث")}
             value={draft.search}
             onChange={(e) => setField("search", e.target.value)}
-            placeholder="ابحث بالاسم..."
+            placeholder={t("ابحث بالاسم...")}
           />
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              الحالة
+              {t("الحالة")}
             </label>
             <select
               value={draft.isActive}
@@ -147,7 +148,7 @@ export default function ItemsCategoriesPage() {
           <div className="flex gap-2">
             <Button onClick={handleSearch} className="h-9 flex-1">
               <Search size={14} />
-              بحث
+              {t("بحث")}
             </Button>
             <Button variant="outline" onClick={handleReset} className="h-9">
               <RotateCcw size={14} />
@@ -174,14 +175,14 @@ export default function ItemsCategoriesPage() {
             strokeWidth={1.6}
           />
           <p className="text-ink-900 font-medium text-sm mb-1">
-            تعذر تحميل التصنيفات
+            {t("تعذر تحميل التصنيفات")}
           </p>
           <button
             onClick={refetch}
             className="inline-flex items-center gap-2 text-xs font-medium text-primary-500 hover:text-primary-600 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-lg transition-colors mt-2"
           >
             <RefreshCw size={13} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : (
@@ -193,12 +194,12 @@ export default function ItemsCategoriesPage() {
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الاسم
+                    {t("الاسم")}
                   </th>
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    ملاحظات
+                    {t("ملاحظات")}
                   </th>
-                  <th className="p-2.5 font-medium">الحالة</th>
+                  <th className="p-2.5 font-medium">{t("الحالة")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -214,10 +215,10 @@ export default function ItemsCategoriesPage() {
                           />
                         </div>
                         <p className="text-ink-900 font-medium text-sm mb-1">
-                          لا توجد تصنيفات
+                          {t("لا توجد تصنيفات")}
                         </p>
                         <p className="text-xs text-ink-400">
-                          دوس "تصنيف جديد" للبدء
+                          {t("دوس \"تصنيف جديد\" للبدء")}
                         </p>
                       </div>
                     </td>
@@ -249,7 +250,7 @@ export default function ItemsCategoriesPage() {
                             : "text-ink-400 bg-ink-400/10"
                         }`}
                       >
-                        {cat.isActive ? "مفعّل" : "معطّل"}
+                        {cat.isActive ? t("مفعّل") : t("معطّل")}
                       </span>
                     </td>
                   </tr>
@@ -261,7 +262,7 @@ export default function ItemsCategoriesPage() {
                       <input
                         autoFocus
                         type="text"
-                        placeholder="اسم التصنيف"
+                        placeholder={t("اسم التصنيف")}
                         value={newCategory.name}
                         onChange={(e) =>
                           setNewCategory((n) => ({
@@ -275,7 +276,7 @@ export default function ItemsCategoriesPage() {
                     <td className="p-1.5 border-l border-ink-400/5">
                       <input
                         type="text"
-                        placeholder="ملاحظات (اختياري)"
+                        placeholder={t("ملاحظات (اختياري)")}
                         value={newCategory.notes}
                         onChange={(e) =>
                           setNewCategory((n) => ({
@@ -300,13 +301,13 @@ export default function ItemsCategoriesPage() {
                             }
                             className="accent-primary-500"
                           />
-                          مفعّل
+                          {t("مفعّل")}
                         </label>
                         <button
                           onClick={handleSave}
                           disabled={isSaving}
                           className="w-7 h-7 flex items-center justify-center rounded-md bg-positive/15 text-positive hover:bg-positive/25 transition-colors disabled:opacity-50"
-                          title="حفظ"
+                          title={t("حفظ")}
                         >
                           {isSaving ? (
                             <Loader2 size={14} className="animate-spin" />
@@ -318,7 +319,7 @@ export default function ItemsCategoriesPage() {
                           onClick={closeAddRow}
                           disabled={isSaving}
                           className="w-7 h-7 flex items-center justify-center rounded-md bg-ink-900/[0.05] text-ink-400 hover:bg-ink-900/10 transition-colors disabled:opacity-50"
-                          title="إلغاء"
+                          title={t("إلغاء")}
                         >
                           <X size={14} />
                         </button>

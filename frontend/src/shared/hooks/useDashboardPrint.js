@@ -1,7 +1,8 @@
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
-export function useDashboardPrint({ title = "تقرير لوحة التحكم" } = {}) {
+import { t } from "../../i18n";
+export function useDashboardPrint({ title = t("تقرير لوحة التحكم") } = {}) {
   const printRef = useRef(null);
 
   const printDashboard = useReactToPrint({

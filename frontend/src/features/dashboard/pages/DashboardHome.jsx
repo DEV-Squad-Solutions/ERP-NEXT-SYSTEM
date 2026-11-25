@@ -44,6 +44,8 @@ import DashboardPrintTemplate from "../../../shared/components/print/DashboardPr
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 /* ------------------------------------------------------------------ */
 /* توكنز التصميم — هوية "دفتر أستاذ" (Ledger): تيل داكن كأساس ماليّ    */
 /* موثوق + لمسة نحاسية/ذهبية للقيم المالية، بعيدًا عن كليشيه الإندجو  */
@@ -59,35 +61,35 @@ const TOKENS = {
 };
 
 const MONTH_NAMES = [
-  "يناير",
-  "فبراير",
-  "مارس",
-  "أبريل",
-  "مايو",
-  "يونيو",
-  "يوليو",
-  "أغسطس",
-  "سبتمبر",
-  "أكتوبر",
-  "نوفمبر",
-  "ديسمبر",
+  t("يناير"),
+  t("فبراير"),
+  t("مارس"),
+  t("أبريل"),
+  t("مايو"),
+  t("يونيو"),
+  t("يوليو"),
+  t("أغسطس"),
+  t("سبتمبر"),
+  t("أكتوبر"),
+  t("نوفمبر"),
+  t("ديسمبر"),
 ];
 
 const CURRENCIES = [
-  { value: "EGP", label: "جنيه مصري" },
-  { value: "USD", label: "دولار أمريكي" },
-  { value: "EUR", label: "يورو" },
-  { value: "GBP", label: "جنيه إسترليني" },
-  { value: "SAR", label: "ريال سعودي" },
-  { value: "AED", label: "درهم إماراتي" },
-  { value: "KWD", label: "دينار كويتي" },
+  { value: "EGP", label: t("جنيه مصري") },
+  { value: "USD", label: t("دولار أمريكي") },
+  { value: "EUR", label: t("يورو") },
+  { value: "GBP", label: t("جنيه إسترليني") },
+  { value: "SAR", label: t("ريال سعودي") },
+  { value: "AED", label: t("درهم إماراتي") },
+  { value: "KWD", label: t("دينار كويتي") },
 ];
 
 const getCurrencyLabel = (code) =>
-  CURRENCIES.find((c) => c.value === code)?.label ?? code ?? "جنيه مصري";
+  CURRENCIES.find((c) => c.value === code)?.label ?? code ?? t("جنيه مصري");
 
 const fmtMoney = (v, currencyCode = "EGP") =>
-  `${(v ?? 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 })} ${getCurrencyLabel(
+  `${(v ?? 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 })} ${getCurrencyLabel(
     currencyCode,
   )}`;
 
@@ -135,37 +137,37 @@ function DecorativeBlobs() {
 const QUICK_ACTIONS = [
   {
     to: "/dashboard/sales/new",
-    label: "فاتورة مبيعات",
+    label: t("فاتورة مبيعات"),
     icon: FilePlus2,
     tone: "primary",
   },
   {
     to: "/dashboard/purchases/new",
-    label: "فاتورة مشتريات",
+    label: t("فاتورة مشتريات"),
     icon: FileMinus2,
     tone: "gold",
   },
   {
     to: "/dashboard/treasury",
-    label: "الخزائن",
+    label: t("الخزائن"),
     icon: Wallet,
     tone: "success",
   },
   {
     to: "/dashboard/treasury/transfers",
-    label: "تحويل بين خزائن",
+    label: t("تحويل بين خزائن"),
     icon: ArrowLeftRight,
     tone: "primary",
   },
   {
     to: "/dashboard/inventory/adjustments/new",
-    label: "تسوية مخزون",
+    label: t("تسوية مخزون"),
     icon: Boxes,
     tone: "gold",
   },
   {
     to: "/dashboard/journal-entries/new",
-    label: "قيد يومية",
+    label: t("قيد يومية"),
     icon: BookOpen,
     tone: "danger",
   },
@@ -294,7 +296,7 @@ function ChartTooltip({ active, payload, label, currency }) {
   if (!active || !payload?.length) return null;
   return (
     <div
-      dir="rtl"
+      dir={getDir()}
       className="rounded-xl border border-slate-200 bg-white/95 px-3 py-2 text-xs shadow-lg backdrop-blur dark:border-slate-700 dark:bg-slate-900/95"
     >
       <p className="mb-1 font-semibold text-slate-700 dark:text-slate-200">
@@ -341,7 +343,7 @@ export default function DashboardPage() {
       { skip: !selectedFiscalYearId },
     );
   const { printDashboard, printRef } = useDashboardPrint({
-    title: `تقرير لوحة التحكم - ${data?.fiscalYearName || "التقرير"}`,
+    title: t("تقرير لوحة التحكم - {0}", { 0: data?.fiscalYearName || "التقرير" }),
   });
   const monthlyChartData = useMemo(() => {
     if (!data?.monthlyActivity) return [];
@@ -356,14 +358,14 @@ export default function DashboardPage() {
     if (!data?.invoiceStatus) return [];
     const s = data.invoiceStatus;
     return [
-      { name: "مدفوعة", value: s.paidCount, color: TOKENS.success },
+      { name: t("مدفوعة"), value: s.paidCount, color: TOKENS.success },
       {
-        name: "مدفوعة جزئيًا",
+        name: t("مدفوعة جزئيًا"),
         value: s.partiallyPaidCount,
         color: TOKENS.goldSoft,
       },
-      { name: "غير مدفوعة", value: s.unpaidCount, color: TOKENS.muted },
-      { name: "متأخرة", value: s.overdueCount, color: TOKENS.danger },
+      { name: t("غير مدفوعة"), value: s.unpaidCount, color: TOKENS.muted },
+      { name: t("متأخرة"), value: s.overdueCount, color: TOKENS.danger },
     ].filter((d) => d.value > 0);
   }, [data]);
 
@@ -375,7 +377,7 @@ export default function DashboardPage() {
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
           className="h-8 w-8 rounded-full border-2 border-teal-200 border-t-teal-600"
         />
-        جاري تحميل بيانات لوحة التحكم...
+        {t("جاري تحميل بيانات لوحة التحكم...")}
       </div>
     );
   }
@@ -383,17 +385,17 @@ export default function DashboardPage() {
   if (isError) {
     return (
       <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-rose-700 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-300">
-        <p className="font-semibold">حصل خطأ في تحميل الداشبورد</p>
+        <p className="font-semibold">{t("حصل خطأ في تحميل الداشبورد")}</p>
         <p className="mt-1 text-sm opacity-80">
           {error?.data?.detail ||
             error?.data?.title ||
-            "برجاء المحاولة مرة أخرى"}
+            t("برجاء المحاولة مرة أخرى")}
         </p>
         <button
           onClick={refetch}
           className="mt-3 rounded-lg bg-rose-600 px-3 py-1.5 text-sm text-white hover:bg-rose-700"
         >
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
@@ -401,7 +403,7 @@ export default function DashboardPage() {
 
   return (
     <motion.div
-      dir="rtl"
+      dir={getDir()}
       variants={pageVariants}
       initial="hidden"
       animate="show"
@@ -417,10 +419,10 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center gap-2">
               <Sparkles size={18} className="text-amber-300" />
-              <h1 className="text-2xl font-bold">لوحة التحكم</h1>
+              <h1 className="text-2xl font-bold">{t("لوحة التحكم")}</h1>
             </div>
             <p className="mt-1 text-sm text-teal-100">
-              {data?.fiscalYearName} • {data?.fromDate ? formatDate(data.fromDate) : "—"} إلى {data?.toDate ? formatDate(data.toDate) : "—"} •
+              {data?.fiscalYearName} • {data?.fromDate ? formatDate(data.fromDate) : "—"} {t("إلى")} {data?.toDate ? formatDate(data.toDate) : "—"} •
               {getCurrencyLabel(data?.baseCurrency)}
             </p>
           </div>
@@ -436,7 +438,7 @@ export default function DashboardPage() {
               }
               className="rounded-lg border border-white/30 bg-white/10 px-2 py-1.5 text-sm text-white placeholder-white/70 backdrop-blur focus:border-amber-300 focus:outline-none focus:ring-1 focus:ring-amber-300 [color-scheme:dark]"
             />
-            <span className="text-sm text-teal-100">إلى</span>
+            <span className="text-sm text-teal-100">{t("إلى")}</span>
             <DateInput
               type="date"
               dark
@@ -454,7 +456,7 @@ export default function DashboardPage() {
                 transition={{ repeat: Infinity, duration: 1.2 }}
                 className="text-xs text-teal-100"
               >
-                جاري التحديث...
+                {t("جاري التحديث...")}
               </motion.span>
             )}
             <button
@@ -462,7 +464,7 @@ export default function DashboardPage() {
               onClick={printDashboard}
               className="inline-flex items-center gap-2 rounded-lg bg-white/15 px-3 py-1.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/25"
             >
-              <Printer size={16} /> طباعة
+              <Printer size={16} /> {t("طباعة")}
             </button>
           </div>
         </div>
@@ -475,80 +477,80 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <StatCard
           icon={Landmark}
-          label="صافي المبيعات"
+          label={t("صافي المبيعات")}
           value={data?.sales?.net ?? 0}
           format={(v) => fmtMoney(v, data?.baseCurrency)}
-          sub={`مستحق: ${fmtMoney(data?.sales?.outstanding, data?.baseCurrency)}`}
+          sub={t("مستحق: {0}", { 0: fmtMoney(data?.sales?.outstanding, data?.baseCurrency) })}
           tone="primary"
         />
         <StatCard
           icon={Package}
-          label="صافي المشتريات"
+          label={t("صافي المشتريات")}
           value={data?.purchases?.net ?? 0}
           format={(v) => fmtMoney(v, data?.baseCurrency)}
-          sub={`مستحق: ${fmtMoney(data?.purchases?.outstanding, data?.baseCurrency)}`}
+          sub={t("مستحق: {0}", { 0: fmtMoney(data?.purchases?.outstanding, data?.baseCurrency) })}
           tone="gold"
         />
         <StatCard
           icon={TrendingUp}
-          label="إجمالي الربح"
+          label={t("إجمالي الربح")}
           value={data?.profitability?.grossProfit ?? 0}
           format={(v) => fmtMoney(v, data?.baseCurrency)}
-          sub={`هامش الربح: ${(data?.profitability?.grossMarginPercentage ?? 0).toFixed(1)}%`}
+          sub={t("هامش الربح: {0}%", { 0: (data?.profitability?.grossMarginPercentage ?? 0).toFixed(1) })}
           tone="success"
         />
         <StatCard
           icon={Wallet}
-          label="قيمة المخزون الحالية"
+          label={t("قيمة المخزون الحالية")}
           value={data?.inventory?.currentInventoryValue ?? 0}
           format={(v) => fmtMoney(v, data?.baseCurrency)}
-          sub={`${data?.inventory?.zeroStockItemCount ?? 0} صنف بدون رصيد`}
+          sub={t("{0} صنف بدون رصيد", { 0: data?.inventory?.zeroStockItemCount ?? 0 })}
           tone="primary"
         />
         <StatCard
           icon={Users}
-          label="الشركاء التجاريين"
+          label={t("الشركاء التجاريين")}
           value={data?.counts?.businessPartnerCount ?? 0}
-          format={(v) => Math.round(v).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
-          sub="عملاء وموردين"
+          format={(v) => Math.round(v).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
+          sub={t("عملاء وموردين")}
           tone="info"
         />
         <StatCard
           icon={Briefcase}
-          label="الموظفين"
+          label={t("الموظفين")}
           value={data?.counts?.employeeCount ?? 0}
-          format={(v) => Math.round(v).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+          format={(v) => Math.round(v).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
           tone="gold"
         />
         <StatCard
           icon={Truck}
-          label="السائقين"
+          label={t("السائقين")}
           value={data?.counts?.driverCount ?? 0}
-          format={(v) => Math.round(v).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+          format={(v) => Math.round(v).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
           tone="primary"
         />
         <StatCard
           icon={FileText}
-          label="عدد الفواتير"
+          label={t("عدد الفواتير")}
           value={data?.counts?.invoiceCount ?? 0}
-          format={(v) => Math.round(v).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+          format={(v) => Math.round(v).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
           tone="success"
         />
         <StatCard
           icon={Clock}
-          label="فواتير متأخرة"
+          label={t("فواتير متأخرة")}
           value={data?.invoiceStatus?.overdueCount ?? 0}
-          format={(v) => Math.round(v).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}
+          format={(v) => Math.round(v).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}
           sub={fmtMoney(data?.invoiceStatus?.overdueAmount, data?.baseCurrency)}
           tone="danger"
         />
         <StatCard
           icon={data?.accounting?.isReady ? CheckCircle2 : FileWarning}
-          label="جاهزية الحسابات"
+          label={t("جاهزية الحسابات")}
           value={
             data?.accounting?.isReady
-              ? "جاهز"
-              : `${data?.accounting?.issueCount} مشكلة`
+              ? t("جاهز")
+              : t("{0} مشكلة", { 0: data?.accounting?.issueCount })
           }
           tone={data?.accounting?.isReady ? "success" : "danger"}
         />
@@ -557,7 +559,7 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* رسم النشاط الشهري — Area chart بتدرّج لوني */}
         <SectionCard
-          title="النشاط الشهري (مبيعات / مشتريات)"
+          title={t("النشاط الشهري (مبيعات / مشتريات)")}
           icon={TrendingUp}
           className="lg:col-span-2"
         >
@@ -602,7 +604,7 @@ export default function DashboardPage() {
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Area
                 type="monotone"
-                dataKey="المبيعات"
+                dataKey={t("المبيعات")}
                 stroke={TOKENS.primary}
                 strokeWidth={2.5}
                 fill="url(#salesFill)"
@@ -610,7 +612,7 @@ export default function DashboardPage() {
               />
               <Line
                 type="monotone"
-                dataKey="المشتريات"
+                dataKey={t("المشتريات")}
                 stroke={TOKENS.gold}
                 strokeWidth={2.5}
                 dot={{ r: 3, fill: TOKENS.gold, strokeWidth: 0 }}
@@ -621,7 +623,7 @@ export default function DashboardPage() {
         </SectionCard>
 
         {/* حالة الفواتير */}
-        <SectionCard title="حالة الفواتير" icon={FileWarning}>
+        <SectionCard title={t("حالة الفواتير")} icon={FileWarning}>
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
               <Pie
@@ -689,7 +691,7 @@ export default function DashboardPage() {
       )}
 
       {/* أرصدة الخزائن */}
-      <SectionCard title="أرصدة الخزائن حسب العملة" icon={Wallet}>
+      <SectionCard title={t("أرصدة الخزائن حسب العملة")} icon={Wallet}>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {data?.cashBalances?.map((c, i) => (
             <motion.div
@@ -708,7 +710,7 @@ export default function DashboardPage() {
                   format={(v) => fmtMoney(v, c.currency)}
                 />
               </p>
-              <p className="text-xs text-slate-400">{c.cashboxCount} خزينة</p>
+              <p className="text-xs text-slate-400">{c.cashboxCount} {t("خزينة")}</p>
             </motion.div>
           ))}
         </div>

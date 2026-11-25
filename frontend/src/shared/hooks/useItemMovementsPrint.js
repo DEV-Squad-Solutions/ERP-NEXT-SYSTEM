@@ -1,11 +1,12 @@
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 
+import { t } from "../../i18n";
 /**
  * هوك طباعة حركة الصنف — بنفس نمط useInvoiceListPrint
  * @param {{ title?: string }} options
  */
-export function useItemMovementsPrint({ title = "حركة-صنف" } = {}) {
+export function useItemMovementsPrint({ title = t("حركة-صنف") } = {}) {
   const printRef = useRef(null);
 
   const printList = useReactToPrint({

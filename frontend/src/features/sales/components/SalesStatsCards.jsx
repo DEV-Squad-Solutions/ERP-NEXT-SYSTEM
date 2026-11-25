@@ -7,6 +7,8 @@ import {
   Boxes,
 } from "lucide-react";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 /**
  * @param {{
  *   summary: {
@@ -22,37 +24,37 @@ import {
 export default function SalesStatsCards({ summary, isLoading }) {
   const cards = [
     {
-      label: "إجمالي قبل الخصم",
+      label: t("إجمالي قبل الخصم"),
       value: summary?.subtotal,
       icon: TrendingUp,
       tone: "text-ink-900 bg-ink-400/10",
     },
     {
-      label: "الخصم",
+      label: t("الخصم"),
       value: summary?.discountAmount,
       icon: BadgePercent,
       tone: "text-warning bg-warning/10",
     },
     {
-      label: "الإجمالي",
+      label: t("الإجمالي"),
       value: summary?.total,
       icon: FileText,
       tone: "text-primary-500 bg-primary-50",
     },
     {
-      label: "المدفوع",
+      label: t("المدفوع"),
       value: summary?.paidAmount,
       icon: Wallet,
       tone: "text-positive bg-positive/10",
     },
     {
-      label: "المتبقي",
+      label: t("المتبقي"),
       value: summary?.remainingAmount,
       icon: AlertCircle,
       tone: "text-negative bg-negative/10",
     },
     {
-      label: "إجمالي الكمية",
+      label: t("إجمالي الكمية"),
       value: summary?.totalQuantity,
       icon: Boxes,
       tone: "text-blue-500 bg-blue-50",
@@ -80,11 +82,11 @@ export default function SalesStatsCards({ summary, isLoading }) {
               <div className="h-5 w-16 rounded bg-ink-400/10 animate-pulse mt-1" />
             ) : (
               <p className="num font-bold text-ink-900 text-sm truncate">
-                {(Number(card.value) || 0).toLocaleString("ar-EG", {
+                {(Number(card.value) || 0).toLocaleString(getLocale(), {
                   minimumFractionDigits: card.isQuantity ? 0 : 2,
                   maximumFractionDigits: card.isQuantity ? 0 : 2,
                 })}
-                {card.isQuantity ? "" : " ج.م"}
+                {card.isQuantity ? "" : t(" ج.م")}
               </p>
             )}
           </div>

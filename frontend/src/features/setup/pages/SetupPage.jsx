@@ -14,6 +14,8 @@ import {
   useInitializeSetupMutation,
 } from "../setupApi";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const ALL_ROLES = ["Admin", "User", "Accountant", "Cashier"];
 
 const emptyAdmin = {
@@ -43,7 +45,7 @@ const errorText = (error) => {
     data?.detail ||
     data?.message ||
     data?.title ||
-    "تعذر تنفيذ العملية، راجع البيانات وحاول مرة أخرى."
+    t("تعذر تنفيذ العملية، راجع البيانات وحاول مرة أخرى.")
   );
 };
 
@@ -52,7 +54,7 @@ function Field({ label, value, onChange, type = "text", dir, optional }) {
     <label className="block">
       <span className="mb-1.5 block text-[11px] font-semibold text-ink-600">
         {label}
-        {optional ? " (اختياري)" : ""}
+        {optional ? t(" (اختياري)") : ""}
       </span>
       <input
         type={type}
@@ -69,12 +71,12 @@ function AdminFields({ admin, setAdmin }) {
   const set = (key) => (value) => setAdmin((prev) => ({ ...prev, [key]: value }));
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <Field label="الاسم الأول" value={admin.firstName} onChange={set("firstName")} />
-      <Field label="الاسم الأخير" value={admin.lastName} onChange={set("lastName")} />
-      <Field label="اسم المستخدم" value={admin.userName} onChange={set("userName")} dir="ltr" />
-      <Field label="البريد الإلكتروني" type="email" value={admin.email} onChange={set("email")} dir="ltr" />
-      <Field label="الهاتف" value={admin.phoneNumber} onChange={set("phoneNumber")} dir="ltr" optional />
-      <Field label="كلمة المرور (8 أحرف على الأقل)" type="password" value={admin.password} onChange={set("password")} dir="ltr" />
+      <Field label={t("الاسم الأول")} value={admin.firstName} onChange={set("firstName")} />
+      <Field label={t("الاسم الأخير")} value={admin.lastName} onChange={set("lastName")} />
+      <Field label={t("اسم المستخدم")} value={admin.userName} onChange={set("userName")} dir="ltr" />
+      <Field label={t("البريد الإلكتروني")} type="email" value={admin.email} onChange={set("email")} dir="ltr" />
+      <Field label={t("الهاتف")} value={admin.phoneNumber} onChange={set("phoneNumber")} dir="ltr" optional />
+      <Field label={t("كلمة المرور (8 أحرف على الأقل)")} type="password" value={admin.password} onChange={set("password")} dir="ltr" />
     </div>
   );
 }
@@ -83,12 +85,12 @@ function CompanyFields({ company, setCompany }) {
   const set = (key) => (value) => setCompany((prev) => ({ ...prev, [key]: value }));
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <Field label="اسم الشركة" value={company.name} onChange={set("name")} />
-      <Field label="اسم المدير" value={company.managerName} onChange={set("managerName")} />
-      <Field label="السجل التجاري" value={company.commercialRegister} onChange={set("commercialRegister")} />
-      <Field label="الرقم الضريبي" value={company.taxNumber} onChange={set("taxNumber")} />
+      <Field label={t("اسم الشركة")} value={company.name} onChange={set("name")} />
+      <Field label={t("اسم المدير")} value={company.managerName} onChange={set("managerName")} />
+      <Field label={t("السجل التجاري")} value={company.commercialRegister} onChange={set("commercialRegister")} />
+      <Field label={t("الرقم الضريبي")} value={company.taxNumber} onChange={set("taxNumber")} />
       <div className="sm:col-span-2">
-        <Field label="العنوان" value={company.address} onChange={set("address")} />
+        <Field label={t("العنوان")} value={company.address} onChange={set("address")} />
       </div>
     </div>
   );
@@ -108,7 +110,7 @@ const Button = ({ loading, children, ...props }) => (
     className="mt-4 h-11 rounded-xl bg-primary-500 px-6 text-sm font-semibold text-white disabled:opacity-60"
     {...props}
   >
-    {loading ? "جارٍ الحفظ..." : children}
+    {loading ? t("جارٍ الحفظ...") : children}
   </button>
 );
 
@@ -137,7 +139,7 @@ function FirstRunSetup() {
       setError(errorText(err));
       return;
     }
-    toast.success("تم إنشاء الأدمن والشركة");
+    toast.success(t("تم إنشاء الأدمن والشركة"));
     dispatch(baseApi.util.resetApiState());
     await login({ userName: admin.userName.trim(), password: admin.password });
     navigate("/", { replace: true });
@@ -145,19 +147,19 @@ function FirstRunSetup() {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <Card title="1) بيانات الأدمن">
+      <Card title={t("1) بيانات الأدمن")}>
         <AdminFields admin={admin} setAdmin={setAdmin} />
       </Card>
-      <Card title="2) بيانات أول شركة">
+      <Card title={t("2) بيانات أول شركة")}>
         <CompanyFields company={company} setCompany={setCompany} />
       </Card>
       {status?.tokenRequired && (
-        <Card title="رمز الإعداد">
+        <Card title={t("رمز الإعداد")}>
           <Field label="Setup token" value={setupToken} onChange={setSetupToken} type="password" dir="ltr" />
         </Card>
       )}
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <Button loading={isLoading || loggingIn}>إنشاء وبدء الاستخدام</Button>
+      <Button loading={isLoading || loggingIn}>{t("إنشاء وبدء الاستخدام")}</Button>
     </form>
   );
 }
@@ -176,7 +178,7 @@ function AdminSetup() {
     setError("");
     try {
       await createCompany(company).unwrap();
-      toast.success("تمت إضافة الشركة");
+      toast.success(t("تمت إضافة الشركة"));
       setCompany(emptyCompany);
     } catch (err) {
       setError(errorText(err));
@@ -196,7 +198,7 @@ function AdminSetup() {
         roles: ALL_ROLES,
         companyIds,
       }).unwrap();
-      toast.success("تمت إضافة الأدمن");
+      toast.success(t("تمت إضافة الأدمن"));
       setAdmin(emptyAdmin);
     } catch (err) {
       setError(errorText(err));
@@ -206,15 +208,15 @@ function AdminSetup() {
   return (
     <div className="space-y-4">
       <form onSubmit={submitCompany}>
-        <Card title="إضافة شركة">
+        <Card title={t("إضافة شركة")}>
           <CompanyFields company={company} setCompany={setCompany} />
-          <Button loading={addingCompany}>إضافة الشركة</Button>
+          <Button loading={addingCompany}>{t("إضافة الشركة")}</Button>
         </Card>
       </form>
       <form onSubmit={submitAdmin}>
-        <Card title="إضافة أدمن (يُربط بكل الشركات الحالية)">
+        <Card title={t("إضافة أدمن (يُربط بكل الشركات الحالية)")}>
           <AdminFields admin={admin} setAdmin={setAdmin} />
-          <Button loading={addingUser}>إضافة الأدمن</Button>
+          <Button loading={addingUser}>{t("إضافة الأدمن")}</Button>
         </Card>
       </form>
       {error && <p className="text-sm text-red-600">{error}</p>}
@@ -230,8 +232,8 @@ export default function SetupPage({ mode = "first-run" }) {
 
   if (mode === "admin") {
     return (
-      <div dir="rtl" className="mx-auto max-w-3xl p-4">
-        <h1 className="mb-4 font-display text-xl font-bold">إعداد النظام: الأدمن والشركات</h1>
+      <div dir={getDir()} className="mx-auto max-w-3xl p-4">
+        <h1 className="mb-4 font-display text-xl font-bold">{t("إعداد النظام: الأدمن والشركات")}</h1>
         <AdminSetup />
       </div>
     );
@@ -243,19 +245,18 @@ export default function SetupPage({ mode = "first-run" }) {
   }
 
   return (
-    <main dir="rtl" className="min-h-[100dvh] bg-paper px-4 py-8 text-ink-900">
+    <main dir={getDir()} className="min-h-[100dvh] bg-paper px-4 py-8 text-ink-900">
       <div className="mx-auto max-w-3xl">
         <h1 className="font-display text-2xl font-bold text-primary-500">
-          إعداد النظام لأول مرة
+          {t("إعداد النظام لأول مرة")}
         </h1>
         <p className="mb-6 mt-1 text-xs text-ink-400">
-          أضف الأدمن وأول شركة. بعد كده تقدر تضيف باقي الأدمن والشركات من قسم
-          الإدارة داخل النظام.
+          {t("أضف الأدمن وأول شركة. بعد كده تقدر تضيف باقي الأدمن والشركات من قسم الإدارة داخل النظام.")}
         </p>
-        {isLoading && <p className="text-sm">جارٍ التحميل...</p>}
+        {isLoading && <p className="text-sm">{t("جارٍ التحميل...")}</p>}
         {isError && (
           <p className="text-sm text-red-600">
-            تعذر الاتصال بالسيرفر. <Link to="/">رجوع</Link>
+            {t("تعذر الاتصال بالسيرفر.")} <Link to="/">{t("رجوع")}</Link>
           </p>
         )}
         {status?.requiresSetup && <FirstRunSetup />}

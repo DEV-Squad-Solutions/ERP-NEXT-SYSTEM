@@ -3,6 +3,7 @@ import { useMemo, useCallback } from "react";
 import { useGetEmployeesSelectQuery } from "../../payroll/payrollApi";
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
 
+import { t } from "../../../i18n";
 export default function EmployeeSelectHeader({ employeeId, onChange }) {
   const { data, isLoading, isFetching } = useGetEmployeesSelectQuery();
 
@@ -29,7 +30,7 @@ export default function EmployeeSelectHeader({ employeeId, onChange }) {
       value={normalizedId}
       onChange={handleChange}
       isLoading={isLoading || isFetching}
-      placeholder="اختر موظف لعرض كشف حسابه"
+      placeholder={t("اختر موظف لعرض كشف حسابه")}
     />
   );
 }

@@ -19,7 +19,9 @@ import Modal from "../../components/ui/Modal";
 import FiscalYearSwitcher from "./FiscalYearSwitcher";
 import CompanySwitcher from "./CompanySwitcher";
 import ThemePicker from "./ThemePicker";
+import LanguageSwitcher from "./LanguageSwitcher";
 
+import { t } from "../../../i18n";
 /* =========================================================
    BREADCRUMB
 ========================================================= */
@@ -90,7 +92,7 @@ export default function Navbar({ onMenuClick }) {
      PAGE TITLE
   ===================================================== */
 
-  const pageTitle = matchRouteTitle(location.pathname) || "نظام إدارة الحسابات";
+  const pageTitle = matchRouteTitle(location.pathname) || t("نظام إدارة الحسابات");
 
   const initials = getInitials(fullName);
 
@@ -117,7 +119,7 @@ export default function Navbar({ onMenuClick }) {
   ===================================================== */
 
   useEffect(() => {
-    document.title = `${pageTitle} | نظام إدارة الحسابات`;
+    document.title = t("{0} | نظام إدارة الحسابات", { 0: pageTitle });
   }, [pageTitle]);
 
   /* =====================================================
@@ -182,7 +184,7 @@ export default function Navbar({ onMenuClick }) {
             <button
               type="button"
               onClick={onMenuClick}
-              aria-label="فتح القائمة"
+              aria-label={t("فتح القائمة")}
               className={[
                 "group flex h-8 w-8 shrink-0",
                 "items-center justify-center",
@@ -214,7 +216,7 @@ export default function Navbar({ onMenuClick }) {
               <button
                 type="button"
                 onClick={handleBack}
-                aria-label="رجوع"
+                aria-label={t("رجوع")}
                 className={[
                   "group flex h-8 w-8 shrink-0",
                   "items-center justify-center",
@@ -359,12 +361,13 @@ export default function Navbar({ onMenuClick }) {
           <div className="flex shrink-0 items-center gap-2">
             <CompanySwitcher />
             <FiscalYearSwitcher />
+            <LanguageSwitcher />
             <ThemePicker />
 
             <button
               type="button"
               onClick={() => setProfileOpen(true)}
-              aria-label="قائمة المستخدم"
+              aria-label={t("قائمة المستخدم")}
               className={[
                 "group flex items-center gap-2",
                 "rounded-xl",
@@ -437,7 +440,7 @@ export default function Navbar({ onMenuClick }) {
                     "lg:max-w-36",
                   ].join(" ")}
                 >
-                  {fullName || "المستخدم"}
+                  {fullName || t("المستخدم")}
                 </span>
 
                 <span
@@ -450,7 +453,7 @@ export default function Navbar({ onMenuClick }) {
                       : "text-ink-500 dark:text-ink-300",
                   ].join(" ")}
                 >
-                  {isAdmin ? "مدير النظام" : "مستخدم"}
+                  {isAdmin ? t("مدير النظام") : t("مستخدم")}
                 </span>
               </div>
 
@@ -482,7 +485,7 @@ export default function Navbar({ onMenuClick }) {
       <Modal
         isOpen={profileOpen}
         onClose={() => setProfileOpen(false)}
-        title="حسابي"
+        title={t("حسابي")}
       >
         <div className="space-y-3">
           {/* =================================================
@@ -553,7 +556,7 @@ export default function Navbar({ onMenuClick }) {
                   "dark:text-white",
                 ].join(" ")}
               >
-                {fullName || "المستخدم"}
+                {fullName || t("المستخدم")}
               </p>
 
               <p
@@ -566,7 +569,7 @@ export default function Navbar({ onMenuClick }) {
                   "dark:text-ink-300",
                 ].join(" ")}
               >
-                {email || "لا يوجد بريد إلكتروني"}
+                {email || t("لا يوجد بريد إلكتروني")}
               </p>
             </div>
           </div>
@@ -626,7 +629,7 @@ export default function Navbar({ onMenuClick }) {
                   "dark:text-white",
                 ].join(" ")}
               >
-                عرض الملف الشخصي
+                {t("عرض الملف الشخصي")}
               </p>
 
               <p
@@ -638,7 +641,7 @@ export default function Navbar({ onMenuClick }) {
                   "dark:text-ink-300",
                 ].join(" ")}
               >
-                عرض بيانات الحساب والشركات والصلاحيات
+                {t("عرض بيانات الحساب والشركات والصلاحيات")}
               </p>
             </div>
 
@@ -710,7 +713,7 @@ export default function Navbar({ onMenuClick }) {
                   "dark:text-white",
                 ].join(" ")}
               >
-                تعديل الملف الشخصي
+                {t("تعديل الملف الشخصي")}
               </p>
 
               <p
@@ -722,7 +725,7 @@ export default function Navbar({ onMenuClick }) {
                   "dark:text-ink-300",
                 ].join(" ")}
               >
-                تعديل بيانات الحساب والصلاحيات
+                {t("تعديل بيانات الحساب والصلاحيات")}
               </p>
             </div>
 
@@ -786,7 +789,7 @@ export default function Navbar({ onMenuClick }) {
                   "dark:text-red-400",
                 ].join(" ")}
               >
-                تسجيل الخروج
+                {t("تسجيل الخروج")}
               </p>
 
               <p
@@ -798,7 +801,7 @@ export default function Navbar({ onMenuClick }) {
                   "dark:text-red-400/80",
                 ].join(" ")}
               >
-                إنهاء جلسة الحساب
+                {t("إنهاء جلسة الحساب")}
               </p>
             </div>
           </button>

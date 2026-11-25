@@ -7,6 +7,7 @@ import RoleRoute from "../shared/components/RoleRoute";
 import DashboardLayout from "../shared/components/layout/DashboardLayout";
 import Error404 from "../shared/components/Error404";
 
+import { t } from "../i18n";
 const DashboardHome = lazy(
   () => import("../features/dashboard/pages/DashboardHome"),
 );
@@ -252,7 +253,7 @@ function LazyPage({ children }) {
     <Suspense
       fallback={
         <div className="flex min-h-[50vh] items-center justify-center text-sm text-ink-400">
-          جاري تحميل الصفحة...
+          {t("جاري تحميل الصفحة...")}
         </div>
       }
     >
@@ -265,7 +266,7 @@ function ComingSoon({ title }) {
   return (
     <div className="py-20 text-center text-gray-400">
       <p className="text-lg">{title}</p>
-      <p className="mt-1 text-sm">هذه الصفحة قيد التطوير</p>
+      <p className="mt-1 text-sm">{t("هذه الصفحة قيد التطوير")}</p>
     </div>
   );
 }
@@ -944,7 +945,7 @@ export const router = createBrowserRouter([
         element: (
           <LazyPage>
             <Role roles={FULL_ACCESS_ROLES}>
-              <ComingSoon title="التقارير" />
+              <ComingSoon title={t("التقارير")} />
             </Role>
           </LazyPage>
         ),

@@ -10,8 +10,10 @@ import Input from "../../../shared/components/ui/Input";
 import Button from "../../../shared/components/ui/Button";
 import randomId from "../../../lib/randomId";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 function fmt(n) {
-  return new Intl.NumberFormat("ar-EG", {
+  return new Intl.NumberFormat(getLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(n || 0);
@@ -69,7 +71,7 @@ export default function InvoiceLineExpensesModal({
     );
 
     if (invalidRow) {
-      toast.error("تأكد من إدخال اسم وقيمة صحيحة لكل مصروف");
+      toast.error(t("تأكد من إدخال اسم وقيمة صحيحة لكل مصروف"));
       return;
     }
 
@@ -85,7 +87,7 @@ export default function InvoiceLineExpensesModal({
         expenses: payload,
       }).unwrap();
 
-      toast.success("تم حفظ مصروفات الصنف بنجاح");
+      toast.success(t("تم حفظ مصروفات الصنف بنجاح"));
 
       onSaved?.();
     } catch (error) {
@@ -93,7 +95,7 @@ export default function InvoiceLineExpensesModal({
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "حدث خطأ أثناء الحفظ، حاول تاني",
+          t("حدث خطأ أثناء الحفظ، حاول تاني"),
       );
     }
   };
@@ -104,17 +106,17 @@ export default function InvoiceLineExpensesModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`مصروفات الصنف — ${line.itemName}`}
+      title={t("مصروفات الصنف — {0}", { 0: line.itemName })}
       wide
     >
       <div className="space-y-4">
         {/* Line summary */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <SummaryChip label="الفاتورة" value={line.invoiceNumber} />
-          <SummaryChip label="الكمية" value={line.quantity} />
-          <SummaryChip label="متوسط التكلفة" value={fmt(line.averageCost)} />
+          <SummaryChip label={t("الفاتورة")} value={line.invoiceNumber} />
+          <SummaryChip label={t("الكمية")} value={line.quantity} />
+          <SummaryChip label={t("متوسط التكلفة")} value={fmt(line.averageCost)} />
           <SummaryChip
-            label="التكلفة الإرشادية"
+            label={t("التكلفة الإرشادية")}
             value={fmt(line.indicativeUnitCost)}
           />
         </div>
@@ -122,18 +124,18 @@ export default function InvoiceLineExpensesModal({
         {/* Expenses rows */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-ink-900">المصروفات</p>
+            <p className="text-sm font-semibold text-ink-900">{t("المصروفات")}</p>
 
             <Button variant="outline" className="h-8" onClick={addRow}>
               <Plus size={13} />
-              إضافة مصروف
+              {t("إضافة مصروف")}
             </Button>
           </div>
 
           {rows.length === 0 ? (
             <div className="text-center py-8 border border-dashed border-ink-400/20 rounded-xl">
               <p className="text-xs text-ink-400">
-                لا توجد مصروفات مضافة على هذا الصنف
+                {t("لا توجد مصروفات مضافة على هذا الصنف")}
               </p>
             </div>
           ) : (
@@ -145,7 +147,7 @@ export default function InvoiceLineExpensesModal({
                 >
                   <div className="col-span-4">
                     <Input
-                      placeholder="اسم المصروف"
+                      placeholder={t("اسم المصروف")}
                       value={row.name}
                       onChange={(event) =>
                         updateRow(index, "name", event.target.value)
@@ -158,7 +160,7 @@ export default function InvoiceLineExpensesModal({
                       type="number"
                       min="0"
                       step="0.01"
-                      placeholder="القيمة"
+                      placeholder={t("القيمة")}
                       value={row.amount}
                       onChange={(event) =>
                         updateRow(index, "amount", event.target.value)
@@ -168,7 +170,7 @@ export default function InvoiceLineExpensesModal({
 
                   <div className="col-span-4">
                     <Input
-                      placeholder="ملاحظات (اختياري)"
+                      placeholder={t("ملاحظات (اختياري)")}
                       value={row.notes}
                       onChange={(event) =>
                         updateRow(index, "notes", event.target.value)
@@ -181,7 +183,7 @@ export default function InvoiceLineExpensesModal({
                       type="button"
                       onClick={() => removeRow(index)}
                       className="p-1.5 rounded-lg text-ink-400 hover:text-negative hover:bg-negative/10 transition-colors"
-                      title="حذف"
+                      title={t("حذف")}
                     >
                       <Trash2 size={15} />
                     </button>
@@ -194,14 +196,14 @@ export default function InvoiceLineExpensesModal({
 
         {/* Total */}
         <div className="flex items-center justify-between rounded-xl bg-ink-400/5 px-3 py-2">
-          <p className="text-xs text-ink-400">إجمالي المصروفات اليدوية</p>
+          <p className="text-xs text-ink-400">{t("إجمالي المصروفات اليدوية")}</p>
           <p className="text-sm font-bold text-ink-900 num">{fmt(total)}</p>
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 pt-1">
           <Button variant="outline" onClick={onClose} disabled={isSaving}>
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button onClick={handleSubmit} disabled={isSaving}>
@@ -210,7 +212,7 @@ export default function InvoiceLineExpensesModal({
             ) : (
               <Save size={14} />
             )}
-            {isSaving ? "جارِ الحفظ..." : "حفظ المصروفات"}
+            {isSaving ? t("جارِ الحفظ...") : t("حفظ المصروفات")}
           </Button>
         </div>
       </div>

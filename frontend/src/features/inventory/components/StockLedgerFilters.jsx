@@ -1,10 +1,11 @@
 import { useGetItemsSelectQuery } from "../inventoryApi";
 import Input from "../../../shared/components/ui/Input";
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
+import { t } from "../../../i18n";
 const movementTabs = [
-  { value: "all", label: "الكل" },
-  { value: "purchase", label: "شراء" },
-  { value: "sale", label: "بيع" },
+  { value: "all", label: t("الكل") },
+  { value: "purchase", label: t("شراء") },
+  { value: "sale", label: t("بيع") },
 ];
 
 /**
@@ -34,21 +35,21 @@ export default function StockLedgerFilters({ filters, onChange }) {
 
         <div className="flex-1 grid grid-cols-1 justify-center sm:grid-cols-3 gap-3">
           <Input
-            label="التاريخ من"
+            label={t("التاريخ من")}
             type="date"
             value={filters.from}
             onChange={(e) => onChange({ ...filters, from: e.target.value })}
           />
           <Input
-            label="تاريخ إلى"
+            label={t("تاريخ إلى")}
             type="date"
             value={filters.to}
             onChange={(e) => onChange({ ...filters, to: e.target.value })}
           />
           <div className="p-2">
-            الصنف
+            {t("الصنف")}
             <CompactSelect
-              label="الصنف"
+              label={t("الصنف")}
               options={
                 items?.map((item) => ({
                   value: item.id,
@@ -63,7 +64,7 @@ export default function StockLedgerFilters({ filters, onChange }) {
                 })
               }
               isLoading={isLoading}
-              placeholder="كل الأصناف"
+              placeholder={t("كل الأصناف")}
               isClearable
             />
           </div>

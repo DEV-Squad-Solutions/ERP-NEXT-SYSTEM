@@ -32,25 +32,27 @@ import InvoiceNumberLink from "../../../shared/components/InvoiceNumberLink";
 import { useInvoicePrint } from "../../../shared/hooks/useInvoicePrint";
 import InvoicePrintTemplate from "../../../shared/components/print/InvoicePrintTemplate";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const typeLabels = {
-  Sales: "بيع",
-  Purchase: "شراء",
-  SalesReturn: "مرتجع بيع",
-  PurchaseReturn: "مرتجع شراء",
+  Sales: t("بيع"),
+  Purchase: t("شراء"),
+  SalesReturn: t("مرتجع بيع"),
+  PurchaseReturn: t("مرتجع شراء"),
 };
 
 const paymentLabels = {
-  Cash: "نقدي",
-  Credit: "آجل",
+  Cash: t("نقدي"),
+  Credit: t("آجل"),
 };
 
 const paymentStatusLabels = {
-  Paid: "مدفوعة",
-  PartiallyPaid: "مدفوعة جزئيًا",
-  Unpaid: "غير مدفوعة",
+  Paid: t("مدفوعة"),
+  PartiallyPaid: t("مدفوعة جزئيًا"),
+  Unpaid: t("غير مدفوعة"),
 };
 
-const fmt = (v) => Number(v || 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+const fmt = (v) => Number(v || 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 function TruncatedText({
   text,
@@ -82,12 +84,12 @@ function PricingStatusBadge({ invoice }) {
   return isPriced ? (
     <span className="inline-flex items-center gap-1 rounded-full bg-positive/10 px-2 py-0.5 text-[11px] font-medium text-positive">
       <CircleCheck size={11} />
-      متسعّرة
+      {t("متسعّرة")}
     </span>
   ) : (
     <span className="inline-flex items-center gap-1 rounded-full bg-negative/10 px-2 py-0.5 text-[11px] font-medium text-negative">
       <CircleDashed size={11} />
-      غير مسعّرة
+      {t("غير مسعّرة")}
     </span>
   );
 }
@@ -102,7 +104,7 @@ function PaymentStatusBadge({ status }) {
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-positive/10 px-2 py-0.5 text-[11px] font-medium text-positive whitespace-nowrap">
           <CircleCheck size={11} />
-          مدفوعة
+          {t("مدفوعة")}
         </span>
       );
 
@@ -110,7 +112,7 @@ function PaymentStatusBadge({ status }) {
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-medium text-warning whitespace-nowrap">
           <Clock3 size={11} />
-          مدفوعة جزئيًا
+          {t("مدفوعة جزئيًا")}
         </span>
       );
 
@@ -119,7 +121,7 @@ function PaymentStatusBadge({ status }) {
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-negative/10 px-2 py-0.5 text-[11px] font-medium text-negative whitespace-nowrap">
           <CircleDollarSign size={11} />
-          غير مدفوعة
+          {t("غير مدفوعة")}
         </span>
       );
   }
@@ -175,7 +177,7 @@ export default function SalesInvoicesTable({
         rowVersion: invoice.rowVersion,
       }).unwrap();
 
-      toast.success("تم حذف الفاتورة");
+      toast.success(t("تم حذف الفاتورة"));
     } catch (error) {
       console.error("Delete invoice failed:", error);
     }
@@ -192,7 +194,7 @@ export default function SalesInvoicesTable({
       // =====================================================
 
       columnHelper.accessor("invoiceNumber", {
-        header: "رقم الفاتورة",
+        header: t("رقم الفاتورة"),
 
         cell: (info) => (
           <InvoiceNumberLink
@@ -209,7 +211,7 @@ export default function SalesInvoicesTable({
       // =====================================================
 
       columnHelper.accessor("invoiceDate", {
-        header: "التاريخ",
+        header: t("التاريخ"),
 
         cell: (info) => (
           <span className="num whitespace-nowrap text-[13px] text-ink-600">
@@ -223,7 +225,7 @@ export default function SalesInvoicesTable({
       // =====================================================
 
       columnHelper.accessor("invoiceType", {
-        header: "النوع",
+        header: t("النوع"),
 
         enableSorting: false,
 
@@ -239,7 +241,7 @@ export default function SalesInvoicesTable({
       // =====================================================
 
       columnHelper.accessor("businessPartnerName", {
-        header: "العميل",
+        header: t("العميل"),
 
         cell: (info) => (
           <TruncatedText
@@ -255,7 +257,7 @@ export default function SalesInvoicesTable({
       // =====================================================
 
       columnHelper.accessor("paymentTerm", {
-        header: "الدفع",
+        header: t("الدفع"),
 
         enableSorting: false,
 
@@ -271,7 +273,7 @@ export default function SalesInvoicesTable({
       // =====================================================
 
       columnHelper.accessor("paymentStatus", {
-        header: "حالة الدفع",
+        header: t("حالة الدفع"),
 
         enableSorting: false,
 
@@ -283,7 +285,7 @@ export default function SalesInvoicesTable({
       // =====================================================
 
       columnHelper.accessor("total", {
-        header: "الإجمالي",
+        header: t("الإجمالي"),
 
         cell: (info) => (
           <span className="num whitespace-nowrap text-[13px] font-medium text-ink-900">
@@ -297,7 +299,7 @@ export default function SalesInvoicesTable({
       // =====================================================
 
       columnHelper.accessor("paidAmount", {
-        header: "المدفوع",
+        header: t("المدفوع"),
 
         cell: (info) => (
           <span className="num whitespace-nowrap text-[13px] text-positive">
@@ -311,7 +313,7 @@ export default function SalesInvoicesTable({
       // =====================================================
 
       columnHelper.accessor("remainingAmount", {
-        header: "المتبقي",
+        header: t("المتبقي"),
 
         cell: (info) => (
           <span
@@ -331,7 +333,7 @@ export default function SalesInvoicesTable({
       columnHelper.display({
         id: "pricingStatus",
 
-        header: "حالة التسعير",
+        header: t("حالة التسعير"),
 
         enableSorting: false,
 
@@ -345,7 +347,7 @@ export default function SalesInvoicesTable({
       columnHelper.display({
         id: "actions",
 
-        header: "إجراءات",
+        header: t("إجراءات"),
 
         cell: (info) => {
           const inv = info.row.original;
@@ -357,7 +359,7 @@ export default function SalesInvoicesTable({
               <button
                 onClick={() => navigate(`/dashboard/sales/${inv.id}`)}
                 className="rounded-lg p-1.5 text-primary-500 hover:bg-primary-50"
-                title="عرض"
+                title={t("عرض")}
               >
                 <Eye size={14} />
               </button>
@@ -367,7 +369,7 @@ export default function SalesInvoicesTable({
               <button
                 onClick={() => navigate(`/dashboard/sales/${inv.id}/edit`)}
                 className="rounded-lg p-1.5 text-primary-500 hover:bg-primary-50"
-                title="تعديل"
+                title={t("تعديل")}
               >
                 <Pencil size={14} />
               </button>
@@ -377,7 +379,7 @@ export default function SalesInvoicesTable({
               <button
                 onClick={() => printInvoice(inv)}
                 className="rounded-lg p-1.5 text-ink-400 hover:bg-ink-400/5"
-                title="طباعة"
+                title={t("طباعة")}
               >
                 <Printer size={14} />
               </button>
@@ -389,7 +391,7 @@ export default function SalesInvoicesTable({
                   setOpenMenuId(openMenuId === inv.id ? null : inv.id)
                 }
                 className="rounded-lg p-1.5 text-ink-400 hover:bg-ink-400/5"
-                title="المزيد"
+                title={t("المزيد")}
               >
                 <MoreVertical size={14} />
               </button>
@@ -411,7 +413,7 @@ export default function SalesInvoicesTable({
                       className="flex w-full items-center gap-2 px-3 py-2 text-right text-xs text-negative hover:bg-negative/5"
                     >
                       <Trash2 size={13} />
-                      حذف الفاتورة
+                      {t("حذف الفاتورة")}
                     </button>
                   </div>
                 </>
@@ -494,7 +496,7 @@ export default function SalesInvoicesTable({
         />
 
         <p className="mb-1 text-sm font-medium text-ink-900">
-          حدث خطأ في تحميل الفواتير
+          {t("حدث خطأ في تحميل الفواتير")}
         </p>
 
         <button
@@ -502,7 +504,7 @@ export default function SalesInvoicesTable({
           className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-xs font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
         >
           <RefreshCw size={13} />
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
@@ -522,10 +524,10 @@ export default function SalesInvoicesTable({
         </div>
 
         <p className="mb-1 text-sm font-medium text-ink-900">
-          لا توجد فواتير مطابقة
+          {t("لا توجد فواتير مطابقة")}
         </p>
 
-        <p className="text-xs text-ink-400">جرّب تعديل الفلاتر</p>
+        <p className="text-xs text-ink-400">{t("جرّب تعديل الفلاتر")}</p>
       </div>
     );
   }
@@ -616,7 +618,7 @@ export default function SalesInvoicesTable({
           totalCount={data.totalCount}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
-          label="فاتورة"
+          label={t("فاتورة")}
         />
       )}
 

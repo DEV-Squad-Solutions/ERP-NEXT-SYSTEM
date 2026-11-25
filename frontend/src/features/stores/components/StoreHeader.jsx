@@ -1,13 +1,15 @@
 import { Trash2, Warehouse } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function StoreHeader({ store, onPrint }) {
   const navigate = useNavigate();
 
   const isActive = store?.isActive ?? store?.status === "Active";
 
   return (
-    <div className="bg-white rounded-2xl shadow-card p-6 mb-6" dir="rtl">
+    <div className="bg-white rounded-2xl shadow-card p-6 mb-6" dir={getDir()}>
       <div className="flex items-start justify-center flex-wrap gap-4">
         <div className="flex items-start gap-4">
           <div className="w-14 h-14 rounded-2xl bg-ink-50 flex items-center justify-center shrink-0">
@@ -26,7 +28,7 @@ export default function StoreHeader({ store, onPrint }) {
                     : "bg-rose-50 text-rose-700"
                 }`}
               >
-                {isActive ? "نشط" : "غير نشط"}
+                {isActive ? t("نشط") : t("غير نشط")}
               </span>
             </div>
 

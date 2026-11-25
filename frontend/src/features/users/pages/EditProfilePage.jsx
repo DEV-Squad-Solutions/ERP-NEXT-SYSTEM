@@ -10,6 +10,7 @@ import {
 } from "../../../features/users/usersApi";
 import { selectIsAdmin, selectUserId } from "../../auth/authSlice";
 
+import { t } from "../../../i18n";
 export default function EditProfilePage() {
   const navigate = useNavigate();
 
@@ -59,12 +60,12 @@ export default function EditProfilePage() {
     if (!userId) return;
 
     if (!roles.length) {
-      toast.error("يجب أن يمتلك المستخدم دورًا واحدًا على الأقل");
+      toast.error(t("يجب أن يمتلك المستخدم دورًا واحدًا على الأقل"));
       return;
     }
 
     if (!companyIds.length) {
-      toast.error("يجب ربط المستخدم بشركة واحدة على الأقل");
+      toast.error(t("يجب ربط المستخدم بشركة واحدة على الأقل"));
       return;
     }
 
@@ -80,12 +81,12 @@ export default function EditProfilePage() {
         companyIds,
       }).unwrap();
 
-      toast.success("تم تحديث الملف الشخصي بنجاح");
+      toast.success(t("تم تحديث الملف الشخصي بنجاح"));
 
       navigate("/dashboard/profile");
     } catch (error) {
       const message =
-        error?.data?.detail || error?.data?.title || "تعذر تحديث الملف الشخصي";
+        error?.data?.detail || error?.data?.title || t("تعذر تحديث الملف الشخصي");
 
       toast.error(message);
     }
@@ -96,7 +97,7 @@ export default function EditProfilePage() {
       <div className="p-4 lg:p-6">
         <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-center dark:border-red-500/10 dark:bg-red-500/5">
           <p className="text-sm font-semibold text-red-600 dark:text-red-400">
-            لا تملك صلاحية تعديل المستخدم
+            {t("لا تملك صلاحية تعديل المستخدم")}
           </p>
         </div>
       </div>
@@ -112,7 +113,7 @@ export default function EditProfilePage() {
       <div className="p-4 lg:p-6">
         <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-center dark:border-red-500/10 dark:bg-red-500/5">
           <p className="text-sm font-semibold text-red-600 dark:text-red-400">
-            تعذر تحميل بيانات المستخدم
+            {t("تعذر تحميل بيانات المستخدم")}
           </p>
         </div>
       </div>
@@ -132,11 +133,11 @@ export default function EditProfilePage() {
 
         <div>
           <h2 className="font-display text-lg font-bold text-ink-900 dark:text-white">
-            تعديل الملف الشخصي
+            {t("تعديل الملف الشخصي")}
           </h2>
 
           <p className="mt-0.5 text-xs text-ink-400 dark:text-ink-500">
-            تعديل بيانات الحساب
+            {t("تعديل بيانات الحساب")}
           </p>
         </div>
       </div>
@@ -152,25 +153,25 @@ export default function EditProfilePage() {
 
           <div>
             <h3 className="text-sm font-bold text-ink-800 dark:text-white">
-              بيانات الحساب
+              {t("بيانات الحساب")}
             </h3>
 
             <p className="text-[10px] text-ink-400 dark:text-ink-500">
-              تحديث المعلومات الأساسية للمستخدم
+              {t("تحديث المعلومات الأساسية للمستخدم")}
             </p>
           </div>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <Field
-            label="اسم المستخدم"
+            label={t("اسم المستخدم")}
             {...register("userName", {
               required: true,
             })}
           />
 
           <Field
-            label="البريد الإلكتروني"
+            label={t("البريد الإلكتروني")}
             type="email"
             {...register("email", {
               required: true,
@@ -178,25 +179,25 @@ export default function EditProfilePage() {
           />
 
           <Field
-            label="الاسم الأول"
+            label={t("الاسم الأول")}
             {...register("firstName", {
               required: true,
             })}
           />
 
           <Field
-            label="اسم العائلة"
+            label={t("اسم العائلة")}
             {...register("lastName", {
               required: true,
             })}
           />
 
-          <Field label="رقم الهاتف" {...register("phoneNumber")} />
+          <Field label={t("رقم الهاتف")} {...register("phoneNumber")} />
         </div>
 
         <div className="mt-4 rounded-xl bg-ink-50 p-3 dark:bg-white/[0.03]">
           <p className="text-[10px] font-semibold text-ink-500 dark:text-ink-400">
-            الأدوار
+            {t("الأدوار")}
           </p>
 
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -213,7 +214,7 @@ export default function EditProfilePage() {
 
         <div className="mt-4 rounded-xl bg-ink-50 p-3 dark:bg-white/[0.03]">
           <p className="text-[10px] font-semibold text-ink-500 dark:text-ink-400">
-            الشركات
+            {t("الشركات")}
           </p>
 
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -234,7 +235,7 @@ export default function EditProfilePage() {
             onClick={() => navigate(-1)}
             className="rounded-xl border border-ink-200 px-4 py-2 text-xs font-semibold text-ink-600 transition-all hover:bg-ink-50 dark:border-white/[0.08] dark:text-ink-300 dark:hover:bg-white/[0.04]"
           >
-            إلغاء
+            {t("إلغاء")}
           </button>
 
           <button
@@ -244,7 +245,7 @@ export default function EditProfilePage() {
           >
             <Save size={15} />
 
-            {isSaving ? "جارٍ الحفظ..." : "حفظ التعديلات"}
+            {isSaving ? t("جارٍ الحفظ...") : t("حفظ التعديلات")}
           </button>
         </div>
       </form>

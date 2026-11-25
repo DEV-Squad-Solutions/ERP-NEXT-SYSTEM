@@ -29,13 +29,14 @@ import Button from "../../../shared/components/ui/Button";
 import Modal from "../../../shared/components/ui/Modal";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
 const ISSUE_LABELS = {
-  MissingJournal: "قيد ناقص",
-  PendingInventoryCost: "تكلفة مخزون معلّقة",
-  OrphanAutomaticJournal: "قيد آلي بلا مصدر",
-  DuplicateAutomaticJournal: "قيد آلي مكرر",
-  UnbalancedAutomaticJournal: "قيد آلي غير متوازن",
-  MissingMapping: "ربط محاسبي ناقص",
+  MissingJournal: t("قيد ناقص"),
+  PendingInventoryCost: t("تكلفة مخزون معلّقة"),
+  OrphanAutomaticJournal: t("قيد آلي بلا مصدر"),
+  DuplicateAutomaticJournal: t("قيد آلي مكرر"),
+  UnbalancedAutomaticJournal: t("قيد آلي غير متوازن"),
+  MissingMapping: t("ربط محاسبي ناقص"),
 };
 
 const ISSUE_BADGE = {
@@ -136,14 +137,14 @@ export default function AccountingReadinessPage() {
         await backfillAccountingReadiness(activeFiscalYearId).unwrap();
 
       toast.success(
-        `تم التنفيذ: ${result.createdJournals} قيد جديد، ${result.updatedJournals} قيد محدّث`,
+        t("تم التنفيذ: {0} قيد جديد، {1} قيد محدّث", { 0: result.createdJournals, 1: result.updatedJournals }),
       );
       setIsBackfillOpen(false);
     } catch (error) {
       toast.error(
         error?.data?.detail ||
           error?.data?.title ||
-          "حدث خطأ أثناء تنفيذ عملية الاستكمال",
+          t("حدث خطأ أثناء تنفيذ عملية الاستكمال"),
       );
     } finally {
       setIsBackfilling(false);
@@ -159,11 +160,10 @@ export default function AccountingReadinessPage() {
           </div>
           <div>
             <h2 className="font-display text-2xl font-bold text-ink-900">
-              مراقبة الجاهزية المحاسبية
+              {t("مراقبة الجاهزية المحاسبية")}
             </h2>
             <p className="text-sm text-ink-400 mt-0.5">
-              يفحص السنة المالية ويعرض مؤشرات اكتمال دفتر الأستاذ الموحد بدون
-              تعديل البيانات
+              {t("يفحص السنة المالية ويعرض مؤشرات اكتمال دفتر الأستاذ الموحد بدون تعديل البيانات")}
             </p>
           </div>
         </div>
@@ -177,12 +177,12 @@ export default function AccountingReadinessPage() {
                 (activeFiscalYearId ? String(activeFiscalYearId) : "")
               }
               onChange={(v) => setFiscalYearId(v)}
-              placeholder="اختر السنة المالية"
+              placeholder={t("اختر السنة المالية")}
             />
           </div>
           <Button variant="outline" className="h-9" onClick={refetch}>
             <RotateCcw size={14} />
-            تحديث
+            {t("تحديث")}
           </Button>
           <Button
             className="h-9 bg-amber-600 hover:bg-amber-600/90"
@@ -190,7 +190,7 @@ export default function AccountingReadinessPage() {
             disabled={!activeFiscalYearId}
           >
             <Wrench size={14} />
-            استكمال القيود
+            {t("استكمال القيود")}
           </Button>
         </div>
       </div>
@@ -205,14 +205,14 @@ export default function AccountingReadinessPage() {
             strokeWidth={1.6}
           />
           <p className="mb-1 font-medium text-ink-900">
-            حدث خطأ في تحميل تقرير الجاهزية
+            {t("حدث خطأ في تحميل تقرير الجاهزية")}
           </p>
           <button
             onClick={refetch}
             className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
           >
             <RotateCcw size={15} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : !readiness ? (
@@ -223,7 +223,7 @@ export default function AccountingReadinessPage() {
             strokeWidth={1.6}
           />
           <p className="font-medium text-ink-900">
-            اختر سنة مالية لعرض تقرير الجاهزية
+            {t("اختر سنة مالية لعرض تقرير الجاهزية")}
           </p>
         </div>
       ) : (
@@ -247,13 +247,13 @@ export default function AccountingReadinessPage() {
             )}
             <div>
               <p className="font-semibold text-ink-900">
-                {readiness.fiscalYearName} — {formatDate(readiness.startDate)} إلى{" "}
+                {readiness.fiscalYearName} — {formatDate(readiness.startDate)} {t("إلى")}{" "}
                 {formatDate(readiness.endDate)}
               </p>
               <p className="text-sm text-ink-600 mt-0.5">
                 {readiness.isReady
-                  ? "السنة المالية جاهزة، مفيش مشاكل مانعة في المصادر غير المؤجلة"
-                  : "فيه مشاكل محتاجة مراجعة قبل اعتبار السنة جاهزة"}
+                  ? t("السنة المالية جاهزة، مفيش مشاكل مانعة في المصادر غير المؤجلة")
+                  : t("فيه مشاكل محتاجة مراجعة قبل اعتبار السنة جاهزة")}
               </p>
             </div>
           </div>
@@ -261,33 +261,33 @@ export default function AccountingReadinessPage() {
           {/* Summary cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <SummaryCard
-              label="إجمالي المصادر"
+              label={t("إجمالي المصادر")}
               value={readiness.totalSources}
             />
             <SummaryCard
-              label="مُرحّلة"
+              label={t("مُرحّلة")}
               value={readiness.postedSources}
               tone="positive"
             />
             <SummaryCard
-              label="قيود ناقصة"
+              label={t("قيود ناقصة")}
               value={readiness.missingJournalSources}
               tone={readiness.missingJournalSources ? "negative" : "positive"}
             />
             <SummaryCard
-              label="تكاليف مخزون معلّقة"
+              label={t("تكاليف مخزون معلّقة")}
               value={readiness.pendingInventoryCosts}
               tone={readiness.pendingInventoryCosts ? "amber" : "positive"}
             />
             <SummaryCard
-              label="روابط محاسبية ناقصة"
+              label={t("روابط محاسبية ناقصة")}
               value={readiness.missingOrInvalidMappings}
               tone={
                 readiness.missingOrInvalidMappings ? "negative" : "positive"
               }
             />
             <SummaryCard
-              label="مرتبات مؤجلة"
+              label={t("مرتبات مؤجلة")}
               value={readiness.deferredPayrollSources}
               tone="neutral"
               icon={<Clock size={13} />}
@@ -298,17 +298,17 @@ export default function AccountingReadinessPage() {
           <div className="overflow-hidden rounded-2xl border border-ink-400/10 bg-white shadow-card">
             <div className="border-b border-ink-400/10 px-5 py-3">
               <h3 className="font-semibold text-ink-900 text-sm">
-                تفصيل المصادر حسب النوع
+                {t("تفصيل المصادر حسب النوع")}
               </h3>
             </div>
             <div className="overflow-x-auto custom-scroll">
               <table className="min-w-full border-collapse text-sm">
                 <thead className="bg-slate-50">
                   <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
-                    <th className="px-4 py-2.5 text-right">النوع</th>
-                    <th className="px-4 py-2.5 text-center">الإجمالي</th>
-                    <th className="px-4 py-2.5 text-center">مُرحّل</th>
-                    <th className="px-4 py-2.5 text-center">ناقص</th>
+                    <th className="px-4 py-2.5 text-right">{t("النوع")}</th>
+                    <th className="px-4 py-2.5 text-center">{t("الإجمالي")}</th>
+                    <th className="px-4 py-2.5 text-center">{t("مُرحّل")}</th>
+                    <th className="px-4 py-2.5 text-center">{t("ناقص")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -346,28 +346,28 @@ export default function AccountingReadinessPage() {
           <div className="overflow-hidden rounded-2xl border border-ink-400/10 bg-white shadow-card">
             <div className="border-b border-ink-400/10 px-5 py-3 flex items-center justify-between">
               <h3 className="font-semibold text-ink-900 text-sm">
-                المشاكل التفصيلية
+                {t("المشاكل التفصيلية")}
               </h3>
               <span className="text-xs text-ink-400">
-                {readiness.issues.length} مشكلة
+                {readiness.issues.length} {t("مشكلة")}
               </span>
             </div>
 
             {readiness.issues.length === 0 ? (
               <div className="py-10 text-center text-sm text-ink-400">
-                لا توجد مشاكل حالياً
+                {t("لا توجد مشاكل حالياً")}
               </div>
             ) : (
               <div className="overflow-x-auto custom-scroll">
                 <table className="min-w-full border-collapse text-sm">
                   <thead className="bg-slate-50">
                     <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
-                      <th className="px-4 py-2.5 text-right">النوع</th>
-                      <th className="px-4 py-2.5 text-right">المصدر</th>
-                      <th className="px-4 py-2.5 text-center">الرقم</th>
-                      <th className="px-4 py-2.5 text-center">التاريخ</th>
-                      <th className="px-4 py-2.5 text-right">التفاصيل</th>
-                      <th className="px-4 py-2.5 text-center">إجراء سريع</th>
+                      <th className="px-4 py-2.5 text-right">{t("النوع")}</th>
+                      <th className="px-4 py-2.5 text-right">{t("المصدر")}</th>
+                      <th className="px-4 py-2.5 text-center">{t("الرقم")}</th>
+                      <th className="px-4 py-2.5 text-center">{t("التاريخ")}</th>
+                      <th className="px-4 py-2.5 text-right">{t("التفاصيل")}</th>
+                      <th className="px-4 py-2.5 text-center">{t("إجراء سريع")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -399,7 +399,7 @@ export default function AccountingReadinessPage() {
                                 type="button"
                                 onClick={() => navigate(sourceLink)}
                                 className="inline-flex items-center gap-1 font-medium text-primary-600 underline-offset-2 transition-colors hover:text-primary-700 hover:underline"
-                                title="فتح المصدر"
+                                title={t("فتح المصدر")}
                               >
                                 {issue.sourceNumber}
                                 <ExternalLink size={11} />
@@ -423,7 +423,7 @@ export default function AccountingReadinessPage() {
                                   type="button"
                                   onClick={() => navigate(sourceLink)}
                                   className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                                  title="فتح المصدر"
+                                  title={t("فتح المصدر")}
                                 >
                                   <ExternalLink size={14} />
                                 </button>
@@ -433,7 +433,7 @@ export default function AccountingReadinessPage() {
                                   type="button"
                                   onClick={() => navigate(mappingLink)}
                                   className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-amber-50 hover:text-amber-600"
-                                  title="تصحيح الربط المحاسبي"
+                                  title={t("تصحيح الربط المحاسبي")}
                                 >
                                   <Wrench size={14} />
                                 </button>
@@ -459,7 +459,7 @@ export default function AccountingReadinessPage() {
       <Modal
         isOpen={isBackfillOpen}
         onClose={() => setIsBackfillOpen(false)}
-        title="تأكيد استكمال القيود"
+        title={t("تأكيد استكمال القيود")}
       >
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-xl border border-amber-500/20 bg-amber-500/[0.04] px-4 py-3">
@@ -469,10 +469,7 @@ export default function AccountingReadinessPage() {
               strokeWidth={1.8}
             />
             <p className="text-sm leading-relaxed text-ink-700">
-              هيتم استكمال الحسابات والروابط الناقصة، وإعادة حساب تكلفة المخزون،
-              وإنشاء أو تحديث القيود التلقائية للمصادر القديمة في هذه السنة
-              المالية. العملية آمنة ولن تكرر القيود عند التنفيذ أكتر من مرة،
-              لكنها متاحة للمسؤول فقط.
+              {t("هيتم استكمال الحسابات والروابط الناقصة، وإعادة حساب تكلفة المخزون، وإنشاء أو تحديث القيود التلقائية للمصادر القديمة في هذه السنة المالية. العملية آمنة ولن تكرر القيود عند التنفيذ أكتر من مرة، لكنها متاحة للمسؤول فقط.")}
             </p>
           </div>
 
@@ -483,7 +480,7 @@ export default function AccountingReadinessPage() {
               onClick={() => setIsBackfillOpen(false)}
               disabled={isBackfilling}
             >
-              إلغاء
+              {t("إلغاء")}
             </Button>
             <Button
               type="button"
@@ -494,10 +491,10 @@ export default function AccountingReadinessPage() {
               {isBackfilling ? (
                 <span className="flex items-center gap-2">
                   <Loader2 size={14} className="animate-spin" />
-                  جارِ التنفيذ...
+                  {t("جارِ التنفيذ...")}
                 </span>
               ) : (
-                "تأكيد الاستكمال"
+                t("تأكيد الاستكمال")
               )}
             </Button>
           </div>

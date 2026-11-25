@@ -10,6 +10,7 @@ import {
 } from "../payroll.constants";
 import { formatDate as sharedFormatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
 export default function AttendanceDetailsModal({
   isOpen,
   onClose,
@@ -20,7 +21,7 @@ export default function AttendanceDetailsModal({
   const status = normalizeStatus(attendance.status);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="تفاصيل سجل الحضور">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("تفاصيل سجل الحضور")}>
       <div className="space-y-5">
         <div className="flex items-center gap-3 p-4 rounded-xl bg-ink-900/[0.03] border border-ink-400/10">
           <div className="w-11 h-11 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
@@ -32,14 +33,14 @@ export default function AttendanceDetailsModal({
           </div>
 
           <div className="min-w-0">
-            <p className="text-xs text-ink-400 mb-0.5">الموظف</p>
+            <p className="text-xs text-ink-400 mb-0.5">{t("الموظف")}</p>
 
             <h3 className="text-base font-bold text-ink-900 truncate">
               {attendance.employeeName || "—"}
             </h3>
 
             <p className="text-xs text-ink-400 mt-0.5 num">
-              رقم الموظف: {attendance.employeeId ?? "—"}
+              {t("رقم الموظف:")} {attendance.employeeId ?? "—"}
             </p>
           </div>
 
@@ -52,72 +53,72 @@ export default function AttendanceDetailsModal({
           </span>
         </div>
 
-        <SectionTitle title="بيانات الحضور" />
+        <SectionTitle title={t("بيانات الحضور")} />
 
         <div className="grid grid-cols-2 gap-3">
           <InfoCard
             icon={<CalendarDays size={15} />}
-            label="تاريخ العمل"
+            label={t("تاريخ العمل")}
             value={formatDate(attendance.workDate)}
           />
 
           <InfoCard
             icon={<Clock3 size={15} />}
-            label="عدد ساعات العمل"
+            label={t("عدد ساعات العمل")}
             value={attendance.workHours || "—"}
             numeric
           />
 
           <InfoCard
-            label="وقت الحضور"
+            label={t("وقت الحضور")}
             value={formatTime(attendance.checkIn)}
             numeric
           />
 
           <InfoCard
-            label="وقت الانصراف"
+            label={t("وقت الانصراف")}
             value={formatTime(attendance.checkOut)}
             numeric
           />
         </div>
 
-        <SectionTitle title="نسب العمل" />
+        <SectionTitle title={t("نسب العمل")} />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <RatioCard label="نسبة يوم العمل" value={attendance.workDayRatio} />
+          <RatioCard label={t("نسبة يوم العمل")} value={attendance.workDayRatio} />
 
-          <RatioCard label="الإضافي" value={attendance.workOverTimeRatio} />
+          <RatioCard label={t("الإضافي")} value={attendance.workOverTimeRatio} />
 
           <RatioCard
-            label="خصم أيام العمل"
+            label={t("خصم أيام العمل")}
             value={attendance.workDaysDeductionRatio}
           />
         </div>
 
         <div>
-          <SectionTitle title="مكان العمل" />
+          <SectionTitle title={t("مكان العمل")} />
 
           <div className="flex items-center gap-2 rounded-xl border border-ink-400/10 bg-white px-3 py-3">
             <MapPin size={16} className="text-ink-400 shrink-0" />
 
             <span className="text-sm text-ink-900">
-              {attendance.workLocation || "غير محدد"}
+              {attendance.workLocation || t("غير محدد")}
             </span>
           </div>
         </div>
 
         <div>
-          <SectionTitle title="الملاحظات" />
+          <SectionTitle title={t("الملاحظات")} />
 
           <div className="rounded-xl border border-ink-400/10 bg-ink-900/[0.02] px-3 py-3 min-h-[70px]">
             <p className="text-sm text-ink-700 whitespace-pre-wrap">
-              {attendance.notes || "لا توجد ملاحظات"}
+              {attendance.notes || t("لا توجد ملاحظات")}
             </p>
           </div>
         </div>
 
         <div className="pt-3 border-t border-ink-400/10 flex items-center justify-between">
-          <span className="text-xs text-ink-400">رقم السجل</span>
+          <span className="text-xs text-ink-400">{t("رقم السجل")}</span>
 
           <span className="text-xs font-semibold text-ink-700 num">
             #{attendance.id}

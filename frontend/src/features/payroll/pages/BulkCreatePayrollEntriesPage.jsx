@@ -36,6 +36,8 @@ import Input from "../../../shared/components/ui/Input";
 import { formatDate } from "../../../lib/date.js";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 function getToday() {
   const date = new Date();
   const year = date.getFullYear();
@@ -265,7 +267,7 @@ export default function BulkCreatePayrollEntriesPage() {
 
   const applyBulkAmount = (field, value, label) => {
     if (!selectedIds.length) {
-      toast.error("اختر الموظفين أولاً");
+      toast.error(t("اختر الموظفين أولاً"));
       return;
     }
 
@@ -284,7 +286,7 @@ export default function BulkCreatePayrollEntriesPage() {
       return next;
     });
 
-    toast.success(`تم تطبيق ${label} على ${selectedIds.length} موظف`);
+    toast.success(t("تم تطبيق {0} على {1} موظف", { 0: label, 1: selectedIds.length }));
   };
 
   const resetPage = () => {
@@ -313,24 +315,24 @@ export default function BulkCreatePayrollEntriesPage() {
     }
 
     if (!endDate) {
-      toast.error("حدد تاريخ المرتب أولاً");
+      toast.error(t("حدد تاريخ المرتب أولاً"));
       return;
     }
 
     if (isOutCompany) {
       if (!startDate) {
-        toast.error("حدد فترة المرتب (من) للموظفين خارج الشركة");
+        toast.error(t("حدد فترة المرتب (من) للموظفين خارج الشركة"));
         return;
       }
 
       if (new Date(startDate) > new Date(endDate)) {
-        toast.error("تاريخ البداية لا يمكن أن يكون بعد تاريخ النهاية");
+        toast.error(t("تاريخ البداية لا يمكن أن يكون بعد تاريخ النهاية"));
         return;
       }
     }
 
     if (!selectedIds.length) {
-      toast.error("حدد موظفًا واحدًا على الأقل لإنشاء المرتب");
+      toast.error(t("حدد موظفًا واحدًا على الأقل لإنشاء المرتب"));
       return;
     }
 
@@ -368,13 +370,13 @@ export default function BulkCreatePayrollEntriesPage() {
         await bulkCreateOutCompany(payload).unwrap();
 
         toast.success(
-          `تم إنشاء قيود مرتبات ${selectedIds.length} موظف خارج الشركة بنجاح`,
+          t("تم إنشاء قيود مرتبات {0} موظف خارج الشركة بنجاح", { 0: selectedIds.length }),
         );
       } else {
         await bulkCreate(payload).unwrap();
 
         toast.success(
-          `تم إنشاء قيود مرتبات ${selectedIds.length} موظف داخل الشركة بنجاح`,
+          t("تم إنشاء قيود مرتبات {0} موظف داخل الشركة بنجاح", { 0: selectedIds.length }),
         );
       }
 
@@ -384,13 +386,13 @@ export default function BulkCreatePayrollEntriesPage() {
         error?.data?.message ||
           error?.data?.title ||
           error?.data?.detail ||
-          "حدث خطأ أثناء إنشاء قيود المرتبات",
+          t("حدث خطأ أثناء إنشاء قيود المرتبات"),
       );
     }
   };
 
   return (
-    <div className="animate-fadeUp space-y-4" dir="rtl">
+    <div className="animate-fadeUp space-y-4" dir={getDir()}>
       {isFiscalYearReadOnly && (
         <ReadOnlyFiscalYearBanner fiscalYear={fiscalYear} />
       )}
@@ -408,11 +410,11 @@ export default function BulkCreatePayrollEntriesPage() {
 
             <div>
               <h2 className="font-display text-2xl font-bold text-ink-900">
-                إنشاء قيود المرتبات
+                {t("إنشاء قيود المرتبات")}
               </h2>
 
               <p className="text-sm text-ink-400 mt-1">
-                اختر الموظفين وحدد بيانات الحضور والعمل والتعديلات
+                {t("اختر الموظفين وحدد بيانات الحضور والعمل والتعديلات")}
               </p>
             </div>
           </div>
@@ -421,7 +423,7 @@ export default function BulkCreatePayrollEntriesPage() {
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={resetPage} disabled={isSaving}>
             <RotateCcw size={15} />
-            إعادة ضبط
+            {t("إعادة ضبط")}
           </Button>
 
           <Button
@@ -440,10 +442,8 @@ export default function BulkCreatePayrollEntriesPage() {
             )}
 
             {isSaving
-              ? "جارِ الإنشاء..."
-              : `إنشاء المرتبات${
-                  selectedIds.length ? ` (${selectedIds.length})` : ""
-                }`}
+              ? t("جارِ الإنشاء...")
+              : t("إنشاء المرتبات{0}", { 0: selectedIds.length ? ` (${selectedIds.length})` : "" })}
           </Button>
         </div>
       </div>
@@ -451,7 +451,7 @@ export default function BulkCreatePayrollEntriesPage() {
       <div className="rounded-2xl border border-ink-400/10 bg-white shadow-card p-3">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <p className="text-xs font-semibold text-ink-900 shrink-0">
-            مكان العمل
+            {t("مكان العمل")}
           </p>
 
           <div className="inline-flex rounded-lg border border-ink-400/15 p-0.5 bg-ink-900/[0.02] w-fit">
@@ -465,7 +465,7 @@ export default function BulkCreatePayrollEntriesPage() {
               }`}
             >
               <Building size={13} />
-              داخل الشركة
+              {t("داخل الشركة")}
             </button>
 
             <button
@@ -478,7 +478,7 @@ export default function BulkCreatePayrollEntriesPage() {
               }`}
             >
               <Building2 size={13} />
-              خارج الشركة
+              {t("خارج الشركة")}
             </button>
           </div>
         </div>
@@ -490,7 +490,7 @@ export default function BulkCreatePayrollEntriesPage() {
             <CalendarDays size={15} className="text-primary-500" />
 
             <p className="text-xs font-semibold text-ink-900">
-              {isOutCompany ? "فترة المرتب" : "تاريخ المرتب"}
+              {isOutCompany ? t("فترة المرتب") : t("تاريخ المرتب")}
             </p>
           </div>
 
@@ -502,7 +502,7 @@ export default function BulkCreatePayrollEntriesPage() {
             {isOutCompany && (
               <div>
                 <label className="block text-[11px] font-medium text-ink-400 mb-1">
-                  من
+                  {t("من")}
                 </label>
 
                 <DateInput
@@ -518,7 +518,7 @@ export default function BulkCreatePayrollEntriesPage() {
 
             <div>
               <label className="block text-[11px] font-medium text-ink-400 mb-1">
-                {isOutCompany ? "إلى" : "التاريخ"}
+                {isOutCompany ? t("إلى") : t("التاريخ")}
               </label>
 
               <DateInput
@@ -535,39 +535,39 @@ export default function BulkCreatePayrollEntriesPage() {
 
         <SummaryCard
           icon={Users}
-          label="إجمالي الموظفين"
+          label={t("إجمالي الموظفين")}
           value={summary.total}
         />
 
         <SummaryCard
           icon={UserCheck}
-          label="المحدد"
+          label={t("المحدد")}
           value={summary.selected}
           tone="positive"
         />
 
         <SummaryCard
           icon={Clock3}
-          label="أيام الحضور"
+          label={t("أيام الحضور")}
           value={summary.totalPresentDays.toFixed(2)}
         />
 
         <SummaryCard
           icon={Timer}
-          label="أيام العمل"
+          label={t("أيام العمل")}
           value={summary.totalWorkedDaysByDayUnit.toFixed(2)}
         />
 
         <SummaryCard
           icon={ArrowDownUp}
-          label="الإضافات"
+          label={t("الإضافات")}
           value={summary.totalBonus.toFixed(2)}
           tone="positive"
         />
 
         <SummaryCard
           icon={Minus}
-          label="الخصومات"
+          label={t("الخصومات")}
           value={summary.totalDeduction.toFixed(2)}
           tone="negative"
         />
@@ -577,7 +577,7 @@ export default function BulkCreatePayrollEntriesPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="lg:col-span-2">
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              البحث عن موظف
+              {t("البحث عن موظف")}
             </label>
 
             <div className="relative">
@@ -589,7 +589,7 @@ export default function BulkCreatePayrollEntriesPage() {
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="ابحث باسم الموظف أو الرقم..."
+                placeholder={t("ابحث باسم الموظف أو الرقم...")}
                 className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pr-9 pl-3 text-sm outline-none focus:border-primary-500 transition-colors"
               />
             </div>
@@ -603,18 +603,18 @@ export default function BulkCreatePayrollEntriesPage() {
               disabled={!search}
             >
               <RotateCcw size={14} />
-              تصفير البحث
+              {t("تصفير البحث")}
             </Button>
           </div>
 
           <div className="flex items-end">
             <div className="text-xs text-ink-400 w-full h-9 flex items-center justify-end">
               <span>
-                عرض{" "}
+                {t("عرض")}{" "}
                 <strong className="text-ink-900">{filteredRows.length}</strong>{" "}
-                من{" "}
+                {t("من")}{" "}
                 <strong className="text-ink-900">{employeeRows.length}</strong>{" "}
-                موظف
+                {t("موظف")}
               </span>
             </div>
           </div>
@@ -630,15 +630,15 @@ export default function BulkCreatePayrollEntriesPage() {
 
             <div>
               <p className="text-sm font-semibold text-ink-900">
-                اختيار الموظفين
+                {t("اختيار الموظفين")}
               </p>
 
               <p className="text-[11px] text-ink-400">
-                المحدد حاليًا:{" "}
+                {t("المحدد حاليًا:")}{" "}
                 <span className="font-semibold text-primary-600">
                   {selectedIds.length}
                 </span>{" "}
-                موظف
+                {t("موظف")}
               </p>
             </div>
           </div>
@@ -651,7 +651,7 @@ export default function BulkCreatePayrollEntriesPage() {
               disabled={!employeeRows.length}
             >
               <CheckCircle2 size={14} />
-              تحديد الكل
+              {t("تحديد الكل")}
             </Button>
 
             <Button
@@ -661,7 +661,7 @@ export default function BulkCreatePayrollEntriesPage() {
               disabled={!filteredRows.length}
             >
               <Check size={14} />
-              تحديد الظاهر
+              {t("تحديد الظاهر")}
             </Button>
 
             <Button
@@ -671,7 +671,7 @@ export default function BulkCreatePayrollEntriesPage() {
               disabled={!filteredRows.length}
             >
               <X size={14} />
-              إلغاء الظاهر
+              {t("إلغاء الظاهر")}
             </Button>
 
             <Button
@@ -681,7 +681,7 @@ export default function BulkCreatePayrollEntriesPage() {
               disabled={!selectedIds.length}
             >
               <RotateCcw size={14} />
-              إلغاء الكل
+              {t("إلغاء الكل")}
             </Button>
           </div>
         </div>
@@ -692,17 +692,17 @@ export default function BulkCreatePayrollEntriesPage() {
           <div className="flex flex-col gap-3">
             <div>
               <p className="text-sm font-semibold text-ink-900">
-                إجراءات جماعية
+                {t("إجراءات جماعية")}
               </p>
 
               <p className="text-[11px] text-ink-400 mt-1">
-                تطبيق قيم موحدة على الموظفين المحددين
+                {t("تطبيق قيم موحدة على الموظفين المحددين")}
               </p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2">
               <Input
-                label="أيام الحضور"
+                label={t("أيام الحضور")}
                 type="number"
                 min="0"
                 step="0.01"
@@ -712,7 +712,7 @@ export default function BulkCreatePayrollEntriesPage() {
               />
 
               <Input
-                label="أيام العمل"
+                label={t("أيام العمل")}
                 type="number"
                 min="0"
                 step="0.01"
@@ -724,7 +724,7 @@ export default function BulkCreatePayrollEntriesPage() {
               />
 
               <Input
-                label="الإضافي باليوم"
+                label={t("الإضافي باليوم")}
                 type="number"
                 min="0"
                 step="0.01"
@@ -736,7 +736,7 @@ export default function BulkCreatePayrollEntriesPage() {
               />
 
               <Input
-                label="خصم باليوم"
+                label={t("خصم باليوم")}
                 type="number"
                 min="0"
                 step="0.01"
@@ -748,7 +748,7 @@ export default function BulkCreatePayrollEntriesPage() {
               />
 
               <Input
-                label="إضافة مالية"
+                label={t("إضافة مالية")}
                 type="number"
                 min="0"
                 step="0.01"
@@ -758,7 +758,7 @@ export default function BulkCreatePayrollEntriesPage() {
               />
 
               <Input
-                label="خصم مالي"
+                label={t("خصم مالي")}
                 type="number"
                 min="0"
                 step="0.01"
@@ -773,11 +773,11 @@ export default function BulkCreatePayrollEntriesPage() {
                 variant="outline"
                 className="h-9"
                 onClick={() =>
-                  applyBulkAmount("presentDays", bulkPresentDays, "أيام الحضور")
+                  applyBulkAmount("presentDays", bulkPresentDays, t("أيام الحضور"))
                 }
               >
                 <Check size={14} />
-                تطبيق الحضور
+                {t("تطبيق الحضور")}
               </Button>
 
               <Button
@@ -787,12 +787,12 @@ export default function BulkCreatePayrollEntriesPage() {
                   applyBulkAmount(
                     "workedDaysByDayUnit",
                     bulkWorkedDaysByDayUnit,
-                    "أيام العمل",
+                    t("أيام العمل"),
                   )
                 }
               >
                 <Clock3 size={14} />
-                تطبيق العمل
+                {t("تطبيق العمل")}
               </Button>
 
               <Button
@@ -802,12 +802,12 @@ export default function BulkCreatePayrollEntriesPage() {
                   applyBulkAmount(
                     "overtimeByDayUnit",
                     bulkOvertimeByDayUnit,
-                    "الإضافي",
+                    t("الإضافي"),
                   )
                 }
               >
                 <Timer size={14} />
-                تطبيق الإضافي
+                {t("تطبيق الإضافي")}
               </Button>
 
               <Button
@@ -817,34 +817,34 @@ export default function BulkCreatePayrollEntriesPage() {
                   applyBulkAmount(
                     "deductionByDayUnit",
                     bulkDeductionByDayUnit,
-                    "خصم الأيام",
+                    t("خصم الأيام"),
                   )
                 }
               >
                 <Ban size={14} />
-                تطبيق خصم الأيام
+                {t("تطبيق خصم الأيام")}
               </Button>
 
               <Button
                 variant="outline"
                 className="h-9"
                 onClick={() =>
-                  applyBulkAmount("bonus", bulkBonus, "الإضافة المالية")
+                  applyBulkAmount("bonus", bulkBonus, t("الإضافة المالية"))
                 }
               >
                 <Plus size={14} />
-                تطبيق الإضافة
+                {t("تطبيق الإضافة")}
               </Button>
 
               <Button
                 variant="outline"
                 className="h-9"
                 onClick={() =>
-                  applyBulkAmount("deduction", bulkDeduction, "الخصم المالي")
+                  applyBulkAmount("deduction", bulkDeduction, t("الخصم المالي"))
                 }
               >
                 <Minus size={14} />
-                تطبيق الخصم
+                {t("تطبيق الخصم")}
               </Button>
             </div>
           </div>
@@ -857,9 +857,9 @@ export default function BulkCreatePayrollEntriesPage() {
         <div className="text-center py-16 border border-dashed border-ink-400/20 rounded-2xl">
           <Users size={30} className="mx-auto text-ink-400/50 mb-3" />
 
-          <p className="text-ink-900 font-medium text-sm">لا توجد نتائج</p>
+          <p className="text-ink-900 font-medium text-sm">{t("لا توجد نتائج")}</p>
 
-          <p className="text-xs text-ink-400 mt-1">جرّب تغيير كلمة البحث</p>
+          <p className="text-xs text-ink-400 mt-1">{t("جرّب تغيير كلمة البحث")}</p>
         </div>
       ) : (
         <>
@@ -885,23 +885,23 @@ export default function BulkCreatePayrollEntriesPage() {
                     />
                   </th>
 
-                  <th className="p-2.5 font-medium">الموظف</th>
+                  <th className="p-2.5 font-medium">{t("الموظف")}</th>
 
-                  <th className="p-2.5 font-medium">أيام الحضور</th>
+                  <th className="p-2.5 font-medium">{t("أيام الحضور")}</th>
 
-                  <th className="p-2.5 font-medium">أيام العمل</th>
+                  <th className="p-2.5 font-medium">{t("أيام العمل")}</th>
 
-                  <th className="p-2.5 font-medium">الإضافي باليوم</th>
+                  <th className="p-2.5 font-medium">{t("الإضافي باليوم")}</th>
 
-                  <th className="p-2.5 font-medium">خصم باليوم</th>
+                  <th className="p-2.5 font-medium">{t("خصم باليوم")}</th>
 
-                  <th className="p-2.5 font-medium">الإضافات</th>
+                  <th className="p-2.5 font-medium">{t("الإضافات")}</th>
 
-                  <th className="p-2.5 font-medium">الخصومات</th>
+                  <th className="p-2.5 font-medium">{t("الخصومات")}</th>
 
-                  <th className="p-2.5 font-medium">صافي التعديلات</th>
+                  <th className="p-2.5 font-medium">{t("صافي التعديلات")}</th>
 
-                  <th className="p-2.5 font-medium text-center">الحالة</th>
+                  <th className="p-2.5 font-medium text-center">{t("الحالة")}</th>
                 </tr>
               </thead>
 
@@ -951,7 +951,7 @@ export default function BulkCreatePayrollEntriesPage() {
                             </p>
                             {employee.lastDayOfReceivingSalary && (
                               <p className="text-[10px] text-ink-400 num">
-                                تاريخ اخر صرف:
+                                {t("تاريخ اخر صرف:")}
                                 {employee.lastDayOfReceivingSalary}
                               </p>
                             )}
@@ -1087,12 +1087,12 @@ export default function BulkCreatePayrollEntriesPage() {
                         {selected ? (
                           <span className="inline-flex items-center gap-1 rounded-full bg-positive/10 text-positive px-2.5 py-1 text-[10px] font-semibold">
                             <Check size={11} />
-                            سيتم الإنشاء
+                            {t("سيتم الإنشاء")}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 rounded-full bg-ink-400/10 text-ink-400 px-2.5 py-1 text-[10px] font-medium">
                             <X size={11} />
-                            غير محدد
+                            {t("غير محدد")}
                           </span>
                         )}
                       </td>
@@ -1116,73 +1116,73 @@ export default function BulkCreatePayrollEntriesPage() {
                   <span>
                     {isOutCompany ? (
                       <>
-                        الفترة:
+                        {t("الفترة:")}
                         <strong className="text-ink-900 mx-1">
                           {formatDate(startDate)}
                         </strong>
-                        إلى
+                        {t("إلى")}
                         <strong className="text-ink-900 mx-1">{formatDate(endDate)}</strong>
                       </>
                     ) : (
                       <>
-                        التاريخ:
+                        {t("التاريخ:")}
                         <strong className="text-ink-900 mx-1">{formatDate(endDate)}</strong>
                       </>
                     )}
                   </span>
 
                   <span>
-                    المحدد:
+                    {t("المحدد:")}
                     <strong className="text-primary-600 mx-1">
                       {summary.selected}
                     </strong>
-                    موظف
+                    {t("موظف")}
                   </span>
 
                   <span>
-                    الحضور:
+                    {t("الحضور:")}
                     <strong className="text-ink-900 mx-1 num">
                       {summary.totalPresentDays.toFixed(2)}
                     </strong>
                   </span>
 
                   <span>
-                    العمل:
+                    {t("العمل:")}
                     <strong className="text-ink-900 mx-1 num">
                       {summary.totalWorkedDaysByDayUnit.toFixed(2)}
                     </strong>
                   </span>
 
                   <span>
-                    الإضافي:
+                    {t("الإضافي:")}
                     <strong className="text-primary-600 mx-1 num">
                       {summary.totalOvertimeByDayUnit.toFixed(2)}
                     </strong>
                   </span>
 
                   <span>
-                    خصم الأيام:
+                    {t("خصم الأيام:")}
                     <strong className="text-negative mx-1 num">
                       {summary.totalDeductionByDayUnit.toFixed(2)}
                     </strong>
                   </span>
 
                   <span>
-                    الإضافات:
+                    {t("الإضافات:")}
                     <strong className="text-positive mx-1 num">
                       {summary.totalBonus.toFixed(2)}
                     </strong>
                   </span>
 
                   <span>
-                    الخصومات:
+                    {t("الخصومات:")}
                     <strong className="text-negative mx-1 num">
                       {summary.totalDeduction.toFixed(2)}
                     </strong>
                   </span>
 
                   <span>
-                    صافي التعديلات:
+                    {t("صافي التعديلات:")}
                     <strong
                       className={`mx-1 num ${
                         summary.netAdjustments >= 0
@@ -1202,7 +1202,7 @@ export default function BulkCreatePayrollEntriesPage() {
                     disabled={isSaving || !selectedIds.length}
                   >
                     <X size={14} />
-                    إلغاء التحديد
+                    {t("إلغاء التحديد")}
                   </Button>
 
                   <Button
@@ -1221,8 +1221,8 @@ export default function BulkCreatePayrollEntriesPage() {
                     )}
 
                     {isSaving
-                      ? "جارِ الإنشاء..."
-                      : `إنشاء ${selectedIds.length || ""} مرتب`}
+                      ? t("جارِ الإنشاء...")
+                      : t("إنشاء {0} مرتب", { 0: selectedIds.length || "" })}
                   </Button>
                 </div>
               </div>

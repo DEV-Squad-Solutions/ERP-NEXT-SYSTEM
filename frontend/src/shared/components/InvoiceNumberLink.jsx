@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 
 import { selectRoles } from "../../features/auth/authSlice";
 
+import { t } from "../../i18n";
 // الأدوار اللي مسموح لها تفتح صفحة الفاتورة (نفس INVOICE_ROLES في router.jsx).
 // لو المستخدم مش من الأدوار دي بنسيب الرقم نص عادي من غير لينك.
 const INVOICE_ROLES = ["admin", "accountant", "user", "cashier"];
@@ -72,7 +73,7 @@ export default function InvoiceNumberLink({
         event.stopPropagation();
         navigate(`${basePath}/${invoiceId}`);
       }}
-      title={title ?? "عرض تفاصيل الفاتورة"}
+      title={title ?? t("عرض تفاصيل الفاتورة")}
       className={`cursor-pointer text-primary-600 transition-colors hover:text-primary-700 hover:underline underline-offset-2 ${className}`}
     >
       {label ?? "—"}

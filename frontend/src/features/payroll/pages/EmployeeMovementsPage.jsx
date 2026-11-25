@@ -34,7 +34,9 @@ import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFisc
 import { formatDate } from "../../../lib/date.js";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
-const fmt = (n) => (n ?? 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 });
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
+const fmt = (n) => (n ?? 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 });
 
 export default function EmployeeMovementsPage() {
   const { isReadOnly: isFiscalYearReadOnly, fiscalYear } = useFiscalYearGuard();
@@ -107,14 +109,14 @@ export default function EmployeeMovementsPage() {
 
     try {
       await deleteMovement(movementToDelete.id).unwrap();
-      toast.success("تم حذف الحركة بنجاح");
+      toast.success(t("تم حذف الحركة بنجاح"));
       setMovementToDelete(null);
       refetch();
     } catch (error) {
       toast.error(
         error?.data?.message ||
           error?.data?.title ||
-          "حدث خطأ أثناء حذف الحركة",
+          t("حدث خطأ أثناء حذف الحركة"),
       );
     }
   };
@@ -124,10 +126,10 @@ export default function EmployeeMovementsPage() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
         <div>
           <h2 className="font-display text-2xl font-bold text-ink-900">
-            حركات الموظفين
+            {t("حركات الموظفين")}
           </h2>
           <p className="text-sm text-ink-400 mt-1">
-            سلف، خصومات، مكافآت، وسحوبات الموظفين
+            {t("سلف، خصومات، مكافآت، وسحوبات الموظفين")}
           </p>
         </div>
 
@@ -138,14 +140,14 @@ export default function EmployeeMovementsPage() {
             disabled={isFiscalYearReadOnly}
           >
             <MinusCircle size={15} />
-            خصم سريع
+            {t("خصم سريع")}
           </Button>
           <Button
             onClick={() => openForm(undefined)}
             disabled={isFiscalYearReadOnly}
           >
             <Plus size={15} />
-            تسجيل حركة جديدة
+            {t("تسجيل حركة جديدة")}
           </Button>
         </div>
       </div>
@@ -158,7 +160,7 @@ export default function EmployeeMovementsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           <div className="lg:col-span-2">
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              بحث
+              {t("بحث")}
             </label>
             <div className="relative">
               <Search
@@ -171,7 +173,7 @@ export default function EmployeeMovementsPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="ابحث..."
+                placeholder={t("ابحث...")}
                 className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pr-9 pl-3 text-sm outline-none focus:border-primary-500"
               />
             </div>
@@ -179,7 +181,7 @@ export default function EmployeeMovementsPage() {
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              الموظف
+              {t("الموظف")}
             </label>
             <CompactSelect
               options={employeeOptions}
@@ -188,13 +190,13 @@ export default function EmployeeMovementsPage() {
                 setEmployeeId(v);
                 setPage(1);
               }}
-              placeholder="كل الموظفين"
+              placeholder={t("كل الموظفين")}
             />
           </div>
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              نوع الحركة
+              {t("نوع الحركة")}
             </label>
             <CompactSelect
               options={movementTypeOptions}
@@ -203,13 +205,13 @@ export default function EmployeeMovementsPage() {
                 setType(v);
                 setPage(1);
               }}
-              placeholder="كل الأنواع"
+              placeholder={t("كل الأنواع")}
             />
           </div>
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              العملة
+              {t("العملة")}
             </label>
             <CompactSelect
               options={currencyOptions}
@@ -218,13 +220,13 @@ export default function EmployeeMovementsPage() {
                 setCurrency(v);
                 setPage(1);
               }}
-              placeholder="كل العملات"
+              placeholder={t("كل العملات")}
             />
           </div>
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              من تاريخ
+              {t("من تاريخ")}
             </label>
             <DateInput
               type="date"
@@ -241,7 +243,7 @@ export default function EmployeeMovementsPage() {
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              إلى تاريخ
+              {t("إلى تاريخ")}
             </label>
             <DateInput
               type="date"
@@ -260,7 +262,7 @@ export default function EmployeeMovementsPage() {
         <div className="mt-3 flex justify-end">
           <Button variant="outline" className="h-9" onClick={resetFilters}>
             <RotateCcw size={14} />
-            تصفير الفلاتر
+            {t("تصفير الفلاتر")}
           </Button>
         </div>
       </div>
@@ -282,14 +284,14 @@ export default function EmployeeMovementsPage() {
             strokeWidth={1.6}
           />
           <p className="mb-1 font-medium text-ink-900">
-            حدث خطأ في تحميل الحركات
+            {t("حدث خطأ في تحميل الحركات")}
           </p>
           <button
             onClick={refetch}
             className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-500 hover:bg-primary-100 hover:text-primary-600"
           >
             <RotateCcw size={15} />
-            إعادة المحاولة
+            {t("إعادة المحاولة")}
           </button>
         </div>
       ) : !isFetching && items.length === 0 ? (
@@ -301,7 +303,7 @@ export default function EmployeeMovementsPage() {
               strokeWidth={1.6}
             />
           </div>
-          <p className="font-medium text-ink-900">لا توجد حركات مطابقة</p>
+          <p className="font-medium text-ink-900">{t("لا توجد حركات مطابقة")}</p>
         </div>
       ) : (
         <div
@@ -313,21 +315,21 @@ export default function EmployeeMovementsPage() {
             <table className="min-w-full border-collapse text-sm">
               <thead className="bg-slate-50">
                 <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
-                  <th className="px-4 py-3 text-right">الموظف</th>
-                  <th className="px-4 py-3 text-center">النوع</th>
-                  <th className="px-4 py-3 text-center">التاريخ</th>
+                  <th className="px-4 py-3 text-right">{t("الموظف")}</th>
+                  <th className="px-4 py-3 text-center">{t("النوع")}</th>
+                  <th className="px-4 py-3 text-center">{t("التاريخ")}</th>
                   <th className="w-32 px-4 py-3 text-center text-positive">
-                    مدين
+                    {t("مدين")}
                   </th>
                   <th className="w-32 px-4 py-3 text-center text-negative">
-                    دائن
+                    {t("دائن")}
                   </th>
-                  <th className="px-4 py-3 text-center">العملة</th>
-                  <th className="px-4 py-3 text-right">رقم السند</th>
+                  <th className="px-4 py-3 text-center">{t("العملة")}</th>
+                  <th className="px-4 py-3 text-right">{t("رقم السند")}</th>
                   <th className="min-w-[200px] px-4 py-3 text-right">
-                    ملاحظات
+                    {t("ملاحظات")}
                   </th>
-                  <th className="w-16 px-4 py-3 text-center">إجراءات</th>
+                  <th className="w-16 px-4 py-3 text-center">{t("إجراءات")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -386,7 +388,7 @@ export default function EmployeeMovementsPage() {
                           type="button"
                           onClick={() => setMovementToDelete(item)}
                           className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-negative/70 hover:bg-negative/10 hover:text-negative transition-colors"
-                          title="حذف الحركة"
+                          title={t("حذف الحركة")}
                         >
                           <Trash2 size={15} />
                         </button>
@@ -409,7 +411,7 @@ export default function EmployeeMovementsPage() {
                   setPageSize(size);
                   setPage(1);
                 }}
-                label="حركة"
+                label={t("حركة")}
               />
             </div>
           )}
@@ -429,13 +431,13 @@ export default function EmployeeMovementsPage() {
         onClose={() => setMovementToDelete(null)}
         onConfirm={handleConfirmDelete}
         isDeleting={isDeleting}
-        title="تأكيد حذف الحركة"
+        title={t("تأكيد حذف الحركة")}
         itemName={
           movementToDelete
             ? `${MOVEMENT_TYPE_LABELS[movementToDelete.type] || movementToDelete.type} - ${movementToDelete.employeeName}`
             : ""
         }
-        description="سيتم حذف هذه الحركة نهائيًا من سجل حركات الموظف. هذا الإجراء لا يمكن التراجع عنه."
+        description={t("سيتم حذف هذه الحركة نهائيًا من سجل حركات الموظف. هذا الإجراء لا يمكن التراجع عنه.")}
       />
     </div>
   );

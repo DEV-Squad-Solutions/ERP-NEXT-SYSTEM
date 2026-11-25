@@ -9,14 +9,16 @@ import {
 import Pagination from "../../../shared/components/ui/Pagination";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getLocale } from "../../../i18n";
 const currencyLabels = {
-  EGP: "جنيه مصري",
-  USD: "دولار أمريكي",
-  EUR: "يورو",
-  GBP: "جنيه إسترليني",
-  SAR: "ريال سعودي",
-  AED: "درهم إماراتي",
-  KWD: "دينار كويتي",
+  EGP: t("جنيه مصري"),
+  USD: t("دولار أمريكي"),
+  EUR: t("يورو"),
+  GBP: t("جنيه إسترليني"),
+  SAR: t("ريال سعودي"),
+  AED: t("درهم إماراتي"),
+  KWD: t("دينار كويتي"),
 };
 
 function BalanceTypeBadge({ type }) {
@@ -30,7 +32,7 @@ function BalanceTypeBadge({ type }) {
           : "text-negative bg-negative/10"
       }`}
     >
-      {isReceivable ? "مدين" : "دائن"}
+      {isReceivable ? t("مدين") : t("دائن")}
     </span>
   );
 }
@@ -38,10 +40,10 @@ function BalanceTypeBadge({ type }) {
 function CarriedForwardBadge() {
   return (
     <span
-      title="هذا الرصيد مرحّل تلقائيًا من قيد إقفال السنة المالية السابقة، ولا يمكن تعديله أو حذفه من هنا."
+      title={t("هذا الرصيد مرحّل تلقائيًا من قيد إقفال السنة المالية السابقة، ولا يمكن تعديله أو حذفه من هنا.")}
       className="inline-flex items-center rounded-full bg-ink-400/10 px-2.5 py-1 text-xs font-medium text-ink-500"
     >
-      مرحل من السنة السابقة
+      {t("مرحل من السنة السابقة")}
     </span>
   );
 }
@@ -49,10 +51,10 @@ function CarriedForwardBadge() {
 function ReadOnlyBadge() {
   return (
     <span
-      title="هذا الرصيد للقراءة فقط."
+      title={t("هذا الرصيد للقراءة فقط.")}
       className="inline-flex items-center rounded-full bg-ink-400/10 px-2.5 py-1 text-xs font-medium text-ink-500"
     >
-      للقراءة فقط
+      {t("للقراءة فقط")}
     </span>
   );
 }
@@ -91,14 +93,14 @@ export default function DriverOpeningBalancesTable({
           strokeWidth={1.6}
         />
         <p className="mb-1 font-medium text-ink-900">
-          حدث خطأ في تحميل الأرصدة الافتتاحية للسائقين
+          {t("حدث خطأ في تحميل الأرصدة الافتتاحية للسائقين")}
         </p>
         <button
           onClick={refetch}
           className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary-50 px-4 py-2 text-sm font-medium text-primary-500 transition-colors hover:bg-primary-100 hover:text-primary-600"
         >
           <RefreshCw size={15} />
-          إعادة المحاولة
+          {t("إعادة المحاولة")}
         </button>
       </div>
     );
@@ -113,7 +115,7 @@ export default function DriverOpeningBalancesTable({
           <FileSearch size={26} className="text-ink-400/50" strokeWidth={1.6} />
         </div>
         <p className="font-medium text-ink-900">
-          لا توجد أرصدة افتتاحية مطابقة
+          {t("لا توجد أرصدة افتتاحية مطابقة")}
         </p>
       </div>
     );
@@ -129,14 +131,14 @@ export default function DriverOpeningBalancesTable({
         <table className="min-w-full border-collapse text-sm">
           <thead className="bg-ink-900/[0.03]">
             <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-400">
-              <th className="px-4 py-3 text-right">رقم المستند</th>
-              <th className="w-36 px-4 py-3 text-center">التاريخ</th>
-              <th className="w-36 px-4 py-3 text-right">السنة المالية</th>
-              <th className="min-w-[200px] px-4 py-3 text-right">السائق</th>
-              <th className="w-28 px-4 py-3 text-center">النوع</th>
-              <th className="w-32 px-4 py-3 text-center">المبلغ</th>
-              <th className="w-32 px-4 py-3 text-center">العملة</th>
-              <th className="min-w-[180px] px-4 py-3 text-right">ملاحظات</th>
+              <th className="px-4 py-3 text-right">{t("رقم المستند")}</th>
+              <th className="w-36 px-4 py-3 text-center">{t("التاريخ")}</th>
+              <th className="w-36 px-4 py-3 text-right">{t("السنة المالية")}</th>
+              <th className="min-w-[200px] px-4 py-3 text-right">{t("السائق")}</th>
+              <th className="w-28 px-4 py-3 text-center">{t("النوع")}</th>
+              <th className="w-32 px-4 py-3 text-center">{t("المبلغ")}</th>
+              <th className="w-32 px-4 py-3 text-center">{t("العملة")}</th>
+              <th className="min-w-[180px] px-4 py-3 text-right">{t("ملاحظات")}</th>
               {canManage && <th className="w-20 px-4 py-3"></th>}
             </tr>
           </thead>
@@ -175,7 +177,7 @@ export default function DriverOpeningBalancesTable({
                   </td>
                   <td className="num px-4 py-3 text-center text-sm font-semibold text-ink-900">
                     {(item.amountText ??
-                      Number(item.amount).toLocaleString("ar-EG", {
+                      Number(item.amount).toLocaleString(getLocale(), {
                         maximumFractionDigits: 2,
                       })) ||
                       "0.00"}
@@ -197,7 +199,7 @@ export default function DriverOpeningBalancesTable({
                             type="button"
                             onClick={() => onEdit?.(item)}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
-                            title="تعديل"
+                            title={t("تعديل")}
                           >
                             <Pencil size={14} />
                           </button>
@@ -206,7 +208,7 @@ export default function DriverOpeningBalancesTable({
                             onClick={() => onDelete?.(item)}
                             disabled={deletingId === item.id}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-negative/10 hover:text-negative disabled:opacity-50"
-                            title="حذف"
+                            title={t("حذف")}
                           >
                             <Trash2 size={14} />
                           </button>
@@ -229,7 +231,7 @@ export default function DriverOpeningBalancesTable({
             totalCount={data?.totalCount || 0}
             onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}
-            label="رصيد"
+            label={t("رصيد")}
           />
         </div>
       )}

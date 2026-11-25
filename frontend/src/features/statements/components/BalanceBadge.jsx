@@ -1,3 +1,4 @@
+import { getLocale } from "../../../i18n";
 function getTone(description = "") {
   if (description.includes("عليه") || description.includes("مدين"))
     return "text-positive";
@@ -11,7 +12,7 @@ export default function BalanceBadge({ amount, description }) {
 
   return (
     <span className={`num font-semibold ${tone}`}>
-      {(amount ?? 0).toLocaleString("ar-EG", { maximumFractionDigits: 2 })}{" "}
+      {(amount ?? 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 })}{" "}
       <span className="text-xs font-normal">{description}</span>
     </span>
   );

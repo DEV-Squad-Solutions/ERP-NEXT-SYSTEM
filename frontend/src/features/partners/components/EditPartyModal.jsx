@@ -10,23 +10,24 @@ import Button from "../../../shared/components/ui/Button";
 
 import { useUpdatePartyMutation } from "../partiesApi";
 
+import { t } from "../../../i18n";
 const CURRENCIES = [
-  { value: "EGP", label: "جنيه مصري" },
-  { value: "USD", label: "دولار أمريكي" },
-  { value: "EUR", label: "يورو" },
-  { value: "GBP", label: "جنيه إسترليني" },
-  { value: "SAR", label: "ريال سعودي" },
-  { value: "AED", label: "درهم إماراتي" },
-  { value: "KWD", label: "دينار كويتي" },
+  { value: "EGP", label: t("جنيه مصري") },
+  { value: "USD", label: t("دولار أمريكي") },
+  { value: "EUR", label: t("يورو") },
+  { value: "GBP", label: t("جنيه إسترليني") },
+  { value: "SAR", label: t("ريال سعودي") },
+  { value: "AED", label: t("درهم إماراتي") },
+  { value: "KWD", label: t("دينار كويتي") },
 ];
 
 const editPartySchema = z.object({
-  name: z.string().trim().min(2, "اسم الشريك مطلوب"),
+  name: z.string().trim().min(2, t("اسم الشريك مطلوب")),
 
   email: z
     .string()
     .trim()
-    .email("البريد الإلكتروني غير صحيح")
+    .email(t("البريد الإلكتروني غير صحيح"))
     .or(z.literal("")),
 
   currency: z.enum(["EGP", "USD", "EUR", "GBP", "SAR", "AED", "KWD"]),
@@ -100,29 +101,29 @@ export default function EditPartyModal({ isOpen, onClose, party }) {
         creditLimit: data.creditLimit === "" ? null : Number(data.creditLimit),
       }).unwrap();
 
-      toast.success("تم تعديل الشريك بنجاح");
+      toast.success(t("تم تعديل الشريك بنجاح"));
 
       handleClose();
     } catch (error) {
       toast.error(
-        error?.data?.message || error?.data?.title || "تعذر تعديل الشريك",
+        error?.data?.message || error?.data?.title || t("تعذر تعديل الشريك"),
       );
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="تعديل الشريك" size="md">
+    <Modal isOpen={isOpen} onClose={handleClose} title={t("تعديل الشريك")} size="md">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* اسم الشريك */}
         <Input
-          label="اسم الشريك"
+          label={t("اسم الشريك")}
           {...register("name")}
           error={errors.name?.message}
         />
 
         {/* البريد الإلكتروني */}
         <Input
-          label="البريد الإلكتروني"
+          label={t("البريد الإلكتروني")}
           type="email"
           placeholder="example@email.com"
           {...register("email")}
@@ -131,7 +132,7 @@ export default function EditPartyModal({ isOpen, onClose, party }) {
 
         {/* العملة */}
         <div>
-          <label className="mb-1.5 block text-xs text-ink-500">العملة</label>
+          <label className="mb-1.5 block text-xs text-ink-500">{t("العملة")}</label>
 
           <select
             {...register("currency")}
@@ -153,28 +154,28 @@ export default function EditPartyModal({ isOpen, onClose, party }) {
 
         {/* رقم الهاتف */}
         <Input
-          label="رقم الهاتف"
+          label={t("رقم الهاتف")}
           {...register("phoneNumber")}
           error={errors.phoneNumber?.message}
         />
 
         {/* الرقم الضريبي */}
         <Input
-          label="الرقم الضريبي"
+          label={t("الرقم الضريبي")}
           {...register("taxNumber")}
           error={errors.taxNumber?.message}
         />
 
         {/* العنوان */}
         <Input
-          label="العنوان"
+          label={t("العنوان")}
           {...register("address")}
           error={errors.address?.message}
         />
 
         {/* حد الائتمان */}
         <Input
-          label="حد الائتمان"
+          label={t("حد الائتمان")}
           type="number"
           min="0"
           {...register("creditLimit")}
@@ -185,7 +186,7 @@ export default function EditPartyModal({ isOpen, onClose, party }) {
         <label className="flex items-center gap-2 text-sm text-ink-700">
           <input type="checkbox" {...register("isActive")} />
 
-          <span>الشريك نشط</span>
+          <span>{t("الشريك نشط")}</span>
         </label>
 
         {/* شريك خاص */}
@@ -196,9 +197,9 @@ export default function EditPartyModal({ isOpen, onClose, party }) {
             className="h-4 w-4 rounded border-ink-400/30 accent-amber-500"
           />
           <span>
-            شريك خاص
+            {t("شريك خاص")}
             <span className="block text-xs text-ink-400 mt-0.5">
-              يُستخدم لتمييز هذا الشريك كحساب خاص
+              {t("يُستخدم لتمييز هذا الشريك كحساب خاص")}
             </span>
           </span>
         </label>
@@ -212,11 +213,11 @@ export default function EditPartyModal({ isOpen, onClose, party }) {
             disabled={isLoading}
             className="flex-1"
           >
-            إلغاء
+            {t("إلغاء")}
           </Button>
 
           <Button type="submit" disabled={isLoading} className="flex-1">
-            {isLoading ? "جاري الحفظ..." : "حفظ التعديلات"}
+            {isLoading ? t("جاري الحفظ...") : t("حفظ التعديلات")}
           </Button>
         </div>
       </form>

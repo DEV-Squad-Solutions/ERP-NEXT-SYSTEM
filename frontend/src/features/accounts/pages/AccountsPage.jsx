@@ -10,6 +10,8 @@ import { getAccountErrorMessage } from "../utils/getAccountErrorMessage";
 import AccountTreeNode from "../components/AccountTreeNode";
 import AccountFormModal from "../components/AccountFormModal";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 export default function AccountsPage() {
   const { data: tree, isLoading, isFetching } = useGetAccountsTreeQuery();
   const [deleteAccount] = useDeleteAccountMutation();
@@ -47,12 +49,12 @@ export default function AccountsPage() {
   };
 
   return (
-    <div dir="rtl" className="mx-auto max-w-4xl p-6">
+    <div dir={getDir()} className="mx-auto max-w-4xl p-6">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-900">دليل الحسابات</h1>
+          <h1 className="text-xl font-semibold text-gray-900">{t("دليل الحسابات")}</h1>
           <p className="text-sm text-gray-500">
-            إدارة الشجرة المحاسبية للشركة الحالية
+            {t("إدارة الشجرة المحاسبية للشركة الحالية")}
           </p>
         </div>
         <button
@@ -61,7 +63,7 @@ export default function AccountsPage() {
           className="flex items-center gap-1.5 rounded-lg bg-green-900 px-3.5 py-2 text-sm text-white hover:bg-blue-700"
         >
           <Plus size={16} />
-          حساب رئيسي جديد
+          {t("حساب رئيسي جديد")}
         </button>
       </div>
 
@@ -87,7 +89,7 @@ export default function AccountsPage() {
           </div>
         ) : (
           <p className="p-6 text-center text-sm text-gray-400">
-            لا توجد حسابات بعد. ابدأ بإضافة حساب رئيسي.
+            {t("لا توجد حسابات بعد. ابدأ بإضافة حساب رئيسي.")}
           </p>
         )}
       </div>
@@ -106,10 +108,10 @@ export default function AccountsPage() {
         <Modal
           isOpen
           onClose={closeDeleteModal}
-          title={`حذف الحساب "${pendingDelete.name}"؟`}
+          title={t("حذف الحساب \"{0}\"؟", { 0: pendingDelete.name })}
         >
           <p className="mb-4 text-sm text-gray-500">
-            الإجراء ده نهائي ولا يمكن التراجع عنه.
+            {t("الإجراء ده نهائي ولا يمكن التراجع عنه.")}
           </p>
           {deleteError && (
             <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
@@ -122,14 +124,14 @@ export default function AccountsPage() {
               onClick={closeDeleteModal}
               className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-              إلغاء
+              {t("إلغاء")}
             </button>
             <button
               type="button"
               onClick={confirmDelete}
               className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700"
             >
-              تأكيد الحذف
+              {t("تأكيد الحذف")}
             </button>
           </div>
         </Modal>

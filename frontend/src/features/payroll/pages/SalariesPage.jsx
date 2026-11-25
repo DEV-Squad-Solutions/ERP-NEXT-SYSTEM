@@ -45,6 +45,8 @@ import { usePayrollListPrint } from "../../../shared/hooks/usePayrollListPrint";
 import PayrollListPrintTemplate from "../../../shared/components/print/PayrollListPrintTemplate";
 import { formatDate } from "../../../lib/date.js";
 
+import { t } from "../../../i18n";
+import { getDir } from "../../../i18n";
 const currentYear = new Date().getFullYear();
 
 const emptyFilters = {
@@ -179,7 +181,7 @@ export default function SalariesPage() {
       toastError(
         error?.data?.message ||
           error?.data?.title ||
-          "حدث خطأ أثناء إعادة احتساب المرتب",
+          t("حدث خطأ أثناء إعادة احتساب المرتب"),
       );
     }
   }
@@ -188,7 +190,7 @@ export default function SalariesPage() {
     const ids = [...selectedIds];
 
     if (!ids.length) {
-      toastError("حدد سجلاً واحدًا على الأقل للحذف");
+      toastError(t("حدد سجلاً واحدًا على الأقل للحذف"));
       return;
     }
 
@@ -197,8 +199,8 @@ export default function SalariesPage() {
     ).length;
 
     const confirmMessage = selectedMovedCount
-      ? `تنبيه: من بين السجلات المحددة ${selectedMovedCount} سجل تم ترحيله بالفعل لحساب الموظف. هل أنت متأكد من حذف ${ids.length} سجل مرتب؟`
-      : `هل أنت متأكد من حذف ${ids.length} سجل مرتب؟`;
+      ? t("تنبيه: من بين السجلات المحددة {0} سجل تم ترحيله بالفعل لحساب الموظف. هل أنت متأكد من حذف {1} سجل مرتب؟", { 0: selectedMovedCount, 1: ids.length })
+      : t("هل أنت متأكد من حذف {0} سجل مرتب؟", { 0: ids.length });
 
     if (!window.confirm(confirmMessage)) {
       return;
@@ -209,7 +211,7 @@ export default function SalariesPage() {
         payrollEntryIds: ids,
       }).unwrap();
 
-      toastSuccess(`تم حذف ${ids.length} سجل مرتب بنجاح`);
+      toastSuccess(t("تم حذف {0} سجل مرتب بنجاح", { 0: ids.length }));
 
       setSelectedIds(new Set());
 
@@ -222,7 +224,7 @@ export default function SalariesPage() {
       toastError(
         error?.data?.message ||
           error?.data?.title ||
-          "حدث خطأ أثناء حذف قيود المرتبات",
+          t("حدث خطأ أثناء حذف قيود المرتبات"),
       );
     }
   }
@@ -231,16 +233,16 @@ export default function SalariesPage() {
     selectableRows.length > 0 &&
     selectableRows.every((row) => selectedIds.has(row.id));
   const { printList, printRef } = usePayrollListPrint({
-    title: "تقرير-المرتبات",
+    title: t("تقرير-المرتبات"),
   });
   return (
-    <div className="animate-fadeUp space-y-5" dir="rtl">
+    <div className="animate-fadeUp space-y-5" dir={getDir()}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-ink-900">المرتبات</h1>
+          <h1 className="text-xl font-bold text-ink-900">{t("المرتبات")}</h1>
 
           <p className="text-xs text-ink-400 mt-1">
-            عرض ومتابعة قيود مرتبات الموظفين
+            {t("عرض ومتابعة قيود مرتبات الموظفين")}
           </p>
         </div>
 
@@ -253,7 +255,7 @@ export default function SalariesPage() {
                 disabled={isDeleting || isFiscalYearReadOnly}
               >
                 <Send size={14} />
-                ترحيل المحدد ({selectedIds.size})
+                {t("ترحيل المحدد (")}{selectedIds.size})
               </Button>
 
               <Button
@@ -269,8 +271,8 @@ export default function SalariesPage() {
                 )}
 
                 {isDeleting
-                  ? "جارِ الحذف..."
-                  : `حذف المحدد (${selectedIds.size})`}
+                  ? t("جارِ الحذف...")
+                  : t("حذف المحدد ({0})", { 0: selectedIds.size })}
               </Button>
             </>
           )}
@@ -279,7 +281,7 @@ export default function SalariesPage() {
             variant="outline"
             onClick={() => {
               if (!rows.length) {
-                toastError("لا توجد بيانات للطباعة");
+                toastError(t("لا توجد بيانات للطباعة"));
                 return;
               }
               printList();
@@ -287,7 +289,7 @@ export default function SalariesPage() {
             className="h-9"
           >
             <Printer size={14} />
-            طباعة
+            {t("طباعة")}
           </Button>
 
           <Button
@@ -296,7 +298,7 @@ export default function SalariesPage() {
             disabled={isFiscalYearReadOnly}
           >
             <Plus size={14} />
-            قيود مرتبات جديدة
+            {t("قيود مرتبات جديدة")}
           </Button>
         </div>
       </div>
@@ -308,7 +310,7 @@ export default function SalariesPage() {
       <div className="bg-white rounded-2xl border border-ink-400/10 shadow-card p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <Input
-            label="من تاريخ"
+            label={t("من تاريخ")}
             type="date"
             min={fiscalYear?.startDate}
             max={fiscalYear?.endDate}
@@ -317,7 +319,7 @@ export default function SalariesPage() {
           />
 
           <Input
-            label="إلى تاريخ"
+            label={t("إلى تاريخ")}
             type="date"
             min={fiscalYear?.startDate}
             max={fiscalYear?.endDate}
@@ -327,28 +329,28 @@ export default function SalariesPage() {
 
           <div>
             <label className="block text-xs font-medium text-ink-400 mb-1">
-              نوع الموظف
+              {t("نوع الموظف")}
             </label>
 
             <CompactSelect
               options={employeeTypeOptions}
               value={draft.employeeType}
               onChange={(value) => setField("employeeType", value)}
-              placeholder="كل الأنواع"
+              placeholder={t("كل الأنواع")}
             />
           </div>
 
           <Input
-            label="بحث"
+            label={t("بحث")}
             value={draft.search}
             onChange={(e) => setField("search", e.target.value)}
-            placeholder="اسم الموظف أو الكود..."
+            placeholder={t("اسم الموظف أو الكود...")}
           />
 
           <div className="flex items-end gap-2">
             <Button onClick={handleSearch} className="h-9 flex-1">
               <Search size={14} />
-              بحث
+              {t("بحث")}
             </Button>
 
             <Button variant="outline" onClick={handleReset} className="h-9">
@@ -363,12 +365,11 @@ export default function SalariesPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <div>
               <p className="text-sm font-semibold text-ink-900">
-                تم تحديد {selectedIds.size} سجل
+                {t("تم تحديد")} {selectedIds.size} {t("سجل")}
               </p>
 
               <p className="text-xs text-ink-400 mt-0.5">
-                يمكنك ترحيل أو حذف السجلات المحددة (حتى لو كان فيها سجلات
-                مُرحّلة بالفعل)
+                {t("يمكنك ترحيل أو حذف السجلات المحددة (حتى لو كان فيها سجلات مُرحّلة بالفعل)")}
               </p>
             </div>
 
@@ -379,7 +380,7 @@ export default function SalariesPage() {
               className="h-8"
             >
               <RotateCcw size={13} />
-              إلغاء التحديد
+              {t("إلغاء التحديد")}
             </Button>
           </div>
         </div>
@@ -417,42 +418,42 @@ export default function SalariesPage() {
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الموظف
+                    {t("الموظف")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    النوع
+                    {t("النوع")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    مكان العمل
+                    {t("مكان العمل")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الفترة
+                    {t("الفترة")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الإضافات
+                    {t("الإضافات")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الخصومات
+                    {t("الخصومات")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الإجمالي
+                    {t("الإجمالي")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    الصافي
+                    {t("الصافي")}
                   </th>
 
                   <th className="p-2.5 font-medium border-l border-ink-400/5">
-                    حالة الترحيل
+                    {t("حالة الترحيل")}
                   </th>
 
-                  <th className="p-2.5 font-medium">الإجراءات</th>
+                  <th className="p-2.5 font-medium">{t("الإجراءات")}</th>
                 </tr>
               </thead>
 
@@ -526,8 +527,8 @@ export default function SalariesPage() {
                       <td className="p-2.5 border-l border-ink-400/5">
                         <span className="text-xs text-ink-700">
                           {row.workPlaceStatus === "OutCompany"
-                            ? "خارج الشركة"
-                            : "داخل الشركة"}
+                            ? t("خارج الشركة")
+                            : t("داخل الشركة")}
                         </span>
                       </td>
 
@@ -555,11 +556,11 @@ export default function SalariesPage() {
                       <td className="p-2.5 border-l border-ink-400/5">
                         {isMoved ? (
                           <span className="inline-flex whitespace-nowrap rounded-md bg-primary-500/10 px-2 py-1 text-[11px] text-primary-500">
-                            مُرحّل
+                            {t("مُرحّل")}
                           </span>
                         ) : (
                           <span className="inline-flex whitespace-nowrap rounded-md bg-amber-500/10 px-2 py-1 text-[11px] text-amber-600">
-                            لم يُرحّل
+                            {t("لم يُرحّل")}
                           </span>
                         )}
                       </td>
@@ -573,14 +574,14 @@ export default function SalariesPage() {
                             }
                             className="text-xs text-primary-600 hover:underline font-medium"
                           >
-                            التفاصيل
+                            {t("التفاصيل")}
                           </button>
 
                           {!isMoved && !isFiscalYearReadOnly && (
                             <button
                               type="button"
                               onClick={() => setMoveModalRow(row)}
-                              title="ترحيل الراتب لحساب الموظف"
+                              title={t("ترحيل الراتب لحساب الموظف")}
                               className="rounded-lg p-1.5 text-ink-400 transition hover:bg-primary-500/10 hover:text-primary-600"
                             >
                               <Send size={14} />
@@ -591,7 +592,7 @@ export default function SalariesPage() {
                             type="button"
                             onClick={() => handleRecalculate(row.id)}
                             disabled={isRecalculating || isFiscalYearReadOnly}
-                            title="إعادة احتساب"
+                            title={t("إعادة احتساب")}
                             className="rounded-lg p-1.5 text-ink-400 transition hover:bg-ink-400/10 hover:text-ink-700 disabled:opacity-40"
                           >
                             <RotateCw
@@ -696,7 +697,7 @@ function ErrorState({ refetch }) {
       />
 
       <p className="text-ink-900 font-medium text-sm mb-1">
-        حدث خطأ في تحميل المرتبات
+        {t("حدث خطأ في تحميل المرتبات")}
       </p>
 
       <button
@@ -719,7 +720,7 @@ function ErrorState({ refetch }) {
         "
       >
         <RefreshCw size={13} />
-        إعادة المحاولة
+        {t("إعادة المحاولة")}
       </button>
     </div>
   );
@@ -732,10 +733,10 @@ function EmptyState() {
         <Wallet size={24} className="text-ink-400/50" strokeWidth={1.6} />
       </div>
 
-      <p className="text-ink-900 font-medium text-sm mb-1">لا توجد مرتبات</p>
+      <p className="text-ink-900 font-medium text-sm mb-1">{t("لا توجد مرتبات")}</p>
 
       <p className="text-xs text-ink-400">
-        لا توجد قيود مرتبات مطابقة للفلاتر الحالية
+        {t("لا توجد قيود مرتبات مطابقة للفلاتر الحالية")}
       </p>
     </div>
   );

@@ -1,0 +1,350 @@
+1250|No matching items in this warehouse.
+1251|Enter the expense name
+1252|Enter the expense amount correctly
+1253|No item selected
+1254|Could not save the item expenses
+1255|Item cost details
+1256|Loading item cost details...
+1257|Could not load the item details
+1258|Try closing the window and opening the details again.
+1259|Balance date
+1260|Cost including pricing expenses
+1261|Edit expense
+1262|Add the expenses that are part of the item's pricing cost
+1263|Cancel edit
+1264|Example: shipping
+1265|Optional notes
+1266|Update expense
+1267|Add expense
+1268|Pricing expenses
+1269|Expenses linked to this item
+1270|Expense
+1271|No pricing expenses for this item.
+1272|Total pricing expenses
+1273|Are you sure you want to delete voucher "{0}"?
+1274|Warehouse opening balance deleted
+1275|Back to opening balances
+1276|Warehouse opening balances
+1277|Record item opening balances in each warehouse
+1278|Overview
+1279|Movements
+1280|Transfers
+1281|Are you sure you want to delete this warehouse?
+1282|An error occurred while deleting the warehouse
+1283|Could not load the warehouse data.
+1284|Back to the warehouses list
+1285|An error occurred while deleting the warehouse, please try again
+1286|Select a warehouse to open its data and record its movements
+1287|Example: MAIN
+1288|An error occurred while loading warehouses
+1289|No matching warehouses
+1290|Add the first warehouse
+1291|Delete warehouse
+1292|The warehouse will be permanently deleted. This action cannot be undone.
+1293|No items recorded yet
+1294|Balance reached the minimum level
+1295|Item is required
+1296|Transfer date is required
+1297|Source warehouse is required
+1298|Destination warehouse is required
+1299|At least one item must be added
+1300|The destination warehouse must be different from the source warehouse
+1301|This item has already been added
+1302|Warehouse {0}
+1303|Item {0}
+1304|Stock transfer updated successfully
+1305|Stock transfer created successfully
+1306|An error occurred while saving the stock transfer
+1307|Edit stock transfer
+1308|New stock transfer
+1309|Select the source warehouse
+1310|Destination warehouse
+1311|Select the destination warehouse
+1312|Cannot transfer from a warehouse to the same warehouse.
+1313|Select the item to show its current balance in the source warehouse
+1314|Select the source warehouse first to show item balances.
+1315|Transfer notes...
+1316|Create transfer
+1317|Current balance in the source warehouse:
+1318|Reading...
+1319|Select the source warehouse first to see the balance.
+1320|Fetching the item balance from the warehouse...
+1321|Could not fetch the item balance from the source warehouse.
+1322|Available balance in the warehouse
+1323|This item has already been added to the transfer.
+1324|Enter a valid quantity
+1325|Available balance {0}
+1326|The requested quantity is greater than the balance
+1327|Available balance in the source warehouse:
+1328|No balance available for this item in the source warehouse.
+1329|Item notes
+1330|rowVersion is missing - reload the voucher
+1331|Item code is required
+1332|Unit of measure is required
+1333|Cannot be negative
+1334|Purchase price is required
+1335|Selling price is required
+1336|Failed to add the item:
+1337|Unit of measure
+1338|Carton / kg / piece
+1339|Minimum order level
+1340|Purchase price
+1341|Save item
+1342|Date from
+1343|Date to
+1344|Stock transfer details
+1345|Could not load the transfer details
+1346|Source balance
+1347|Source average
+1348|Destination balance
+1349|Destination average
+1350|Total quantities
+1351|Transferred
+1352|No movements match this filter
+1353|Item statement
+1354|Profit
+1355|Total balance
+1356|Item updated successfully
+1357|Item added successfully
+1358|Failed to update the item
+1359|Failed to add the item
+1360|Edit item data
+1361|Item is active
+1362|Add item
+1363|An error occurred while loading the warehouse opening balances
+1364|Document number must be 50 characters at most
+1365|Warehouse opening balance updated successfully
+1366|Warehouse opening balance added successfully
+1367|Voucher data
+1368|Item deleted successfully
+1369|Failed to delete the item
+1370|Could not load the item data
+1371|Delete transfer "{0}"?
+1372|The transfer and its related stock movements will be deleted.
+1373|Stock transfer deleted successfully
+1374|Could not delete the stock transfer
+1375|Transfer items between company warehouses and track transfer movements
+1376|Stock transfer
+1377|Transfer count
+1378|Items on the page
+1379|Total quantities on the page
+1380|Document number or warehouse name...
+1381|An error occurred while loading transfers
+1382|No stock transfers
+1383|Try adjusting the filters or create a new transfer
+1384|Balances and movements of cashboxes, customers, suppliers, drivers, employees, revenues and expenses in the company's base currency after adjustment entries
+1385|Opening debit
+1386|Opening credit
+1387|Closing debit
+1388|Closing credit
+1389|Account movements during the period before adjustment entries
+1390|Invoice / container / description
+1391|All containers
+1392|Containers out to the customer
+1393|Containers returned from the customer
+1394|Select the container first
+1395|Count must be a whole number greater than zero
+1396|Manual movement updated successfully
+1397|Manual movement added successfully
+1398|Could not save the manual movement
+1399|Edit manual movement
+1400|A manual movement affects container counts only, and does not create any accounting entry, cashbox movement or customer balance.
+1401|No containers are assigned to this warehouse. Add them from "Container management".
+1402|Example: 50
+1403|Example: manual stocktake or count adjustment
+1404|Add movement
+1405|Credit
+1406|Debit
+1407|Even
+1408|Could not determine the customer or supplier linked to the warehouse
+1409|Warehouse data updated successfully
+1410|Containers warehouse created successfully
+1411|Could not save the warehouse data
+1412|Edit containers warehouse
+1413|All containers were unassigned
+1414|{0} containers assigned to the warehouse
+1415|Could not update the warehouse containers
+1416|Container name is required
+1417|Container added and assigned to the warehouse
+1418|Warehouse container management
+1419|Container name
+1420|Add container
+1421|Assign containers
+1422|Some containers are selected
+1423|Loading containers...
+1424|No containers available right now.
+1425|Deselect all containers
+1426|All containers will be assigned to this warehouse
+1427|Assigned
+1428|Remove from warehouse
+1429|Save assignments ({0})
+1430|Cannot open the invoice details because the invoice ID is missing
+1431|Are you sure you want to delete the manual movement for container "{0}" dated {1}?
+1432|Manual movement deleted successfully
+1433|Could not delete the manual movement
+1434|Manage the containers warehouse, containers and movements.
+1435|No containers warehouse for this partner
+1436|No containers warehouse linked to this customer or supplier was found.
+1437|Showing movements of container:
+1438|Container no. {0}
+1439|Loading the containers warehouse statement...
+1440|An error occurred while loading the containers warehouse details.
+1441|Try refreshing the data again.
+1442|Total outgoing
+1443|Total incoming
+1444|Movement count
+1445|Containers summary
+1446|Click any container to view all its movements and invoices
+1447|Net
+1448|Closing
+1449|Credit / Debit
+1450|Displayed movements
+1451|View movements
+1452|No container data available.
+1453|Container movements {0}
+1454|Total movements:
+1455|Running balance
+1456|No movements match the filters
+1457|Open invoice details
+1458|Customer invoice:
+1459|Unit name is required
+1460|Unit updated successfully
+1461|Unit added successfully
+1462|Edit unit
+1463|Unit name
+1464|Example: kilogram
+1465|Unit deleted successfully
+1466|Manage the units of measure used by items
+1467|An error occurred while loading units
+1468|No matching units
+1469|Add the first unit
+1470|Unit
+1471|Are you sure you want to delete the unit
+1472|Account type is required
+1473|Balance nature is required
+1474|Edit account: {0}
+1475|Add new account
+1476|Example: National Bank
+1477|Parent account
+1478|— No parent (main account) —
+1479|The parent must be a non-postable account. Choosing a parent sets the type and balance nature automatically.
+1480|Account type
+1481|Select account type
+1482|Balance nature
+1483|Select balance nature
+1484|Postable (final sub-account)
+1485|Active
+1486|Note: a postable account cannot later be a parent of other accounts.
+1487|Add account
+1488|Collapse account
+1489|Expand account
+1490|Sub-account
+1491|Postable
+1492|Inactive
+1493|Add sub-account
+1494|Manage the chart of accounts of the current company
+1495|New main account
+1496|There are no accounts yet. Start by adding a main account.
+1497|Delete account "{0}"?
+1498|This action is final and cannot be undone.
+1499|The selected parent account is inactive, choose another account.
+1500|The selected parent account does not exist.
+1501|This account cannot be deleted because it has sub-accounts. Delete or move the sub-accounts first.
+1502|This account cannot be deleted because it is linked to recorded movements.
+1503|This account cannot be deleted because it is linked to recorded journal entries. You can deactivate it instead.
+1504|This account cannot be deleted because it is linked to recorded receipt or payment vouchers. You can deactivate it instead.
+1505|This account cannot be deleted because it is linked to currency revaluation movements. You can deactivate it instead.
+1506|This account cannot be deleted because it is used in accounting mapping settings. Change the mapped account first or deactivate the account.
+1507|This account cannot be deleted because it has a current or historical link to financial statements. You can deactivate it instead.
+1508|The account does not exist or was already deleted.
+1509|An unexpected error occurred while performing the operation, please try again.
+1510|This account was modified by another user at the same time. Please reload the page and try again.
+1511|Imported
+1512|Updated
+1513|Skipped
+1514|Could not fetch the rates preview
+1515|Import completed
+1516|Could not complete the import
+1517|Import exchange rates from an external source
+1518|Currencies
+1519|Leave empty to import all available currencies (except the company's base currency)
+1520|Replace unused imported rates on the same date
+1521|Manual rates and imported rates linked to actual movements are never overwritten.
+1522|Fetching...
+1523|Preview
+1524|Requested date:
+1525|Actual rate date
+1526|Importing...
+1527|Confirm import
+1528|Newly imported
+1529|Updated
+1530|Skipped
+1531|Done
+1532|Rate must be greater than zero
+1533|Currency rate updated successfully
+1534|Currency rate added successfully
+1535|Edit {0} rate
+1536|Update all invoices, vouchers, cashbox transfers and balances linked to the same exchange rate
+1537|Warning: this will recalculate old movements linked to this rate — use with care.
+1538|Are you sure you want to delete the {0} rate?
+1539|Rate deleted successfully
+1540|The rate cannot be deleted — it may be linked to actual movements
+1541|Manage the exchange rates of currencies used in vouchers and invoices
+1542|View only — adding, editing and deleting exchange rates is available to the system administrator.
+1543|Import from an external source
+1544|Loading currencies...
+1545|An error occurred while loading currencies.
+1546|Rate (against
+1547|No currencies recorded
+1548|Edit rate
+1549|Delete rate
+1550|Category name is required
+1551|Category added successfully
+1552|An active category with the same name already exists
+1553|Could not add the category
+1554|Item categories
+1555|Categories used in the invoice header
+1556|New category
+1557|Could not load categories
+1558|No categories
+1559|Click "New category" to start
+1560|Category name
+1561|Voucher no. / description / reference
+1562|All accounts
+1563|Voucher details {0}
+1564|Linked invoice
+1565|Amount applied to the invoice
+1566|All payment vouchers classified as expenses
+1567|Loading expenses...
+1568|An error occurred while loading expenses.
+1569|No matching expenses
+1570|Open the voucher in the cashbox
+1571|Invoice: {0}
+1572|Invoice:
+1573|Could not complete the operation, review the data and try again.
+1574|Last name
+1575|Phone
+1576|Password (at least 8 characters)
+1577|Manager name
+1578|Admin and company created
+1579|1) Admin details
+1580|2) First company details
+1581|Setup code
+1582|Create and start using
+1583|Company added
+1584|Admin added
+1585|Add company
+1586|Add the company
+1587|Add admin (linked to all existing companies)
+1588|Add the admin
+1589|System setup: admins and companies
+1590|First-time system setup
+1591|Add the admin and the first company. After that you can add the other admins and companies from the Administration section inside the system.
+1592|Loading...
+1593|Could not connect to the server.
+1594|Container name is required
+1595|Container updated successfully
+1596|Container added successfully
+1597|Edit container
+1598|Example: 200-liter drum
+1599|Any extra details about the container

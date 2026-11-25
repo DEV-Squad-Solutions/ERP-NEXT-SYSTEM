@@ -1,0 +1,340 @@
+560|Price per kg
+561|Add another item
+562|Note
+563|Invoice summary
+564|Clear
+565|Realized exchange difference
+566|Invoice date
+567|Country
+568|Item category
+569|Optional
+570|Loading transfers...
+571|From warehouse
+572|To warehouse
+573|Action
+574|Warehouse #
+575|Edit warehouse
+576|New warehouse
+577|Create warehouse
+578|Sales invoice
+579|Purchase invoice
+580|Final
+581|Partially costed
+582|Revalued
+583|Search for an item...
+584|Current inventory value
+585|Pending:
+586|Add new item
+587|Loading items...
+588|Current quantity
+589|Item
+590|Item expenses saved successfully
+591|Add expense
+592|Expense name
+593|Save expenses
+594|Warehouse deleted successfully
+595|An error occurred while loading data
+596|You cannot add more than 100 items
+597|Transfer date
+598|Loading warehouses...
+599|Transfer items
+600|Optional notes...
+601|Item name is required
+602|Receiving warehouse
+603|Price
+604|Select unit
+605|Adding...
+606|Document number is required
+607|Cashboxes
+608|Employees
+609|Show zero-balance accounts
+610|Loading trial balance...
+611|An error occurred while loading the trial balance.
+612|Movement date is required
+613|Add manual movement
+614|Movement date
+615|Description (optional)
+616|Exit
+617|Warehouse name is required
+618|Create containers warehouse
+619|Could not add the container
+620|Add new container
+621|Selected
+622|Deselect all
+623|Select all containers
+624|Clear container filter
+625|Action
+626|No number
+627|No invoice
+628|Edit manual movement
+629|Delete manual movement
+630|Refreshing data...
+631|An error occurred, please try again
+632|New unit
+633|Assets
+634|Liabilities
+635|Equity
+636|Name is required
+637|This account code is already used in the company.
+638|A postable account cannot be chosen as a parent. Choose a non-postable header account.
+639|Failed
+640|Reason
+641|An error occurred while saving, please try again
+642|Add currency rate
+643|Disabled
+644|Expense account
+645|Include sub-accounts
+646|{0} (trip {1})
+647|Party
+648|Amount in base currency
+649|Reference number
+650|Company name
+651|New container
+652|Description (optional)
+653|An error occurred while deleting
+654|Add new type
+655|General
+656|Roles
+657|Loading cashboxes...
+658|Could not save, please try again
+659|Last name
+660|Password
+661|Open
+662|Start date
+663|End date
+664|Reset filters
+665|Add customer or supplier
+666|Withdrawal
+667|Statement - {0}
+668|Select an employee
+669|The cause may be pending inventory cost, an unsettled stocktake difference, or unmapped accounts. Turn on "Show unmapped accounts" to review.
+670|The statement is ready for approval and reports.
+671|Delete line
+672|This adjustment came from a stocktake and cannot be deleted manually
+673|Are you sure you want to delete the adjustment "{0}"? Its effect on the warehouse balance will be reversed.
+674|Adjustment deleted successfully
+675|Failed to delete the adjustment
+676|Line count
+677|Could not load the adjustment data
+678|Entry
+679|Updating...
+680|View entry
+681|Back to entries
+682|Save entry
+683|All present
+684|All absent
+685|Day deduction
+686|Employee code:
+687|Working days deduction
+688|Employee no.:
+689|Posting date
+690|Posting...
+691|Movement recorded successfully
+692|Select movement type
+693|Add notes if any...
+694|Required working days per month
+695|An error occurred while saving, please try again
+696|Edit opening balance
+697|New opening balance
+698|Loading employees...
+699|Select at least one employee
+700|Total employees
+701|Search for an employee
+702|Select visible
+703|Selected:
+704|Check-out
+705|None
+706|Pay salary
+707|Wages and salaries reports
+708|Detailed report of salaries, employees, attendance and entitlements
+709|Financial deduction
+710|Movement deleted successfully
+711|Search...
+712|Delete movement
+713|Record
+714|Add employee
+715|Basic information
+716|No movements
+717|Opening balance deleted successfully
+718|An error occurred while loading opening balances
+719|Wages and salaries dashboard
+720|Overall summary of salaries, payments and entitlements
+721|Select all
+722|Overtime per day
+723|Deduction per day
+724|Sign in
+725|Smart financial management
+726|Debit (owed to the company)
+727|Credit (owed by the company)
+728|Opening balance added successfully
+729|Select type
+730|Partner name is required
+731|This balance was carried forward automatically from the previous fiscal year closing entry and cannot be edited or deleted here.
+732|Carried forward from previous year
+733|Balance
+734|Normal
+735|Print list
+736|Create partner
+737|An error occurred while loading data
+738|Back to list
+739|Opening balance deleted
+740|Partial
+741|Gross revenue
+742|Fully costed
+743|Total profitability of each item after deducting sales returns
+744|Sales revenue
+745|Returns revenue
+746|Sales quantity
+747|Return
+748|Sales revenue
+749|Cost of sales
+750|Return revenue
+751|Return cost
+752|Exists
+753|All customers
+754|Start date must be before end date
+755|Filters active
+756|Apply
+757|Total results:
+758|An error occurred while loading the report
+759|No data matches the filters
+760|Profitability analysis of sales invoices after deducting returns
+761|This voucher was generated from an invoice and cannot be edited here.
+762|You do not have permission to delete the opening balance
+763|Cashbox
+764|Amount must be greater than zero
+765|Cannot transfer to the same cashbox
+766|Transfer updated successfully
+767|Enter a valid number
+768|The cashbox was modified elsewhere, refresh the page and try again
+769|Cashbox name
+770|Opening exchange rate
+771|Expenses
+772|Salaries and wages
+773|Advances
+774|Select customer / supplier
+775|Unnamed
+776|Transfer between cashboxes
+777|— Inactive
+778|Amount ({0})
+779|Exchange rate ({0})
+780|Uses the voucher-day rate automatically if left empty
+781|Fetching rate
+782|for the voucher date...
+783|Other party
+784|Party type
+785|Shift handover
+786|The trip was modified elsewhere. Reload the data and try again.
+787|The invoice trip is managed through the invoice or the trip costs screen.
+788|The fiscal year is closed.
+789|Select the fiscal year first
+790|Add standalone trip
+791|National ID
+792|The opening balance changed elsewhere. Reload the data and try again.
+793|All drivers
+794|Indicative cost
+795|Sales
+796|Purchases
+797|New country
+798|Could not load user data
+799|Open source
+800|View invoice details
+801|You are not authorized to access this
+802|You do not have the role required to access this page. If you think this is wrong, contact the system administrator.
+803|View voucher {0} in the cashbox statement
+804|Page not found
+805|The page you are looking for may have been moved or deleted, or the link is incorrect.
+806|Home page
+807|Processing...
+808|Not the current year
+809|— This screen is view only. You cannot add, edit or delete any movement on it.
+810|Are you sure you want to delete?
+811|will be deleted
+812|Page navigation
+813|of
+814|Items per page
+815|per page
+816|First page
+817|Previous page
+818|Go to page {0}
+819|Next page
+820|Last page
+821|Not authorized to view the report
+822|You do not have access to all the data needed to view this report. The report is not shown partially. Contact the system administrator if you need access.
+823|Select...
+824|Main menu
+825|Current company
+826|Close menu
+827|Main navigation
+828|Appearance
+829|Light
+830|Dark
+831|Use the company default
+832|Uses the default that the admin set for the company.
+833|Set as company default
+834|Accounting Management System
+835|{0} | Accounting Management System
+836|Open menu
+837|User menu
+838|System administrator
+839|My account
+840|No email
+841|View profile
+842|View account, company and permission details
+843|Edit account and permission details
+844|Sign out
+845|End the account session
+846|Switched company successfully
+847|Change company
+848|Company
+849|Change fiscal year
+850|Summary report of salaries, payments and entitlements
+851|No pending payroll sheets.
+852|No recent activity.
+853|Operation
+854|Created at
+855|| License no.:
+856|Total records:
+857|| Tax no.:
+858|| Currency:
+859|Payroll entries report
+860|Total additions
+861|Total basic
+862|Total net
+863|Customer details
+864|Name:
+865|Country:
+866|Due date:
+867|Payment method:
+868|Warehouse:
+869|Vehicle no.:
+870|Driver:
+871|Receiver signature
+872|Item movement:
+873|Customer / Supplier:
+874|Period from
+875|Cash movement
+876|Bank movement
+877|Cash receipt
+878|Cash payment
+879|Payment
+880|Customer / supplier statement
+881|Account number
+882|Account currency
+883|Statement criteria
+884|Cash movement type:
+885|Category:
+886|Debit (
+887|Credit (
+888|Balance (
+889|Reference:
+890|No movements in the selected period
+891|Customer / supplier signature
+892|Operational statement —
+893|| Base: {0}
+894|Detailed invoices report
+895|Invoice count:
+896|— invoice
+897|Total:
+898|Paid:
+899|No items recorded for this invoice

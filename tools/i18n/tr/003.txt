@@ -1,0 +1,350 @@
+900|Total discount
+901|Grand total
+902|Salary payment receipt
+903|Posting status:
+904|Payment date:
+905|Item
+906|Balance sheet is balanced
+907|Difference between the two sides
+908|Detailed report of salaries, attendance and entitlements
+909|Total sheets
+910|Calculated salary
+911|Pending
+912|Paid:
+913|Pending:
+914|Amount paid:
+915|Amount pending:
+916|No employee data.
+917|Present
+918|Absent
+919|Units
+920|Unit deduction
+921|Employee count:
+922|Driver code
+923|Movement direction:
+924|Trip number:
+925|Trip cost:
+926|General vouchers without a trip
+927|Total received from driver
+928|Driver signature
+929|Cashbox movement statement
+930|Cashbox:
+931|Management and Accounting System
+932|Report criteria
+933|No filters
+934|No entries to display
+935|Report total
+936|Accounting balance status
+937|Entry is balanced ✓
+938|There is a difference in balances
+939|Difference:
+940|Reviewer signature
+941|Report generated on
+942|Cashbox balances
+943|Vouchers
+944|Debit ({0})
+945|Credit ({0})
+946|Balance ({0})
+947|Operational and financial summary
+948|Financial and operational summary
+949|Margin: {0}%
+950|{0} without balance
+951|Overdue: {0}
+952|Operational indicators
+953|Active items
+954|Items with balance
+955|Overdue amount
+956|Monthly activity
+957|Cashbox count
+958|Accounting readiness
+959|Needs review
+960|Issue count
+961|Missing entry sources
+962|Unbalanced entries
+963|Pending inventory costs
+964|Alerts
+965|Alert
+966|Classic green
+967|Ocean
+968|Royal
+969|Sunset
+970|Rose
+971|Graphite
+972|invoice-{0}
+973|Invoices
+974|Statement
+975|item-movement
+976|Cashbox movement statement
+977|salary-receipt
+978|Payroll report
+979|Operations
+980|Customers and suppliers
+981|Finance
+982|Human resources
+983|Wages and salaries
+984|Profitability reports
+985|Administration
+986|Admin and company setup
+987|New sales invoice
+988|Invoice details
+989|Edit invoice
+990|New purchase invoice
+991|Purchase invoice details
+992|Edit purchase invoice
+993|Customer/supplier details
+994|Containers statement
+995|Driver details
+996|Cashbox details
+997|Bank
+998|Adjustment details
+999|Item details
+1000|Wages dashboard
+1001|Employee details
+1002|Record attendance
+1003|Create payroll
+1004|Salary details
+1005|New journal entry
+1006|Journal entry details
+1007|Edit journal entry
+1008|Invoice profitability details
+1009|This page is under development
+1010|[tagsFor] "{0}" is not registered in resourceTagsMap.js, so invalidation will be incomplete until you add it.
+1011|Data belonging to a different fiscal year than the selected one was ignored.
+1012|Fiscal year mismatch
+1013|The selected date is outside the fiscal year "{0}" ({1} — {2}).
+1014|Reconnecting to updates...
+1015|Reconnected to updates
+1016|Connection to updates was lost
+1017|Connecting to updates...
+1018|Could not connect to updates
+1019|The system will keep working and retry when needed.
+1020|A payroll belonging to a closed fiscal year cannot be transferred or edited, because historical year data is not changed after closing. Create an adjustment in the current year instead.
+1021|This balance was carried forward from the previous year and cannot be edited or deleted here. To correct it, edit the source entry after reopening the previous year, or create an adjustment entry in the current year.
+1022|The company has no current fiscal year. Set a current year from the fiscal years screen.
+1023|Could not reach the server. Check your internet connection.
+1024|The server connection timed out.
+1025|Could not read the server response.
+1026|Priced
+1027|Not priced
+1028|Invoice deleted
+1029|Payment
+1030|Payment status
+1031|Pricing status
+1032|An error occurred while loading invoices
+1033|No matching invoices
+1034|Not priced
+1035|Priced
+1036|{0} containers
+1037|Loading container data...
+1038|Could not load container data for this customer
+1039|No containers warehouse linked
+1040|No containers linked to this customer
+1041|Assigned
+1042|Not assigned
+1043|Confirm container data
+1044|Delete container
+1045|Awaiting pricing
+1046|Optional note
+1047|Quantity is limited to what is available to return
+1048|Max quantity: {0}
+1049|The item was created but its data was not received
+1050|Item "{0}" was added and selected
+1051|Enter the item name
+1052|Could not load items
+1053|Item not found in the warehouse - type its name manually
+1054|Add a new item to inventory
+1055|Available:
+1056|Total cost:
+1057|Not available for a manual item
+1058|Reason for price difference
+1059|Restore original price
+1060|Original price:
+1061|Items from another invoice have already been added. Remove them first to return from here
+1062|The original invoice discount will be applied ({0})
+1063|This invoice already had a partial return, so it cannot be returned in full
+1064|Return the whole invoice
+1065|or select specific items below
+1066|This invoice already had a partial return, so it cannot be returned in full and the discount will not be applied
+1067|Original quantity
+1068|Previously returned
+1069|Return quantity
+1070|Add the selected items (without discount)
+1071|Select the customer/supplier, warehouse and date first so the original invoices appear
+1072|Original invoices for the return
+1073|Search by invoice number...
+1074|An error occurred while loading invoices
+1075|No invoices have a quantity available to return
+1076|· private
+1077|The customer was added but the list could not be refreshed
+1078|The warehouse was added but the list could not be refreshed
+1079|The country was added but the list could not be refreshed
+1080|If it does not appear in the list, refresh the page
+1081|The driver was created but its data was not received
+1082|Items from another invoice have already been added
+1083|Remove the current items first if you want to return from a different invoice
+1084|Select the invoice type
+1085|Select the invoice type (sale / purchase / return)
+1086|The customer/supplier has no linked containers warehouse
+1087|Choose a customer or supplier with a linked containers warehouse for a containers invoice
+1088|The due date cannot be before the invoice date
+1089|Enter an exchange rate greater than zero
+1090|Enter a valid exchange rate for the foreign currency
+1091|Select the cashbox that receives the cash payment
+1092|Add at least one container movement
+1093|Open the containers warehouse and add an outgoing or incoming quantity for at least one container
+1094|Add the return items
+1095|Select the return items from the original invoice
+1096|Enter the quantity or (count and weight)
+1097|Duplicate item in the invoice
+1098|Enter the reason for the price difference
+1099|Add at least one item
+1100|Add at least one item with a valid quantity
+1101|Incomplete data
+1102|Line {0}: {1}
+1103|Review the data before saving
+1104|{0} notes need correction
+1105|Invoice saved successfully
+1106|Invoice no.: {0}
+1107|Invoice data cleared
+1108|Generated automatically on save
+1109|Enter the invoice number manually
+1110|Available only for foreign currencies
+1111|Customer and transport
+1112|Add new customer/supplier
+1113|Add new customer or supplier
+1114|Could not load the customers and suppliers list
+1115|(automatic by customer)
+1116|Will appear after selecting the customer
+1117|Select the customer or supplier first
+1118|Could not load the warehouses list
+1119|Enter the driver name
+1120|Temporary driver name
+1121|Cancel temporary driver
+1122|Temporary driver
+1123|Switch temporary driver
+1124|Could not load the drivers list
+1125|Enter the actual driver name (optional)
+1126|Could not load the countries list
+1127|Payment and notes
+1128|Containers-only invoice: it records container quantities without a financial value, so there is no discount, payment or cashbox linked to the invoice.
+1129|(calculated automatically)
+1130|A containers-only invoice records outgoing and incoming quantities on the customer's containers without items and without a financial value. You must add at least one container movement.
+1131|Select the customer or supplier first to determine the containers warehouse
+1132|{0} containers moved in the invoice
+1133|No container movements yet
+1134|Edit container movements
+1135|Add container movements
+1136|Container #{0}
+1137|Return items
+1138|Select the warehouse first before adding items
+1139|Select the return items from the original invoice above
+1140|in
+1141|item has a price different from the original invoice - enter the reason for the difference next to the price in the table below before saving
+1142|Review
+1143|and
+1144|Other notes…
+1145|Invoice creation steps
+1146|Container movements
+1147|Items with quantities
+1148|Container count
+1149|Invoice total
+1150|Containers-only invoice: the financial value is zero, only the container movement is recorded.
+1151|The original invoice discount is applied automatically because this is a full return
+1152|No discount on a partial return
+1153|Cash - calculated automatically at the full net value
+1154|Equivalent of the net in Egyptian pounds
+1155|Save (Ctrl+S)
+1156|Save and print (Ctrl+Enter)
+1157|Save and print
+1158|Clear all entered data and start an empty invoice
+1159|Clear invoice data
+1160|Do you want to clear all data and start over?
+1161|Everything you typed in this invoice will be cleared and an empty invoice started.
+1162|Clear data
+1163|Amount in cashbox currency
+1164|Payment details
+1165|{0} (external driver)
+1166|{0} (base: {1})
+1167|There are no containers in this invoice
+1168|Container movement
+1169|In base currency (
+1170|) — exchange rate:
+1171|Could not load the invoice data
+1172|The invoice may not exist, or there was a connection problem.
+1173|Total
+1174|Are you sure you want to delete the invoice
+1175|This action cannot be undone
+1176|Delete permanently
+1177|There are no items in this invoice
+1178|Invoice items
+1179|Fully paid
+1180|Containers warehouse selected automatically: {0}
+1181|This customer has no linked containers warehouse
+1182|The customer/supplier has no linked containers warehouse — choose a party that has one first
+1183|Add at least one container movement (outgoing or incoming)
+1184|Select the warehouse before saving
+1185|A line is missing data (count or weight must be greater than zero)
+1186|Changes saved successfully
+1187|An error occurred while saving the changes, please try again
+1188|Could not load the invoice
+1189|Edit invoice #
+1190|Determined automatically by the selected customer
+1191|Calculated automatically
+1192|A line can be linked to an inventory item or be a manual item not in inventory.
+1193|Return invoice — each line must be linked to the original invoice line if it is a return from a previous invoice.
+1194|Add container
+1195|Containers-only invoice: at least one container movement (outgoing or incoming) is required, with no items and no financial value.
+1196|Financial summary
+1197|Containers-only invoice — no financial value, so there is no discount or payment.
+1198|Total (estimated)
+1199|Remaining (estimated)
+1200|These values are estimates for display only — actual values such as inventory and costs are calculated by the server after saving.
+1201|Deletion data is incomplete
+1202|Invoice deleted successfully
+1203|purchase-invoices
+1204|sales-invoices
+1205|{0} invoices exported
+1206|No matching invoices to export
+1207|Preparing Excel file...
+1208|invoices-{0}
+1209|No invoices to print
+1210|Failed to prepare print data
+1211|A problem occurred while preparing the invoices for printing
+1212|New invoice
+1213|Exporting...
+1214|Export to Excel
+1215|Preparing print...
+1216|— Coming soon —
+1217|Available items count
+1218|{0} EGP
+1219|Warehouse transfers
+1220|Log of incoming and outgoing transfers to and from this warehouse
+1221|Could not load transfers
+1222|An error occurred while fetching the warehouse transfers.
+1223|View transfer
+1224|No transfers
+1225|There is no transfer history linked to this warehouse yet.
+1226|Failed to save the warehouse
+1227|Active warehouse
+1228|Surplus adjustment
+1229|Shortage adjustment
+1230|Incoming transfer
+1231|Outgoing transfer
+1232|Select an item to view its movements in this warehouse
+1233|Select an item to view its movement history in this warehouse.
+1234|Loading movements...
+1235|An error occurred while loading the movements.
+1236|Movements with pending cost
+1237|Balance after movement
+1238|No movements for this item in this warehouse.
+1239|Business partner:
+1240|Warehouse code
+1241|Items warehouse
+1242|Could not load the item cost details
+1243|Could not update the item cost details
+1244|Search by item code or name...
+1245|With balance only
+1246|No balance
+1247|Total items
+1248|Items with balance
+1249|An error occurred while loading the warehouse items.

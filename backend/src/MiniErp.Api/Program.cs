@@ -9,6 +9,10 @@ using MiniErp.Api.Exceptions;
 using MiniErp.Api.ModelBinding;
 using MiniErp.Api.Monitoring;
 using MiniErp.Api.Realtime;
+using MiniErp.Api.Security;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 using MiniErp.Api.Swagger;
 using MiniErp.Api.Startup;
 using MiniErp.Api.Validation;
@@ -22,6 +26,7 @@ using Serilog;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 const string AllowAnyFrontendPolicy = "AllowAnyFrontend";
+const string AuthRateLimitPolicy = "auth";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,14 +59,63 @@ builder.Services
                 namingPolicy: null,
                 allowIntegerValues: true));
     });
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()
+    ?.Where(origin => !string.IsNullOrWhiteSpace(origin))
+    .ToArray() ?? [];
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
         AllowAnyFrontendPolicy,
-        policy => policy
-            .AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader());
+        policy =>
+        {
+            // Configure Cors:AllowedOrigins to restrict browsers to known
+            // frontends. When it is empty the previous open policy is kept.
+            if (allowedOrigins.Length > 0)
+            {
+                policy.WithOrigins(allowedOrigins);
+            }
+            else
+            {
+                policy.AllowAnyOrigin();
+            }
+
+            policy.AllowAnyMethod().AllowAnyHeader();
+        });
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+    options.ForwardLimit = 1;
+});
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy(AuthRateLimitPolicy, context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = builder.Configuration.GetValue(
+                    "RateLimiting:AuthPermitPerMinute", 20),
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(
+        context => RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = builder.Configuration.GetValue(
+                    "RateLimiting:GlobalPermitPerMinute", 1200),
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
 });
 
 builder.Services.AddProblemDetails();
@@ -140,6 +194,8 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
+app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseExceptionHandler();
 app.UseStatusCodePages(async context =>
 {
@@ -154,6 +210,7 @@ app.UseSwaggerDocumentation();
 
 app.UseHttpsRedirection();
 app.UseCors(AllowAnyFrontendPolicy);
+app.UseRateLimiter();
 app.UseMiddleware<RequestMonitoringMiddleware>();
 app.UseMiddleware<DatabaseReadinessMiddleware>();
 app.UseAuthentication();

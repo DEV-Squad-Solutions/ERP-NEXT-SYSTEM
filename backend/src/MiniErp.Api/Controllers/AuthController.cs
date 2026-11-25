@@ -7,6 +7,7 @@ using static MiniErp.Application.Features.Authentication.AuthenticationErrors;
 
 namespace MiniErp.Api.Controllers;
 
+[Microsoft.AspNetCore.RateLimiting.EnableRateLimiting("auth")]
 public sealed class AuthController(
     IAuthenticationService authenticationService)
     : ApiControllerBase

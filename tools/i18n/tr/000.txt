@@ -1,0 +1,260 @@
+0|Cancel
+1|All
+2|Status
+3|Retry
+4|Date
+5|Search
+6|Notes
+7|From date
+8|To date
+9|Currency
+10|Delete
+11|Total
+12|Edit
+13|Employee
+14|Saving...
+15|Active
+16|Outgoing
+17|Incoming
+18|Code
+19|Item
+20|Save changes
+21|Inactive
+22|Confirm deletion
+23|Discount
+24|Quantity
+25|Print
+26|Amount
+27|Unit
+28|Debit
+29|Credit
+30|Warehouse
+31|Type
+32|To
+33|View
+34|From
+35|Sales return
+36|Purchase return
+37|Sale
+38|Purchase
+39|Refresh
+40|Back
+41|Net
+42|Print date:
+43|Customer / Supplier
+44|Document no.
+45|Description
+46|Exchange rate
+47|Driver
+48|EGP
+49|Egyptian pound
+50|Address
+51|Name
+52|Cashbox
+53|Actions
+54|US dollar
+55|Movement type
+56|Description
+57|Price
+58|Save
+59|Euro
+60|British pound
+61|Saudi riyal
+62|UAE dirham
+63|Kuwaiti dinar
+64|This action cannot be undone
+65|Saving...
+66|Deductions
+67|Count
+68|Invoice no.
+69|Movement
+70|Account
+71|Customer
+72|Reset
+73|Date is required
+74|Category
+75|Workplace
+76|Voucher no.
+77|An error occurred while deleting, please try again
+78|Net revenue
+79|Cost
+80|Deleting...
+81|Daily
+82|Monthly
+83|Manager signature
+84|Paid
+85|Opening balance
+86|Attendance days
+87|Direction
+88|Reset filters
+89|Employee
+90|Revenues
+91|Active
+92|Inactive
+93|Phone number
+94|Incomplete
+95|Fiscal year
+96|Wages and salaries report
+97|Period:
+98|Item count
+99|From:
+100|To:
+101|Cash
+102|Credit
+103|Weight
+104|Container
+105|Detailed
+106|Summary
+107|Period debit
+108|Period credit
+109|Carried forward
+110|Current balance
+111|Select cashbox
+112|Containers warehouse
+113|Select driver
+114|Actions
+115|Filters
+116|Search by name...
+117|Not specified
+118|Remaining
+119|Invoice
+120|Receipt
+121|Beginning balance
+122|Ending balance
+123|Country
+124|Invoice
+125|Balance
+126|Income statement
+127|Manual
+128|Adjustment
+129|Opening
+130|Automatic
+131|Reversed
+132|Cash flow statement
+133|Unpaid
+134|Invoice type
+135|Select item
+136|Select warehouse
+137|Items
+138|Expenses
+139|Tax number
+140|Deleted successfully
+141|Loading...
+142|Additional
+143|Gross profit
+144|Close
+145|Loading...
+146|All employees
+147|No data to print
+148|Outside the company
+149|Inside the company
+150|Currency:
+151|Total debit
+152|Total credit
+153|Summary
+154|Before adjustment
+155|After adjustment
+156|Trip cost
+157|Customers and suppliers
+158|Paid
+159|Partially paid
+160|Cost status
+161|Zero out
+162|Add
+163|Notes (optional)
+164|Draft
+165|Username
+166|Email
+167|Absent
+168|Present
+169|Select employee
+170|Balance type
+171|Delete "{0}"?
+172|Profit margin
+173|Profit
+174|Margin
+175|No results
+176|All types
+177|License number
+178|Extras
+179|Cash voucher
+180|Item name
+181|Absence days
+182|Net salary
+183|Statement of financial position
+184|Fiscal year:
+185|Total expenses
+186|Employee statement
+187|Employees
+188|Attendance
+189|Try adjusting the filters
+190|Customer / Supplier
+191|?
+192|Transfer no.
+193|Average cost
+194|Details
+195|Expense
+196|Selling price
+197|Unit cost
+198|All warehouses
+199|All categories
+200|View mode
+201|Select currency
+202|Other
+203|Full day
+204|Working days
+205|Print date
+206|Employee type
+207|Total deductions
+208|Employee count
+209|Phone
+210|Credit limit
+211|Period
+212|Carried forward
+213|Date:
+214|Movement
+215|Source:
+216|Opening balance
+217|Item code
+218|Total salary
+219|Paid
+220|Driver statement
+221|AED
+222|KWD
+223|Net sales
+224|Due: {0}
+225|Invoice count
+226|Drivers
+227|Invoices
+228|Containers
+229|Reports
+230|Item profitability
+231|Payment method
+232|Items
+233|Containers
+234|Select customer or supplier
+235|Due date
+236|Add new driver
+237|Pascal weight
+238|Value
+239|Pending
+240|Add opening balance
+241|Cashbox
+242|Driver
+243|Drivers
+244|No data for this period
+245|Cashbox
+246|Approved
+247|Commercial register
+248|Payment
+249|All statuses
+250|Egyptian pound (EGP)
+251|No matching movements
+252|Increase
+253|Decrease
+254|Reset
+255|Half day
+256|One third of a day
+257|Quarter day
+258|Wage type
+259|Employee #{0}

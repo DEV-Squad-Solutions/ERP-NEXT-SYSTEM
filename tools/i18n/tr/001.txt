@@ -1,0 +1,300 @@
+260|Day ratio
+261|Clear selection
+262|Attendance
+263|Revenue
+264|Select the cashbox to transfer from
+265|Select the cashbox to transfer to
+266|From cashbox
+267|To cashbox
+268|Home
+269|To cashbox
+270|From cashbox
+271|Closed
+272|Saving...
+273|User
+274|Edit profile
+275|Current
+276|Total payroll sheets
+277|Total paid
+278|Total inventory value
+279|Search:
+280|License expiry
+281|Record count:
+282|Not carried forward
+283|Invoice no.:
+284|Invoice details
+285|Movement count:
+286|Movement type:
+287|Search:
+288|Closing balance
+289|Total quantity
+290|Additions and bonuses
+291|View mode:
+292|| Adjustments:
+293|| Currency:
+294|Period movement
+295|Total assets
+296|Payment status
+297|Pending
+298|With cost
+299|Without cost
+300|Statement line
+301|Total revenues
+302|Notes
+303|Journal entries report
+304|Entry type
+305|Difference
+306|Voucher
+307|Salary transfer
+308|Dashboard report
+309|Inventory value
+310|Sales
+311|Purchases
+312|Countries
+313|Stock transfers
+314|Stock adjustments
+315|Units of measure
+316|Opening balances
+317|Cashboxes and banks
+318|Transfers between cashboxes
+319|Cashbox movement types
+320|Currencies and exchange rates
+321|Expenses
+322|Salaries
+323|Accounting
+324|Accounting readiness monitor
+325|Fiscal years
+326|Chart of accounts
+327|Accounting mapping settings
+328|Journal entries
+329|Trial balance before adjustments
+330|Trial balance after adjustments
+331|Invoice profitability
+332|Filter active
+333|Container name
+334|Delete item
+335|Export invoice code
+336|Partner invoice number
+337|Invoice content
+338|Actual driver
+339|Vehicle number
+340|Cashbox exchange rate
+341|General notes
+342|Scale difference
+343|Container movements
+344|Unit weight
+345|Add item
+346|Transfer
+347|Warehouse name
+348|Sales return
+349|Purchase return
+350|Containers warehouse
+351|Could not delete the opening balance
+352|Quantity must be greater than zero
+353|Source warehouse
+354|At least one item with a count and weight greater than zero is required
+355|All items
+356|Total cost
+357|No matching opening balances
+358|Could not save the opening balance
+359|View details
+360|Revenue
+361|Entry
+362|Container management
+363|Net movement
+364|Source
+365|Read only
+366|Price date
+367|Enabled
+368|(optional)
+369|First name
+370|Customer/supplier settlement
+371|Movement direction
+372|No check
+373|Check by date
+374|Final check
+375|Both
+376|US dollar (USD)
+377|Euro (EUR)
+378|British pound (GBP)
+379|Saudi riyal (SAR)
+380|UAE dirham (AED)
+381|Kuwaiti dinar (KWD)
+382|Email
+383|Companies
+384|All cashboxes
+385|Deleting...
+386|Private
+387|You do not have permission to view this statement. Contact the system administrator if you need access.
+388|Advance
+389|Deduction
+390|Bonus
+391|Adjustments
+392|Show unmapped accounts
+393|This report covers all company cashboxes. You do not have access to all cashboxes, so a partial report is not shown. Contact the system administrator if you need access.
+394|The statement is not ready for approval
+395|Expenses
+396|Select the fiscal year first
+397|Two days
+398|Three days
+399|Four days
+400|Five days
+401|Three quarters of a day
+402|Two thirds of a day
+403|Working day
+404|Selected
+405|Check-in time
+406|Check-out time
+407|Enter a valid amount
+408|Employee is required
+409|Creating...
+410|Job title
+411|Basic salary
+412|Opening balance updated successfully
+413|Not recorded
+414|All currencies
+415|Report filters
+416|Cashboxes
+417|Ledger System
+418|Add optional notes...
+419|Private partner
+420|Classification
+421|Loading price...
+422|Select an account or classification
+423|Add new cashbox
+424|New voucher
+425|No party
+426|Trip number
+427|Line name
+428|Select fiscal year
+429|DD/MM/YYYY
+430|Select date
+431|— Select —
+432|Fiscal year "
+433|This action cannot be undone.
+434|item
+435|page
+436|All rights reserved
+437|User
+438|Loading page...
+439|Net payable
+440|Total advances
+441|Pending payroll sheets
+442|Recent activity
+443|Reference
+444|Warehouse type
+445|Last updated
+446|Drivers report
+447|Total drivers:
+448|| Code:
+449|| Status:
+450|Customers and suppliers report
+451|Posting status
+452|Type:
+453|Sales invoice
+454|Purchase invoice
+455|Subtotal
+456|Notes:
+457|Total sales quantity
+458|Total purchase quantity
+459|Total sales weight
+460|Total purchase weight
+461|Total results
+462|Journal entry
+463|Base currency
+464|Total debit (
+465|Total credit (
+466|Closing balance (
+467|Remaining:
+468|Total before discount
+469|Employee name
+470|Employee code
+471|Attendance summary
+472|Total attendance days
+473|Overtime days
+474|Deduction days
+475|Salary calculation summary
+476|Employee signature
+477|Total liabilities and equity
+478|Report period
+479|Bonuses
+480|Net salaries
+481|Work units
+482|Employee details
+483|Overtime
+484|Bonus
+485|Document
+486|Trip
+487|Paid to driver
+488|Received from
+489|Not priced
+490|No movements in the statement
+491|Total paid to driver
+492|Total trip costs
+493|Net profit for the period
+494|Net loss for the period
+495|Entry count
+496|Search
+497|Entry no.
+498|Custody handover report
+499|Expected balance after posting
+500|Incoming drafts
+501|Outgoing drafts
+502|Report summary
+503|Cash flow item
+504|Net flow
+505|Base currency:
+506|Net purchases
+507|Total profit
+508|Business partners
+509|Invoice status
+510|Overdue
+511|Month
+512|Cashbox balances by currency
+513|Ready
+514|Invoices report
+515|Sales and purchases
+516|Customers and suppliers list
+517|Customer/supplier statement
+518|Opening balances
+519|Warehouses
+520|Warehouses list
+521|Warehouse opening balances
+522|Drivers list
+523|Trip expenses
+524|Dashboard
+525|Employee financial transactions
+526|Payroll reports
+527|Financial statements preparation
+528|Financial position
+529|Permissions
+530|Driver opening balances
+531|Transfer details
+532|Warehouse details
+533|New stock adjustment
+534|Edit adjustment
+535|Invoice item costs
+536|Profile
+537|Connected to updates successfully
+538|An unexpected error occurred.
+539|More
+540|Delete invoice
+541|Search filters
+542|Containers warehouse
+543|Select container
+544|Item removed from the invoice
+545|Unnamed item
+546|Could not load
+547|Select an item first
+548|No price
+549|Available
+550|If it is not in the list, refresh the page
+551|Unlock the field to type the invoice number manually
+552|Lock the field and return to automatic numbering
+553|Open containers warehouse
+554|No containers warehouse linked to the customer
+555|Add new warehouse
+556|Actual driver name
+557|Select country
+558|Add new country
+559|Count in warehouse

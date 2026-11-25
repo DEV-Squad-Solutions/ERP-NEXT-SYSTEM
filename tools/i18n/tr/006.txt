@@ -1,0 +1,450 @@
+1950|Work date
+1951|Work hours
+1952|Work ratios
+1953|Work day ratio
+1954|No notes
+1955|Record no.
+1956|{0} salaries posted successfully
+1957|An error occurred while posting
+1958|Post {0} salaries
+1959|The posting date and notes will be applied to all selected entries.
+1960|Add notes if any
+1961|Post ({0})
+1962|Movement type is required
+1963|Enter the exchange rate
+1964|An error occurred while recording the movement
+1965|Record an employee movement
+1966|Save movement
+1967|Salary entry created successfully
+1968|An error occurred while creating the salary
+1969|Create salary
+1970|Overtime unit per day
+1971|Cashbox number
+1972|Cashbox is required
+1973|Cashbox movement type
+1974|Cashbox movement type is required
+1975|Create the salary
+1976|Employee name is required
+1977|Job title is required
+1978|Invalid email
+1979|Wage type is required
+1980|Must be a positive value
+1981|Workplace is required
+1982|Employee data updated successfully
+1983|Employee added successfully
+1984|Edit employee data
+1985|Add new employee
+1986|Not required for a daily employee
+1987|Place name
+1988|Active employee
+1989|Select the employee first
+1990|Set the document date
+1991|Enter a valid balance value
+1992|Opening balance created successfully
+1993|Document date
+1994|Value in Egyptian pounds
+1995|Salary posted successfully
+1996|An error occurred while posting, please try again
+1997|Post salary {0}
+1998|Post
+1999|Invalid status
+2000|Check-in time is required for a present employee
+2001|Set the check-in time first
+2002|Attendance record updated successfully
+2003|Attendance recorded successfully
+2004|An error occurred while saving the attendance record, please try again
+2005|Edit attendance record
+2006|Record attendance / absence
+2007|Select status
+2008|Work day calculation
+2009|Set the day ratio, overtime and deduction
+2010|No overtime
+2011|No deduction
+2012|Example: head office
+2013|Add notes on the attendance record...
+2014|Record attendance
+2015|An error occurred while saving attendance and absence
+2016|The displayed employees were marked present
+2017|The displayed employees were marked absent
+2018|Set the check-in and check-out times first
+2019|Check-in and check-out times applied
+2020|Local edits were discarded
+2021|No employees to record attendance for
+2022|No attendance or absence has been recorded for any employee
+2023|{0} present employees have no check-in or check-out time
+2024|Attendance and absence saved successfully — new: {0}, edited: {1}
+2025|Record attendance and absence
+2026|Record and review employee attendance for a specific day
+2027|Discard edits
+2028|Save attendance
+2029|Present
+2030|Absent
+2031|Attendance date
+2032|Employee name or number...
+2033|Default check-in time
+2034|Default check-out time
+2035|Selected present
+2036|Selected absent
+2037|Apply times
+2038|No matching data
+2039|Notes...
+2040|salary-receipt-{0}
+2041|Payment date is required
+2042|Select the cashbox the payment will be made from
+2043|Employee data not found
+2044|Net salary is not valid for payment
+2045|Salary payment {0} to {1}
+2046|Salary paid and movement recorded successfully
+2047|An error occurred while paying the salary, please try again
+2048|Loading salary data...
+2049|Could not load the salary data
+2050|Back to salaries
+2051|Back to the salaries list
+2052|Code:
+2053|Cashbox {0}
+2054|Payment date
+2055|Payment notes...
+2056|The salary will be recorded as an employee movement of type Credit, with the salary amount deducted from the selected cashbox.
+2057|Recording payment...
+2058|Confirm salary payment
+2059|No data
+2060|There are no payroll sheets or employee data in the selected period.
+2061|Set the period you want the payroll report for
+2062|An error occurred while loading the wages and salaries report.
+2063|Total financial and operational indicators for the selected period
+2064|Grand total
+2065|Total calculated salary
+2066|Total bonuses
+2067|Amount paid
+2068|Amount pending
+2069|Total work units
+2070|Payroll distribution between paid and pending
+2071|Payroll and attendance details for each employee
+2072|Absence
+2073|Total employees:
+2074|Deductions for absence, lateness and penalties
+2075|No deductions
+2076|Due
+2077|Could not find the advance
+2078|Back to the advances list
+2079|This installment schedule is mock data until a real endpoint for advance installment details is available from the backend. Only the total value and the advance date are real data.
+2080|Advance amount
+2081|Monthly installment
+2082|Installment schedule
+2083|Installment amount
+2084|An error occurred while deleting the movement
+2085|Employee movements
+2086|Employee advances, deductions, bonuses and withdrawals
+2087|Quick deduction
+2088|Record a new movement
+2089|An error occurred while loading movements
+2090|Confirm deleting the movement
+2091|This movement will be permanently deleted from the employee's movement log. This action cannot be undone.
+2092|Delete attendance record "{0}"?
+2093|Attendance record deleted successfully
+2094|Delete {0} attendance records?
+2095|{0} attendance records deleted successfully
+2096|An error occurred during bulk deletion, please try again
+2097|Track employee attendance and check-out
+2098|Record attendance
+2099|Delete selected
+2100|An error occurred while loading attendance data
+2101|No attendance records
+2102|Try adjusting the filters or record today's attendance
+2103|Hours
+2104|View employee details
+2105|Record details
+2106|Manage employee and wage data
+2107|Monthly employees
+2108|Daily employees
+2109|Active
+2110|Inactive
+2111|Search by name or number...
+2112|Lowest salary
+2113|Highest salary
+2114|Filter active
+2115|An error occurred while loading employee data
+2116|No employees
+2117|Try adjusting the filters or add a new employee
+2118|Employee no.
+2119|Contact
+2120|Day/month
+2121|Movements (advances, deductions, bonuses, withdrawals)
+2122|Salary history
+2123|Could not load the employee data
+2124|Back to the employees list
+2125|Salary data
+2126|Last salary due date
+2127|No attendance record
+2128|No salary history
+2129|Delete the opening balance of employee "{0}"?
+2130|Employee opening balances
+2131|Manage the opening balances of employee accounts
+2132|Record count
+2133|Total debit
+2134|Total credit
+2135|Document number...
+2136|No opening balances
+2137|Try adjusting the filters or add a new opening balance
+2138|Carried forward from
+2139|the previous year
+2140|View source entry
+2141|Advances
+2142|Employee advances and their installments
+2143|No advances
+2144|items
+2145|Employee {0}
+2146|An error occurred while loading the wages dashboard data.
+2147|No pending sheets
+2148|No pending salaries within the current filters.
+2149|Net salary
+2150|No recent activity
+2151|No financial operations in the selected period.
+2152|Financial operation
+2153|Employee: {0}
+2154|An error occurred while recalculating the salary
+2155|Select at least one record to delete
+2156|Warning: {0} of the selected records have already been posted to the employee's account. Are you sure you want to delete {1} salary records?
+2157|Are you sure you want to delete {0} salary records?
+2158|{0} salary records deleted successfully
+2159|An error occurred while deleting payroll entries
+2160|payroll-report
+2161|View and track employee payroll entries
+2162|Post selected (
+2163|Delete selected ({0})
+2164|New payroll entries
+2165|Employee name or code...
+2166|You can post or delete the selected records (even if some are already posted)
+2167|Post the salary to the employee's account
+2168|Recalculate
+2169|An error occurred while loading salaries
+2170|No salaries
+2171|No payroll entries match the current filters
+2172|Select the employees first
+2173|{0} applied to {1} employees
+2174|Set the salary date first
+2175|Set the salary period (from) for employees outside the company
+2176|The start date cannot be after the end date
+2177|Select at least one employee to create the salary
+2178|Payroll entries created for {0} outside-company employees successfully
+2179|Payroll entries created for {0} inside-company employees successfully
+2180|An error occurred while creating payroll entries
+2181|Create payroll entries
+2182|Select the employees and set the attendance, work and adjustment data
+2183|Create salaries{0}
+2184|Salary period
+2185|Salary date
+2186|Selected
+2187|Search by employee name or number...
+2188|Clear search
+2189|Select employees
+2190|Currently selected:
+2191|Deselect visible
+2192|Deselect all
+2193|Bulk actions
+2194|Apply uniform values to the selected employees
+2195|Financial addition
+2196|Financial deduction
+2197|Apply attendance
+2198|Apply work
+2199|Apply overtime
+2200|Apply day deduction
+2201|Financial addition
+2202|Apply addition
+2203|Apply deduction
+2204|Try changing the search term
+2205|Net adjustments
+2206|Last payment date:
+2207|Will be created
+2208|Attendance:
+2209|Work:
+2210|Overtime:
+2211|Day deduction:
+2212|Additions:
+2213|Deductions:
+2214|Net adjustments:
+2215|Create {0} salaries
+2216|January
+2217|February
+2218|March
+2219|April
+2220|May
+2221|June
+2222|July
+2223|August
+2224|September
+2225|October
+2226|November
+2227|December
+2228|Transfer between cashboxes
+2229|Stock adjustment
+2230|Dashboard report - {0}
+2231|Loading dashboard data...
+2232|An error occurred while loading the dashboard
+2233|Please try again
+2234|Profit margin: {0}%
+2235|{0} items without balance
+2236|Overdue invoices
+2237|Accounting readiness
+2238|{0} issues
+2239|Monthly activity (sales / purchases)
+2240|Sales returns
+2241|Purchase returns
+2242|Inventory
+2243|Cost of goods sold
+2244|Total customers account
+2245|Total suppliers account
+2246|Total employees account
+2247|Total drivers account
+2248|Currency exchange gains
+2249|Currency exchange losses
+2250|Inventory adjustment gains
+2251|Inventory adjustment losses
+2252|Opening balance equity
+2253|Employee receivables
+2254|Driver trip expenses
+2255|Movement types
+2256|General mapping
+2257|Failed to save the accounting mapping
+2258|Settings
+2259|Save mapping
+2260|Map cashboxes, movement types and invoices to default accounts for each fiscal year.
+2261|Year is open
+2262|Year is closed
+2263|The mapping can be edited
+2264|The mapping cannot be edited
+2265|Search mapping items
+2266|Cashbox, movement type, invoice...
+2267|Select the fiscal year...
+2268|The default mapping sets the account that reports use later. It does not change an invoice or voucher value. Any mapping can be removed by leaving it without an account and saving.
+2269|Mapping type
+2270|Default account
+2271|Select the account...
+2272|No matching results
+2273|Could not sign in, please check your details and try again.
+2274|Enter your details to access your account
+2275|Hide password
+2276|Show password
+2277|Signing in...
+2278|An error occurred while selecting the company, please try again
+2279|Welcome
+2280|back
+2281|Select the company you want to enter
+2282|Search for a company...
+2283|Clear search
+2284|Enter the company
+2285|We could not find a company matching "
+2286|Show all companies
+2287|Back to sign in
+2288|Manage an unlimited number of companies from one account
+2289|Accurate, real-time financial reports for each company
+2290|Your data is protected and fully isolated between companies
+2291|An integrated accounting platform
+2292|Your accounts,
+2293|all your companies,
+2294|in one place.
+2295|An integrated accounting system that helps you follow your business, your companies and your financial reports from one place with clarity and confidence.
+2296|Compliant with Egyptian accounting standards
+2297|Select company
+2298|Select the company
+2299|Welcome back
+2300|Select the company you want to work on
+2301|Sign in to access the dashboard
+2302|Your data is protected and secure
+2303|No exchange rate found for this date
+2304|Loading the exchange rate...
+2305|The rate was edited manually
+2306|The rate was loaded automatically
+2307|You can enter the rate manually
+2308|Supplier
+2309|Supplier
+2310|Customer
+2311|{0} created successfully
+2312|Could not create {0}
+2313|Could not create the containers warehouse automatically — complete the step manually
+2314|No containers are available for automatic selection — add a container manually
+2315|The containers warehouse was created and {0} containers were selected automatically
+2316|Could not save the containers automatically — review the selection and complete manually
+2317|Containers warehouse created successfully
+2318|Could not create the containers warehouse
+2319|Allowed containers saved
+2320|Could not save the allowed containers
+2321|Container added and selected
+2322|Finish setup
+2323|Create {0} and set up the containers warehouse
+2324|Allowed containers
+2325|Completed
+2326|{0} name
+2327|Uses returnable containers
+2328|Used to mark
+2329|as a private account (such as management partners or parties with exceptional treatment)
+2330|A containers warehouse dedicated to {0} will be created automatically with all available containers selected, with no extra steps.
+2331|If the option is enabled, a containers warehouse will be created automatically with all containers selected for {0}.
+2332|Create {0}
+2333|Creating the containers warehouse for {0} automatically...
+2334|The automatic run needs review — complete creating the warehouse manually.
+2335|Containers warehouse name
+2336|You can skip creating the containers warehouse and complete it later.
+2337|Skip for now
+2338|Create the warehouse and continue
+2339|Selecting all available containers automatically...
+2340|Select the containers allowed for
+2341|+ Add container
+2342|Selected:
+2343|Loading containers...
+2344|No containers available right now.
+2345|Creating...
+2346|Create and select
+2347|{0} created
+2348|The containers warehouse was created automatically
+2349|{0} containers were selected automatically
+2350|Done — selecting
+2351|and closing
+2352|Please wait a moment...
+2353|Invalid email address
+2354|Partner updated successfully
+2355|Could not update the partner
+2356|Edit partner
+2357|Partner name
+2358|Partner is active
+2359|Used to mark this partner as a private account
+2360|Total customers and suppliers:
+2361|Partner type
+2362|No customers or suppliers
+2363|Could not determine the partner
+2364|Could not load the customer/supplier data
+2365|Regular partner
+2366|No containers warehouse is linked at the moment.
+2367|You can create the warehouse and link containers from the warehouse page.
+2368|Manage the containers warehouse
+2369|Assigned containers
+2370|Customer and supplier opening balances
+2371|Record and manage debit and credit opening balances
+2372|Completed
+2373|Invoice profitability report
+2374|The report was generated by the management system
+2375|Invoice profitability - {0}
+2376|Could not load the invoice details
+2377|Make sure the invoice exists and belongs to the current company.
+2378|Back
+2379|Invoice profitability
+2380|Revenue, cost and profit analysis for each item in the invoice
+2381|The invoice cost is not fully complete
+2382|The invoice cost is complete
+2383|Some lines may have a pending or partial cost, so the final profit is not considered complete.
+2384|The cost of all lines was calculated and the displayed profit can be relied on.
+2385|Pending quantity:
+2386|Item details
+2387|Line count:
+2388|Cost and profitability details
+2389|There are no items in the invoice
+2390|Item profitability report
+2391|line with a pending cost.
+2392|item-profitability-report-{0}-{1}
+2393|Set the period, customer, warehouse, item and category
+2394|Item name or code...
+2395|{0} lines with a pending cost
+2396|Some items have an incomplete cost
+2397|Number of lines with a pending cost:
+2398|The final profit of an item is hidden when its cost is incomplete.
+2399|Pending cost

@@ -48,7 +48,7 @@ export default function AdvanceDetailPage() {
 
   if (isLoading) return <div className="p-6 text-ink-400">{t("جاري التحميل...")}</div>;
   if (!advance)
-    return <div className="p-6 text-red-500">{t("تعذر إيجاد السلفة")}</div>;
+    return <div className="p-6 error-text">{t("تعذر إيجاد السلفة")}</div>;
 
   const { cleanNotes } = parseCategory(advance.notes);
   const installments = buildMockInstallments(advance);

@@ -286,7 +286,7 @@ export default function PartnersListPage() {
 
         {isError && (
           <div className="py-16 text-center">
-            <p className="mb-3 text-red-500">{t("حدث خطأ أثناء تحميل البيانات")}</p>
+            <p className="mb-3 error-text">{t("حدث خطأ أثناء تحميل البيانات")}</p>
 
             <Button variant="outline" onClick={refetch}>
               {t("إعادة المحاولة")}

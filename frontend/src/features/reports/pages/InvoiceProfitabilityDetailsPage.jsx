@@ -471,7 +471,7 @@ export default function InvoiceProfitabilityDetailsPage() {
         className="flex min-h-[450px] flex-col items-center justify-center p-6"
       >
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
-          <AlertCircle size={34} className="text-red-500" />
+          <AlertCircle size={34} className="error-text" />
         </div>
 
         <h2 className="mt-4 text-lg font-bold text-slate-800">
@@ -890,7 +890,7 @@ export default function InvoiceProfitabilityDetailsPage() {
                           {formatNumber(line.grossRevenue)}
                         </td>
 
-                        <td className="px-4 py-3 text-red-600">
+                        <td className="px-4 py-3 error-text">
                           {formatNumber(line.discountAmount)}
                         </td>
 

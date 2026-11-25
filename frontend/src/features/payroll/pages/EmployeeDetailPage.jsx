@@ -69,7 +69,7 @@ export default function EmployeeDetailPage() {
 
   if (isLoading) return <div className="p-6 text-ink-400">{t("جاري التحميل...")}</div>;
   if (isError || !employee)
-    return <div className="p-6 text-red-500">{t("تعذر تحميل بيانات الموظف")}</div>;
+    return <div className="p-6 error-text">{t("تعذر تحميل بيانات الموظف")}</div>;
 
   return (
     <div className="animate-fadeUp space-y-6">
@@ -106,7 +106,7 @@ export default function EmployeeDetailPage() {
               {t("تعديل")}
             </Button>
             <Button variant="outline" onClick={handleDelete}>
-              <Trash2 size={14} className="text-red-600" />
+              <Trash2 size={14} className="error-text" />
               {t("حذف")}
             </Button>
           </div>

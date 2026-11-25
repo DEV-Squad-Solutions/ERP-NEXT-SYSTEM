@@ -93,7 +93,7 @@ export default function StoreMovementsTab({ storeId }) {
       )}
 
       {selectedItem && isError && (
-        <div className="py-14 text-center text-sm text-rose-500">
+        <div className="py-14 text-center text-sm error-text">
           {t("حدث خطأ أثناء تحميل الحركات.")}
         </div>
       )}
@@ -183,7 +183,7 @@ export default function StoreMovementsTab({ storeId }) {
                       <td className="py-2.5 px-3 text-emerald-600 font-medium">
                         {row.quantityIn || "—"}
                       </td>
-                      <td className="py-2.5 px-3 text-rose-600 font-medium">
+                      <td className="py-2.5 px-3 error-text font-medium">
                         {row.quantityOut || "—"}
                       </td>
                       <td className="py-2.5 px-3 text-ink-900 font-medium">

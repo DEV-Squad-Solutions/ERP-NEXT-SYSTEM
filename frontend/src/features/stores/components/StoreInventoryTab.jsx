@@ -171,7 +171,7 @@ export default function StoreInventoryTab({
       )}
 
       {isError && (
-        <div className="py-14 text-center text-sm text-rose-500">
+        <div className="py-14 text-center text-sm error-text">
           {t("حدث خطأ أثناء تحميل أصناف المخزن.")}
         </div>
       )}
@@ -497,7 +497,7 @@ function ItemBalanceModal({
               <ReceiptText className="w-5 h-5" />
             </div>
 
-            <p className="text-sm font-medium text-rose-600">
+            <p className="text-sm font-medium error-text">
               {t("تعذر تحميل تفاصيل الصنف")}
             </p>
 

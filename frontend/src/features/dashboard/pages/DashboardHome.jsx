@@ -386,7 +386,7 @@ export default function DashboardPage() {
 
   if (isError) {
     return (
-      <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 text-rose-700 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-300">
+      <div className="rounded-2xl border p-6 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-300 error-banner">
         <p className="font-semibold">{t("حصل خطأ في تحميل الداشبورد")}</p>
         <p className="mt-1 text-sm opacity-80">
           {error?.data?.detail ||

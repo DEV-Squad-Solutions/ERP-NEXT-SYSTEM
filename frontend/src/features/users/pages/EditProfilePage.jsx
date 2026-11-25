@@ -96,7 +96,7 @@ export default function EditProfilePage() {
     return (
       <div className="p-4 lg:p-6">
         <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-center dark:border-red-500/10 dark:bg-red-500/5">
-          <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+          <p className="text-sm font-semibold error-text">
             {t("لا تملك صلاحية تعديل المستخدم")}
           </p>
         </div>
@@ -112,7 +112,7 @@ export default function EditProfilePage() {
     return (
       <div className="p-4 lg:p-6">
         <div className="rounded-2xl border border-red-100 bg-red-50 p-5 text-center dark:border-red-500/10 dark:bg-red-500/5">
-          <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+          <p className="text-sm font-semibold error-text">
             {t("تعذر تحميل بيانات المستخدم")}
           </p>
         </div>

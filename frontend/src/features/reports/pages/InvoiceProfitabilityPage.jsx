@@ -923,7 +923,7 @@ export default function InvoiceProfitabilityPage() {
                   <tr>
                     <td
                       colSpan={12}
-                      className="px-4 py-12 text-center text-sm text-red-500"
+                      className="px-4 py-12 text-center text-sm error-text"
                     >
                       {t("حدث خطأ أثناء تحميل التقرير")}
                     </td>
@@ -982,7 +982,7 @@ export default function InvoiceProfitabilityPage() {
                           {formatNumber(invoice.grossRevenue)}
                         </td>
 
-                        <td className="px-4 py-3 text-red-600">
+                        <td className="px-4 py-3 error-text">
                           {formatNumber(invoice.discountAmount)}
                         </td>
 

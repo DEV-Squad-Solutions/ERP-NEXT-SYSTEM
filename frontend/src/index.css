@@ -396,3 +396,7 @@ html.dark [data-sonner-toast].app-toast [data-close-button] { background: rgb(va
 
 /* Refined surfaces: hairline borders, calmer headings */
 @layer base { h1, h2, h3 { letter-spacing: -0.005em; } }
+.error-banner { border: 1px solid #fecdca; border-inline-start: 4px solid #d92d20; background: #fef3f2; color: #b42318; }
+.error-text { color: #b42318; }
+html.dark .error-banner { border-color: rgb(217 45 32 / .4); background: rgb(217 45 32 / .12); color: #fda29b; }
+html.dark .error-text { color: #fda29b; }

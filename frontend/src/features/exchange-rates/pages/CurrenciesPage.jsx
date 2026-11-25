@@ -128,7 +128,7 @@ export default function CurrenciesPage() {
       )}
 
       {isError && (
-        <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
+        <div className="flex items-center justify-between rounded-2xl border p-4 text-sm error-banner">
           <span className="flex items-center gap-2">
             <AlertCircle size={16} />
             {t("حدث خطأ أثناء تحميل العملات.")}

@@ -400,7 +400,7 @@ export default function PayrollDashboardPage() {
 
       {/* Error */}
       {isError && (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-2xl border p-4 text-sm error-banner">
           {t("حدث خطأ أثناء تحميل بيانات لوحة الأجور.")}
         </div>
       )}

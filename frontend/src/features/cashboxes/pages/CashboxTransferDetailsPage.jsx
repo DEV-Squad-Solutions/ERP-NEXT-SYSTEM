@@ -62,7 +62,7 @@ export default function CashboxTransferDetailsPage() {
       )}
 
       {isError && (
-        <div className="flex items-center justify-between rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+        <div className="flex items-center justify-between rounded-2xl border p-4 text-sm error-banner">
           <span>{t("لم يتم العثور على التحويل، أو حدث خطأ أثناء التحميل.")}</span>
           <button
             onClick={refetch}

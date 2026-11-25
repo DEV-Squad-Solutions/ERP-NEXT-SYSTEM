@@ -38,7 +38,7 @@ export default function DriverDetailPage() {
 
   if (isLoading) return <div className="p-6 text-ink-400">{t("جاري التحميل...")}</div>;
   if (isError || !driver)
-    return <div className="p-6 text-red-500">{t("تعذر تحميل بيانات السائق")}</div>;
+    return <div className="p-6 error-text">{t("تعذر تحميل بيانات السائق")}</div>;
 
   const expired =
     driver.licenseExpiryDate && new Date(driver.licenseExpiryDate) < new Date();
@@ -79,7 +79,7 @@ export default function DriverDetailPage() {
               {t("تعديل")}
             </Button>
             <Button variant="outline" onClick={handleDelete}>
-              <Trash2 size={14} className="text-red-600" />
+              <Trash2 size={14} className="error-text" />
               {t("حذف")}
             </Button>
           </div>

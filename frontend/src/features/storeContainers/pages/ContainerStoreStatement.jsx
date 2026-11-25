@@ -969,7 +969,7 @@ export default function ContainerStoreStatementPage() {
       ===================================================== */}
 
       {isError && !isStoreNotFound && (
-        <div className="mb-5 flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-rose-600">
+        <div className="mb-5 flex items-center justify-between rounded-2xl border p-4 error-banner">
           <div>
             <div className="font-semibold">
               {t("حدث خطأ أثناء تحميل تفاصيل مخزن العبوات.")}
@@ -981,7 +981,7 @@ export default function ContainerStoreStatementPage() {
           <Button
             variant="secondary"
             onClick={refetch}
-            className="text-rose-600"
+            className="error-text"
           >
             <RefreshCw size={15} />
             {t("إعادة المحاولة")}
@@ -1166,7 +1166,7 @@ export default function ContainerStoreStatementPage() {
                           {/* Outgoing */}
 
                           <td className="px-3 py-3">
-                            <span className="font-semibold text-rose-600">
+                            <span className="font-semibold error-text">
                               {fmt(container.periodOutgoingUnits)}
                             </span>
                           </td>
@@ -1450,7 +1450,7 @@ export default function ContainerStoreStatementPage() {
 
                           {/* Outgoing */}
 
-                          <td className="px-3 py-3 font-semibold text-rose-600">
+                          <td className="px-3 py-3 font-semibold error-text">
                             {item.outgoingUnits ? fmt(item.outgoingUnits) : "—"}
                           </td>
 

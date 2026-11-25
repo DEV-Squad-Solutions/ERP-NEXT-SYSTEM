@@ -989,7 +989,7 @@ export default function ItemProfitabilityPage() {
                   <tr>
                     <td
                       colSpan={16}
-                      className="px-4 py-12 text-center text-sm text-red-500"
+                      className="px-4 py-12 text-center text-sm error-text"
                     >
                       {t("حدث خطأ أثناء تحميل التقرير")}
                     </td>
@@ -1039,7 +1039,7 @@ export default function ItemProfitabilityPage() {
                           {formatNumber(item.salesQuantity)}
                         </td>
 
-                        <td className="px-4 py-3 text-red-600">
+                        <td className="px-4 py-3 error-text">
                           {formatNumber(item.returnQuantity)}
                         </td>
 
@@ -1055,11 +1055,11 @@ export default function ItemProfitabilityPage() {
                           {formatNumber(item.salesCost)}
                         </td>
 
-                        <td className="px-4 py-3 text-red-600">
+                        <td className="px-4 py-3 error-text">
                           {formatNumber(item.returnRevenue)}
                         </td>
 
-                        <td className="px-4 py-3 text-red-600">
+                        <td className="px-4 py-3 error-text">
                           {formatNumber(item.returnCost)}
                         </td>
 

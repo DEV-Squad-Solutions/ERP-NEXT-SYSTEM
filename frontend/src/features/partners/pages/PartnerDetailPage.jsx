@@ -84,7 +84,7 @@ export default function PartnerDetailPage() {
 
   if (isError || !party) {
     return (
-      <div className="p-6 text-red-500">{t("تعذر تحميل بيانات العميل/المورد")}</div>
+      <div className="p-6 error-text">{t("تعذر تحميل بيانات العميل/المورد")}</div>
     );
   }
 
@@ -150,7 +150,7 @@ export default function PartnerDetailPage() {
             </Button>
 
             <Button variant="outline" onClick={handleDelete}>
-              <Trash2 size={14} className="text-red-600" />
+              <Trash2 size={14} className="error-text" />
               {t("حذف")}
             </Button>
           </div>

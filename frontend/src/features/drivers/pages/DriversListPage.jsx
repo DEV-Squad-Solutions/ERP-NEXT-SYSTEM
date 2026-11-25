@@ -226,7 +226,7 @@ export default function DriversListPage() {
 
         {isError && (
           <div className="text-center py-16">
-            <p className="text-red-500 mb-3">{t("حدث خطأ أثناء تحميل البيانات")}</p>
+            <p className="error-text mb-3">{t("حدث خطأ أثناء تحميل البيانات")}</p>
             <Button variant="outline" onClick={refetch}>
               {t("إعادة المحاولة")}
             </Button>

@@ -166,7 +166,7 @@ export default function CashHandoverReportModal({
                 <div>
                   <p className="text-ink-400">{t("مسودات صادر")}</p>
 
-                  <p className="num text-red-600">{fmt(b.draftPayment)}</p>
+                  <p className="num error-text">{fmt(b.draftPayment)}</p>
                 </div>
               </div>
             </div>
@@ -252,7 +252,7 @@ export default function CashHandoverReportModal({
             {t("جاري تحميل التقرير...")}
           </p>
         ) : isError ? (
-          <p className="py-10 text-center text-sm text-red-600">
+          <p className="py-10 text-center text-sm error-text">
             {t("حصل خطأ أثناء تحميل التقرير")}
           </p>
         ) : items.length === 0 ? (
@@ -290,7 +290,7 @@ export default function CashHandoverReportModal({
                     <div>
                       <p className="text-ink-400">{t("صادر")}</p>
 
-                      <p className="num font-bold text-red-600">
+                      <p className="num font-bold error-text">
                         {fmt(s.payment)}
                       </p>
                     </div>

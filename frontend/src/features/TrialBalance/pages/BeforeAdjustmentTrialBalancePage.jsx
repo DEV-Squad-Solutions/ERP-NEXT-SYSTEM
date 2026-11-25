@@ -216,7 +216,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
       )}
 
       {isError && (
-        <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
+        <div className="flex items-center justify-between rounded-2xl border p-4 text-sm error-banner">
           <span>{t("حدث خطأ أثناء تحميل ميزان المراجعة.")}</span>
 
           <button
@@ -297,7 +297,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
                         {fmt(row.periodDebit)}
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-2.5 text-rose-600">
+                      <td className="whitespace-nowrap px-3 py-2.5 error-text">
                         {fmt(row.periodCredit)}
                       </td>
                     </tr>

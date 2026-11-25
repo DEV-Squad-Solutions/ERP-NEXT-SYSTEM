@@ -347,7 +347,7 @@ export default function CashboxTransfersPage() {
           Error
       ========================== */}
       {isError && !isLoading && (
-        <div className="flex items-center justify-between rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+        <div className="flex items-center justify-between rounded-2xl border p-4 text-sm error-banner">
           <span>{t("حدث خطأ أثناء تحميل التحويلات.")}</span>
 
           <Button variant="outline" onClick={refetch}>

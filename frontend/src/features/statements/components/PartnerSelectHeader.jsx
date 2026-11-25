@@ -130,11 +130,11 @@ function PartnerSelectHeader({
           {isError ? (
             <div className="flex items-center justify-between gap-3 rounded-xl border border-red-100 bg-red-50/70 px-3.5 py-3">
               <div>
-                <p className="text-sm font-medium text-red-600">
+                <p className="text-sm font-medium error-text">
                   {t("تعذر تحميل العملاء والموردين")}
                 </p>
 
-                <p className="mt-0.5 text-xs text-red-500/80">
+                <p className="mt-0.5 text-xs error-text/80">
                   {t("تحقق من الاتصال وحاول مرة أخرى")}
                 </p>
               </div>

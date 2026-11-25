@@ -249,7 +249,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
             onRetry={() => refetch()}
           />
         ) : (
-          <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
+          <div className="flex items-center justify-between rounded-2xl border p-4 text-sm error-banner">
             <span>{t("حدث خطأ أثناء تحميل قائمة الدخل.")}</span>
             <button
               type="button"
@@ -291,7 +291,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
             <div className="rounded-2xl border border-ink-400/10 bg-white p-5 shadow-card">
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm text-ink-400">{t("إجمالي المصروفات")}</span>
-                <TrendingDown size={20} className="text-rose-500" />
+                <TrendingDown size={20} className="error-text" />
               </div>
               <p className="text-2xl font-bold text-ink-900">{fmt(expense)}</p>
               <span className="text-xs text-ink-400">
@@ -305,7 +305,7 @@ export default function IncomeStatementPage({ companyName = "" }) {
                 {netResult >= 0 ? (
                   <TrendingUp size={20} className="text-primary-600" />
                 ) : (
-                  <TrendingDown size={20} className="text-rose-600" />
+                  <TrendingDown size={20} className="error-text" />
                 )}
               </div>
               <p

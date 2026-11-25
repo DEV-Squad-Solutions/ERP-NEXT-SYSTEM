@@ -16,7 +16,7 @@ export function InvoiceDetailsSkeleton() {
 export function InvoiceDetailsError({ onRetry, onBack }) {
   return (
     <div className="mx-auto flex max-w-md flex-col items-center gap-3 rounded-xl border border-slate-200 bg-white px-6 py-16 text-center">
-      <AlertTriangle className="h-8 w-8 text-red-500" />
+      <AlertTriangle className="h-8 w-8 error-text" />
       <p className="font-semibold text-slate-800">{t("تعذر تحميل بيانات الفاتورة")}</p>
       <p className="text-sm text-slate-500">
         {t("قد تكون الفاتورة غير موجودة، أو حدثت مشكلة في الاتصال.")}

@@ -69,7 +69,7 @@ export default function ExpenseDetailsModal({ voucher, onClose, onEdit }) {
             <Row
               label={t("المبلغ")}
               value={
-                <span className="font-bold text-rose-600">
+                <span className="font-bold error-text">
                   {fmtAmount(v.amount, v.currency)}
                 </span>
               }

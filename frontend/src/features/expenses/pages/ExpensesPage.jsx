@@ -180,7 +180,7 @@ export default function ExpensesPage() {
       )}
 
       {isError && (
-        <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
+        <div className="flex items-center justify-between rounded-2xl border p-4 text-sm error-banner">
           <span>{t("حدث خطأ أثناء تحميل المصاريف.")}</span>
 
           <button
@@ -352,7 +352,7 @@ export default function ExpensesPage() {
                         </span>
                       </td>
 
-                      <td className="whitespace-nowrap px-3 py-2.5 font-bold text-rose-600">
+                      <td className="whitespace-nowrap px-3 py-2.5 font-bold error-text">
                         {fmtAmount(v.amount, v.currency)}
 
                         {v.baseCurrency &&

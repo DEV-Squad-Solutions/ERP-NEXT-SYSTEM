@@ -176,7 +176,7 @@ export default function CountriesPage() {
 
       {isError && (
         <div className="text-center py-20 border border-dashed border-red-200 rounded-2xl">
-          <p className="text-red-500 mb-3">{t("حدث خطأ أثناء تحميل الدول")}</p>
+          <p className="error-text mb-3">{t("حدث خطأ أثناء تحميل الدول")}</p>
           <Button variant="outline" onClick={refetch}>
             {t("إعادة المحاولة")}
           </Button>

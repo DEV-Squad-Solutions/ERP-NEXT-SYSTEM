@@ -356,7 +356,7 @@ export default function CashMovementTypeFormModal({
           />
         </label>
         {errors.forPartner && (
-          <p className="text-xs text-red-600">{errors.forPartner.message}</p>
+          <p className="text-xs error-text">{errors.forPartner.message}</p>
         )}
 
         {/* الأثر المحاسبي المشتق */}

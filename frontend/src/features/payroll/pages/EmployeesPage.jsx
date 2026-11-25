@@ -153,7 +153,7 @@ export default function EmployeesPage() {
           </div>
           <div className="rounded-2xl border border-ink-400/10 bg-white p-4 shadow-card">
             <p className="text-xs text-ink-400 mb-1">{t("غير نشطين")}</p>
-            <p className="text-lg font-bold num text-red-500">
+            <p className="text-lg font-bold num error-text">
               {data.summary.totalInactiveEmployees}
             </p>
           </div>

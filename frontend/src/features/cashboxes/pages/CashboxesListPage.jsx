@@ -328,7 +328,7 @@ export default function CashboxesListPage() {
 
       {isError && !isLoading && (
         <div className="rounded-2xl border border-dashed border-red-200 bg-white py-20 text-center">
-          <p className="mb-3 text-red-500">{t("حدث خطأ أثناء تحميل الخزائن")}</p>
+          <p className="mb-3 error-text">{t("حدث خطأ أثناء تحميل الخزائن")}</p>
 
           <Button variant="outline" onClick={refetch}>
             {t("إعادة المحاولة")}

@@ -158,7 +158,7 @@ function FirstRunSetup() {
           <Field label="Setup token" value={setupToken} onChange={setSetupToken} type="password" dir="ltr" />
         </Card>
       )}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm error-text">{error}</p>}
       <Button loading={isLoading || loggingIn}>{t("إنشاء وبدء الاستخدام")}</Button>
     </form>
   );
@@ -219,7 +219,7 @@ function AdminSetup() {
           <Button loading={addingUser}>{t("إضافة الأدمن")}</Button>
         </Card>
       </form>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm error-text">{error}</p>}
     </div>
   );
 }
@@ -255,7 +255,7 @@ export default function SetupPage({ mode = "first-run" }) {
         </p>
         {isLoading && <p className="text-sm">{t("جارٍ التحميل...")}</p>}
         {isError && (
-          <p className="text-sm text-red-600">
+          <p className="text-sm error-text">
             {t("تعذر الاتصال بالسيرفر.")} <Link to="/">{t("رجوع")}</Link>
           </p>
         )}

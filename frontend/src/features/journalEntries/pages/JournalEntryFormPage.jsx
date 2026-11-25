@@ -1061,7 +1061,7 @@ export default function JournalEntryFormPage() {
         )}
 
         {formError && (
-          <div className="mb-5 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3.5 text-sm text-red-700">
+          <div className="mb-5 flex items-start gap-3 rounded-2xl border px-4 py-3.5 text-sm error-banner">
             <span className="text-lg leading-none">⚠️</span>
             <p className="font-medium">{formError}</p>
           </div>

@@ -264,7 +264,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
             onRetry={() => refetch()}
           />
         ) : (
-          <div className="flex items-center justify-between rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600">
+          <div className="flex items-center justify-between rounded-2xl border p-4 text-sm error-banner">
             <span>{t("حدث خطأ أثناء تحميل قائمة المركز المالي.")}</span>
             <button
               type="button"
@@ -330,7 +330,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
                 {balanced ? (
                   <CheckCircle2 size={20} className="text-primary-600" />
                 ) : (
-                  <AlertTriangle size={20} className="text-rose-600" />
+                  <AlertTriangle size={20} className="error-text" />
                 )}
               </div>
               <p

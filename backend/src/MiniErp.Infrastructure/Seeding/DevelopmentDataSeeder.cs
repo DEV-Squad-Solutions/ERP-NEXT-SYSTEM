@@ -1,4 +1,3 @@
-using Bogus;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -52,15 +51,15 @@ public static class DevelopmentDataSeeder
     private static readonly SeedCompany[] AdditionalSeedCompanies =
     [
         new(
-            "MiniERP Trading Company",
-            "Nasr City, Cairo",
+            "Delta Fresh Exports",
+            "Damietta Port Area, Damietta",
             "54322",
             "456789124",
             "Ahmed Hassan",
             new DateTime(2026, 4, 1, 0, 0, 0, DateTimeKind.Utc)),
         new(
-            "MiniERP Distribution Company",
-            "Smouha, Alexandria",
+            "Red Sea Trading & Logistics",
+            "Free Zone, Port Said",
             "54323",
             "456789125",
             "Mona Ibrahim",
@@ -83,6 +82,51 @@ public static class DevelopmentDataSeeder
         "Local Items",
         "Export Items"
     ];
+
+    private static readonly (string Name, string Description)[]
+        ImportExportCatalog =
+        [
+        ("Egyptian Valencia Oranges 15kg Carton", "Fresh Valencia oranges, export grade, 15 kg carton"),
+        ("Egyptian Navel Oranges 15kg Carton", "Fresh navel oranges, export grade, 15 kg carton"),
+        ("Fresh Mandarins 10kg Carton", "Fresh mandarins, export grade, 10 kg carton"),
+        ("Fresh Strawberries 2kg Tray", "Fresh strawberries, air freight tray, 2 kg"),
+        ("IQF Frozen Strawberries 10kg", "Individually quick frozen strawberries, 10 kg bag"),
+        ("Red Onions 25kg Sack", "Dry red onions, export grade, 25 kg sack"),
+        ("White Onions 25kg Sack", "Dry white onions, export grade, 25 kg sack"),
+        ("Fresh Garlic 10kg Carton", "Fresh white garlic, 10 kg carton"),
+        ("Potatoes Spunta 25kg Sack", "Spunta potatoes for export, 25 kg sack"),
+        ("Sweet Potatoes 10kg Carton", "Fresh sweet potatoes, 10 kg carton"),
+        ("Peanuts Raw Shelled 25kg", "Raw shelled peanuts, 25 kg bag"),
+        ("Medjool Dates 5kg Box", "Medjool dates, premium grade, 5 kg box"),
+        ("Siwi Dates 10kg Box", "Siwi dates, 10 kg box"),
+        ("Extra Virgin Olive Oil 5L", "Extra virgin olive oil, 5 litre tin"),
+        ("Dried Hibiscus 20kg Bale", "Dried hibiscus flowers, 20 kg bale"),
+        ("Dried Basil 10kg Bag", "Dried basil leaves, 10 kg bag"),
+        ("Cumin Seeds 25kg Bag", "Cumin seeds, 25 kg bag"),
+        ("Egyptian Cotton Yarn 30/1", "Combed cotton yarn, count 30/1, per kg"),
+        ("Cotton Bed Linen Set 400TC", "Cotton bed linen set, 400 thread count"),
+        ("Cotton Terry Towels 600gsm", "Terry towels, 600 gsm, pack of 12"),
+        ("Porcelain Floor Tiles 60x60", "Porcelain floor tiles, 60x60 cm, per box"),
+        ("Ceramic Wall Tiles 30x60", "Ceramic wall tiles, 30x60 cm, per box"),
+        ("Marble Slabs Galala 2cm", "Galala marble slabs, 2 cm, per square metre"),
+        ("Rebar Steel 12mm", "Reinforcing steel bar, 12 mm, per tonne"),
+        ("Wheat Milling Grade 50kg", "Milling wheat, 50 kg bag"),
+        ("Sunflower Oil 18L", "Refined sunflower oil, 18 litre tin"),
+        ("White Sugar 50kg Bag", "Refined white sugar, 50 kg bag"),
+        ("Basmati Rice 25kg Bag", "Basmati rice, 25 kg bag"),
+        ("Black Tea CTC 20kg", "Black tea CTC grade, 20 kg bag"),
+        ("Instant Coffee 200g Jar", "Instant coffee, 200 g jar, carton of 24"),
+        ("Polypropylene Woven Sacks", "PP woven sacks, 50 kg capacity, per bale"),
+        ("Corrugated Export Cartons", "Corrugated cartons for citrus, per bundle"),
+        ("Stretch Film 500mm", "Pallet stretch film, 500 mm, per roll"),
+        ("Wooden Export Pallets", "Heat-treated wooden pallets, ISPM-15"),
+        ("Forklift Spare Parts Kit", "Spare parts kit for 3-tonne forklift"),
+        ("Cold Room Compressor Unit", "Refrigeration compressor for cold room"),
+        ("Sorting Line Conveyor Belt", "Conveyor belt for fruit sorting line, per metre"),
+        ("NPK Fertilizer 50kg Bag", "NPK fertilizer, 50 kg bag"),
+        ("Drip Irrigation Pipe 16mm", "Drip irrigation pipe, 16 mm, 400 m roll"),
+        ("Plastic Produce Crates 20kg", "Stackable plastic crate, 20 kg")
+        ];
 
     private static readonly SeedStore[] DefaultStores =
     [
@@ -107,14 +151,21 @@ public static class DevelopmentDataSeeder
         new("EG", "\u0645\u0635\u0631", "Egypt"),
         new("SA", "\u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", "Saudi Arabia"),
         new("AE", "\u0627\u0644\u0625\u0645\u0627\u0631\u0627\u062a", "United Arab Emirates"),
-        new("US", "\u0627\u0644\u0648\u0644\u0627\u064a\u0627\u062a \u0627\u0644\u0645\u062a\u062d\u062f\u0629", "United States")
+        new("US", "\u0627\u0644\u0648\u0644\u0627\u064a\u0627\u062a \u0627\u0644\u0645\u062a\u062d\u062f\u0629", "United States"),
+        new("IT", "إيطاليا", "Italy"),
+        new("DE", "ألمانيا", "Germany"),
+        new("CN", "الصين", "China"),
+        new("TR", "تركيا", "Turkey"),
+        new("KW", "الكويت", "Kuwait"),
+        new("GB", "المملكة المتحدة", "United Kingdom"),
+        new("FR", "فرنسا", "France")
     ];
 
     private static readonly SeedContainer[] DefaultContainers =
     [
-        new("CTN-001", "Small Crate", "Reusable small crate"),
-        new("CTN-002", "Large Crate", "Reusable large crate"),
-        new("CTN-003", "Pallet", "Reusable pallet")
+        new("CTN-001", "Export Carton Crate", "Reusable crate for packed fresh produce"),
+        new("CTN-002", "Bulk Produce Crate", "Reusable large crate for bulk produce"),
+        new("CTN-003", "Euro Pallet", "Standard 120x80 export pallet")
     ];
 
     private static readonly SeedDriver[] DefaultDrivers =
@@ -173,16 +224,16 @@ public static class DevelopmentDataSeeder
 
     private static readonly SeedBusinessPartner[] DefaultBusinessPartners =
     [
-        new("BP-001", "Ahmed Mohamed Trading", "123456", CurrencyCode.EGP, 50_000m),
-        new("BP-002", "Al Salam Supplies", "234567", CurrencyCode.USD, 75_000m),
-        new("BP-003", "Nile Distribution", "345678", CurrencyCode.EGP, 100_000m),
-        new("BP-004", "Delta Wholesale", "456789", CurrencyCode.EGP, 60_000m),
-        new("BP-005", "Cairo Market", "567890", CurrencyCode.USD, 80_000m),
-        new("BP-006", "Upper Egypt Supplies", "678901", CurrencyCode.EGP, 90_000m),
-        new("BP-007", "Future Trade", "789012", CurrencyCode.EGP, 70_000m),
-        new("BP-008", "Nile Valley Stores", "890123", CurrencyCode.USD, 85_000m),
-        new("BP-009", "Al Waha Distribution", "901234", CurrencyCode.EGP, 65_000m),
-        new("BP-010", "United Merchants", "012345", CurrencyCode.EGP, 110_000m)
+        new("BP-001", "Cairo Packaging Supplies", "123456", CurrencyCode.EGP, 50_000m),
+        new("BP-002", "Al Rawabi Foodstuff Trading LLC", "234567", CurrencyCode.USD, 75_000m),
+        new("BP-003", "Alexandria Port Clearance Services", "345678", CurrencyCode.EGP, 100_000m),
+        new("BP-004", "Delta Farms Cooperative", "456789", CurrencyCode.EGP, 60_000m),
+        new("BP-005", "Gulf Fresh Produce Importers", "567890", CurrencyCode.USD, 80_000m),
+        new("BP-006", "Upper Egypt Cotton Ginning", "678901", CurrencyCode.EGP, 90_000m),
+        new("BP-007", "Suez Shipping Agency", "789012", CurrencyCode.EGP, 70_000m),
+        new("BP-008", "Mediterranean Citrus Imports SpA", "890123", CurrencyCode.USD, 85_000m),
+        new("BP-009", "Nile Cold Storage", "901234", CurrencyCode.EGP, 65_000m),
+        new("BP-010", "Sinai Dates Packing", "012345", CurrencyCode.EGP, 110_000m)
     ];
 
     private static readonly SeedEmployee[] DefaultEmployees =
@@ -190,19 +241,19 @@ public static class DevelopmentDataSeeder
         new(
             Key: "01",
             Name: "Ahmed Samir",
-            JobTitle: "Accountant",
+            JobTitle: "Export Accountant",
             Type: EmployeeType.Monthly,
             Salary: 8_000m),
         new(
             Key: "02",
             Name: "Mona Hassan",
-            JobTitle: "Sales Specialist",
+            JobTitle: "Export Sales Specialist",
             Type: EmployeeType.Monthly,
             Salary: 9_000m),
         new(
             Key: "03",
             Name: "Karim Adel",
-            JobTitle: "Store Keeper",
+            JobTitle: "Warehouse Keeper",
             Type: EmployeeType.Monthly,
             Salary: 7_500m),
         new(
@@ -214,7 +265,7 @@ public static class DevelopmentDataSeeder
         new(
             Key: "05",
             Name: "Youssef Nabil",
-            JobTitle: "Operations Supervisor",
+            JobTitle: "Shipping Operations Supervisor",
             Type: EmployeeType.Monthly,
             Salary: 11_000m),
         new(
@@ -238,7 +289,7 @@ public static class DevelopmentDataSeeder
         new(
             Key: "09",
             Name: "Nour Khaled",
-            JobTitle: "Delivery Assistant",
+            JobTitle: "Port Delivery Assistant",
             Type: EmployeeType.Daily,
             Salary: 290m),
         new(
@@ -963,22 +1014,26 @@ public static class DevelopmentDataSeeder
                 "At least one active item unit is required to seed items.");
         }
 
-        var itemFaker = new Faker<Item>("en")
-            .RuleFor(item => item.CompanyId, _ => companyId)
-            .RuleFor(item => item.Code, faker => $"ITEM-{faker.IndexFaker + 1:0000}")
-            .RuleFor(
-                item => item.Name,
-                faker => $"Company {companyId} - {faker.Commerce.ProductName()}")
-            .RuleFor(
-                item => item.Description,
-                faker => $"Company {companyId}: {faker.Commerce.ProductDescription()}")
-            .RuleFor(item => item.IsActive, _ => true)
-            .RuleFor(item => item.CreatedById, _ => SeedActor)
-            .RuleFor(item => item.CreatedByPc, _ => createdByPc)
-            .RuleFor(item => item.CreatedOn, _ => createdOn)
-            .UseSeed(20260719 + companyId);
+        var generatedItems = Enumerable.Range(0, itemCount)
+            .Select(index =>
+            {
+                var template = ImportExportCatalog[index % ImportExportCatalog.Length];
+                var lot = index / ImportExportCatalog.Length;
+                var suffix = lot == 0 ? string.Empty : $" (lot {lot + 1})";
 
-        var generatedItems = itemFaker.Generate(itemCount);
+                return new Item
+                {
+                    CompanyId = companyId,
+                    Code = $"ITEM-{index + 1:0000}",
+                    Name = template.Name + suffix,
+                    Description = template.Description,
+                    IsActive = true,
+                    CreatedById = SeedActor,
+                    CreatedByPc = createdByPc,
+                    CreatedOn = createdOn
+                };
+            })
+            .ToList();
 
         for (var index = 0; index < generatedItems.Count; index++)
         {
@@ -3344,8 +3399,8 @@ public static class DevelopmentDataSeeder
 
         var company = new Company
         {
-            Name = "مجموعة السلام القابضة",
-            Address = "شارع النصر، مدينة نصر، القاهرة",
+            Name = "بوابة النيل للاستيراد والتصدير",
+            Address = "المنطقة الصناعية، العاشر من رمضان، الشرقية",
             CommercialRegister = commercialRegister,
             TaxNumber = taxNumber,
             ManagerName = "خالد السلام",

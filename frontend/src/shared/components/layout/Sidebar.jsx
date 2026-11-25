@@ -4,6 +4,7 @@ import { X, Info, ChevronDown } from "lucide-react";
 import { useSelector } from "react-redux";
 
 import { navigationItems } from "../../constants/navigation";
+import useHiddenScreens from "../../../features/screenAccess/useHiddenScreens";
 import CompanyDetailsModal from "../../../features/company/components/CompanyDetailsModal";
 
 /* =========================================================
@@ -22,7 +23,7 @@ function canAccessItem(item, roles) {
    NAVIGATION FILTER
 ========================================================= */
 
-function filterNavigationItems(items, roles) {
+function filterNavigationItems(items, roles, hidden = []) {
   if (!items?.length) return [];
 
   return items.reduce((result, item) => {
@@ -31,12 +32,19 @@ function filterNavigationItems(items, roles) {
       return result;
     }
 
-    if (!canAccessItem(item, roles)) {
+    if (
+      !canAccessItem(item, roles) ||
+      (item.path && hidden.includes(item.path))
+    ) {
       return result;
     }
 
     if (item.children?.length) {
-      const filteredChildren = filterNavigationItems(item.children, roles);
+      const filteredChildren = filterNavigationItems(
+        item.children,
+        roles,
+        hidden,
+      );
 
       if (filteredChildren.length) {
         result.push({
@@ -598,6 +606,7 @@ function Sidebar({ isOpen, onClose }) {
   const company = useSelector((state) => state.auth.selectedCompany);
 
   const roles = useSelector((state) => state.auth.roles);
+  const hiddenScreens = useHiddenScreens();
 
   const [showDetails, setShowDetails] = useState(false);
 
@@ -607,8 +616,10 @@ function Sidebar({ isOpen, onClose }) {
   );
 
   const filteredNavigationItems = useMemo(() => {
-    return removeEmptySections(filterNavigationItems(navigationItems, roles));
-  }, [roles]);
+    return removeEmptySections(
+      filterNavigationItems(navigationItems, roles, hiddenScreens),
+    );
+  }, [roles, hiddenScreens]);
 
   const handleClose = useCallback(() => {
     onClose?.();

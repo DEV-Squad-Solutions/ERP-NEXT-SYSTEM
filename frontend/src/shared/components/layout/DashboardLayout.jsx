@@ -4,10 +4,14 @@ import { Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import PageLoader from "./PageLoader";
+import UnauthorizedPage from "../UnauthorizedPage";
+import useHiddenScreens from "../../../features/screenAccess/useHiddenScreens";
+import { isPathHidden } from "../../../features/screenAccess/screenList";
 
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { pathname } = useLocation();
+  const hiddenScreens = useHiddenScreens();
 
   return (
     <div
@@ -116,7 +120,11 @@ export default function DashboardLayout() {
           >
             <Suspense fallback={<PageLoader />}>
               <div key={pathname} className="page-enter">
-                <Outlet />
+                {isPathHidden(pathname, hiddenScreens) ? (
+                  <UnauthorizedPage />
+                ) : (
+                  <Outlet />
+                )}
               </div>
             </Suspense>
           </div>

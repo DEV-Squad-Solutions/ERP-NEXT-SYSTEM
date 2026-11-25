@@ -10,6 +10,7 @@ export const baseApi = createApi({
     // ==================== Auth / Administration ====================
     "Company",
     "Theme",
+    "ScreenAccess",
     "User",
 
     // ==================== Partners ====================

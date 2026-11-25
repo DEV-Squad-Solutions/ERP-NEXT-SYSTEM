@@ -9,6 +9,7 @@ import {
   Pencil,
   Trash2,
   ShieldCheck,
+  LayoutList,
 } from "lucide-react";
 import Pagination from "../../../shared/components/ui/Pagination";
 import Button from "../../../shared/components/ui/Button";
@@ -16,6 +17,7 @@ import { useGetUsersQuery, useDeleteUserMutation } from "../usersApi";
 import { selectIsAdmin } from "../../auth/authSlice";
 import QuickAddUserModal from "../components/QuickAddUserModal";
 import UserCashboxPermissionsModal from "../components/UserCashboxPermissionsModal";
+import UserScreensModal from "../components/UserScreensModal";
 
 export default function UsersTab() {
   const [page, setPage] = useState(1);
@@ -24,6 +26,7 @@ export default function UsersTab() {
   const [showModal, setShowModal] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [cashboxUser, setCashboxUser] = useState(null);
+  const [screensUser, setScreensUser] = useState(null);
 
   const isAdmin = useSelector(selectIsAdmin);
 
@@ -173,6 +176,16 @@ export default function UsersTab() {
                         {isAdmin && (
                           <button
                             type="button"
+                            onClick={() => setScreensUser(u)}
+                            className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
+                            title="الشاشات الظاهرة"
+                          >
+                            <LayoutList size={14} />
+                          </button>
+                        )}
+                        {isAdmin && (
+                          <button
+                            type="button"
                             onClick={() => setCashboxUser(u)}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-ink-400 transition-colors hover:bg-primary-50 hover:text-primary-600"
                             title="صلاحيات الخزائن"
@@ -224,6 +237,12 @@ export default function UsersTab() {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         user={editingUser}
+      />
+
+      <UserScreensModal
+        isOpen={Boolean(screensUser)}
+        onClose={() => setScreensUser(null)}
+        user={screensUser}
       />
 
       <UserCashboxPermissionsModal

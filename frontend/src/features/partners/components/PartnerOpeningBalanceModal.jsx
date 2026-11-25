@@ -219,7 +219,9 @@ export default function PartnerOpeningBalanceModal({
      FIELD CHANGE
   ======================================================= */
 
+  const [errors, setErrors] = useState({});
   const setField = (key, value) => {
+    setErrors((cur) => (cur[key] ? { ...cur, [key]: undefined } : cur));
     setForm((current) => ({
       ...current,
       [key]: value,
@@ -288,6 +290,14 @@ export default function PartnerOpeningBalanceModal({
       toast.error(dateWarning);
       return;
     }
+
+    const nextErrors = {};
+    if (!form.businessPartnerId)
+      nextErrors.businessPartnerId = t("اختر العميل أو المورد");
+    if (!(Number(form.amount) > 0))
+      nextErrors.amount = t("أدخل مبلغاً أكبر من صفر");
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
 
     const payload = {
       businessPartnerId: Number(form.businessPartnerId),
@@ -383,6 +393,9 @@ export default function PartnerOpeningBalanceModal({
             onChange={(value) => setField("businessPartnerId", value)}
             placeholder={t("اختر العميل أو المورد")}
           />
+          {errors.businessPartnerId && (
+            <p role="alert" className="field-error">{errors.businessPartnerId}</p>
+          )}
         </div>
 
         {/* =================================================
@@ -511,6 +524,9 @@ export default function PartnerOpeningBalanceModal({
               decimals
               onChange={(value) => setField("amount", value)}
             />
+            {errors.amount && (
+              <p role="alert" className="field-error">{errors.amount}</p>
+            )}
           </div>
 
           {/* EXCHANGE RATE */}

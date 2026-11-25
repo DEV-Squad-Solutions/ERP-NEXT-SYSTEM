@@ -41,10 +41,10 @@ export default {
           400: "#3D4E63",
           500: "#2E3F54",
           600: "#1B2A40",
-          700: "#152236",
-          800: "#0E1827",
-          900: "#0A2540",
-          950: "#06111F",
+          700: "rgb(var(--c-ink-700) / <alpha-value>)",
+          800: "rgb(var(--c-ink-800) / <alpha-value>)",
+          900: "rgb(var(--c-ink-900) / <alpha-value>)",
+          950: "rgb(var(--c-ink-950) / <alpha-value>)",
         },
 
         /* =====================================================
@@ -67,8 +67,49 @@ export default {
           950: "rgb(var(--c-gold-950) / <alpha-value>)",
         },
 
+        /* Legacy brand-green utilities follow the active theme */
+        teal: {
+          50: "rgb(var(--c-primary-50) / <alpha-value>)",
+          100: "rgb(var(--c-primary-100) / <alpha-value>)",
+          200: "rgb(var(--c-primary-200) / <alpha-value>)",
+          300: "rgb(var(--c-primary-300) / <alpha-value>)",
+          400: "rgb(var(--c-primary-400) / <alpha-value>)",
+          500: "rgb(var(--c-primary-500) / <alpha-value>)",
+          600: "rgb(var(--c-primary-600) / <alpha-value>)",
+          700: "rgb(var(--c-primary-700) / <alpha-value>)",
+          800: "rgb(var(--c-primary-800) / <alpha-value>)",
+          900: "rgb(var(--c-primary-900) / <alpha-value>)",
+          950: "rgb(var(--c-primary-950) / <alpha-value>)",
+        },
+        green: {
+          50: "rgb(var(--c-primary-50) / <alpha-value>)",
+          100: "rgb(var(--c-primary-100) / <alpha-value>)",
+          200: "rgb(var(--c-primary-200) / <alpha-value>)",
+          300: "rgb(var(--c-primary-300) / <alpha-value>)",
+          400: "rgb(var(--c-primary-400) / <alpha-value>)",
+          500: "rgb(var(--c-primary-500) / <alpha-value>)",
+          600: "rgb(var(--c-primary-600) / <alpha-value>)",
+          700: "rgb(var(--c-primary-700) / <alpha-value>)",
+          800: "rgb(var(--c-primary-800) / <alpha-value>)",
+          900: "rgb(var(--c-primary-900) / <alpha-value>)",
+          950: "rgb(var(--c-primary-950) / <alpha-value>)",
+        },
+        emerald: {
+          50: "rgb(var(--c-primary-50) / <alpha-value>)",
+          100: "rgb(var(--c-primary-100) / <alpha-value>)",
+          200: "rgb(var(--c-primary-200) / <alpha-value>)",
+          300: "rgb(var(--c-primary-300) / <alpha-value>)",
+          400: "rgb(var(--c-primary-400) / <alpha-value>)",
+          500: "rgb(var(--c-primary-500) / <alpha-value>)",
+          600: "rgb(var(--c-primary-600) / <alpha-value>)",
+          700: "rgb(var(--c-primary-700) / <alpha-value>)",
+          800: "rgb(var(--c-primary-800) / <alpha-value>)",
+          900: "rgb(var(--c-primary-900) / <alpha-value>)",
+          950: "rgb(var(--c-primary-950) / <alpha-value>)",
+        },
+
         /* Warm paper surface — the light-mode canvas */
-        paper: "#FAF8F3",
+        paper: "rgb(var(--c-canvas) / <alpha-value>)",
 
         /* Success / positivity */
         positive: {
@@ -103,10 +144,10 @@ export default {
 
         /* Dark-mode semantic surfaces (used via dark: variants) */
         dark: {
-          bg: "#0F1720",
-          surface: "#16212B",
-          elevated: "#1C2A35",
-          border: "#263642",
+          bg: "rgb(var(--c-dk-bg) / <alpha-value>)",
+          surface: "rgb(var(--c-dk-surface) / <alpha-value>)",
+          elevated: "rgb(var(--c-dk-elevated) / <alpha-value>)",
+          border: "rgb(var(--c-dk-border) / <alpha-value>)",
           text: "#F1F5F3",
           muted: "#94A3B8",
         },
@@ -147,47 +188,8 @@ export default {
           950: "#111A16",
         },
 
-        emerald: {
-          50: "#E8F3F0",
-          100: "#C5E1D9",
-          200: "#A6CFC2",
-          300: "#7FB5A4",
-          400: "#1A7A5E",
-          500: "#0C4A3E",
-          600: "#093A31",
-          700: "#072D26",
-          800: "#052019",
-          900: "#041613",
-          950: "#020C0A",
-        },
 
-        green: {
-          50: "#E8F3F0",
-          100: "#C5E1D9",
-          200: "#A6CFC2",
-          300: "#7FB5A4",
-          400: "#1A7A5E",
-          500: "#0C4A3E",
-          600: "#093A31",
-          700: "#072D26",
-          800: "#052019",
-          900: "#041613",
-          950: "#020C0A",
-        },
 
-        teal: {
-          50: "#E8F3F0",
-          100: "#C5E1D9",
-          200: "#A6CFC2",
-          300: "#7FB5A4",
-          400: "#1A7A5E",
-          500: "#0C4A3E",
-          600: "#093A31",
-          700: "#072D26",
-          800: "#052019",
-          900: "#041613",
-          950: "#020C0A",
-        },
 
         amber: {
           50: "#FBF3E1",
@@ -294,7 +296,7 @@ export default {
       },
 
       boxShadow: {
-        card: "0 1px 2px rgba(10,37,64,0.04), 0 1px 8px rgba(10,37,64,0.06)",
+        card: "0 1px 2px rgba(15,23,42,0.05), 0 4px 14px -4px rgba(15,23,42,0.08)",
 
         stamp: "0 0 0 3px rgba(201,150,44,0.15)",
 

@@ -54,7 +54,7 @@ const showErrors = (error) => {
   const messages = [...new Set(getApiErrors(error))];
 
   messages.forEach((message) => {
-    toast.error(message);
+    toast.error(message, { id: message });
   });
 };
 

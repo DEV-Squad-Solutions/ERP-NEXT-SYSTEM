@@ -17,7 +17,9 @@ createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <App />
       <Toaster
-        richColors
+        closeButton
+        visibleToasts={4}
+        toastOptions={{ classNames: { toast: "app-toast" } }}
         position={getLang() === "ar" ? "top-left" : "top-right"}
         theme={savedTheme === "dark" ? "dark" : "light"}
       />

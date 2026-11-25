@@ -172,7 +172,7 @@ export default function AccountFormModal({
               placeholder={t("مثال: بنك الأهلي")}
             />
             {errors.name && (
-              <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
+              <p className="field-error">{errors.name.message}</p>
             )}
           </div>
         </div>

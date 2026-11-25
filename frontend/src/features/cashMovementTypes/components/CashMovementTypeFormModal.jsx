@@ -264,7 +264,7 @@ export default function CashMovementTypeFormModal({
             className="w-full rounded-xl border border-gold/30 bg-white px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-emerald-600"
           />
           {errors.name && (
-            <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
+            <p className="field-error">{errors.name.message}</p>
           )}
         </div>
 

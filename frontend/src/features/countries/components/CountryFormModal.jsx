@@ -146,7 +146,7 @@ export default function CountryFormModal({
           />
 
           {errors.name && (
-            <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>
+            <p className="field-error">{errors.name.message}</p>
           )}
         </div>
 
@@ -165,7 +165,7 @@ export default function CountryFormModal({
           />
 
           {errors.englishName && (
-            <p className="mt-1 text-xs text-red-500">
+            <p className="field-error">
               {errors.englishName.message}
             </p>
           )}

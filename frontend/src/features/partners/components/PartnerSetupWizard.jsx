@@ -518,7 +518,7 @@ export default function PartnerSetupWizard({
             </select>
 
             {partnerErrors.currency?.message && (
-              <p className="text-xs text-red-500 mt-1">
+              <p className="field-error">
                 {partnerErrors.currency.message}
               </p>
             )}

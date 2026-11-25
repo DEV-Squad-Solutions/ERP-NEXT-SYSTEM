@@ -108,7 +108,7 @@ export default function CashboxTransferEditModal({
                 ))}
               </select>
               {errors.fromCashboxId && (
-                <p className="mt-1 text-sm text-red-500">
+                <p className="field-error">
                   {errors.fromCashboxId.message}
                 </p>
               )}
@@ -132,7 +132,7 @@ export default function CashboxTransferEditModal({
                 ))}
               </select>
               {errors.toCashboxId && (
-                <p className="mt-1 text-sm text-red-500">
+                <p className="field-error">
                   {errors.toCashboxId.message}
                 </p>
               )}

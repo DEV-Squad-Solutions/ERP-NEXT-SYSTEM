@@ -495,7 +495,7 @@ export default function CashboxTransferFormModal({
                 </select>
 
                 {errors.sourceCashboxId && (
-                  <p className="mt-1 text-xs text-red-500">
+                  <p className="field-error">
                     {errors.sourceCashboxId.message}
                   </p>
                 )}
@@ -546,7 +546,7 @@ export default function CashboxTransferFormModal({
                 </select>
 
                 {errors.destinationCashboxId && (
-                  <p className="mt-1 text-xs text-red-500">
+                  <p className="field-error">
                     {errors.destinationCashboxId.message}
                   </p>
                 )}

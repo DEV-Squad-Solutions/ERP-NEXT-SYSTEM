@@ -146,7 +146,7 @@ export default function EditPartyModal({ isOpen, onClose, party }) {
           </select>
 
           {errors.currency?.message && (
-            <p className="mt-1 text-xs text-red-500">
+            <p className="field-error">
               {errors.currency.message}
             </p>
           )}

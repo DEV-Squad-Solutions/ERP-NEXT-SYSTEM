@@ -222,7 +222,7 @@ export default function CashboxFormModal({
               </select>
 
               {errors.currency && (
-                <p className="mt-1 text-sm text-red-500">
+                <p className="field-error">
                   {errors.currency.message}
                 </p>
               )}

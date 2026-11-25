@@ -78,7 +78,7 @@ export default function UnitFormModal({ isOpen, onClose, unit }) {
             {...register("name")}
           />
           {errors.name && (
-            <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>
+            <p className="field-error">{errors.name.message}</p>
           )}
         </div>
 

@@ -203,7 +203,7 @@ export default function QuickAddUserModal({
             )}
           />
           {errors.roles?.message && (
-            <p className="mt-1 text-xs text-red-600">{errors.roles.message}</p>
+            <p className="field-error">{errors.roles.message}</p>
           )}
         </div>
 
@@ -243,7 +243,7 @@ export default function QuickAddUserModal({
             )}
           />
           {errors.companyIds?.message && (
-            <p className="mt-1 text-xs text-red-600">
+            <p className="field-error">
               {errors.companyIds.message}
             </p>
           )}

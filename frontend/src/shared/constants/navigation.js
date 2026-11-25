@@ -450,4 +450,11 @@ export const navigationItems = [
     end: true,
     roles: ["Admin"],
   },
+  {
+    label: "إعداد الأدمن والشركات",
+    path: "/dashboard/setup",
+    icon: ShieldCheck,
+    end: true,
+    roles: ["Admin"],
+  },
 ];

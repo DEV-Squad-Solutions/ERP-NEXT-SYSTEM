@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage";
+import SetupPage from "../features/setup/pages/SetupPage";
 import ProtectedRoute from "../shared/components/ProtectedRoute";
 import RoleRoute from "../shared/components/RoleRoute";
 import DashboardLayout from "../shared/components/layout/DashboardLayout";
@@ -273,6 +274,10 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <LoginPage />,
+  },
+  {
+    path: "/setup",
+    element: <SetupPage mode="first-run" />,
   },
   {
     path: "*",
@@ -970,6 +975,16 @@ export const router = createBrowserRouter([
           <LazyPage>
             <Role roles={FULL_ACCESS_ROLES}>
               <ItemProfitabilityPage />
+            </Role>
+          </LazyPage>
+        ),
+      },
+      {
+        path: "setup",
+        element: (
+          <LazyPage>
+            <Role roles={[ROLES.ADMIN]}>
+              <SetupPage mode="admin" />
             </Role>
           </LazyPage>
         ),

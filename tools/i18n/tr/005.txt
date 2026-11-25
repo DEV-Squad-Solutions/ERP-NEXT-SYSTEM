@@ -1,0 +1,350 @@
+1600|Container deleted successfully
+1601|Manage packing containers (drum, box, carton...)
+1602|Example: CTN-001
+1603|An error occurred while loading containers
+1604|No matching containers
+1605|Add the first container
+1606|Container
+1607|Are you sure you want to delete the container
+1608|Type name is required
+1609|The name is too long
+1610|Select the movement direction
+1611|Select the type category
+1612|The notes are too long
+1613|The "Customer/supplier settlement" category must be linked to a customer/supplier
+1614|This default must have direction {0}
+1615|Invoice default is only available for the "Customer/supplier settlement" category
+1616|The type must be active to be an invoice default
+1617|Default for sales invoices
+1618|Default for purchase returns
+1619|Default for purchase invoices
+1620|Default for sales returns
+1621|No effect on a customer/supplier account
+1622|Credit on the customer/supplier account
+1623|Debit on the customer/supplier account
+1624|Movement type updated
+1625|Movement type created
+1626|A movement type with the same name and direction already exists
+1627|Edit movement type
+1628|Add new movement type
+1629|Type name
+1630|Example: collection from a customer
+1631|Expenses/revenues independent of direction, optionally linked to a customer/supplier. A customer/supplier settlement must be linked to a party.
+1632|Receipt (increases cashbox balance)
+1633|Payment (decreases cashbox balance)
+1634|Linked to a customer/supplier (forPartner)
+1635|— required for this category
+1636|Automatic accounting effect:
+1637|Default for invoice types
+1638|— only available for the "Customer/supplier settlement" category
+1639|Only available for the customer/supplier settlement category
+1640|Requires direction {0}
+1641|Add type
+1642|No effect on the customer/supplier
+1643|Credit to the customer/supplier
+1644|Debit on the customer/supplier
+1645|Movement type deleted
+1646|This type is used in previous movements and cannot be deleted
+1647|Categories of receipt and payment vouchers (customer/supplier settlement, expenses, revenues), and linking them as defaults for sales and purchase invoices
+1648|All directions
+1649|Link to customer/supplier
+1650|Customer/supplier + general
+1651|Linked to a customer/supplier only
+1652|General only (expenses, wages...)
+1653|Active only
+1654|Inactive only
+1655|Accounting effect
+1656|Default for
+1657|No matching movement types, try changing the filters
+1658|No movement types yet, start by adding a new type
+1659|Type
+1660|Delete the movement type?
+1661|"
+1662|" will be permanently deleted. If this type is used in previous movements, the deletion will be rejected.
+1663|Are you sure you want to delete user "{0}"?
+1664|User deleted
+1665|Could not delete the user
+1666|Registered users, their roles and the companies available to each one
+1667|+ New user
+1668|An error occurred while loading users
+1669|No matching users
+1670|Visible screens
+1671|Cashbox permissions
+1672|Are you sure you want to delete company "{0}"?
+1673|Company deleted
+1674|Could not delete the company
+1675|All companies registered in the system
+1676|+ New company
+1677|An error occurred while loading companies
+1678|No matching companies
+1679|Responsible manager
+1680|Company
+1681|Cashbox permissions saved
+1682|The permissions were updated elsewhere — we reloaded them
+1683|You are not allowed to edit cashbox permissions
+1684|Could not save the permissions
+1685|Cashbox permissions of {0}
+1686|Could not load the cashbox permissions.
+1687|Permissions apply to the currently selected company and are linked to the user (not to the fiscal year). "Execute" automatically includes "View". Without any grants, the user will not see any cashbox.
+1688|Grants all current and future cashboxes of the current company (view and execute permission).
+1689|Execute
+1690|There are no cashboxes in this company.
+1691|All cashboxes granted
+1692|{0} cashboxes granted view
+1693|Company name is required
+1694|Address is required
+1695|Commercial register is required
+1696|Tax number is required
+1697|Manager name is required
+1698|Company data updated
+1699|Company added successfully
+1700|The commercial register or tax number is already used
+1701|Edit company data
+1702|Add new company
+1703|Responsible manager name
+1704|Inventory balance check mode
+1705|Screens saved
+1706|Could not save the screens
+1707|Visible screens for {0}
+1708|The admin always sees all screens and is not affected by these choices.
+1709|Username is required
+1710|Email is required
+1711|Invalid email
+1712|First name is required
+1713|Last name is required
+1714|Select at least one role
+1715|Select at least one company
+1716|At least 8 characters
+1717|User data updated
+1718|User added successfully
+1719|The username or email is already used
+1720|Edit user
+1721|Add new user
+1722|Roles (permissions)
+1723|Companies available to them
+1724|Users and permissions
+1725|Companies and users
+1726|Manage registered companies, users and their permissions from one place
+1727|Fiscal year name is required
+1728|Start date is required
+1729|End date is required
+1730|The end date must be after the start date
+1731|Could not verify the record version, please reload the page and try again
+1732|Fiscal year updated successfully
+1733|Fiscal year created successfully
+1734|An error occurred while saving the fiscal year
+1735|Edit fiscal year
+1736|Add a new fiscal year
+1737|Set the fiscal year name and period. This data cannot be edited after the year is closed.
+1738|Fiscal year name
+1739|Example: 2026
+1740|Make it the current fiscal year
+1741|Fiscal year closed successfully
+1742|An error occurred while closing the fiscal year
+1743|Fiscal year reopened successfully
+1744|An error occurred while reopening the fiscal year
+1745|Manage the company's open and closed financial periods
+1746|New fiscal year
+1747|Search by fiscal year name...
+1748|An error occurred while loading fiscal years
+1749|No matching fiscal years
+1750|Try changing the search or filter
+1751|Closing date
+1752|Close fiscal year
+1753|Reopen fiscal year
+1754|Fiscal year
+1755|Are you sure you want to delete the fiscal year
+1756|? This action cannot be undone.
+1757|Confirm closing the fiscal year
+1758|Are you sure you want to close the fiscal year
+1759|? Movements cannot be added or edited in this year after closing.
+1760|Closing...
+1761|Confirm closing
+1762|Confirm reopening the fiscal year
+1763|Are you sure you want to reopen the fiscal year
+1764|? It will be possible to add and edit movements in this year again.
+1765|Reopening...
+1766|Confirm reopening
+1767|Customer invoices
+1768|Total invoices:
+1769|Print report
+1770|Select an employee to view their statement
+1771|Select the party to view their account
+1772|Could not load customers and suppliers
+1773|Check the connection and try again
+1774|Trying...
+1775|Loading customers and suppliers...
+1776|Search by customer or supplier name
+1777|No parties available
+1778|Search by customer or supplier name...
+1779|Print statement
+1780|Select a customer or supplier first
+1781|Party available
+1782|Type to search quickly
+1783|item-movement-{0}
+1784|Select an item and search to view its movement
+1785|An error occurred while loading the data
+1786|No movement for this item with the selected filters
+1787|Not authorized to view the employee statement
+1788|An error occurred while loading the employee statement
+1789|No movement description
+1790|Statement summary
+1791|· Base currency: {0}
+1792|Base values are shown in Egyptian pounds
+1793|Search by document number or description...
+1794|Source type
+1795|Receipt voucher
+1796|Payment voucher
+1797|Statement filters
+1798|Movement source
+1799|Not authorized to view the statement
+1800|An error occurred while loading the statement
+1801|Foreign-currency customer — amounts are shown in the account currency (
+1802|) and their Egyptian equivalent (
+1803|statement-{0}
+1804|Statement
+1805|Select a customer or supplier
+1806|to view the statement, invoices and items
+1807|A complete statement with advances, deductions, bonuses and salary transfers
+1808|to view their financial statement
+1809|No line item
+1810|Cash flows resulting from entries affecting cashbox accounts during the period; transfers between cashboxes are not counted as net flow
+1811|Loading the cash flow statement...
+1812|Not authorized to view the cash flow statement
+1813|An error occurred while loading the cash flow statement.
+1814|There may be offsetting accounts not linked to a cash flow item. Turn on "Show unmapped accounts" to review.
+1815|Net cash flow
+1816|No cash flows for this period
+1817|The difference between the net flow and the total of the displayed items (it may be due to unmapped accounts)
+1818|Unmapped accounts
+1819|These offsetting accounts have a cash movement but are not linked to a cash flow item.
+1820|The cash flow statement is ready for reporting.
+1821|Assets
+1822|Liabilities
+1823|Equity
+1824|Assets, liabilities and equity up to the end of the period from posted entries
+1825|Loading the financial position statement...
+1826|Not authorized to view the financial position statement
+1827|An error occurred while loading the financial position statement.
+1828|Liabilities and equity
+1829|Balance sheet balance
+1830|Balanced
+1831|Assets = Liabilities + Equity
+1832|Difference between the two sides
+1833|Accounts not linked to an item in the financial position statement
+1834|These accounts have a movement but are not linked to an item in the statement.
+1835|Revenues
+1836|Other items
+1837|Revenues, expenses and net result of the period from posted entries
+1838|Loading the income statement...
+1839|Not authorized to view the income statement
+1840|An error occurred while loading the income statement.
+1841|Net result of the period
+1842|Net profit
+1843|Net loss
+1844|Accounts not linked to an item in the income statement
+1845|These accounts have a movement but are not linked to an item in the income statement.
+1846|Select the adjustment type
+1847|Add at least one line
+1848|Unit cost is required for surplus lines
+1849|Adjustment updated successfully
+1850|Adjustment created successfully
+1851|This adjustment was edited by someone else at the same time. Refresh the page and try again.
+1852|Failed to update the adjustment
+1853|Failed to create the adjustment
+1854|Adjustment type
+1855|Adjustment reason (optional)
+1856|Adjustment items
+1857|Calculated automatically from the average cost
+1858|Line reason (optional)
+1859|Create adjustment
+1860|New adjustment
+1861|Search by document number...
+1862|Loading adjustments...
+1863|An error occurred while loading adjustments
+1864|No matching adjustments
+1865|From a stocktake - cannot be edited
+1866|This adjustment came from a stocktake and cannot be edited
+1867|From a stocktake
+1868|Items (
+1869|Balance after
+1870|Average cost after
+1871|Cashbox voucher
+1872|Party opening balance
+1873|Cashbox opening balance
+1874|Inventory opening balance
+1875|The entry contains more than one currency
+1876|Multiple
+1877|Entry currency: {0}
+1878|Failed to delete the entry
+1879|Manage and review daily accounting entries
+1880|New entry
+1881|Currencies used
+1882|Filter entries
+1883|Search and filter by entry data
+1884|Entry number, description, source...
+1885|All years
+1886|Daily entries
+1887|Description / source
+1888|No description
+1889|No matching entries
+1890|No entries were found matching the current search and filter criteria.
+1891|Reset filters
+1892|Failed to save the entry
+1893|There was a problem saving the entry. Check the data and try again.
+1894|Could not load the entry
+1895|There was a problem loading the entry data. Try again.
+1896|Edit entry
+1897|New manual entry
+1898|Enter the entry details and its linked accounts quickly and clearly.
+1899|Automatic entry
+1900|Reversed entry
+1901|This entry was generated from a source document (invoice, voucher, etc.) and is updated automatically from there, so it cannot be edited here.
+1902|This entry is already reversed and locked, so it cannot be edited.
+1903|This entry results from reversing entry number
+1904|This entry was reversed by entry number
+1905|Entry data
+1906|Basic data of the accounting entry
+1907|Loading years...
+1908|Select the year...
+1909|Entry date
+1910|Select the entry type...
+1911|Entry description...
+1912|Entry details
+1913|Select the account or party, then enter the debit or credit value.
+1914|Loading accounts...
+1915|Account / party
+1916|Select the account or party...
+1917|Line description (optional)
+1918|Foreign currency
+1919|Debit in currency
+1920|Credit in currency
+1921|The amount in the company's base currency is calculated automatically = value in currency × exchange rate.
+1922|Add line
+1923|Entry total
+1924|Entry is balanced ✓
+1925|Enter the entry values
+1926|Not balanced — difference {0}
+1927|Refreshing data...
+1928|Under review
+1929|Paid out
+1930|Three quarters
+1931|All employees were marked present
+1932|All employees were marked absent
+1933|Attendance statuses cleared
+1934|Set the status of at least one employee
+1935|Attendance of {0} employees saved successfully
+1936|An error occurred while saving attendance
+1937|Record employee attendance
+1938|Record daily attendance
+1939|Employees with no attendance record are automatically counted as present.
+1940|remaining)
+1941|Save ({0})
+1942|Overtime
+1943|No time
+1944|Loading attendance data...
+1945|Please wait
+1946|No employees
+1947|No employees available to record attendance.
+1948|Attendance record details
+1949|Attendance data

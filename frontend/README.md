@@ -2,8 +2,8 @@
 
 A full ERP system with an Arabic RTL interface covering: sales & purchases, stores & inventory, cashboxes & banks, partners & drivers, expenses, payroll, and permissions.
 
-- **Repository:** `DEV-Squad-Solutions/ERP-SYSTEM_FRONTENDTEAM`
-- **Project path inside it:** `ERP_SYSTEM/`
+- **Location:** `frontend/` inside the ERP monorepo
+- **Project path:** `frontend/`
 - **App type:** SPA (React 19 + Vite) talking to an external REST API + real-time updates over SignalR
 
 ---
@@ -113,7 +113,7 @@ npm run dev               # http://localhost:5173
 
 ## 5) Environment Variables
 
-Create `.env` inside `ERP_SYSTEM/`:
+Create `.env` inside `frontend/`:
 
 ```env
 # Base API URL (used by baseQueryWithReauth)

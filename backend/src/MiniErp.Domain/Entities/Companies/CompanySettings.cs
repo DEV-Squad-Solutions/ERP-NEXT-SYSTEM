@@ -11,5 +11,9 @@ public sealed class CompanySettings
     public StockBalanceCheckMode StockBalanceCheckMode { get; set; } =
         StockBalanceCheckMode.None;
 
+    public string DefaultColorTheme { get; set; } = "default";
+
+    public string DefaultThemeMode { get; set; } = "light";
+
     public Company Company { get; set; } = null!;
 }

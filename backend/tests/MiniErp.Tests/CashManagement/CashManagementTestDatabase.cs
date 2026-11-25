@@ -409,6 +409,8 @@ internal sealed class CashManagementTestDatabase : IAsyncDisposable
             );
 
             CREATE TABLE CompanySettings (
+                DefaultColorTheme TEXT NULL,
+                DefaultThemeMode TEXT NULL,
                 CompanyId INTEGER NOT NULL PRIMARY KEY,
                 BaseCurrency INTEGER NOT NULL DEFAULT 1,
                 StockBalanceCheckMode INTEGER NOT NULL DEFAULT 1,

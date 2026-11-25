@@ -179,6 +179,10 @@ public sealed partial class ApplicationDbContext
             entity.HasIndex(user => new { user.CreatedOn, user.Id })
                 .IsDescending(true, true);
 
+            entity.Property(user => user.ColorTheme).HasMaxLength(20);
+
+            entity.Property(user => user.ThemeMode).HasMaxLength(10);
+
             entity.Property(user => user.FirstName)
                 .HasMaxLength(100)
                 .IsRequired();

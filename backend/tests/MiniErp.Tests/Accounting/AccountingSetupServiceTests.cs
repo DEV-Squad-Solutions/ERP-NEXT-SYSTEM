@@ -1759,6 +1759,8 @@ public sealed class AccountingSetupServiceTests
                 );
 
                 CREATE TABLE CompanySettings (
+                    DefaultColorTheme TEXT NULL,
+                    DefaultThemeMode TEXT NULL,
                     CompanyId INTEGER PRIMARY KEY,
                     BaseCurrency INTEGER NOT NULL DEFAULT 1,
                     StockBalanceCheckMode INTEGER NOT NULL DEFAULT 0,

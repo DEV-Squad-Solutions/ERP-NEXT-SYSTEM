@@ -249,6 +249,8 @@ public sealed class InvoiceItemPricingServiceTests
                 );
 
                 CREATE TABLE CompanySettings (
+                    DefaultColorTheme TEXT NULL,
+                    DefaultThemeMode TEXT NULL,
                     CompanyId INTEGER PRIMARY KEY,
                     BaseCurrency INTEGER NOT NULL,
                     StockBalanceCheckMode INTEGER NOT NULL

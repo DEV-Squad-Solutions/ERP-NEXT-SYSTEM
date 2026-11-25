@@ -10,6 +10,10 @@ public sealed class ApplicationUser : IdentityUser<Guid>
 
     public string LastName { get; set; } = string.Empty;
 
+    public string? ColorTheme { get; set; }
+
+    public string? ThemeMode { get; set; }
+
     public string ProfileImage { get; set; } = string.Empty;
 
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];

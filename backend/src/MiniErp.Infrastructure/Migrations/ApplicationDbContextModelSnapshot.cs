@@ -2411,6 +2411,20 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
+                    b.Property<string>("DefaultColorTheme")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("default");
+
+                    b.Property<string>("DefaultThemeMode")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)")
+                        .HasDefaultValue("light");
+
                     b.Property<int>("StockBalanceCheckMode")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -5518,6 +5532,10 @@ namespace MiniErp.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
+                    b.Property<string>("ColorTheme")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -5573,6 +5591,10 @@ namespace MiniErp.Infrastructure.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ThemeMode")
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");

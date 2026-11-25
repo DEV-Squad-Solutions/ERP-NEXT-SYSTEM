@@ -23,6 +23,16 @@ public sealed class CompanySettingsConfiguration
             .HasDefaultValue(Domain.Enums.StockBalanceCheckMode.None)
             .IsRequired();
 
+        builder.Property(settings => settings.DefaultColorTheme)
+            .HasMaxLength(20)
+            .HasDefaultValue("default")
+            .IsRequired();
+
+        builder.Property(settings => settings.DefaultThemeMode)
+            .HasMaxLength(10)
+            .HasDefaultValue("light")
+            .IsRequired();
+
         builder.HasOne(settings => settings.Company)
             .WithOne(company => company.Settings)
             .HasForeignKey<CompanySettings>(settings => settings.CompanyId)

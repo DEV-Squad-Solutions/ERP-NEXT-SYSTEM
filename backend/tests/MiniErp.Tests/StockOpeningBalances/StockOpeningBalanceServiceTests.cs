@@ -799,6 +799,8 @@ public sealed class StockOpeningBalanceServiceTests
                 );
 
                 CREATE TABLE CompanySettings (
+                    DefaultColorTheme TEXT NULL,
+                    DefaultThemeMode TEXT NULL,
                     CompanyId INTEGER NOT NULL PRIMARY KEY,
                     StockBalanceCheckMode INTEGER NOT NULL DEFAULT 1,
                     FOREIGN KEY (CompanyId) REFERENCES Companies(Id) ON DELETE CASCADE

@@ -197,7 +197,7 @@ export default function FiscalYearsListPage() {
             <div className="relative">
               <Search
                 size={15}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"
+                className="absolute start-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"
               />
               <input
                 value={search}
@@ -206,7 +206,7 @@ export default function FiscalYearsListPage() {
                   setPage(1);
                 }}
                 placeholder={t("ابحث باسم السنة المالية...")}
-                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pr-9 pl-3 text-sm outline-none transition-colors focus:border-primary-500"
+                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pe-9 ps-3 text-sm outline-none transition-colors focus:border-primary-500"
               />
             </div>
           </div>
@@ -286,7 +286,7 @@ export default function FiscalYearsListPage() {
             <table className="min-w-full border-collapse text-sm">
               <thead className="bg-slate-50">
                 <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
-                  <th className="px-4 py-3 text-right">{t("الاسم")}</th>
+                  <th className="px-4 py-3 text-start">{t("الاسم")}</th>
                   <th className="px-4 py-3 text-center">{t("تاريخ البداية")}</th>
                   <th className="px-4 py-3 text-center">{t("تاريخ النهاية")}</th>
                   <th className="px-4 py-3 text-center">{t("الحالة")}</th>
@@ -308,7 +308,7 @@ export default function FiscalYearsListPage() {
                         animationDelay: `${Math.min(index, 12) * 25}ms`,
                       }}
                     >
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3 text-start">
                         <div className="flex items-center gap-2">
                           <span
                             className={`h-1.5 w-1.5 rounded-full shrink-0 ${
@@ -605,7 +605,7 @@ function FiscalYearsSkeleton() {
             <div className="h-5 w-16 rounded-full bg-ink-400/10 animate-pulse" />
             <div className="h-5 w-14 rounded-full bg-ink-400/10 animate-pulse" />
             <div className="h-3.5 w-20 rounded bg-ink-400/10 animate-pulse" />
-            <div className="mr-auto flex gap-1.5">
+            <div className="me-auto flex gap-1.5">
               <div className="h-7 w-7 rounded-lg bg-ink-400/10 animate-pulse" />
               <div className="h-7 w-7 rounded-lg bg-ink-400/10 animate-pulse" />
               <div className="h-7 w-7 rounded-lg bg-ink-400/10 animate-pulse" />

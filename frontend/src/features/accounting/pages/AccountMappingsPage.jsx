@@ -302,7 +302,7 @@ export default function AccountMappingsPage() {
               className="grid grid-cols-[1fr_140px_1fr] gap-4 items-center px-6 py-3
                          border-b border-gray-50 last:border-b-0 hover:bg-gray-50/60"
             >
-              <div className="text-right">
+              <div className="text-start">
                 <div className="text-sm font-semibold text-gray-900">
                   {row.sourceName}
                 </div>

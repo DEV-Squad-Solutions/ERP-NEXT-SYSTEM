@@ -18,7 +18,7 @@ export default function StoreCard({ store, onClick, onEdit, onDelete }) {
             {store.isActive ? t("نشط") : t("غير نشط")}
           </span>
 
-          <div className="flex items-center gap-1 border-r border-ink-400/10 pr-2 mr-1">
+          <div className="flex items-center gap-1 border-s border-ink-400/10 pe-2 me-1">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -43,7 +43,7 @@ export default function StoreCard({ store, onClick, onEdit, onDelete }) {
         </div>
       </div>
 
-      <button onClick={onClick} className="text-right w-full block">
+      <button onClick={onClick} className="text-start w-full block">
         <h3 className="font-display font-bold text-ink-900 text-lg">
           {store.name}
         </h3>

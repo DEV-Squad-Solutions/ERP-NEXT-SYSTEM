@@ -44,7 +44,7 @@ export default function CompanyDetailsModal({ companyId, isOpen, onClose }) {
         <LedgerPanel title={company.name}>
           {detailRows.map((row) => (
             <div key={row.key} className="flex items-stretch">
-              <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+              <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                 {row.label}
               </div>
               <div className="flex-1 px-3 py-2.5 text-sm text-ink-600 flex items-center">

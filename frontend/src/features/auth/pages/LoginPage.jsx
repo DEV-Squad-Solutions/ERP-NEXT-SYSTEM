@@ -71,13 +71,13 @@ export default function LoginPage() {
                 backgroundSize: "28px 28px",
               }}
             />
-            <div className="absolute -right-32 -top-32 h-72 w-72 rounded-full border border-white/[0.08]" />
-            <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full border border-dashed border-white/[0.08] motion-safe:animate-[spin_45s_linear_infinite]" />
-            <div className="absolute -bottom-40 -left-40 h-[520px] w-[520px] rounded-full border-2 border-white/[0.07]" />
-            <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full border border-dashed border-white/[0.08] motion-safe:animate-[spin_55s_linear_infinite_reverse]" />
-            <span className="absolute right-[18%] top-[34%] h-2 w-2 rounded-full bg-white/30 motion-safe:animate-pulse" />
-            <span className="absolute right-[32%] top-[62%] h-1.5 w-1.5 rounded-full bg-white/20 motion-safe:animate-pulse [animation-delay:700ms]" />
-            <span className="absolute left-[22%] top-[22%] h-1.5 w-1.5 rounded-full bg-white/20 motion-safe:animate-pulse [animation-delay:1200ms]" />
+            <div className="absolute -start-32 -top-32 h-72 w-72 rounded-full border border-white/[0.08]" />
+            <div className="absolute -start-20 -top-20 h-48 w-48 rounded-full border border-dashed border-white/[0.08] motion-safe:animate-[spin_45s_linear_infinite]" />
+            <div className="absolute -bottom-40 -end-40 h-[520px] w-[520px] rounded-full border-2 border-white/[0.07]" />
+            <div className="absolute -bottom-24 -end-24 h-80 w-80 rounded-full border border-dashed border-white/[0.08] motion-safe:animate-[spin_55s_linear_infinite_reverse]" />
+            <span className="absolute start-[18%] top-[34%] h-2 w-2 rounded-full bg-white/30 motion-safe:animate-pulse" />
+            <span className="absolute start-[32%] top-[62%] h-1.5 w-1.5 rounded-full bg-white/20 motion-safe:animate-pulse [animation-delay:700ms]" />
+            <span className="absolute end-[22%] top-[22%] h-1.5 w-1.5 rounded-full bg-white/20 motion-safe:animate-pulse [animation-delay:1200ms]" />
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-black/[0.08]" />
           </div>
 
@@ -183,12 +183,12 @@ export default function LoginPage() {
         <section className="relative flex h-full min-w-0 flex-1 items-center justify-center overflow-hidden bg-paper px-4 py-4 sm:px-6 lg:px-10">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -left-32 -top-32 h-64 w-64 rounded-full bg-primary-500/[0.035] blur-3xl"
+            className="pointer-events-none absolute -end-32 -top-32 h-64 w-64 rounded-full bg-primary-500/[0.035] blur-3xl"
           />
 
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -bottom-32 -right-32 h-72 w-72 rounded-full bg-primary-500/[0.035] blur-3xl"
+            className="pointer-events-none absolute -bottom-32 -start-32 h-72 w-72 rounded-full bg-primary-500/[0.035] blur-3xl"
           />
 
           <div className="relative z-10 flex max-h-full w-full min-w-0 max-w-[500px] flex-col justify-center">

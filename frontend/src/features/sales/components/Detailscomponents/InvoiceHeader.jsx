@@ -120,14 +120,14 @@ export default function InvoiceHeader({ invoice, onAction, isFetching }) {
                   onClick={() => setMenuOpen(false)}
                   className="fixed inset-0 z-10"
                 />
-                <div className="absolute left-0 top-full mt-1 w-48 bg-white rounded-xl shadow-card border border-ink-400/10 py-1 z-20 animate-fadeUp">
+                <div className="absolute end-0 top-full mt-1 w-48 bg-white rounded-xl shadow-card border border-ink-400/10 py-1 z-20 animate-fadeUp">
                   <div className="border-t border-ink-400/10 my-1" />
                   <button
                     onClick={() => {
                       setMenuOpen(false);
                       onAction("delete");
                     }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-negative hover:bg-negative/5 text-right"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-negative hover:bg-negative/5 text-start"
                   >
                     <Trash2 size={14} />
                     {t("حذف الفاتورة")}

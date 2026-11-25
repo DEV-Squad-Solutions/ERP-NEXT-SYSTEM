@@ -6,8 +6,8 @@ export default function Error404() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-paper px-6 font-body">
       {/* Background Decorations */}
-      <div className="absolute -top-32 -left-32 h-80 w-80 rounded-full bg-primary-50 blur-3xl" />
-      <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-gold-50 blur-3xl" />
+      <div className="absolute -top-32 -end-32 h-80 w-80 rounded-full bg-primary-50 blur-3xl" />
+      <div className="absolute -bottom-32 -start-32 h-96 w-96 rounded-full bg-gold-50 blur-3xl" />
 
       <div className="relative w-full max-w-xl animate-fadeUp rounded-3xl border border-primary-100 bg-white p-10 text-center shadow-card">
         {/* Icon */}
@@ -48,7 +48,7 @@ export default function Error404() {
         </div>
 
         {/* Stamp */}
-        <div className="absolute right-6 top-6 rotate-12 rounded-full border-2 border-gold-400 px-4 py-2 font-display text-xs font-bold tracking-[0.3em] text-gold-500 animate-stampIn">
+        <div className="absolute start-6 top-6 rotate-12 rounded-full border-2 border-gold-400 px-4 py-2 font-display text-xs font-bold tracking-[0.3em] text-gold-500 animate-stampIn">
           NOT FOUND
         </div>
       </div>

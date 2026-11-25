@@ -517,7 +517,7 @@ export default function PayrollReportsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1200px] text-right">
+            <table className="w-full min-w-[1200px] text-start">
               <thead>
                 <tr className="border-y border-slate-200 bg-slate-50">
                   <th className="px-4 py-3 text-xs font-bold text-slate-600">

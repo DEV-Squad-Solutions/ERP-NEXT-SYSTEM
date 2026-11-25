@@ -189,25 +189,25 @@ export default function StockAdjustmentsListPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-ink-500 text-xs bg-ink-50/60">
-                    <th className="py-2.5 px-3 text-right font-medium">
+                    <th className="py-2.5 px-3 text-start font-medium">
                       {t("رقم المستند")}
                     </th>
-                    <th className="py-2.5 px-3 text-right font-medium">
+                    <th className="py-2.5 px-3 text-start font-medium">
                       {t("التاريخ")}
                     </th>
-                    <th className="py-2.5 px-3 text-right font-medium">
+                    <th className="py-2.5 px-3 text-start font-medium">
                       {t("المخزن")}
                     </th>
-                    <th className="py-2.5 px-3 text-right font-medium">
+                    <th className="py-2.5 px-3 text-start font-medium">
                       {t("الاتجاه")}
                     </th>
-                    <th className="py-2.5 px-3 text-right font-medium">
+                    <th className="py-2.5 px-3 text-start font-medium">
                       {t("السبب")}
                     </th>
-                    <th className="py-2.5 px-3 text-right font-medium">
+                    <th className="py-2.5 px-3 text-start font-medium">
                       {t("عدد السطور")}
                     </th>
-                    <th className="py-2.5 px-3 text-right font-medium">
+                    <th className="py-2.5 px-3 text-start font-medium">
                       {t("إجراءات")}
                     </th>
                   </tr>

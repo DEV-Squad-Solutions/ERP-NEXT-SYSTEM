@@ -405,10 +405,10 @@ export default function SalariesPage() {
               ${isFetching || isDeleting ? "opacity-60" : ""}
             `}
           >
-            <table className="w-full text-right border-collapse min-w-[1200px]">
+            <table className="w-full text-start border-collapse min-w-[1200px]">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-                  <th className="p-2.5 border-l border-ink-400/5 w-8">
+                  <th className="p-2.5 border-e border-ink-400/5 w-8">
                     <input
                       type="checkbox"
                       checked={allSelectableSelected}
@@ -417,39 +417,39 @@ export default function SalariesPage() {
                     />
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الموظف")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("النوع")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("مكان العمل")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الفترة")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الإضافات")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الخصومات")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الإجمالي")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الصافي")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("حالة الترحيل")}
                   </th>
 
@@ -481,7 +481,7 @@ export default function SalariesPage() {
                         animationDelay: `${Math.min(index, 12) * 25}ms`,
                       }}
                     >
-                      <td className="p-2.5 border-l border-ink-400/5">
+                      <td className="p-2.5 border-e border-ink-400/5">
                         <input
                           type="checkbox"
                           checked={isSelected}
@@ -491,7 +491,7 @@ export default function SalariesPage() {
                         />
                       </td>
 
-                      <td className="p-2.5 border-l border-ink-400/5">
+                      <td className="p-2.5 border-e border-ink-400/5">
                         <button
                           type="button"
                           onClick={() =>
@@ -516,7 +516,7 @@ export default function SalariesPage() {
                         )}
                       </td>
 
-                      <td className="p-2.5 border-l border-ink-400/5">
+                      <td className="p-2.5 border-e border-ink-400/5">
                         <span className="text-xs text-ink-700">
                           {EMPLOYEE_TYPE[row.employeeType] ||
                             row.employeeType ||
@@ -524,7 +524,7 @@ export default function SalariesPage() {
                         </span>
                       </td>
 
-                      <td className="p-2.5 border-l border-ink-400/5">
+                      <td className="p-2.5 border-e border-ink-400/5">
                         <span className="text-xs text-ink-700">
                           {row.workPlaceStatus === "OutCompany"
                             ? t("خارج الشركة")
@@ -532,28 +532,28 @@ export default function SalariesPage() {
                         </span>
                       </td>
 
-                      <td className="p-2.5 num text-[12px] border-l border-ink-400/5">
+                      <td className="p-2.5 num text-[12px] border-e border-ink-400/5">
                         <div>{formatDate(row.startDate)}</div>
                         <div className="text-ink-400">{formatDate(row.endDate)}</div>
                       </td>
 
-                      <td className="p-2.5 num text-positive text-[13px] border-l border-ink-400/5">
+                      <td className="p-2.5 num text-positive text-[13px] border-e border-ink-400/5">
                         {fmtMoney(row.bonus)}
                       </td>
 
-                      <td className="p-2.5 num text-negative text-[13px] border-l border-ink-400/5">
+                      <td className="p-2.5 num text-negative text-[13px] border-e border-ink-400/5">
                         {fmtMoney(row.deduction)}
                       </td>
 
-                      <td className="p-2.5 num font-medium text-[13px] border-l border-ink-400/5">
+                      <td className="p-2.5 num font-medium text-[13px] border-e border-ink-400/5">
                         {fmtMoney(row.grossSalary)}
                       </td>
 
-                      <td className="p-2.5 num font-bold text-[13px] border-l border-ink-400/5">
+                      <td className="p-2.5 num font-bold text-[13px] border-e border-ink-400/5">
                         {fmtMoney(row.netSalary)}
                       </td>
 
-                      <td className="p-2.5 border-l border-ink-400/5">
+                      <td className="p-2.5 border-e border-ink-400/5">
                         {isMoved ? (
                           <span className="inline-flex whitespace-nowrap rounded-md bg-primary-500/10 px-2 py-1 text-[11px] text-primary-500">
                             {t("مُرحّل")}

@@ -528,10 +528,10 @@ export default function AttendancePage() {
               isFetching ? "opacity-60" : ""
             }`}
           >
-            <table className="w-full min-w-[1120px] border-collapse text-right">
+            <table className="w-full min-w-[1120px] border-collapse text-start">
               <thead>
                 <tr className="border-b border-ink-400/10 bg-ink-900/[0.03] text-[11px] text-ink-400">
-                  <th className="w-10 border-l border-ink-400/5 p-2.5">
+                  <th className="w-10 border-e border-ink-400/5 p-2.5">
                     <input
                       type="checkbox"
                       checked={allOnPageSelected}
@@ -540,35 +540,35 @@ export default function AttendancePage() {
                     />
                   </th>
 
-                  <th className="border-l border-ink-400/5 p-2.5 font-medium">
+                  <th className="border-e border-ink-400/5 p-2.5 font-medium">
                     {t("الموظف")}
                   </th>
 
-                  <th className="border-l border-ink-400/5 p-2.5 font-medium">
+                  <th className="border-e border-ink-400/5 p-2.5 font-medium">
                     {t("التاريخ")}
                   </th>
 
-                  <th className="border-l border-ink-400/5 p-2.5 font-medium">
+                  <th className="border-e border-ink-400/5 p-2.5 font-medium">
                     {t("مكان العمل")}
                   </th>
 
-                  <th className="border-l border-ink-400/5 p-2.5 font-medium">
+                  <th className="border-e border-ink-400/5 p-2.5 font-medium">
                     {t("وقت الحضور")}
                   </th>
 
-                  <th className="border-l border-ink-400/5 p-2.5 font-medium">
+                  <th className="border-e border-ink-400/5 p-2.5 font-medium">
                     {t("وقت الانصراف")}
                   </th>
 
-                  <th className="border-l border-ink-400/5 p-2.5 font-medium">
+                  <th className="border-e border-ink-400/5 p-2.5 font-medium">
                     {t("عدد الساعات")}
                   </th>
 
-                  <th className="border-l border-ink-400/5 p-2.5 font-medium">
+                  <th className="border-e border-ink-400/5 p-2.5 font-medium">
                     {t("الحالة")}
                   </th>
 
-                  <th className="border-l border-ink-400/5 p-2.5 font-medium">
+                  <th className="border-e border-ink-400/5 p-2.5 font-medium">
                     {t("ملاحظات")}
                   </th>
 
@@ -592,7 +592,7 @@ export default function AttendancePage() {
                         animationDelay: `${Math.min(index, 12) * 25}ms`,
                       }}
                     >
-                      <td className="border-l border-ink-400/5 p-2.5">
+                      <td className="border-e border-ink-400/5 p-2.5">
                         <input
                           type="checkbox"
                           checked={selected}
@@ -601,11 +601,11 @@ export default function AttendancePage() {
                         />
                       </td>
 
-                      <td className="border-l border-ink-400/5 p-2.5">
+                      <td className="border-e border-ink-400/5 p-2.5">
                         <button
                           type="button"
                           onClick={() => openEmployeeDetails(row)}
-                          className="text-right text-sm font-medium text-primary-600 underline-offset-2 transition-colors hover:text-primary-700 hover:underline"
+                          className="text-start text-sm font-medium text-primary-600 underline-offset-2 transition-colors hover:text-primary-700 hover:underline"
                           title={t("عرض تفاصيل الموظف")}
                         >
                           {row.employeeName || t("موظف #{0}", { 0: row.employeeId })}
@@ -616,11 +616,11 @@ export default function AttendancePage() {
                         </p>
                       </td>
 
-                      <td className="num border-l border-ink-400/5 p-2.5 text-[13px]">
+                      <td className="num border-e border-ink-400/5 p-2.5 text-[13px]">
                         {row.workDate ? formatDate(row.workDate) : "—"}
                       </td>
 
-                      <td className="border-l border-ink-400/5 p-2.5">
+                      <td className="border-e border-ink-400/5 p-2.5">
                         {row.workLocation ? (
                           <div className="inline-flex items-center gap-1.5 rounded-lg bg-ink-400/5 px-2 py-1">
                             <MapPin
@@ -637,19 +637,19 @@ export default function AttendancePage() {
                         )}
                       </td>
 
-                      <td className="num border-l border-ink-400/5 p-2.5 text-[13px]">
+                      <td className="num border-e border-ink-400/5 p-2.5 text-[13px]">
                         {row.checkIn || "—"}
                       </td>
 
-                      <td className="num border-l border-ink-400/5 p-2.5 text-[13px]">
+                      <td className="num border-e border-ink-400/5 p-2.5 text-[13px]">
                         {row.checkOut || "—"}
                       </td>
 
-                      <td className="num border-l border-ink-400/5 p-2.5 text-[13px]">
+                      <td className="num border-e border-ink-400/5 p-2.5 text-[13px]">
                         {row.workHours || "—"}
                       </td>
 
-                      <td className="border-l border-ink-400/5 p-2.5">
+                      <td className="border-e border-ink-400/5 p-2.5">
                         <span
                           className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${getStatusBadge(
                             normalizedStatus,
@@ -659,7 +659,7 @@ export default function AttendancePage() {
                         </span>
                       </td>
 
-                      <td className="max-w-[160px] truncate border-l border-ink-400/5 p-2.5 text-xs text-ink-600">
+                      <td className="max-w-[160px] truncate border-e border-ink-400/5 p-2.5 text-xs text-ink-600">
                         {row.notes || "—"}
                       </td>
 

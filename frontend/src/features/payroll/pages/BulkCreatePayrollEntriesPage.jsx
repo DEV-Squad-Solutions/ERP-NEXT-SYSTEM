@@ -583,14 +583,14 @@ export default function BulkCreatePayrollEntriesPage() {
             <div className="relative">
               <Search
                 size={16}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"
+                className="absolute start-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"
               />
 
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder={t("ابحث باسم الموظف أو الرقم...")}
-                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pr-9 pl-3 text-sm outline-none focus:border-primary-500 transition-colors"
+                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pe-9 ps-3 text-sm outline-none focus:border-primary-500 transition-colors"
               />
             </div>
           </div>
@@ -867,7 +867,7 @@ export default function BulkCreatePayrollEntriesPage() {
             ref={scrollContainerRef}
             className="overflow-x-auto overflow-y-auto max-h-[65vh] custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card"
           >
-            <table className="w-full text-right border-collapse min-w-[1450px]">
+            <table className="w-full text-start border-collapse min-w-[1450px]">
               <thead className="sticky top-0 z-[1] bg-white">
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                   <th className="p-2.5 w-10">

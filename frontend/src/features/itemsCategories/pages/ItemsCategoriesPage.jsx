@@ -190,13 +190,13 @@ export default function ItemsCategoriesPage() {
           <div
             className={`overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card transition-opacity ${isFetching ? "opacity-60" : ""}`}
           >
-            <table className="w-full text-right border-collapse min-w-[700px]">
+            <table className="w-full text-start border-collapse min-w-[700px]">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الاسم")}
                   </th>
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("ملاحظات")}
                   </th>
                   <th className="p-2.5 font-medium">{t("الحالة")}</th>
@@ -230,14 +230,14 @@ export default function ItemsCategoriesPage() {
                     key={cat.id}
                     className="border-b border-ink-400/5 last:border-0 hover:bg-ink-900/[0.01] transition-colors"
                   >
-                    <td className="p-2.5 text-sm font-medium text-ink-900 border-l border-ink-400/5">
+                    <td className="p-2.5 text-sm font-medium text-ink-900 border-e border-ink-400/5">
                       <span className="inline-flex items-center gap-1.5">
                         <Tag size={13} className="text-ink-400" />
                         {cat.name}
                       </span>
                     </td>
                     <td
-                      className="p-2.5 text-sm text-ink-600 border-l border-ink-400/5 max-w-[300px] truncate"
+                      className="p-2.5 text-sm text-ink-600 border-e border-ink-400/5 max-w-[300px] truncate"
                       title={cat.notes}
                     >
                       {cat.notes || "—"}
@@ -258,7 +258,7 @@ export default function ItemsCategoriesPage() {
 
                 {isAdding && (
                   <tr className="bg-primary-50/30">
-                    <td className="p-1.5 border-l border-ink-400/5">
+                    <td className="p-1.5 border-e border-ink-400/5">
                       <input
                         autoFocus
                         type="text"
@@ -273,7 +273,7 @@ export default function ItemsCategoriesPage() {
                         className="w-full text-sm bg-white border border-ink-400/15 rounded-lg px-2.5 py-1.5"
                       />
                     </td>
-                    <td className="p-1.5 border-l border-ink-400/5">
+                    <td className="p-1.5 border-e border-ink-400/5">
                       <input
                         type="text"
                         placeholder={t("ملاحظات (اختياري)")}

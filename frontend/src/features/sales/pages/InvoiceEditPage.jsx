@@ -1099,7 +1099,7 @@ export default function InvoiceEditPage() {
         </div>
 
         <div className="overflow-x-auto custom-scroll">
-          <table className="w-full text-right border-collapse min-w-[1050px]">
+          <table className="w-full text-start border-collapse min-w-[1050px]">
             <thead>
               <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
                 <th className="p-2.5 font-medium">#</th>
@@ -1196,7 +1196,7 @@ export default function InvoiceEditPage() {
 
         {containerLines.length > 0 && (
           <div className="overflow-x-auto custom-scroll">
-            <table className="w-full text-right border-collapse min-w-[500px]">
+            <table className="w-full text-start border-collapse min-w-[500px]">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
                   <th className="p-2.5 font-medium">#</th>

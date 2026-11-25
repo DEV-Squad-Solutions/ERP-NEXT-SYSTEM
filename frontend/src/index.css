@@ -211,3 +211,58 @@
     animation: none;
   }
 }
+
+/* =========================================================
+   DARK MODE FALLBACKS
+   Many screens only define light colors. These low-specificity
+   (:where) rules make them readable in dark mode and never
+   override a component's own dark: variant.
+   ========================================================= */
+html.dark :where(.bg-white, .bg-gray-50, .bg-slate-50, .bg-ink-50, .bg-paper) {
+  background-color: #0e1827;
+}
+html.dark :where(.bg-gray-100, .bg-slate-100, .bg-ink-100) {
+  background-color: #152236;
+}
+html.dark
+  :where(
+    .text-ink-900, .text-ink-800, .text-ink-700, .text-ink-600,
+    .text-gray-900, .text-gray-800, .text-gray-700,
+    .text-slate-900, .text-slate-800, .text-slate-700
+  ) {
+  color: #e5eaf1;
+}
+html.dark
+  :where(
+    .text-ink-500, .text-ink-400, .text-gray-500, .text-gray-600,
+    .text-slate-500, .text-slate-600
+  ) {
+  color: #9fb1c7;
+}
+html.dark
+  :where(
+    .border-ink-100, .border-ink-200, .border-gray-100, .border-gray-200,
+    .border-gray-300, .border-slate-100, .border-slate-200, .border-slate-300
+  ) {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+html.dark :where(input, select, textarea) {
+  background-color: #0a1626;
+  color: #e5eaf1;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+html.dark :where(input, textarea)::placeholder {
+  color: #6b7f96;
+}
+html.dark .rs__control { background-color: #0a1626; border-color: rgba(255,255,255,.14); }
+html.dark .rs__single-value, html.dark .rs__input-container, html.dark .rs__input { color: #e5eaf1; }
+html.dark .rs__menu { background-color: #0e1827; border: 1px solid rgba(255,255,255,.1); }
+html.dark .rs__option { background-color: transparent; color: #e5eaf1; }
+html.dark .rs__option--is-focused { background-color: #152236; }
+html.dark .rs__option--is-selected { background-color: #1a7a5e; color: #fff; }
+html.dark .compact-select__control { background-color: #0a1626; border-color: rgba(255,255,255,.14); }
+html.dark .compact-select__single-value, html.dark .compact-select__input-container, html.dark .compact-select__input { color: #e5eaf1; }
+html.dark .compact-select__menu { background-color: #0e1827; border: 1px solid rgba(255,255,255,.1); }
+html.dark .compact-select__option { background-color: transparent; color: #e5eaf1; }
+html.dark .compact-select__option--is-focused { background-color: #152236; }
+html.dark .compact-select__option--is-selected { background-color: #1a7a5e; color: #fff; }

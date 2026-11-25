@@ -134,7 +134,7 @@ export default function Modal({
           <span
             aria-hidden="true"
             className={[
-              "absolute right-0 top-0",
+              "absolute start-0 top-0",
               "h-px w-24",
               "bg-gradient-to-l",
               "from-primary-500/60",
@@ -145,7 +145,7 @@ export default function Modal({
 
           {/* TITLE */}
 
-          <div className="min-w-0 flex-1 pr-1">
+          <div className="min-w-0 flex-1 pe-1">
             <h3
               id="modal-title"
               className={[

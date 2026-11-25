@@ -299,31 +299,31 @@ export default function EmployeesPage() {
           <div
             className={`overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card transition-opacity duration-200 ${isFetching ? "opacity-60" : ""}`}
           >
-            <table className="w-full text-right border-collapse min-w-[1100px]">
+            <table className="w-full text-start border-collapse min-w-[1100px]">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("رقم الموظف")}
                   </th>
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الموظف")}
                   </th>
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الوظيفة")}
                   </th>
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("التواصل")}
                   </th>
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("مكان العمل")}
                   </th>
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("نوع الأجر")}
                   </th>
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الراتب الأساسي")}
                   </th>
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الحالة")}
                   </th>
                   <th className="p-2.5 font-medium">{t("الإجراءات")}</th>
@@ -336,10 +336,10 @@ export default function EmployeesPage() {
                     className="border-b border-ink-400/5 last:border-0 hover:bg-primary-50/30 transition-colors animate-fadeUp"
                     style={{ animationDelay: `${Math.min(idx, 12) * 25}ms` }}
                   >
-                    <td className="p-2.5 num text-ink-600 text-[13px] border-l border-ink-400/5">
+                    <td className="p-2.5 num text-ink-600 text-[13px] border-e border-ink-400/5">
                       {emp.code}
                     </td>
-                    <td className="p-2.5 border-l border-ink-400/5">
+                    <td className="p-2.5 border-e border-ink-400/5">
                       <button
                         onClick={() =>
                           navigate(`/dashboard/payroll/employees/${emp.id}`)
@@ -349,10 +349,10 @@ export default function EmployeesPage() {
                         {emp.name}
                       </button>
                     </td>
-                    <td className="p-2.5 text-ink-700 text-xs border-l border-ink-400/5">
+                    <td className="p-2.5 text-ink-700 text-xs border-e border-ink-400/5">
                       {emp.jobTitle}
                     </td>
-                    <td className="p-2.5 border-l border-ink-400/5">
+                    <td className="p-2.5 border-e border-ink-400/5">
                       <div className="flex flex-col gap-0.5 text-[11px] text-ink-400">
                         {emp.phoneNumber && (
                           <span className="flex items-center gap-1 num">
@@ -364,7 +364,7 @@ export default function EmployeesPage() {
                         {!emp.phoneNumber && !emp.email && "—"}
                       </div>
                     </td>
-                    <td className="p-2.5 border-l border-ink-400/5">
+                    <td className="p-2.5 border-e border-ink-400/5">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-ink-700">
                           {emp.workPlaceStatus === "OutCompany"
@@ -379,7 +379,7 @@ export default function EmployeesPage() {
                         )}
                       </div>
                     </td>
-                    <td className="p-2.5 border-l border-ink-400/5">
+                    <td className="p-2.5 border-e border-ink-400/5">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs text-ink-700">
                           {emp.employeeType === "Daily" ? t("يومي") : t("شهري")}
@@ -392,10 +392,10 @@ export default function EmployeesPage() {
                           )}
                       </div>
                     </td>
-                    <td className="p-2.5 num text-ink-900 text-[13px] border-l border-ink-400/5">
+                    <td className="p-2.5 num text-ink-900 text-[13px] border-e border-ink-400/5">
                       {fmtMoney(emp.salary)}
                     </td>
-                    <td className="p-2.5 border-l border-ink-400/5">
+                    <td className="p-2.5 border-e border-ink-400/5">
                       <span
                         className={
                           emp.isActive

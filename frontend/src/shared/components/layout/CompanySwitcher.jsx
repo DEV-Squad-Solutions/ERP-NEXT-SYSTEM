@@ -95,7 +95,7 @@ export default function CompanySwitcher() {
                 onClick={() => handleSelect(company.id)}
                 className={[
                   "flex w-full items-center justify-between",
-                  "rounded-xl border px-3.5 py-2.5 text-right",
+                  "rounded-xl border px-3.5 py-2.5 text-start",
                   "transition-all duration-150",
                   isSelected
                     ? "border-primary-300 bg-primary-50 dark:border-primary-500/30 dark:bg-primary-500/10"

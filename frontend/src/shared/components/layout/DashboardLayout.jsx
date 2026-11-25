@@ -84,7 +84,7 @@ export default function DashboardLayout() {
           >
             <div
               className={[
-                "absolute right-0 top-0",
+                "absolute start-0 top-0",
                 "h-56 w-56",
                 "rounded-full",
                 "bg-primary-500/[0.025]",
@@ -95,7 +95,7 @@ export default function DashboardLayout() {
 
             <div
               className={[
-                "absolute bottom-0 left-0",
+                "absolute bottom-0 end-0",
                 "h-64 w-64",
                 "rounded-full",
                 "bg-primary-500/[0.018]",

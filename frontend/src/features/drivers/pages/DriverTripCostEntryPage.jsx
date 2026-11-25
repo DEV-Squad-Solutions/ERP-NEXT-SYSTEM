@@ -388,38 +388,38 @@ export default function DriverTripCostEntryPage() {
               isFetching ? "opacity-60" : ""
             }`}
           >
-            <table className="w-full text-right border-collapse min-w-[1150px]">
+            <table className="w-full text-start border-collapse min-w-[1150px]">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("رقم الرحلة")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("التاريخ")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("السائق")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("العميل")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الدولة")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("رقم الفاتورة")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("تكلفة الرحلة")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("ملاحظات")}
                   </th>
 
@@ -466,7 +466,7 @@ export default function DriverTripCostEntryPage() {
             `}
                     >
                       {/* رقم الرحلة */}
-                      <td className="p-2.5 border-l border-ink-400/5 whitespace-nowrap">
+                      <td className="p-2.5 border-e border-ink-400/5 whitespace-nowrap">
                         <div className="flex flex-col gap-1">
                           <span className="num text-[13px] font-semibold text-ink-900">
                             {row.tripNumber}
@@ -485,14 +485,14 @@ export default function DriverTripCostEntryPage() {
                       </td>
 
                       {/* التاريخ */}
-                      <td className="p-2.5 border-l border-ink-400/5 whitespace-nowrap">
+                      <td className="p-2.5 border-e border-ink-400/5 whitespace-nowrap">
                         <span className="num text-[12px] text-ink-600">
                           {row.tripDate ? formatDate(row.tripDate) : "—"}
                         </span>
                       </td>
 
                       {/* السائق */}
-                      <td className="p-2.5 border-l border-ink-400/5 min-w-[150px]">
+                      <td className="p-2.5 border-e border-ink-400/5 min-w-[150px]">
                         <div className="flex flex-col min-w-0">
                           <span
                             className="text-[12px] font-medium text-ink-800 truncate"
@@ -519,7 +519,7 @@ export default function DriverTripCostEntryPage() {
                       </td>
 
                       {/* العميل */}
-                      <td className="p-2.5 border-l border-ink-400/5 min-w-[190px]">
+                      <td className="p-2.5 border-e border-ink-400/5 min-w-[190px]">
                         <span
                           className="block text-[12px] font-medium text-ink-800 truncate"
                           title={row.businessPartnerName}
@@ -529,7 +529,7 @@ export default function DriverTripCostEntryPage() {
                       </td>
 
                       {/* الدولة */}
-                      <td className="p-2.5 border-l border-ink-400/5 whitespace-nowrap">
+                      <td className="p-2.5 border-e border-ink-400/5 whitespace-nowrap">
                         {row.countryName ? (
                           <span className="inline-flex items-center rounded-md bg-primary-50 px-2 py-1 text-[11px] font-medium text-primary-600">
                             {row.countryName}
@@ -540,7 +540,7 @@ export default function DriverTripCostEntryPage() {
                       </td>
 
                       {/* الفاتورة */}
-                      <td className="p-2.5 border-l border-ink-400/5 whitespace-nowrap">
+                      <td className="p-2.5 border-e border-ink-400/5 whitespace-nowrap">
                         {row.invoiceNumber ? (
                           <InvoiceNumberLink
                             invoiceId={row.invoiceId}
@@ -556,7 +556,7 @@ export default function DriverTripCostEntryPage() {
                       </td>
 
                       {/* التكلفة */}
-                      <td className="p-1.5 border-l border-ink-400/5 w-[150px]">
+                      <td className="p-1.5 border-e border-ink-400/5 w-[150px]">
                         {isStandalone || !canEditInline ? (
                           <div className="flex items-center justify-center gap-1 px-2 py-2">
                             <span className="num text-[12px] font-semibold text-ink-900">

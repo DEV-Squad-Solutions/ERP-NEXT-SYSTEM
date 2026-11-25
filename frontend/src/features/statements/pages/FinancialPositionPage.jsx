@@ -356,16 +356,16 @@ export default function FinancialPositionPage({ companyName = "" }) {
               <table className="w-full min-w-[800px] text-sm">
                 <thead>
                   <tr className="bg-ink-400/5 text-xs text-ink-400">
-                    <th className="px-3 py-2.5 text-right font-medium">
+                    <th className="px-3 py-2.5 text-start font-medium">
                       {isDetailed ? t("الحساب") : t("بند القائمة")}
                     </th>
-                    <th className="px-3 py-2.5 text-right font-medium">
+                    <th className="px-3 py-2.5 text-start font-medium">
                       {t("رصيد أول المدة")}
                     </th>
-                    <th className="px-3 py-2.5 text-right font-medium">
+                    <th className="px-3 py-2.5 text-start font-medium">
                       {t("حركة الفترة")}
                     </th>
-                    <th className="px-3 py-2.5 text-right font-medium">
+                    <th className="px-3 py-2.5 text-start font-medium">
                       {t("رصيد آخر المدة")}
                     </th>
                   </tr>
@@ -400,14 +400,14 @@ export default function FinancialPositionPage({ companyName = "" }) {
                               key={`${section.key}-${row.financialStatementLineId}-${row.accountId ?? idx}`}
                               className="border-t border-ink-400/10 transition-colors hover:bg-ink-900/[0.015]"
                             >
-                              <td className="px-3 py-2.5 pr-6">
+                              <td className="px-3 py-2.5 pe-6">
                                 {isDetailed ? (
                                   <>
                                     <span className="font-medium text-ink-800">
                                       {row.accountName || "—"}
                                     </span>
                                     {row.accountCode && (
-                                      <span className="mr-2 text-[11px] text-ink-400">
+                                      <span className="me-2 text-[11px] text-ink-400">
                                         {row.accountCode}
                                       </span>
                                     )}
@@ -423,7 +423,7 @@ export default function FinancialPositionPage({ companyName = "" }) {
                                       {row.financialStatementLineName || "—"}
                                     </span>
                                     {row.financialStatementLineCode && (
-                                      <span className="mr-2 text-[11px] text-ink-400">
+                                      <span className="me-2 text-[11px] text-ink-400">
                                         {row.financialStatementLineCode}
                                       </span>
                                     )}
@@ -512,16 +512,16 @@ export default function FinancialPositionPage({ companyName = "" }) {
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="bg-ink-400/5 text-xs text-ink-400">
-                      <th className="px-4 py-2.5 text-right font-medium">
+                      <th className="px-4 py-2.5 text-start font-medium">
                         {t("الحساب")}
                       </th>
-                      <th className="px-4 py-2.5 text-right font-medium">
+                      <th className="px-4 py-2.5 text-start font-medium">
                         {t("رصيد أول المدة")}
                       </th>
-                      <th className="px-4 py-2.5 text-right font-medium">
+                      <th className="px-4 py-2.5 text-start font-medium">
                         {t("حركة الفترة")}
                       </th>
-                      <th className="px-4 py-2.5 text-right font-medium">
+                      <th className="px-4 py-2.5 text-start font-medium">
                         {t("رصيد آخر المدة")}
                       </th>
                     </tr>

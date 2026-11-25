@@ -189,13 +189,13 @@ export default function CashMovementTypesListPage() {
             </button>
 
             {showFilters && (
-              <div className="absolute left-0 z-20 mt-2 w-80 animate-fadeUp space-y-3 rounded-2xl border border-gold/20 bg-white p-4 shadow-lg">
+              <div className="absolute end-0 z-20 mt-2 w-80 animate-fadeUp space-y-3 rounded-2xl border border-gold/20 bg-white p-4 shadow-lg">
                 <div>
                   <label className="mb-1.5 block text-xs text-ink/50">
                     {t("بحث")}
                   </label>
                   <div className="relative">
-                    <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
+                    <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
                     <input
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}

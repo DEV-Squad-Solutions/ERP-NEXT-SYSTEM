@@ -72,7 +72,7 @@ export default function SalesFiltersCard({
             <Filter size={18} className="text-primary-600" />
           </div>
 
-          <div className="text-right">
+          <div className="text-start">
             <h3 className="font-semibold">{t("فلاتر البحث")}</h3>
 
             <span className="text-xs text-gray-500">

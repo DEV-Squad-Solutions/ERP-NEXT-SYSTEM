@@ -1035,7 +1035,7 @@ export default function CashboxLedgerTable({
       >
         <div className="overflow-x-auto">
           <table
-            className="w-full min-w-[1180px] border-collapse text-right"
+            className="w-full min-w-[1180px] border-collapse text-start"
             dir={getDir()}
           >
             <colgroup>
@@ -1053,35 +1053,35 @@ export default function CashboxLedgerTable({
 
             <thead>
               <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
-                <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
+                <th className="border-e border-ink-400/5 px-2 py-2 font-medium">
                   {t("الرصيد")}
                 </th>
 
-                <th className="border-l border-ink-400/5 px-2 py-2 font-medium text-positive">
+                <th className="border-e border-ink-400/5 px-2 py-2 font-medium text-positive">
                   {t("صادر")}
                   {isForeign && ` (${currency})`}
                 </th>
 
-                <th className="border-l border-ink-400/5 px-2 py-2 font-medium text-negative">
+                <th className="border-e border-ink-400/5 px-2 py-2 font-medium text-negative">
                   {t("وارد")}
                   {isForeign && ` (${currency})`}
                 </th>
 
                 {isForeign && (
-                  <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
+                  <th className="border-e border-ink-400/5 px-2 py-2 font-medium">
                     {t("سعر الصرف")}
                   </th>
                 )}
 
-                <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
+                <th className="border-e border-ink-400/5 px-2 py-2 font-medium">
                   {t("التوصيف")}
                 </th>
 
-                <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
+                <th className="border-e border-ink-400/5 px-2 py-2 font-medium">
                   {t("البيان")}
                 </th>
 
-                <th className="border-l border-ink-400/5 px-2 py-2 font-medium">
+                <th className="border-e border-ink-400/5 px-2 py-2 font-medium">
                   {t("التاريخ")}
                 </th>
 
@@ -1144,7 +1144,7 @@ export default function CashboxLedgerTable({
                     </div>
                   </td>
 
-                  <td className="border-l border-ink-400/5 p-1.5">
+                  <td className="border-e border-ink-400/5 p-1.5">
                     <input
                       type="number"
                       min="0"
@@ -1159,7 +1159,7 @@ export default function CashboxLedgerTable({
                     />
                   </td>
 
-                  <td className="border-l border-ink-400/5 p-1.5">
+                  <td className="border-e border-ink-400/5 p-1.5">
                     <input
                       type="number"
                       min="0"
@@ -1175,7 +1175,7 @@ export default function CashboxLedgerTable({
                   </td>
 
                   {isForeign && (
-                    <td className="border-l border-ink-400/5 p-1.5">
+                    <td className="border-e border-ink-400/5 p-1.5">
                       <input
                         type="number"
                         min="0"
@@ -1198,14 +1198,14 @@ export default function CashboxLedgerTable({
                     </td>
                   )}
 
-                  <td className="border-l border-ink-400/5 p-1.5">
+                  <td className="border-e border-ink-400/5 p-1.5">
                     <span className="flex items-center justify-center gap-1 text-xs text-ink-300">
                       <PenLine size={12} className="shrink-0" />
                       {t("بيتكتب من عمود البيان")}
                     </span>
                   </td>
 
-                  <td className="border-l border-ink-400/5 p-1.5">
+                  <td className="border-e border-ink-400/5 p-1.5">
                     <input
                       type="text"
                       placeholder={t("بيان الحركة (اختياري)")}
@@ -1222,7 +1222,7 @@ export default function CashboxLedgerTable({
                     </div>
                   </td>
 
-                  <td className="border-l border-ink-400/5 p-1.5">
+                  <td className="border-e border-ink-400/5 p-1.5">
                     <DateInput
                       type="date"
                       value={draft.voucherDate}
@@ -1324,7 +1324,7 @@ export default function CashboxLedgerTable({
                       {fmt(row.balance)}
                     </td>
 
-                    <td className="num border-l border-ink-400/5 px-2 py-2 text-base text-positive">
+                    <td className="num border-e border-ink-400/5 px-2 py-2 text-base text-positive">
                       {row.credit > 0 ? (
                         <>
                           <div className="font-medium">{fmt(row.credit)}</div>
@@ -1340,7 +1340,7 @@ export default function CashboxLedgerTable({
                       )}
                     </td>
 
-                    <td className="num border-l border-ink-400/5 px-2 py-2 text-base text-negative">
+                    <td className="num border-e border-ink-400/5 px-2 py-2 text-base text-negative">
                       {row.debit > 0 ? (
                         <>
                           <div className="font-medium">{fmt(row.debit)}</div>
@@ -1357,14 +1357,14 @@ export default function CashboxLedgerTable({
                     </td>
 
                     {isForeign && (
-                      <td className="num border-l border-ink-400/5 px-2 py-2 text-xs text-ink-600">
+                      <td className="num border-e border-ink-400/5 px-2 py-2 text-xs text-ink-600">
                         {row.debit > 0 || row.credit > 0
                           ? fmt(row.exchangeRate)
                           : "—"}
                       </td>
                     )}
 
-                    <td className="min-w-0 border-l border-ink-400/5 px-2 py-2">
+                    <td className="min-w-0 border-e border-ink-400/5 px-2 py-2">
                       <div className="min-w-[240px]">
                         {isDescriptionLocked ? (
                           <div className="flex items-center gap-1.5 rounded-lg border border-ink-400/10 bg-ink-400/5 px-2.5 py-2 text-xs text-ink-500">
@@ -1410,7 +1410,7 @@ export default function CashboxLedgerTable({
                         )}
 
                         {!isAdminOrAccountant && (
-                          <div className="mt-1 text-right text-[11px] text-ink-300">
+                          <div className="mt-1 text-start text-[11px] text-ink-300">
                             {isDescribeLocked
                               ? t("الحركة موصّفة — التعديل للأدمن أو المحاسب فقط")
                               : t("توصّف الحركة مرة واحدة، وبعدها يتقفل التعديل")}
@@ -1447,7 +1447,7 @@ export default function CashboxLedgerTable({
                     </td>
 
                     {/* البيان: عمود مستقل بخط أوضح وحجم أكبر عشان يتقرا */}
-                    <td className="min-w-0 border-l border-ink-400/5 px-2 py-2">
+                    <td className="min-w-0 border-e border-ink-400/5 px-2 py-2">
                       {row.description ? (
                         <p
                           className="line-clamp-2 text-sm font-medium leading-6 text-ink-900"
@@ -1460,7 +1460,7 @@ export default function CashboxLedgerTable({
                       )}
                     </td>
 
-                    <td className="num border-l border-ink-400/5 px-2 py-2 text-xs text-ink-600">
+                    <td className="num border-e border-ink-400/5 px-2 py-2 text-xs text-ink-600">
                       <span className="whitespace-nowrap">
                         {formatDate(row.voucherDate)}
                       </span>

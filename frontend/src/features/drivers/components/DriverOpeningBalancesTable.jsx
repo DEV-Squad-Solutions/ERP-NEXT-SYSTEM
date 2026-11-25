@@ -131,14 +131,14 @@ export default function DriverOpeningBalancesTable({
         <table className="min-w-full border-collapse text-sm">
           <thead className="bg-ink-900/[0.03]">
             <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-400">
-              <th className="px-4 py-3 text-right">{t("رقم المستند")}</th>
+              <th className="px-4 py-3 text-start">{t("رقم المستند")}</th>
               <th className="w-36 px-4 py-3 text-center">{t("التاريخ")}</th>
-              <th className="w-36 px-4 py-3 text-right">{t("السنة المالية")}</th>
-              <th className="min-w-[200px] px-4 py-3 text-right">{t("السائق")}</th>
+              <th className="w-36 px-4 py-3 text-start">{t("السنة المالية")}</th>
+              <th className="min-w-[200px] px-4 py-3 text-start">{t("السائق")}</th>
               <th className="w-28 px-4 py-3 text-center">{t("النوع")}</th>
               <th className="w-32 px-4 py-3 text-center">{t("المبلغ")}</th>
               <th className="w-32 px-4 py-3 text-center">{t("العملة")}</th>
-              <th className="min-w-[180px] px-4 py-3 text-right">{t("ملاحظات")}</th>
+              <th className="min-w-[180px] px-4 py-3 text-start">{t("ملاحظات")}</th>
               {canManage && <th className="w-20 px-4 py-3"></th>}
             </tr>
           </thead>

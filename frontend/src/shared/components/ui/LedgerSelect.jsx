@@ -12,7 +12,7 @@ export default function LedgerSelect({
   return (
     <div>
       <div className="flex items-stretch">
-        <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+        <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
           {label}
         </div>
         <select

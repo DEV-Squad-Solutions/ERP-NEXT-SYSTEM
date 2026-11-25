@@ -169,13 +169,13 @@ export default function EmployeeStatementTable({
                 </div>
               </th>
 
-              <th className="min-w-[280px] px-4 py-3 text-right">{t("البيان")}</th>
+              <th className="min-w-[280px] px-4 py-3 text-start">{t("البيان")}</th>
 
               <th className="w-36 px-4 py-3 text-center">{t("التاريخ")}</th>
 
-              <th className="w-44 px-4 py-3 text-right">{t("رقم المستند")}</th>
+              <th className="w-44 px-4 py-3 text-start">{t("رقم المستند")}</th>
 
-              <th className="w-40 px-4 py-3 text-right">{t("رقم المرجع")}</th>
+              <th className="w-40 px-4 py-3 text-start">{t("رقم المرجع")}</th>
 
               {isForeignCurrency && (
                 <th className="w-32 px-4 py-3 text-center">{t("سعر الصرف")}</th>
@@ -224,7 +224,7 @@ export default function EmployeeStatementTable({
                       renderBaseValue(item.baseCreditAmount)}
                   </td>
 
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-start">
                     <div className="font-medium text-ink-900">
                       {sourceLabel}
                     </div>
@@ -244,13 +244,13 @@ export default function EmployeeStatementTable({
                     {item.date ? formatDate(item.date) : "—"}
                   </td>
 
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-start">
                     <span className="font-medium text-ink-600">
                       {item.documentNumber || "—"}
                     </span>
                   </td>
 
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3 text-start">
                     <span className="text-ink-500">
                       {item.referenceNumber || "—"}
                     </span>

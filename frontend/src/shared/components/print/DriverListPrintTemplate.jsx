@@ -39,7 +39,7 @@ export default function DriverListPrintTemplate({
         </div>
       )}
 
-      <table className="w-full text-right text-sm border-collapse">
+      <table className="w-full text-start text-sm border-collapse">
         <thead>
           <tr className="border-b-2 border-ink-900">
             <th className="py-2 px-2">{t("الكود")}</th>

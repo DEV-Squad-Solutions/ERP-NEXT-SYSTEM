@@ -44,7 +44,7 @@ function Row({ label, value }) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-ink-400/10 py-2 text-sm last:border-0">
       <span className="text-ink-400">{label}</span>
-      <span className="text-right font-medium text-ink-800">{value}</span>
+      <span className="text-start font-medium text-ink-800">{value}</span>
     </div>
   );
 }

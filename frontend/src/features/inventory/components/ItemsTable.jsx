@@ -35,7 +35,7 @@ export default function ItemsTable() {
 
   return (
     <div className="overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card">
-      <table className="w-full text-right border-collapse">
+      <table className="w-full text-start border-collapse">
         <thead>
           <tr className="bg-ink-900/[0.02] border-b border-ink-400/10 text-ink-400 text-xs">
             <th className="p-3.5 font-medium">{t("الصنف")}</th>

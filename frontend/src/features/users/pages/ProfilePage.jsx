@@ -107,7 +107,7 @@ export default function ProfilePage() {
           <div className="relative flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary-50 text-lg font-bold text-primary-600 ring-4 ring-primary-500/5 dark:bg-primary-500/10 dark:text-primary-400">
             {initials}
 
-            <span className="absolute -bottom-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-primary-500 text-white dark:border-ink-900">
+            <span className="absolute -bottom-1 -end-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-primary-500 text-white dark:border-ink-900">
               <ShieldCheck size={10} />
             </span>
           </div>

@@ -353,34 +353,34 @@ export default function StockTransfersPage() {
               ${isFetching ? "opacity-60" : ""}
             `}
           >
-            <table className="w-full min-w-[1000px] text-right border-collapse">
+            <table className="w-full min-w-[1000px] text-start border-collapse">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("المستند")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("التاريخ")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("من مخزن")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("إلى مخزن")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الأصناف")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الكمية")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("ملاحظات")}
                   </th>
 
@@ -397,7 +397,7 @@ export default function StockTransfersPage() {
                       animationDelay: `${Math.min(index, 12) * 25}ms`,
                     }}
                   >
-                    <td className="p-2.5 border-l border-ink-400/5">
+                    <td className="p-2.5 border-e border-ink-400/5">
                       <button
                         type="button"
                         onClick={() => openDetails(row.id)}
@@ -407,15 +407,15 @@ export default function StockTransfersPage() {
                       </button>
                     </td>
 
-                    <td className="p-2.5 text-[13px] num border-l border-ink-400/5">
+                    <td className="p-2.5 text-[13px] num border-e border-ink-400/5">
                       {formatDate(row.transferDate)}
                     </td>
 
-                    <td className="p-2.5 text-sm text-ink-900 border-l border-ink-400/5">
+                    <td className="p-2.5 text-sm text-ink-900 border-e border-ink-400/5">
                       {row.sourceStoreName}
                     </td>
 
-                    <td className="p-2.5 text-sm text-ink-900 border-l border-ink-400/5">
+                    <td className="p-2.5 text-sm text-ink-900 border-e border-ink-400/5">
                       <div className="flex items-center gap-1.5">
                         <ArrowLeftRight
                           size={13}
@@ -426,17 +426,17 @@ export default function StockTransfersPage() {
                       </div>
                     </td>
 
-                    <td className="p-2.5 text-sm num border-l border-ink-400/5">
+                    <td className="p-2.5 text-sm num border-e border-ink-400/5">
                       {row.lineCount}
                     </td>
 
-                    <td className="p-2.5 text-sm num border-l border-ink-400/5">
+                    <td className="p-2.5 text-sm num border-e border-ink-400/5">
                       {Number(row.totalQuantity || 0).toLocaleString(getLocale(), {
                         maximumFractionDigits: 2,
                       })}
                     </td>
 
-                    <td className="p-2.5 text-xs text-ink-500 max-w-[180px] truncate border-l border-ink-400/5">
+                    <td className="p-2.5 text-xs text-ink-500 max-w-[180px] truncate border-e border-ink-400/5">
                       {row.notes || "—"}
                     </td>
 

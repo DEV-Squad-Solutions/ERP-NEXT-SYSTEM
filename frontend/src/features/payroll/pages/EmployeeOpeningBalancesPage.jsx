@@ -462,34 +462,34 @@ export default function EmployeeOpeningBalancesPage() {
               ${isFetching ? "opacity-60" : ""}
             `}
           >
-            <table className="w-full text-right border-collapse min-w-[950px]">
+            <table className="w-full text-start border-collapse min-w-[950px]">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("الموظف")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("رقم المستند")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("التاريخ")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("نوع الرصيد")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("القيمة")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("العملة")}
                   </th>
 
-                  <th className="p-2.5 font-medium border-l border-ink-400/5">
+                  <th className="p-2.5 font-medium border-e border-ink-400/5">
                     {t("ملاحظات")}
                   </th>
 
@@ -508,7 +508,7 @@ export default function EmployeeOpeningBalancesPage() {
                   >
                     {/* Employee */}
 
-                    <td className="p-2.5 border-l border-ink-400/5">
+                    <td className="p-2.5 border-e border-ink-400/5">
                       <p className="text-sm font-medium text-ink-900">
                         {row.employeeName}
                       </p>
@@ -521,19 +521,19 @@ export default function EmployeeOpeningBalancesPage() {
 
                     {/* Document Number */}
 
-                    <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+                    <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                       {row.documentNumber || "—"}
                     </td>
 
                     {/* Date */}
 
-                    <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+                    <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                       {formatDate(row.documentDate)}
                     </td>
 
                     {/* Balance Type */}
 
-                    <td className="p-2.5 border-l border-ink-400/5">
+                    <td className="p-2.5 border-e border-ink-400/5">
                       <span
                         className={`
                           inline-block
@@ -561,7 +561,7 @@ export default function EmployeeOpeningBalancesPage() {
 
                     {/* Amount */}
 
-                    <td className="p-2.5 num text-[13px] font-semibold border-l border-ink-400/5">
+                    <td className="p-2.5 num text-[13px] font-semibold border-e border-ink-400/5">
                       {fmt(row.amount)}
                       {row.currency !== row.baseCurrency && (
                         <span className="block text-[10px] text-ink-400 font-normal">
@@ -572,13 +572,13 @@ export default function EmployeeOpeningBalancesPage() {
 
                     {/* Currency */}
 
-                    <td className="p-2.5 text-[13px] border-l border-ink-400/5">
+                    <td className="p-2.5 text-[13px] border-e border-ink-400/5">
                       {row.currency}
                     </td>
 
                     {/* Notes */}
 
-                    <td className="p-2.5 text-xs text-ink-600 max-w-[160px] truncate border-l border-ink-400/5">
+                    <td className="p-2.5 text-xs text-ink-600 max-w-[160px] truncate border-e border-ink-400/5">
                       {row.notes || "—"}
                     </td>
 

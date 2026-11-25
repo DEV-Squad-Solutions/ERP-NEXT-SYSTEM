@@ -258,7 +258,7 @@ export default function PartnerDetailPage() {
             </Button>
           </div>
 
-          <table className="w-full text-right">
+          <table className="w-full text-start">
             <thead>
               <tr className="bg-ink-400/5 text-xs text-ink-400">
                 <th className="py-2 px-4 font-medium">{t("الكود")}</th>

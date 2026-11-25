@@ -343,7 +343,7 @@ export default function CashMovementTypeFormModal({
           <span className="text-sm text-ink">
             {t("مرتبط بعميل/مورد (forPartner)")}
             {classification === "PartnerSettlement" && (
-              <span className="mr-1 text-xs text-ink/40">
+              <span className="me-1 text-xs text-ink/40">
                 {t("— إجباري لهذا التصنيف")}
               </span>
             )}
@@ -380,7 +380,7 @@ export default function CashMovementTypeFormModal({
           <p className="mb-2 text-sm font-medium text-ink">
             {t("افتراضي لأنواع الفواتير")}
             {!canEditDefaults && (
-              <span className="mr-1 text-xs text-ink/40">
+              <span className="me-1 text-xs text-ink/40">
                 {t("— متاح بس لتصنيف \"تسوية عميل/مورد\"")}
               </span>
             )}

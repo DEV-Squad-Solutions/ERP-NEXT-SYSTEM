@@ -1189,10 +1189,10 @@ export default function JournalEntriesListPage() {
                 <span>{t("البيان / المصدر")}</span>
                 <span>{t("النوع")}</span>
                 <span>{t("العملة")}</span>
-                <span className="text-left">{t("مدين")}</span>
-                <span className="text-left">{t("دائن")}</span>
+                <span className="text-end">{t("مدين")}</span>
+                <span className="text-end">{t("دائن")}</span>
                 <span>{t("الحالة")}</span>
-                <span className="text-left">{t("الإجراءات")}</span>
+                <span className="text-end">{t("الإجراءات")}</span>
               </div>
 
               {/* Loading */}
@@ -1217,10 +1217,10 @@ export default function JournalEntriesListPage() {
                       <div className="h-4 w-52 animate-pulse rounded-md bg-gray-100" />
                       <div className="h-6 w-16 animate-pulse rounded-full bg-gray-100" />
                       <div className="h-6 w-14 animate-pulse rounded-lg bg-gray-100" />
-                      <div className="ml-auto h-4 w-20 animate-pulse rounded-md bg-gray-100" />
-                      <div className="ml-auto h-4 w-20 animate-pulse rounded-md bg-gray-100" />
+                      <div className="ms-auto h-4 w-20 animate-pulse rounded-md bg-gray-100" />
+                      <div className="ms-auto h-4 w-20 animate-pulse rounded-md bg-gray-100" />
                       <div className="h-6 w-16 animate-pulse rounded-full bg-gray-100" />
-                      <div className="ml-auto h-8 w-16 animate-pulse rounded-lg bg-gray-100" />
+                      <div className="ms-auto h-8 w-16 animate-pulse rounded-lg bg-gray-100" />
                     </div>
                   ))}
                 </div>

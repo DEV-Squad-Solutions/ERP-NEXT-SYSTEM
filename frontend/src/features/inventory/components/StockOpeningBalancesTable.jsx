@@ -90,14 +90,14 @@ function StockOpeningBalanceRow({ item, onEdit, onDelete, deletingId }) {
             <table className="w-full border-collapse text-xs">
               <thead>
                 <tr className="text-ink-400">
-                  <th className="p-2 text-right font-medium">{t("الصنف")}</th>
+                  <th className="p-2 text-start font-medium">{t("الصنف")}</th>
                   <th className="p-2 text-center font-medium">{t("الوحدة")}</th>
                   <th className="p-2 text-center font-medium">{t("العدد")}</th>
                   <th className="p-2 text-center font-medium">{t("الوزن")}</th>
                   <th className="p-2 text-center font-medium">{t("الكمية")}</th>
                   <th className="p-2 text-center font-medium">{t("السعر")}</th>
                   <th className="p-2 text-center font-medium">{t("الإجمالي")}</th>
-                  <th className="p-2 text-right font-medium">{t("ملاحظات")}</th>
+                  <th className="p-2 text-start font-medium">{t("ملاحظات")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -209,12 +209,12 @@ export default function StockOpeningBalancesTable({
           <thead className="bg-ink-900/[0.03]">
             <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-400">
               <th className="w-8 px-4 py-3"></th>
-              <th className="px-4 py-3 text-right">{t("رقم المستند")}</th>
+              <th className="px-4 py-3 text-start">{t("رقم المستند")}</th>
               <th className="w-36 px-4 py-3 text-center">{t("التاريخ")}</th>
-              <th className="min-w-[180px] px-4 py-3 text-right">{t("المخزن")}</th>
+              <th className="min-w-[180px] px-4 py-3 text-start">{t("المخزن")}</th>
               <th className="w-28 px-4 py-3 text-center">{t("عدد الأصناف")}</th>
               <th className="w-36 px-4 py-3 text-center">{t("الإجمالي")}</th>
-              <th className="min-w-[180px] px-4 py-3 text-right">{t("ملاحظات")}</th>
+              <th className="min-w-[180px] px-4 py-3 text-start">{t("ملاحظات")}</th>
               <th className="w-20 px-4 py-3"></th>
             </tr>
           </thead>

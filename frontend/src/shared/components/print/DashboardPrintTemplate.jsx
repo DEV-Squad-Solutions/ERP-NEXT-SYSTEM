@@ -69,7 +69,7 @@ export default function DashboardPrintTemplate({ data }) {
           <p className="mt-1 text-sm text-slate-500">{t("الملخص التشغيلي والمالي")}</p>
         </div>
 
-        <div className="text-left text-xs text-slate-500">
+        <div className="text-end text-xs text-slate-500">
           <p>
             <span className="font-semibold text-slate-800">{t("السنة المالية:")}</span>{" "}
             {data.fiscalYearName || "—"}
@@ -194,11 +194,11 @@ export default function DashboardPrintTemplate({ data }) {
           <table className="w-full border-collapse text-xs">
             <thead>
               <tr className="border-y border-slate-300 bg-slate-50">
-                <th className="px-3 py-2 text-right">{t("الشهر")}</th>
+                <th className="px-3 py-2 text-start">{t("الشهر")}</th>
 
-                <th className="px-3 py-2 text-left">{t("المبيعات")}</th>
+                <th className="px-3 py-2 text-end">{t("المبيعات")}</th>
 
-                <th className="px-3 py-2 text-left">{t("المشتريات")}</th>
+                <th className="px-3 py-2 text-end">{t("المشتريات")}</th>
               </tr>
             </thead>
 
@@ -212,11 +212,11 @@ export default function DashboardPrintTemplate({ data }) {
                     {month.month}/{month.year}
                   </td>
 
-                  <td className="px-3 py-2 text-left font-medium">
+                  <td className="px-3 py-2 text-end font-medium">
                     {fmtMoney(month.sales, data.baseCurrency)}
                   </td>
 
-                  <td className="px-3 py-2 text-left font-medium">
+                  <td className="px-3 py-2 text-end font-medium">
                     {fmtMoney(month.purchases, data.baseCurrency)}
                   </td>
                 </tr>

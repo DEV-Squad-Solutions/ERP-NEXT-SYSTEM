@@ -410,7 +410,7 @@ export default function Navbar({ onMenuClick }) {
                 {isAdmin && (
                   <span
                     className={[
-                      "absolute -bottom-0.5 -left-0.5",
+                      "absolute -bottom-0.5 -end-0.5",
                       "flex h-3.5 w-3.5",
                       "items-center justify-center",
                       "rounded-full",
@@ -528,7 +528,7 @@ export default function Navbar({ onMenuClick }) {
               {isAdmin && (
                 <span
                   className={[
-                    "absolute -bottom-0.5 -left-0.5",
+                    "absolute -bottom-0.5 -end-0.5",
                     "flex h-4 w-4",
                     "items-center justify-center",
                     "rounded-full",
@@ -590,7 +590,7 @@ export default function Navbar({ onMenuClick }) {
               "border border-ink-400/10",
               "bg-white",
               "p-3",
-              "text-right",
+              "text-start",
               "transition-all duration-200",
               "hover:-translate-y-0.5",
               "hover:border-primary-200",
@@ -674,7 +674,7 @@ export default function Navbar({ onMenuClick }) {
               "border border-ink-400/10",
               "bg-white",
               "p-3",
-              "text-right",
+              "text-start",
               "transition-all duration-200",
               "hover:-translate-y-0.5",
               "hover:border-primary-200",
@@ -755,7 +755,7 @@ export default function Navbar({ onMenuClick }) {
               "border border-red-200",
               "bg-red-50/60",
               "p-3",
-              "text-right",
+              "text-start",
               "transition-all duration-200",
               "hover:-translate-y-0.5",
               "hover:border-red-300",

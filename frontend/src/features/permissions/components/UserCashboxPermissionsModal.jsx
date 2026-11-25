@@ -149,7 +149,7 @@ export default function UserCashboxPermissionsModal({ isOpen, onClose, user }) {
           <button
             type="button"
             onClick={refetch}
-            className="mr-2 font-medium underline"
+            className="me-2 font-medium underline"
           >
             {t("إعادة المحاولة")}
           </button>

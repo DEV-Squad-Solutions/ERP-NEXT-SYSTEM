@@ -84,7 +84,7 @@ const AccountTreeNode = memo(function AccountTreeNode({
             style={{ width: INDENT_WIDTH }}
           >
             {showLine && (
-              <span className="absolute bottom-0 right-1/2 top-0 border-r border-slate-200" />
+              <span className="absolute bottom-0 right-1/2 top-0 border-s border-slate-200" />
             )}
           </div>
         ))}
@@ -94,12 +94,12 @@ const AccountTreeNode = memo(function AccountTreeNode({
             className="relative h-[46px] shrink-0"
             style={{ width: INDENT_WIDTH }}
           >
-            <span className="absolute right-1/2 top-0 h-1/2 border-r border-slate-200" />
+            <span className="absolute right-1/2 top-0 h-1/2 border-s border-slate-200" />
 
             <span className="absolute right-1/2 top-1/2 w-1/2 border-t border-slate-200" />
 
             {!isLast && (
-              <span className="absolute bottom-0 right-1/2 top-1/2 border-r border-slate-200" />
+              <span className="absolute bottom-0 right-1/2 top-1/2 border-s border-slate-200" />
             )}
           </div>
         )}
@@ -170,7 +170,7 @@ const AccountTreeNode = memo(function AccountTreeNode({
             type="button"
             onClick={toggleExpanded}
             disabled={!hasChildren}
-            className="min-w-0 flex-1 text-right"
+            className="min-w-0 flex-1 text-start"
           >
             <div
               className={`truncate text-sm leading-5 ${
@@ -207,7 +207,7 @@ const AccountTreeNode = memo(function AccountTreeNode({
             </span>
           )}
 
-          <div className="mr-1 flex shrink-0 items-center gap-0.5 opacity-0 transition-all duration-150 group-hover:opacity-100">
+          <div className="me-1 flex shrink-0 items-center gap-0.5 opacity-0 transition-all duration-150 group-hover:opacity-100">
             {!node.isPosting && (
               <motion.button
                 type="button"

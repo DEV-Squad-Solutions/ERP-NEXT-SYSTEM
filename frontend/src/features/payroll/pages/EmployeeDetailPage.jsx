@@ -211,16 +211,16 @@ function AttendanceTab({ employeeId }) {
 
   return (
     <div className="overflow-x-auto custom-scroll rounded-xl border border-ink-400/10">
-      <table className="w-full text-right border-collapse min-w-[600px]">
+      <table className="w-full text-start border-collapse min-w-[600px]">
         <thead>
           <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("التاريخ")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("الحضور")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("الانصراف")}
             </th>
             <th className="p-2.5 font-medium">{t("الحالة")}</th>
@@ -229,13 +229,13 @@ function AttendanceTab({ employeeId }) {
         <tbody>
           {rows.map((r) => (
             <tr key={r.id} className="border-b border-ink-400/5 last:border-0">
-              <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                 {formatDate(r.workDate)}
               </td>
-              <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                 {r.checkIn || "—"}
               </td>
-              <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                 {r.checkOut || "—"}
               </td>
               <td className="p-2.5 text-xs">{r.status}</td>
@@ -263,25 +263,25 @@ function MovementsTab({ employeeId }) {
 
   return (
     <div className="overflow-x-auto custom-scroll rounded-xl border border-ink-400/10">
-      <table className="w-full text-right border-collapse min-w-[720px]">
+      <table className="w-full text-start border-collapse min-w-[720px]">
         <thead>
           <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("التاريخ")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("النوع")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5 text-positive">
+            <th className="p-2.5 font-medium border-e border-ink-400/5 text-positive">
               {t("مدين")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5 text-negative">
+            <th className="p-2.5 font-medium border-e border-ink-400/5 text-negative">
               {t("دائن")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("العملة")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("رقم السند")}
             </th>
             <th className="p-2.5 font-medium">{t("ملاحظات")}</th>
@@ -290,10 +290,10 @@ function MovementsTab({ employeeId }) {
         <tbody>
           {rows.map((r) => (
             <tr key={r.id} className="border-b border-ink-400/5 last:border-0">
-              <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                 {formatDate(r.movementDate)}
               </td>
-              <td className="p-2.5 border-l border-ink-400/5">
+              <td className="p-2.5 border-e border-ink-400/5">
                 <span
                   className={`inline-flex rounded-full px-2 py-0.5 text-[11px] font-semibold ${
                     movementTypeBadge[r.type] || "bg-ink-400/10 text-ink-400"
@@ -302,16 +302,16 @@ function MovementsTab({ employeeId }) {
                   {MOVEMENT_TYPE_LABELS[r.type] || r.type}
                 </span>
               </td>
-              <td className="p-2.5 num text-positive text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-positive text-[13px] border-e border-ink-400/5">
                 {r.debit > 0 ? fmtMoney(r.debit) : "—"}
               </td>
-              <td className="p-2.5 num text-negative text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-negative text-[13px] border-e border-ink-400/5">
                 {r.credit > 0 ? fmtMoney(r.credit) : "—"}
               </td>
-              <td className="p-2.5 text-xs text-ink-600 border-l border-ink-400/5">
+              <td className="p-2.5 text-xs text-ink-600 border-e border-ink-400/5">
                 {r.currency}
               </td>
-              <td className="p-2.5 text-xs text-ink-600 border-l border-ink-400/5">
+              <td className="p-2.5 text-xs text-ink-600 border-e border-ink-400/5">
                 {r.cashVoucherNumber || "—"}
               </td>
               <td className="p-2.5 text-xs text-ink-600">{r.notes || "—"}</td>
@@ -341,19 +341,19 @@ function PayrollHistoryTab({ employeeId }) {
 
   return (
     <div className="overflow-x-auto custom-scroll rounded-xl border border-ink-400/10">
-      <table className="w-full text-right border-collapse min-w-[700px]">
+      <table className="w-full text-start border-collapse min-w-[700px]">
         <thead>
           <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("الفترة")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("المكافآت")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("الخصومات")}
             </th>
-            <th className="p-2.5 font-medium border-l border-ink-400/5">
+            <th className="p-2.5 font-medium border-e border-ink-400/5">
               {t("إجمالي المرتب")}
             </th>
             <th className="p-2.5 font-medium">{t("صافي المرتب")}</th>
@@ -362,16 +362,16 @@ function PayrollHistoryTab({ employeeId }) {
         <tbody>
           {rows.map((r) => (
             <tr key={r.id} className="border-b border-ink-400/5 last:border-0">
-              <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                 {formatDate(r.startDate)} - {formatDate(r.endDate)}
               </td>
-              <td className="p-2.5 num text-positive text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-positive text-[13px] border-e border-ink-400/5">
                 {fmtMoney(r.bonus)}
               </td>
-              <td className="p-2.5 num text-negative text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-negative text-[13px] border-e border-ink-400/5">
                 {fmtMoney(r.deduction)}
               </td>
-              <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+              <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                 {fmtMoney(r.grossSalary)}
               </td>
               <td className="p-2.5 num font-semibold text-[13px]">

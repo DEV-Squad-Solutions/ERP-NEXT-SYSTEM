@@ -32,7 +32,7 @@ export default function InvoiceContainerLinesTable({ containerLines }) {
 
       {/* Table */}
       <div className="overflow-x-auto custom-scroll">
-        <table className="w-full text-right border-collapse text-sm min-w-[500px]">
+        <table className="w-full text-start border-collapse text-sm min-w-[500px]">
           <thead>
             <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
               <th className="p-3 font-medium">{t("الكود")}</th>

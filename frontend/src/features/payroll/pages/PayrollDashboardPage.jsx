@@ -478,7 +478,7 @@ export default function PayrollDashboardPage() {
                   onClick={() =>
                     navigate(`/dashboard/payroll/salaries/${item.id}`)
                   }
-                  className="group flex w-full items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-right transition hover:border-slate-200 hover:bg-white hover:shadow-sm"
+                  className="group flex w-full items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3 text-start transition hover:border-slate-200 hover:bg-white hover:shadow-sm"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm">
@@ -500,7 +500,7 @@ export default function PayrollDashboardPage() {
                   </div>
 
                   <div className="flex shrink-0 items-center gap-3">
-                    <div className="text-left">
+                    <div className="text-end">
                       <p className="text-xs text-slate-500">{t("صافي الراتب")}</p>
 
                       <p className="mt-0.5 text-sm font-bold text-slate-900">
@@ -560,7 +560,7 @@ export default function PayrollDashboardPage() {
                     </div>
                   </div>
 
-                  <div className="shrink-0 text-left">
+                  <div className="shrink-0 text-end">
                     <p className="text-sm font-bold text-slate-900">
                       {fmtMoney(operation.amount ?? 0)}
                     </p>

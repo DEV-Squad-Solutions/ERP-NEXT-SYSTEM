@@ -98,38 +98,38 @@ export default function StockTransferDetailsModal({
             </div>
 
             <div className="overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10">
-              <table className="w-full min-w-[1100px] text-right border-collapse">
+              <table className="w-full min-w-[1100px] text-start border-collapse">
                 <thead>
                   <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-                    <th className="p-2.5 font-medium border-l border-ink-400/5">
+                    <th className="p-2.5 font-medium border-e border-ink-400/5">
                       {t("الصنف")}
                     </th>
 
-                    <th className="p-2.5 font-medium border-l border-ink-400/5">
+                    <th className="p-2.5 font-medium border-e border-ink-400/5">
                       {t("الوحدة")}
                     </th>
 
-                    <th className="p-2.5 font-medium border-l border-ink-400/5">
+                    <th className="p-2.5 font-medium border-e border-ink-400/5">
                       {t("الكمية")}
                     </th>
 
-                    <th className="p-2.5 font-medium border-l border-ink-400/5">
+                    <th className="p-2.5 font-medium border-e border-ink-400/5">
                       {t("تكلفة الوحدة")}
                     </th>
 
-                    <th className="p-2.5 font-medium border-l border-ink-400/5">
+                    <th className="p-2.5 font-medium border-e border-ink-400/5">
                       {t("إجمالي التكلفة")}
                     </th>
 
-                    <th className="p-2.5 font-medium border-l border-ink-400/5">
+                    <th className="p-2.5 font-medium border-e border-ink-400/5">
                       {t("رصيد المصدر")}
                     </th>
 
-                    <th className="p-2.5 font-medium border-l border-ink-400/5">
+                    <th className="p-2.5 font-medium border-e border-ink-400/5">
                       {t("متوسط المصدر")}
                     </th>
 
-                    <th className="p-2.5 font-medium border-l border-ink-400/5">
+                    <th className="p-2.5 font-medium border-e border-ink-400/5">
                       {t("رصيد الوجهة")}
                     </th>
 
@@ -143,7 +143,7 @@ export default function StockTransferDetailsModal({
                       key={line.id}
                       className="border-b border-ink-400/5 last:border-0 hover:bg-primary-50/20 transition-colors"
                     >
-                      <td className="p-2.5 border-l border-ink-400/5">
+                      <td className="p-2.5 border-e border-ink-400/5">
                         <div>
                           <p className="text-sm font-medium text-ink-900">
                             {line.itemName}
@@ -157,31 +157,31 @@ export default function StockTransferDetailsModal({
                         </div>
                       </td>
 
-                      <td className="p-2.5 text-xs text-ink-500 border-l border-ink-400/5">
+                      <td className="p-2.5 text-xs text-ink-500 border-e border-ink-400/5">
                         {line.itemUnitName || "—"}
                       </td>
 
-                      <td className="p-2.5 num text-sm border-l border-ink-400/5">
+                      <td className="p-2.5 num text-sm border-e border-ink-400/5">
                         {formatQuantity(line.quantity)}
                       </td>
 
-                      <td className="p-2.5 num text-sm border-l border-ink-400/5">
+                      <td className="p-2.5 num text-sm border-e border-ink-400/5">
                         {formatMoney(line.sourceUnitCost)}
                       </td>
 
-                      <td className="p-2.5 num text-sm font-medium border-l border-ink-400/5">
+                      <td className="p-2.5 num text-sm font-medium border-e border-ink-400/5">
                         {formatMoney(line.sourceTotalCost)}
                       </td>
 
-                      <td className="p-2.5 num text-sm border-l border-ink-400/5">
+                      <td className="p-2.5 num text-sm border-e border-ink-400/5">
                         {formatQuantity(line.sourceQuantityAfter)}
                       </td>
 
-                      <td className="p-2.5 num text-sm border-l border-ink-400/5">
+                      <td className="p-2.5 num text-sm border-e border-ink-400/5">
                         {formatMoney(line.sourceAverageCostAfter)}
                       </td>
 
-                      <td className="p-2.5 num text-sm border-l border-ink-400/5">
+                      <td className="p-2.5 num text-sm border-e border-ink-400/5">
                         {formatQuantity(line.destinationQuantityAfter)}
                       </td>
 

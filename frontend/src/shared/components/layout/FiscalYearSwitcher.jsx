@@ -118,7 +118,7 @@ export default function FiscalYearSwitcher() {
                     ? "border-primary-300 bg-primary-50 dark:border-primary-500/30 dark:bg-primary-500/10"
                     : "border-ink-100 bg-white hover:border-ink-200 hover:bg-ink-50 dark:border-white/[0.06] dark:bg-white/[0.02] dark:hover:bg-white/[0.05]",
                   "px-3.5 py-2.5",
-                  "text-right",
+                  "text-start",
                   "transition-all duration-150",
                 ].join(" ")}
               >

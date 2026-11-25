@@ -143,7 +143,7 @@ export default function StoresListPage() {
               <SlidersHorizontal size={16} />
               {t("فلاتر")}
               {hasActiveFilters && (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 mr-1" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 me-1" />
               )}
             </Button>
 
@@ -158,7 +158,7 @@ export default function StoresListPage() {
 
                 {/* Dropdown */}
 
-                <div className="absolute left-0 mt-2 w-80 bg-white border border-ink-400/10 rounded-2xl shadow-lg p-4 z-20 space-y-3 animate-fadeUp">
+                <div className="absolute end-0 mt-2 w-80 bg-white border border-ink-400/10 rounded-2xl shadow-lg p-4 z-20 space-y-3 animate-fadeUp">
                   {/* Search */}
 
                   <div>

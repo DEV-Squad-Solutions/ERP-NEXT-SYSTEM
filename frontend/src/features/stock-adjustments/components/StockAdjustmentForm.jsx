@@ -296,7 +296,7 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
                   name={`lines.${index}.itemId`}
                   render={({ field: f }) => (
                     <Select
-                      isRtl
+                      isRtl={getDir() === "rtl"}
                       options={itemOptions}
                       value={
                         itemOptions.find((o) => o.value === f.value) || null

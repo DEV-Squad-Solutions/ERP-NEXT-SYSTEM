@@ -240,7 +240,7 @@ export default function CashHandoverReportModal({
           </button>
         )}
 
-        <Button variant="outline" onClick={printList} className="mr-auto">
+        <Button variant="outline" onClick={printList} className="me-auto">
           <Printer size={16} />
           {t("طباعة")}
         </Button>
@@ -313,15 +313,15 @@ export default function CashHandoverReportModal({
               <table className="w-full text-sm">
                 <thead className="bg-slate-50 text-xs text-ink-400">
                   <tr>
-                    <th className="px-3 py-2 text-right">{t("رقم السند")}</th>
+                    <th className="px-3 py-2 text-start">{t("رقم السند")}</th>
 
-                    <th className="px-3 py-2 text-right">{t("التاريخ")}</th>
+                    <th className="px-3 py-2 text-start">{t("التاريخ")}</th>
 
-                    <th className="px-3 py-2 text-right">{t("الاتجاه")}</th>
+                    <th className="px-3 py-2 text-start">{t("الاتجاه")}</th>
 
-                    <th className="px-3 py-2 text-right">{t("البيان")}</th>
+                    <th className="px-3 py-2 text-start">{t("البيان")}</th>
 
-                    <th className="px-3 py-2 text-left">{t("المبلغ")}</th>
+                    <th className="px-3 py-2 text-end">{t("المبلغ")}</th>
                   </tr>
                 </thead>
 
@@ -352,7 +352,7 @@ export default function CashHandoverReportModal({
                         {v.description || "-"}
                       </td>
 
-                      <td className="num px-3 py-2 text-left font-semibold">
+                      <td className="num px-3 py-2 text-end font-semibold">
                         {fmt(v.amount)}{" "}
                         {currencySymbols[v.currency] || v.currency}
                       </td>

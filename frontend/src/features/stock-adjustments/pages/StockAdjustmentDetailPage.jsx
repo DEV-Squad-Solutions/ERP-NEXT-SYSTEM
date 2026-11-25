@@ -180,21 +180,21 @@ export default function StockAdjustmentDetailPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-ink-500 text-xs border-b border-ink-100">
-                <th className="py-2.5 px-3 text-right font-medium">{t("الصنف")}</th>
-                <th className="py-2.5 px-3 text-right font-medium">{t("الكمية")}</th>
-                <th className="py-2.5 px-3 text-right font-medium">
+                <th className="py-2.5 px-3 text-start font-medium">{t("الصنف")}</th>
+                <th className="py-2.5 px-3 text-start font-medium">{t("الكمية")}</th>
+                <th className="py-2.5 px-3 text-start font-medium">
                   {t("تكلفة الوحدة")}
                 </th>
-                <th className="py-2.5 px-3 text-right font-medium">
+                <th className="py-2.5 px-3 text-start font-medium">
                   {t("إجمالي التكلفة")}
                 </th>
-                <th className="py-2.5 px-3 text-right font-medium">
+                <th className="py-2.5 px-3 text-start font-medium">
                   {t("الرصيد بعدها")}
                 </th>
-                <th className="py-2.5 px-3 text-right font-medium">
+                <th className="py-2.5 px-3 text-start font-medium">
                   {t("متوسط التكلفة بعدها")}
                 </th>
-                <th className="py-2.5 px-3 text-right font-medium">
+                <th className="py-2.5 px-3 text-start font-medium">
                   {t("حالة التكلفة")}
                 </th>
               </tr>

@@ -40,7 +40,7 @@ export default function CashHandoverReportPrintTemplate({
           <p className="mt-1 text-sm text-ink-500">{cashboxName || t("الخزنة")}</p>
         </div>
 
-        <div className="text-left text-xs text-ink-400">
+        <div className="text-end text-xs text-ink-400">
           <p>{t("تاريخ الطباعة")}</p>
           <p>{printedAt}</p>
         </div>
@@ -130,15 +130,15 @@ export default function CashHandoverReportPrintTemplate({
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="border-b border-ink-200">
-              <th className="px-3 py-2 text-right font-semibold">{t("رقم السند")}</th>
+              <th className="px-3 py-2 text-start font-semibold">{t("رقم السند")}</th>
 
-              <th className="px-3 py-2 text-right font-semibold">{t("التاريخ")}</th>
+              <th className="px-3 py-2 text-start font-semibold">{t("التاريخ")}</th>
 
-              <th className="px-3 py-2 text-right font-semibold">{t("الاتجاه")}</th>
+              <th className="px-3 py-2 text-start font-semibold">{t("الاتجاه")}</th>
 
-              <th className="px-3 py-2 text-right font-semibold">{t("البيان")}</th>
+              <th className="px-3 py-2 text-start font-semibold">{t("البيان")}</th>
 
-              <th className="px-3 py-2 text-left font-semibold">{t("المبلغ")}</th>
+              <th className="px-3 py-2 text-end font-semibold">{t("المبلغ")}</th>
             </tr>
           </thead>
 
@@ -157,7 +157,7 @@ export default function CashHandoverReportPrintTemplate({
                   {item.description || "-"}
                 </td>
 
-                <td className="px-3 py-2 text-left font-semibold">
+                <td className="px-3 py-2 text-end font-semibold">
                   {fmt(item.amount)}{" "}
                   {currencySymbols[item.currency] || item.currency}
                 </td>

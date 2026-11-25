@@ -1115,7 +1115,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
           {/* ============ القسم 1: بيانات الفاتورة الأساسية ============ */}
           <LedgerPanel
             title={
-              <span className="flex items-center gap-2 pr-3">
+              <span className="flex items-center gap-2 pe-3">
                 <FileText size={15} />
                 {t("بيانات الفاتورة")}
               </span>
@@ -1194,7 +1194,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
               </div>
               <div>
                 <div className="flex items-stretch overflow-hidden rounded-lg border border-ink-400/10">
-                  <div className="flex w-36 shrink-0 items-center border-l border-ink-400/10 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900">
+                  <div className="flex w-36 shrink-0 items-center border-e border-ink-400/10 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900">
                     {t("التاريخ")}
                   </div>
                   <DateInput
@@ -1219,7 +1219,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
               >
                 <div>
                   <div className="flex items-stretch overflow-hidden rounded-lg border border-ink-400/10">
-                    <div className="flex w-36 shrink-0 items-center border-l border-ink-400/10 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900">
+                    <div className="flex w-36 shrink-0 items-center border-e border-ink-400/10 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900">
                       {t("تاريخ الاستحقاق")}
                     </div>
                     <DateInput
@@ -1289,7 +1289,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
           {/* ============ القسم 2: العميل والمخزن والنقل ============ */}
           <LedgerPanel
             title={
-              <span className="flex items-center gap-2 pr-3">
+              <span className="flex items-center gap-2 pe-3">
                 <MapPin size={15} />
                 {t("العميل والنقل")}
               </span>
@@ -1302,7 +1302,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
               }
             >
               <div className="flex items-stretch">
-                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                   {t("عميل / مورد")}
                 </div>
                 <CompactSelect
@@ -1318,7 +1318,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                   type="button"
                   onClick={() => setShowAddCustomer(true)}
                   disabled={isLoading}
-                  className="px-3 text-primary-500 border-r border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="px-3 text-primary-500 border-s border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 disabled:cursor-not-allowed disabled:opacity-40"
                   title={t("إضافة عميل/مورد جديد")}
                   aria-label={t("إضافة عميل أو مورد جديد")}
                 >
@@ -1339,7 +1339,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                   <Boxes size={17} />
                   {containersMovement.items.length > 0 && (
                     <Repeat2Icon
-                      className="absolute top-1 left-1 text-primary-600"
+                      className="absolute top-1 end-1 text-primary-600"
                       size={12}
                     />
                   )}
@@ -1361,7 +1361,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2">
               <div className="flex items-stretch">
-                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                   {t("العملة")}
                 </div>
                 <div className="flex flex-1 items-center gap-2 overflow-hidden px-3 py-2.5 text-sm">
@@ -1388,7 +1388,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
               >
                 {isContainersInvoice ? (
                   <div className="flex items-stretch">
-                    <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                    <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                       {t("مخزن العبوات")}
                     </div>
                     <div className="flex flex-1 items-center gap-2 bg-ink-400/5 px-3 py-2.5 text-sm text-ink-600">
@@ -1403,7 +1403,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                   </div>
                 ) : (
                   <div className="flex items-stretch">
-                    <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                    <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                       {t("المخزن")}
                     </div>
                     <CompactSelect
@@ -1418,7 +1418,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                       type="button"
                       onClick={() => setShowAddStore(true)}
                       disabled={isLoading}
-                      className="px-3 text-primary-500 border-r border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="px-3 text-primary-500 border-s border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 disabled:cursor-not-allowed disabled:opacity-40"
                       title={t("إضافة مخزن جديد")}
                       aria-label={t("إضافة مخزن جديد")}
                     >
@@ -1443,7 +1443,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
 
             <div className="grid grid-cols-1">
               <div className="flex items-stretch">
-                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                   {t("السائق")}
                 </div>
                 {isTemporaryDriver ? (
@@ -1469,7 +1469,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                 <button
                   type="button"
                   onClick={() => setShowAddDriver(true)}
-                  className="px-3 text-primary-500 border-r border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+                  className="px-3 text-primary-500 border-s border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
                   title={t("إضافة سائق جديد")}
                   aria-label={t("إضافة سائق جديد")}
                 >
@@ -1510,7 +1510,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2">
               <div className="flex items-stretch">
-                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                   {t("السائق الفعلي")}
                 </div>
                 <input
@@ -1534,7 +1534,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2">
               <div className="flex items-stretch">
-                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                   {t("البلد")}
                 </div>
                 <CompactSelect
@@ -1549,7 +1549,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                   type="button"
                   onClick={() => setShowAddCountry(true)}
                   disabled={isLoading}
-                  className="px-3 text-primary-500 border-r border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="px-3 text-primary-500 border-s border-ink-400/10 transition-colors hover:bg-primary-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 disabled:cursor-not-allowed disabled:opacity-40"
                   title={t("إضافة دولة جديدة")}
                   aria-label={t("إضافة دولة جديدة")}
                 >
@@ -1569,7 +1569,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
           {/* ============ القسم 3: الدفع والملاحظات ============ */}
           <LedgerPanel
             title={
-              <span className="flex items-center gap-2 pr-3">
+              <span className="flex items-center gap-2 pe-3">
                 <Wallet size={15} />
                 {t("الدفع والملاحظات")}
               </span>
@@ -1599,7 +1599,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                   }
                 >
                   <div className="flex items-stretch">
-                    <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                    <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                       {t("الخزنة")}
                     </div>
                     <CompactSelect
@@ -1656,7 +1656,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                 onChange={(e) => setHeaderField("WBDiscount", e.target.value)}
               />
               <div className="flex items-stretch">
-                <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                   {t("الإجمالي")}
                 </div>
                 <div className="flex flex-1 items-center gap-1.5 bg-ink-400/5 px-3 py-2.5 text-sm num text-ink-600">
@@ -1686,7 +1686,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
           {isContainersInvoice ? (
             <LedgerPanel
               title={
-                <span className="flex items-center gap-2 pr-3">
+                <span className="flex items-center gap-2 pe-3">
                   <Boxes size={15} />
                   {t("حركات العبوات")}
                 </span>
@@ -1750,7 +1750,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
 
                 {containerMovementCount > 0 && (
                   <div className="overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card">
-                    <table className="w-full min-w-[520px] border-collapse text-right">
+                    <table className="w-full min-w-[520px] border-collapse text-start">
                       <thead>
                         <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
                           <th className="p-2.5 font-medium">#</th>
@@ -1792,7 +1792,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
             <LedgerPanel
               title={
                 <div className="mb-2 flex items-center justify-between px-1">
-                  <span className="flex items-center gap-2 pr-3">
+                  <span className="flex items-center gap-2 pe-3">
                     <StoreIcon size={15} />
                     {isReturnInvoice ? t("أصناف المرتجع") : t("الأصناف")}
                   </span>
@@ -1849,7 +1849,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                         itemsLocked ? "pointer-events-none opacity-50" : ""
                       }`}
                     >
-                      <table className="w-full min-w-[1350px] border-collapse text-right">
+                      <table className="w-full min-w-[1350px] border-collapse text-start">
                         <thead>
                           <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
                             <th className="p-2.5 font-medium">#</th>
@@ -1921,7 +1921,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                     <button
                       type="button"
                       onClick={() => jumpToField(msg.field)}
-                      className="text-right text-xs leading-5 text-negative/90 hover:underline"
+                      className="text-start text-xs leading-5 text-negative/90 hover:underline"
                     >
                       • {msg.text}
                     </button>
@@ -1983,7 +1983,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
           <LedgerPanel
             title={
               <div className="mb-2 flex items-center justify-between px-1">
-                <span className="flex items-center gap-2 pr-3 text-sm font-semibold">
+                <span className="flex items-center gap-2 pe-3 text-sm font-semibold">
                   <StoreIcon size={15} />
                   {t("ملخص الفاتورة")}
                 </span>
@@ -2026,7 +2026,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                 ) : (
                   <>
                     <div className="flex items-stretch border-b border-ink-400/10">
-                      <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                      <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                         {t("الخصم")}
                       </div>
                       <div className="flex-1 p-2">
@@ -2062,7 +2062,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                     </div>
 
                     <div className="flex items-stretch border-b border-ink-400/10">
-                      <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+                      <div className="w-32 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
                         {t("المدفوع")}
                       </div>
                       <div className="flex-1 p-2">

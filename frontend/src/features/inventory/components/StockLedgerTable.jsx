@@ -55,7 +55,7 @@ export default function StockLedgerTable({ filters }) {
 
   return (
     <div className="overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card">
-      <table className="w-full text-right border-collapse min-w-[1200px]">
+      <table className="w-full text-start border-collapse min-w-[1200px]">
         <thead>
           {/* الصف الأول: العناوين المجمعة (الكمية / الوزن) */}
           <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
@@ -173,7 +173,7 @@ export default function StockLedgerTable({ filters }) {
                   ? row.quantityIn.toLocaleString(getLocale(), { maximumFractionDigits: 2 })
                   : "—"}
               </td>
-              <td className="p-3.5 num text-negative border-l border-ink-400/5 text-center">
+              <td className="p-3.5 num text-negative border-e border-ink-400/5 text-center">
                 {row.quantityOut > 0
                   ? row.quantityOut.toLocaleString(getLocale(), { maximumFractionDigits: 2 })
                   : "—"}
@@ -181,7 +181,7 @@ export default function StockLedgerTable({ filters }) {
               <td className="p-3.5 num text-positive border-x border-ink-400/5 text-center">
                 {row.weightIn > 0 ? row.weightIn.toLocaleString(getLocale(), { maximumFractionDigits: 2 }) : "—"}
               </td>
-              <td className="p-3.5 num text-negative border-l border-ink-400/5 text-center">
+              <td className="p-3.5 num text-negative border-e border-ink-400/5 text-center">
                 {row.weightOut > 0
                   ? row.weightOut.toLocaleString(getLocale(), { maximumFractionDigits: 2 })
                   : "—"}

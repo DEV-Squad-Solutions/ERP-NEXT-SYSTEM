@@ -662,56 +662,56 @@ export default function DriverStatementPage() {
                   isFetching ? "opacity-60" : ""
                 }`}
               >
-                <table className="w-full text-right border-collapse min-w-[1180px] print:min-w-0">
+                <table className="w-full text-start border-collapse min-w-[1180px] print:min-w-0">
                   <thead>
                     <tr className="bg-ink-900/[0.03] text-ink-400 text-[10px] print:bg-transparent print:text-ink-600">
                       {/* الرصيد */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 whitespace-nowrap">
                         {t("الرصيد")}
                       </th>
 
                       {/* المدفوع للسائق */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 text-negative whitespace-nowrap">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 text-negative whitespace-nowrap">
                         {t("مدفوع للسائق")}
                       </th>
 
                       {/* المستلم منه */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 text-positive whitespace-nowrap">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 text-positive whitespace-nowrap">
                         {t("مستلم منه")}
                       </th>
 
                       {/* البلد */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 whitespace-nowrap">
                         {t("البلد")}
                       </th>
 
                       {/* الخزنة */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 whitespace-nowrap">
                         {t("الخزنة")}
                       </th>
 
                       {/* البيان */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 min-w-[180px]">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 min-w-[180px]">
                         {t("البيان")}
                       </th>
 
                       {/* الرحلة */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 whitespace-nowrap">
                         {t("الرحلة")}
                       </th>
 
                       {/* تكلفة الرحلة */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 whitespace-nowrap">
                         {t("تكلفة الرحلة")}
                       </th>
 
                       {/* الفاتورة */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 whitespace-nowrap">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 whitespace-nowrap">
                         {t("الفاتورة")}
                       </th>
 
                       {/* العميل */}
-                      <th className="px-2 py-2 font-medium border-l border-ink-400/5 min-w-[120px]">
+                      <th className="px-2 py-2 font-medium border-e border-ink-400/5 min-w-[120px]">
                         {t("العميل")}
                       </th>
 
@@ -732,7 +732,7 @@ export default function DriverStatementPage() {
                         }}
                       >
                         {/* الرصيد */}
-                        <td className="px-2 py-2 border-l border-ink-400/5">
+                        <td className="px-2 py-2 border-e border-ink-400/5">
                           <div className="flex flex-col gap-0.5">
                             <span className="num font-semibold text-[12px] text-ink-900">
                               {fmt(row.balanceAmount)}
@@ -746,34 +746,34 @@ export default function DriverStatementPage() {
                           </div>
                         </td>
                         {/* المدفوع للسائق */}
-                        <td className="px-2 py-2 num text-negative text-[12px] border-l border-ink-400/5 whitespace-nowrap">
+                        <td className="px-2 py-2 num text-negative text-[12px] border-e border-ink-400/5 whitespace-nowrap">
                           {row.amountPaidToDriver > 0
                             ? fmt(row.amountPaidToDriver)
                             : "—"}
                         </td>
                         {/* المستلم منه */}
-                        <td className="px-2 py-2 num text-positive text-[12px] border-l border-ink-400/5 whitespace-nowrap">
+                        <td className="px-2 py-2 num text-positive text-[12px] border-e border-ink-400/5 whitespace-nowrap">
                           {row.amountReceivedFromDriver > 0
                             ? fmt(row.amountReceivedFromDriver)
                             : "—"}
                         </td>
                         {/* البلد */}
-                        <td className="px-2 py-2 text-[11px] text-ink-600 border-l border-ink-400/5 whitespace-nowrap">
+                        <td className="px-2 py-2 text-[11px] text-ink-600 border-e border-ink-400/5 whitespace-nowrap">
                           {row.countryName || "—"}
                         </td>
                         {/* الخزنة */}
-                        <td className="px-2 py-2 text-ink-600 text-[11px] border-l border-ink-400/5 whitespace-nowrap">
+                        <td className="px-2 py-2 text-ink-600 text-[11px] border-e border-ink-400/5 whitespace-nowrap">
                           {row.cashboxName || "—"}
                         </td>
                         {/* البيان */}
                         <td
-                          className="px-2 py-2 text-ink-700 text-[11px] max-w-[220px] truncate border-l border-ink-400/5"
+                          className="px-2 py-2 text-ink-700 text-[11px] max-w-[220px] truncate border-e border-ink-400/5"
                           title={row.description}
                         >
                           {row.description || "—"}
                         </td>
                         {/* الرحلة */}
-                        <td className="px-2 py-2 num text-[12px] border-l border-ink-400/5 whitespace-nowrap">
+                        <td className="px-2 py-2 num text-[12px] border-e border-ink-400/5 whitespace-nowrap">
                           {row.driverTripNumber ? (
                             <Link
                               to={`/dashboard/drivers/trip-costs?driverId=${driverId}&tripNumber=${row.driverTripNumber}`}
@@ -787,7 +787,7 @@ export default function DriverStatementPage() {
                           )}
                         </td>{" "}
                         {/* تكلفة الرحلة */}
-                        <td className="px-2 py-2 border-l border-ink-400/5 whitespace-nowrap">
+                        <td className="px-2 py-2 border-e border-ink-400/5 whitespace-nowrap">
                           {row.driverTripNumber ? (
                             row.tripCost > 0 ? (
                               <div className="flex items-center gap-1.5">
@@ -805,11 +805,11 @@ export default function DriverStatementPage() {
                           )}
                         </td>
                         {/* الفاتورة */}
-                        <td className="px-2 py-2 text-[12px] font-medium num border-l border-ink-400/5 whitespace-nowrap">
+                        <td className="px-2 py-2 text-[12px] font-medium num border-e border-ink-400/5 whitespace-nowrap">
                           {row.invoiceNumber || "—"}
                         </td>
                         {/* العميل */}
-                        <td className="px-2 py-2 text-[11px] border-l border-ink-400/5">
+                        <td className="px-2 py-2 text-[11px] border-e border-ink-400/5">
                           {row.businessPartnerId && row.businessPartnerName ? (
                             <Link
                               to={`/dashboard/partners/${row.businessPartnerId}`}

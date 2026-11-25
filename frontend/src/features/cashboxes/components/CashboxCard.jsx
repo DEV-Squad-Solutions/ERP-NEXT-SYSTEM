@@ -26,7 +26,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
     <div className="group bg-white border border-ink-400/10 rounded-2xl p-4 hover:border-emerald-700/30 hover:shadow-md transition-all">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
-        <button onClick={onClick} className="min-w-0 text-right flex-1">
+        <button onClick={onClick} className="min-w-0 text-start flex-1">
           <div className="flex items-center gap-2 mb-1">
             <h3 className="font-display font-bold text-ink-900 truncate">
               {cashbox.name || t("بدون اسم")}
@@ -75,7 +75,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
       </div>
 
       {/* Current Balance */}
-      <button onClick={onClick} className="w-full text-right mt-4">
+      <button onClick={onClick} className="w-full text-start mt-4">
         <div className="rounded-xl bg-emerald-700/[0.06] px-4 py-3">
           <p className="text-[11px] text-ink-400 mb-1">{t("الرصيد الحالي")}</p>
 
@@ -92,7 +92,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
 
         {/* Summary */}
         <div className="grid grid-cols-3 divide-x divide-x-reverse divide-ink-400/10 mt-3">
-          <div className="px-2 first:pr-0">
+          <div className="px-2 first:pe-0">
             <p className="text-[10px] text-ink-400 mb-1">{t("الافتتاحي")}</p>
 
             <p className="text-sm font-semibold text-ink-800 truncate">
@@ -108,7 +108,7 @@ export default function CashboxCard({ cashbox, onClick, onEdit, onDelete }) {
             </p>
           </div>
 
-          <div className="px-3 last:pl-0">
+          <div className="px-3 last:ps-0">
             <p className="text-[10px] text-ink-400 mb-1">{t("العملة")}</p>
 
             <p className="text-sm font-semibold text-ink-800">

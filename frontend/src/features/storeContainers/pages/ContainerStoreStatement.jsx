@@ -480,7 +480,7 @@ function ContainersModal({ open, onClose, storeId }) {
               <button
                 type="button"
                 onClick={toggleAll}
-                className="flex w-full items-center gap-3 border-b bg-primary-50/40 p-3 text-right hover:bg-primary-50"
+                className="flex w-full items-center gap-3 border-b bg-primary-50/40 p-3 text-start hover:bg-primary-50"
               >
                 {allSelected ? (
                   <CheckSquare size={18} className="text-primary-600" />
@@ -530,7 +530,7 @@ function ContainersModal({ open, onClose, storeId }) {
                     <button
                       type="button"
                       onClick={() => toggle(container.id)}
-                      className="flex-1 text-right"
+                      className="flex-1 text-start"
                     >
                       <div className="text-sm font-medium">
                         {container.name}
@@ -930,13 +930,13 @@ export default function ContainerStoreStatementPage() {
                 {t("يتم عرض حركات العبوة:")}
               </span>
 
-              <span className="mr-2 text-sm font-bold text-primary-700">
+              <span className="me-2 text-sm font-bold text-primary-700">
                 {selectedContainer?.containerName ||
                   t("عبوة رقم {0}", { 0: selectedContainerId })}
               </span>
 
               {selectedContainer?.containerCode && (
-                <span className="mr-2 text-xs text-ink-400">
+                <span className="me-2 text-xs text-ink-400">
                   ({selectedContainer.containerCode})
                 </span>
               )}
@@ -1096,7 +1096,7 @@ export default function ContainerStoreStatementPage() {
                     ].map((label) => (
                       <th
                         key={label}
-                        className="px-3 py-3 text-right font-semibold"
+                        className="px-3 py-3 text-start font-semibold"
                       >
                         {label}
                       </th>
@@ -1130,7 +1130,7 @@ export default function ContainerStoreStatementPage() {
                               onClick={() =>
                                 filterByContainer(container.containerId)
                               }
-                              className="group text-right"
+                              className="group text-start"
                             >
                               <div className="flex items-center gap-2">
                                 <div
@@ -1305,7 +1305,7 @@ export default function ContainerStoreStatementPage() {
                     ].map((label) => (
                       <th
                         key={label}
-                        className="px-3 py-3 text-right font-semibold"
+                        className="px-3 py-3 text-start font-semibold"
                       >
                         {label}
                       </th>
@@ -1350,7 +1350,7 @@ export default function ContainerStoreStatementPage() {
                               <button
                                 type="button"
                                 onClick={() => openInvoice(item.invoiceId)}
-                                className="group inline-flex items-center gap-1.5 text-right"
+                                className="group inline-flex items-center gap-1.5 text-start"
                                 title={t("فتح تفاصيل الفاتورة")}
                               >
                                 <span className="font-bold text-primary-600 underline-offset-2 group-hover:underline">
@@ -1434,7 +1434,7 @@ export default function ContainerStoreStatementPage() {
                               onClick={() =>
                                 filterByContainer(item.containerId)
                               }
-                              className="text-right"
+                              className="text-start"
                             >
                               <div className="font-medium hover:text-primary-600">
                                 {item.containerName}

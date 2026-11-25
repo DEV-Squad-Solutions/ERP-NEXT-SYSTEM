@@ -154,17 +154,17 @@ export default function CurrenciesPage() {
             <table className="w-full text-sm" dir={getDir()}>
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
-                  <th className="px-3 py-2.5 text-right font-medium">{t("العملة")}</th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">{t("العملة")}</th>
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("السعر (مقابل")} {rows[0]?.baseCurrency || "EGP"})
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("تاريخ السعر")}
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("آخر تحديث")}
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("إجراءات")}
                   </th>
                 </tr>

@@ -69,7 +69,7 @@ export default function PackagingDrawer({
     >
       {isLoading && (
         <div className="flex items-center justify-center py-10 text-ink-400">
-          <Loader2 size={20} className="animate-spin ml-2" />
+          <Loader2 size={20} className="animate-spin ms-2" />
           {t("جاري تحميل بيانات العبوات...")}
         </div>
       )}
@@ -83,7 +83,7 @@ export default function PackagingDrawer({
       {!isLoading && !isError && data && (
         <div className="space-y-4">
           <div className="flex items-stretch rounded-xl overflow-hidden border border-ink-400/10">
-            <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+            <div className="w-36 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
               {t("مخزن الحاويات")}
             </div>
             <div className="flex-1 px-3 py-2.5 text-sm flex items-center gap-2">
@@ -98,7 +98,7 @@ export default function PackagingDrawer({
             </div>
           ) : (
             <div className="overflow-x-auto rounded-2xl border border-ink-400/10">
-              <table className="w-full text-right border-collapse min-w-[560px]">
+              <table className="w-full text-start border-collapse min-w-[560px]">
                 <thead>
                   <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
                     <th className="p-2.5 font-medium">{t("الكود")}</th>

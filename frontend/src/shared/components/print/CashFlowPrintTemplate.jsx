@@ -34,7 +34,7 @@ export default function CashFlowPrintTemplate({
             {t("تاريخ الطباعة:")} {printedAt}
           </p>
         </div>
-        <div className="text-sm text-ink-400 text-left">
+        <div className="text-sm text-ink-400 text-end">
           {data?.fiscalYearName && <p>{t("السنة المالية:")} {data.fiscalYearName}</p>}
           <p>
             {t("من")} {formatDate(filters.fromDate)} {t("إلى")} {formatDate(filters.toDate)}
@@ -53,7 +53,7 @@ export default function CashFlowPrintTemplate({
         <span>{t("| العملة:")} {data?.baseCurrency || "EGP"}</span>
       </div>
 
-      <table className="w-full text-right text-sm border-collapse">
+      <table className="w-full text-start text-sm border-collapse">
         <thead>
           <tr className="border-b-2 border-ink-900">
             <th className="py-2 px-2">
@@ -72,7 +72,7 @@ export default function CashFlowPrintTemplate({
                     <td colSpan={colCount} className="py-2 px-2 font-bold">
                       {g.name}
                       {g.code && (
-                        <span className="mr-2 font-mono text-xs text-ink-400">
+                        <span className="me-2 font-mono text-xs text-ink-400">
                           {g.code}
                         </span>
                       )}
@@ -83,10 +83,10 @@ export default function CashFlowPrintTemplate({
                       key={`${g.key}-${row.accountId ?? idx}`}
                       className="border-b border-ink-900/10"
                     >
-                      <td className="py-2 px-2 pr-5">
+                      <td className="py-2 px-2 pe-5">
                         {row.accountName || "—"}
                         {row.accountCode && (
-                          <span className="mr-2 font-mono text-xs text-ink-400">
+                          <span className="me-2 font-mono text-xs text-ink-400">
                             {row.accountCode}
                           </span>
                         )}
@@ -116,7 +116,7 @@ export default function CashFlowPrintTemplate({
                       {row.financialStatementLineName || "—"}
                     </span>
                     {row.financialStatementLineCode && (
-                      <span className="mr-2 font-mono text-xs text-ink-400">
+                      <span className="me-2 font-mono text-xs text-ink-400">
                         {row.financialStatementLineCode}
                       </span>
                     )}

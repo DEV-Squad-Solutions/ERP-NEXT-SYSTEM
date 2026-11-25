@@ -124,14 +124,14 @@ export default function CompaniesTab() {
             <table className="min-w-full border-collapse text-sm">
               <thead className="bg-ink-900/[0.03]">
                 <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-400">
-                  <th className="px-4 py-3 text-right">{t("الاسم")}</th>
-                  <th className="min-w-[140px] px-4 py-3 text-right">
+                  <th className="px-4 py-3 text-start">{t("الاسم")}</th>
+                  <th className="min-w-[140px] px-4 py-3 text-start">
                     {t("السجل التجاري")}
                   </th>
-                  <th className="min-w-[140px] px-4 py-3 text-right">
+                  <th className="min-w-[140px] px-4 py-3 text-start">
                     {t("الرقم الضريبي")}
                   </th>
-                  <th className="min-w-[160px] px-4 py-3 text-right">
+                  <th className="min-w-[160px] px-4 py-3 text-start">
                     {t("المدير المسؤول")}
                   </th>
                   <th className="w-32 px-4 py-3 text-center">{t("العملة")}</th>

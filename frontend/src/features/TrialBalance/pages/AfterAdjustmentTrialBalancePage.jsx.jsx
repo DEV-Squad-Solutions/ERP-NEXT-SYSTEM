@@ -229,26 +229,26 @@ export default function AfterAdjustmentTrialBalancePage() {
             <table className="w-full min-w-[900px] text-sm" dir={getDir()}>
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("التصنيف")}
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium">{t("الحساب")}</th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">{t("الحساب")}</th>
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("مدين أول المدة")}
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("دائن أول المدة")}
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("مدين الفترة")}
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("دائن الفترة")}
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("مدين آخر المدة")}
                   </th>
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("دائن آخر المدة")}
                   </th>
                 </tr>

@@ -96,7 +96,7 @@ export default function StoreInventoryTab({
     <div className="bg-white rounded-2xl shadow-card p-6" dir={getDir()}>
       <div className="flex items-center gap-3 flex-wrap mb-5">
         <div className="relative flex-1 min-w-[220px]">
-          <Search className="w-4 h-4 text-ink-400 absolute right-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-ink-400 absolute start-3 top-1/2 -translate-y-1/2" />
 
           <input
             value={search}
@@ -105,7 +105,7 @@ export default function StoreInventoryTab({
               setPageNumber(1);
             }}
             placeholder={t("ابحث بكود أو اسم الصنف...")}
-            className="w-full pr-9 pl-3 py-2 text-sm rounded-xl border border-ink-100 focus:outline-none focus:ring-2 focus:ring-ink-200"
+            className="w-full pe-9 ps-3 py-2 text-sm rounded-xl border border-ink-100 focus:outline-none focus:ring-2 focus:ring-ink-200"
           />
         </div>
 
@@ -182,25 +182,25 @@ export default function StoreInventoryTab({
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-ink-500 text-xs border-b border-ink-100">
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("كود الصنف")}
                   </th>
 
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("اسم الصنف")}
                   </th>
 
-                  <th className="py-2.5 px-3 text-right font-medium">{t("الوحدة")}</th>
+                  <th className="py-2.5 px-3 text-start font-medium">{t("الوحدة")}</th>
 
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("الكمية الحالية")}
                   </th>
 
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("متوسط التكلفة")}
                   </th>
 
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("قيمة المخزون")}
                   </th>
 
@@ -672,15 +672,15 @@ function ItemBalanceModal({
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="bg-ink-50 text-xs text-ink-500">
-                          <th className="py-2.5 px-3 text-right font-medium">
+                          <th className="py-2.5 px-3 text-start font-medium">
                             {t("المصروف")}
                           </th>
 
-                          <th className="py-2.5 px-3 text-right font-medium">
+                          <th className="py-2.5 px-3 text-start font-medium">
                             {t("المبلغ")}
                           </th>
 
-                          <th className="py-2.5 px-3 text-right font-medium">
+                          <th className="py-2.5 px-3 text-start font-medium">
                             {t("ملاحظات")}
                           </th>
 

@@ -331,21 +331,21 @@ export default function IncomeStatementPage({ companyName = "" }) {
               <table className="w-full min-w-[800px] text-sm">
                 <thead>
                   <tr className="bg-ink-400/5 text-xs text-ink-400">
-                    <th className="px-3 py-2.5 text-right font-medium">
+                    <th className="px-3 py-2.5 text-start font-medium">
                       {t("بند القائمة")}
                     </th>
                     {isDetailed && (
-                      <th className="px-3 py-2.5 text-right font-medium">
+                      <th className="px-3 py-2.5 text-start font-medium">
                         {t("الحساب")}
                       </th>
                     )}
-                    <th className="px-3 py-2.5 text-right font-medium">
+                    <th className="px-3 py-2.5 text-start font-medium">
                       {t("مدين الفترة")}
                     </th>
-                    <th className="px-3 py-2.5 text-right font-medium">
+                    <th className="px-3 py-2.5 text-start font-medium">
                       {t("دائن الفترة")}
                     </th>
-                    <th className="px-3 py-2.5 text-right font-medium">
+                    <th className="px-3 py-2.5 text-start font-medium">
                       {t("الصافي")}
                     </th>
                   </tr>
@@ -378,12 +378,12 @@ export default function IncomeStatementPage({ companyName = "" }) {
                             key={`${section.key}-${row.financialStatementLineId}-${row.accountId ?? idx}`}
                             className="border-t border-ink-400/10 transition-colors hover:bg-ink-900/[0.015]"
                           >
-                            <td className="px-3 py-2.5 pr-6">
+                            <td className="px-3 py-2.5 pe-6">
                               <span className="font-medium text-ink-800">
                                 {row.financialStatementLineName || "—"}
                               </span>
                               {row.financialStatementLineCode && (
-                                <span className="mr-2 text-[11px] text-ink-400">
+                                <span className="me-2 text-[11px] text-ink-400">
                                   {row.financialStatementLineCode}
                                 </span>
                               )}
@@ -489,16 +489,16 @@ export default function IncomeStatementPage({ companyName = "" }) {
                 <table className="w-full min-w-[700px] text-sm">
                   <thead>
                     <tr className="bg-ink-400/5 text-xs text-ink-400">
-                      <th className="px-4 py-2.5 text-right font-medium">
+                      <th className="px-4 py-2.5 text-start font-medium">
                         {t("الحساب")}
                       </th>
-                      <th className="px-4 py-2.5 text-right font-medium">
+                      <th className="px-4 py-2.5 text-start font-medium">
                         {t("مدين الفترة")}
                       </th>
-                      <th className="px-4 py-2.5 text-right font-medium">
+                      <th className="px-4 py-2.5 text-start font-medium">
                         {t("دائن الفترة")}
                       </th>
-                      <th className="px-4 py-2.5 text-right font-medium">
+                      <th className="px-4 py-2.5 text-start font-medium">
                         {t("الصافي")}
                       </th>
                     </tr>

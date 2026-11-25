@@ -117,9 +117,9 @@ export default function PartnerOpeningBalancesTable({
         <table className="min-w-full border-collapse text-sm">
           <thead className="bg-ink-900/[0.03]">
             <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-400">
-              <th className="px-4 py-3 text-right">{t("رقم المستند")}</th>
+              <th className="px-4 py-3 text-start">{t("رقم المستند")}</th>
               <th className="w-36 px-4 py-3 text-center">{t("التاريخ")}</th>
-              <th className="min-w-[220px] px-4 py-3 text-right">
+              <th className="min-w-[220px] px-4 py-3 text-start">
                 {t("العميل / المورد")}
               </th>
               <th className="w-28 px-4 py-3 text-center">{t("النوع")}</th>
@@ -128,7 +128,7 @@ export default function PartnerOpeningBalancesTable({
               <th className="w-40 px-4 py-3 text-center">
                 {t("المبلغ بالعملة الأساسية")}
               </th>
-              <th className="min-w-[180px] px-4 py-3 text-right">{t("ملاحظات")}</th>
+              <th className="min-w-[180px] px-4 py-3 text-start">{t("ملاحظات")}</th>
               <th className="w-20 px-4 py-3"></th>
             </tr>
           </thead>

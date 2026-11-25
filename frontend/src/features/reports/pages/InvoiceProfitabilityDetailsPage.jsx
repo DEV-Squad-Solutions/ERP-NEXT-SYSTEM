@@ -218,7 +218,7 @@ function InvoiceProfitabilityPrint({ invoice }) {
           </p>
         </div>
 
-        <div className="text-left text-sm text-slate-600">
+        <div className="text-end text-sm text-slate-600">
           <p>
             {t("التاريخ:")}{" "}
             <strong>
@@ -313,7 +313,7 @@ function InvoiceProfitabilityPrint({ invoice }) {
       <table className="w-full border-collapse text-xs">
         <thead>
           <tr className="bg-slate-100">
-            <th className="border border-slate-300 px-2 py-2 text-right">
+            <th className="border border-slate-300 px-2 py-2 text-start">
               {t("الصنف")}
             </th>
 
@@ -767,7 +767,7 @@ export default function InvoiceProfitabilityDetailsPage() {
           <div className="overflow-x-auto">
             <table className="min-w-[1400px] w-full text-sm">
               <thead className="bg-slate-50">
-                <tr className="border-b border-slate-200 text-right">
+                <tr className="border-b border-slate-200 text-start">
                   <th className="px-4 py-3 font-semibold text-slate-600">
                     {t("الصنف")}
                   </th>

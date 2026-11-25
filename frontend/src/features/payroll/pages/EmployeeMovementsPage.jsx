@@ -165,7 +165,7 @@ export default function EmployeeMovementsPage() {
             <div className="relative">
               <Search
                 size={15}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"
+                className="absolute start-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"
               />
               <input
                 value={search}
@@ -174,7 +174,7 @@ export default function EmployeeMovementsPage() {
                   setPage(1);
                 }}
                 placeholder={t("ابحث...")}
-                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pr-9 pl-3 text-sm outline-none focus:border-primary-500"
+                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pe-9 ps-3 text-sm outline-none focus:border-primary-500"
               />
             </div>
           </div>
@@ -315,7 +315,7 @@ export default function EmployeeMovementsPage() {
             <table className="min-w-full border-collapse text-sm">
               <thead className="bg-slate-50">
                 <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
-                  <th className="px-4 py-3 text-right">{t("الموظف")}</th>
+                  <th className="px-4 py-3 text-start">{t("الموظف")}</th>
                   <th className="px-4 py-3 text-center">{t("النوع")}</th>
                   <th className="px-4 py-3 text-center">{t("التاريخ")}</th>
                   <th className="w-32 px-4 py-3 text-center text-positive">
@@ -325,8 +325,8 @@ export default function EmployeeMovementsPage() {
                     {t("دائن")}
                   </th>
                   <th className="px-4 py-3 text-center">{t("العملة")}</th>
-                  <th className="px-4 py-3 text-right">{t("رقم السند")}</th>
-                  <th className="min-w-[200px] px-4 py-3 text-right">
+                  <th className="px-4 py-3 text-start">{t("رقم السند")}</th>
+                  <th className="min-w-[200px] px-4 py-3 text-start">
                     {t("ملاحظات")}
                   </th>
                   <th className="w-16 px-4 py-3 text-center">{t("إجراءات")}</th>
@@ -338,7 +338,7 @@ export default function EmployeeMovementsPage() {
                     key={item.id}
                     className="border-b border-ink-400/5 transition-colors hover:bg-slate-50 last:border-0"
                   >
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-start">
                       <div className="font-medium text-ink-900">
                         {item.employeeName}
                       </div>
@@ -374,11 +374,11 @@ export default function EmployeeMovementsPage() {
                       {item.currency}
                     </td>
 
-                    <td className="px-4 py-3 text-right text-ink-500">
+                    <td className="px-4 py-3 text-start text-ink-500">
                       {item.cashVoucherNumber || "—"}
                     </td>
 
-                    <td className="px-4 py-3 text-right text-ink-500">
+                    <td className="px-4 py-3 text-start text-ink-500">
                       {item.notes || "—"}
                     </td>
 

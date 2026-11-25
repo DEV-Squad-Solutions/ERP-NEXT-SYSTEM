@@ -219,35 +219,35 @@ export default function ExpensesPage() {
 
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("رقم السند")}
                   </th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("التاريخ")}
                   </th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("الخزينة")}
                   </th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("نوع الحركة")}
                   </th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("حساب المصروف")}
                   </th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">{t("الجهة")}</th>
+                  <th className="px-3 py-2.5 text-start font-medium">{t("الجهة")}</th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">{t("المبلغ")}</th>
+                  <th className="px-3 py-2.5 text-start font-medium">{t("المبلغ")}</th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">{t("الوصف")}</th>
+                  <th className="px-3 py-2.5 text-start font-medium">{t("الوصف")}</th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">{t("الحالة")}</th>
+                  <th className="px-3 py-2.5 text-start font-medium">{t("الحالة")}</th>
 
-                  <th className="px-3 py-2.5 text-right font-medium">
+                  <th className="px-3 py-2.5 text-start font-medium">
                     {t("إجراءات")}
                   </th>
                 </tr>
@@ -273,7 +273,7 @@ export default function ExpensesPage() {
                         <button
                           type="button"
                           onClick={() => openVoucher(v)}
-                          className="group flex max-w-full items-center gap-1.5 text-right"
+                          className="group flex max-w-full items-center gap-1.5 text-start"
                           title={t("فتح السند داخل الخزنة")}
                         >
                           <span className="truncate font-semibold text-primary-600 transition-colors group-hover:text-primary-800 group-hover:underline">

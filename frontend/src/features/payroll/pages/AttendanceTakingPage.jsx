@@ -685,14 +685,14 @@ const AttendanceTakingPage = () => {
             <div className="relative">
               <CalendarDays
                 size={17}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-400"
+                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink-400"
               />
 
               <DateInput
                 type="date"
                 value={workDate}
                 onChange={(event) => setWorkDate(event.target.value)}
-                className="h-10 w-full rounded-xl border border-ink-200 bg-white pr-10 pl-3 text-sm text-ink-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
+                className="h-10 w-full rounded-xl border border-ink-200 bg-white pe-10 ps-3 text-sm text-ink-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
               />
             </div>
           </div>
@@ -705,7 +705,7 @@ const AttendanceTakingPage = () => {
             <div className="relative">
               <Search
                 size={17}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-400"
+                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink-400"
               />
 
               <input
@@ -713,7 +713,7 @@ const AttendanceTakingPage = () => {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder={t("اسم الموظف أو الرقم...")}
-                className="h-10 w-full rounded-xl border border-ink-200 bg-white pr-10 pl-3 text-sm text-ink-800 outline-none transition placeholder:text-ink-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
+                className="h-10 w-full rounded-xl border border-ink-200 bg-white pe-10 ps-3 text-sm text-ink-800 outline-none transition placeholder:text-ink-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
               />
             </div>
           </div>
@@ -747,14 +747,14 @@ const AttendanceTakingPage = () => {
             <div className="relative">
               <Clock3
                 size={17}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-400"
+                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink-400"
               />
 
               <input
                 type="time"
                 value={defaultCheckIn}
                 onChange={(event) => setDefaultCheckIn(event.target.value)}
-                className="h-10 w-full rounded-xl border border-ink-200 bg-white pr-10 pl-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
+                className="h-10 w-full rounded-xl border border-ink-200 bg-white pe-10 ps-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
               />
             </div>
           </div>
@@ -767,14 +767,14 @@ const AttendanceTakingPage = () => {
             <div className="relative">
               <Clock3
                 size={17}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-ink-400"
+                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-ink-400"
               />
 
               <input
                 type="time"
                 value={defaultCheckOut}
                 onChange={(event) => setDefaultCheckOut(event.target.value)}
-                className="h-10 w-full rounded-xl border border-ink-200 bg-white pr-10 pl-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
+                className="h-10 w-full rounded-xl border border-ink-200 bg-white pe-10 ps-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
               />
             </div>
           </div>
@@ -856,7 +856,7 @@ const AttendanceTakingPage = () => {
             {t("تطبيق الأوقات")}
           </Button>
 
-          <div className="mr-auto text-sm text-ink-500">
+          <div className="me-auto text-sm text-ink-500">
             {t("المحدد:")}{" "}
             <span className="font-semibold text-ink-800">
               {selectedIds.size}
@@ -919,7 +919,7 @@ const AttendanceTakingPage = () => {
                 return (
                   <div
                     key={employeeId}
-                    className="absolute right-0 left-0 grid grid-cols-[52px_minmax(220px,1.5fr)_140px_130px_130px_180px_170px_180px_minmax(220px,1fr)] items-center border-b border-ink-100 bg-white px-3 transition hover:bg-ink-50/50"
+                    className="absolute start-0 end-0 grid grid-cols-[52px_minmax(220px,1.5fr)_140px_130px_130px_180px_170px_180px_minmax(220px,1fr)] items-center border-b border-ink-100 bg-white px-3 transition hover:bg-ink-50/50"
                     style={{
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`,
@@ -934,7 +934,7 @@ const AttendanceTakingPage = () => {
                       />
                     </div>
 
-                    <div className="min-w-0 pl-3">
+                    <div className="min-w-0 ps-3">
                       <div className="truncate font-semibold text-ink-800">
                         {row.employee.name}
                       </div>
@@ -944,7 +944,7 @@ const AttendanceTakingPage = () => {
                       </div>
                     </div>
 
-                    <div className="pl-3">
+                    <div className="ps-3">
                       <CompactSelect
                         value={row.status}
                         onChange={(value) =>
@@ -968,7 +968,7 @@ const AttendanceTakingPage = () => {
                       />
                     </div>
 
-                    <div className="pl-3">
+                    <div className="ps-3">
                       <input
                         type="time"
                         value={present ? row.checkIn || "" : ""}
@@ -982,7 +982,7 @@ const AttendanceTakingPage = () => {
                       />
                     </div>
 
-                    <div className="pl-3">
+                    <div className="ps-3">
                       <input
                         type="time"
                         value={present ? row.checkOut || "" : ""}
@@ -996,7 +996,7 @@ const AttendanceTakingPage = () => {
                       />
                     </div>
 
-                    <div className="pl-3">
+                    <div className="ps-3">
                       <CompactSelect
                         value={present ? (row.workDayRatio ?? 1) : ""}
                         onChange={(value) =>
@@ -1010,7 +1010,7 @@ const AttendanceTakingPage = () => {
                       />
                     </div>
 
-                    <div className="pl-3">
+                    <div className="ps-3">
                       <CompactSelect
                         value={row.workOverTimeRatio || ""}
                         onChange={(value) =>
@@ -1029,7 +1029,7 @@ const AttendanceTakingPage = () => {
                       />
                     </div>
 
-                    <div className="pl-3">
+                    <div className="ps-3">
                       <CompactSelect
                         value={row.workDaysDeductionRatio || ""}
                         onChange={(value) =>
@@ -1049,7 +1049,7 @@ const AttendanceTakingPage = () => {
                       />
                     </div>
 
-                    <div className="pl-3">
+                    <div className="ps-3">
                       <input
                         type="text"
                         value={row.notes || ""}

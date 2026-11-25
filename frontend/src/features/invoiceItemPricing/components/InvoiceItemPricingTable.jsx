@@ -111,31 +111,31 @@ export default function InvoiceItemPricingTable({
           ${isFetching ? "opacity-60" : ""}
         `}
       >
-        <table className="w-full text-right border-collapse min-w-[1100px]">
+        <table className="w-full text-start border-collapse min-w-[1100px]">
           <thead>
             <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-              <th className="p-2.5 font-medium border-l border-ink-400/5">
+              <th className="p-2.5 font-medium border-e border-ink-400/5">
                 {t("الفاتورة")}
               </th>
-              <th className="p-2.5 font-medium border-l border-ink-400/5">
+              <th className="p-2.5 font-medium border-e border-ink-400/5">
                 {t("النوع")}
               </th>
-              <th className="p-2.5 font-medium border-l border-ink-400/5">
+              <th className="p-2.5 font-medium border-e border-ink-400/5">
                 {t("الصنف")}
               </th>
-              <th className="p-2.5 font-medium border-l border-ink-400/5">
+              <th className="p-2.5 font-medium border-e border-ink-400/5">
                 {t("الكمية")}
               </th>
-              <th className="p-2.5 font-medium border-l border-ink-400/5">
+              <th className="p-2.5 font-medium border-e border-ink-400/5">
                 {t("سعر البيع")}
               </th>
-              <th className="p-2.5 font-medium border-l border-ink-400/5">
+              <th className="p-2.5 font-medium border-e border-ink-400/5">
                 {t("متوسط التكلفة")}
               </th>
-              <th className="p-2.5 font-medium border-l border-ink-400/5">
+              <th className="p-2.5 font-medium border-e border-ink-400/5">
                 {t("إجمالي المصروفات")}
               </th>
-              <th className="p-2.5 font-medium border-l border-ink-400/5">
+              <th className="p-2.5 font-medium border-e border-ink-400/5">
                 {t("التكلفة الإرشادية")}
               </th>
               <th className="p-2.5 font-medium">{t("الإجراءات")}</th>
@@ -149,7 +149,7 @@ export default function InvoiceItemPricingTable({
                 className="border-b border-ink-400/5 last:border-0 hover:bg-primary-50/30 transition-colors animate-fadeUp"
                 style={{ animationDelay: `${Math.min(index, 12) * 25}ms` }}
               >
-                <td className="p-2.5 border-l border-ink-400/5">
+                <td className="p-2.5 border-e border-ink-400/5">
                   <InvoiceNumberLink
                     invoiceId={item.invoiceId}
                     invoiceType={item.invoiceType}
@@ -161,30 +161,30 @@ export default function InvoiceItemPricingTable({
                   </p>
                 </td>
 
-                <td className="p-2.5 text-xs border-l border-ink-400/5">
+                <td className="p-2.5 text-xs border-e border-ink-400/5">
                   {INVOICE_TYPE_LABELS[item.invoiceType] || item.invoiceType}
                 </td>
 
-                <td className="p-2.5 border-l border-ink-400/5">
+                <td className="p-2.5 border-e border-ink-400/5">
                   <p className="text-sm text-ink-900">{item.itemName}</p>
                   <p className="text-[10px] text-ink-400 num mt-0.5">
                     {item.itemCode} • {item.itemUnitName}
                   </p>
                 </td>
 
-                <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+                <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                   {item.quantity}
                 </td>
 
-                <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+                <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                   {fmt(item.invoiceUnitPrice)}
                 </td>
 
-                <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+                <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                   {fmt(item.averageCost)}
                 </td>
 
-                <td className="p-2.5 border-l border-ink-400/5">
+                <td className="p-2.5 border-e border-ink-400/5">
                   <span
                     className={`text-[13px] num font-semibold ${
                       item.manualExpensesTotal > 0
@@ -201,7 +201,7 @@ export default function InvoiceItemPricingTable({
                   )}
                 </td>
 
-                <td className="p-2.5 num text-[13px] font-semibold border-l border-ink-400/5">
+                <td className="p-2.5 num text-[13px] font-semibold border-e border-ink-400/5">
                   {fmt(item.indicativeUnitCost)}
                 </td>
 

@@ -161,7 +161,7 @@ export default function DescriptionCascadeSelect({
                   <button
                     type="button"
                     onClick={() => toggleGroup(group.key)}
-                    className="flex w-full items-center justify-between gap-2 px-2.5 py-2 text-right text-[11px] font-semibold text-ink-700 transition hover:bg-ink-900/[0.03]"
+                    className="flex w-full items-center justify-between gap-2 px-2.5 py-2 text-start text-[11px] font-semibold text-ink-700 transition hover:bg-ink-900/[0.03]"
                   >
                     <span className="flex items-center gap-1.5">
                       {group.label}

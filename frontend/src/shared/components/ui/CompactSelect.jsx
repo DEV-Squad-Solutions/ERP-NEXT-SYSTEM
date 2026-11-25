@@ -2,7 +2,7 @@
 
 import Select from "react-select";
 
-import { t } from "../../../i18n";
+import { t, getDir } from "../../../i18n";
 // src/shared/components/ui/CompactSelect.jsx
 // (نفس الملف — تعديل compactStyles بس، الباقي زي ما هو)
 
@@ -148,7 +148,7 @@ export default function CompactSelect({
       isLoading={isLoading}
       isDisabled={isDisabled}
       isClearable
-      isRtl
+      isRtl={getDir() === "rtl"}
       placeholder={placeholder}
       noOptionsMessage={() => t("لا توجد نتائج")}
       loadingMessage={() => t("جاري التحميل...")}

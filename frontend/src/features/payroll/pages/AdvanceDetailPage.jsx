@@ -111,16 +111,16 @@ export default function AdvanceDetailPage() {
           {t("جدول الأقساط")}
         </h3>
         <div className="overflow-x-auto custom-scroll rounded-xl border border-ink-400/10">
-          <table className="w-full text-right border-collapse">
+          <table className="w-full text-start border-collapse">
             <thead>
               <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
-                <th className="p-2.5 font-medium border-l border-ink-400/5">
+                <th className="p-2.5 font-medium border-e border-ink-400/5">
                   {t("الشهر")}
                 </th>
-                <th className="p-2.5 font-medium border-l border-ink-400/5">
+                <th className="p-2.5 font-medium border-e border-ink-400/5">
                   {t("قيمة القسط")}
                 </th>
-                <th className="p-2.5 font-medium border-l border-ink-400/5">
+                <th className="p-2.5 font-medium border-e border-ink-400/5">
                   {t("تاريخ الاستحقاق")}
                 </th>
                 <th className="p-2.5 font-medium">{t("الحالة")}</th>
@@ -132,13 +132,13 @@ export default function AdvanceDetailPage() {
                   key={idx}
                   className="border-b border-ink-400/5 last:border-0"
                 >
-                  <td className="p-2.5 text-sm text-ink-900 border-l border-ink-400/5">
+                  <td className="p-2.5 text-sm text-ink-900 border-e border-ink-400/5">
                     {i.month}
                   </td>
-                  <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+                  <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                     {fmtMoney(i.amount)}
                   </td>
-                  <td className="p-2.5 num text-[13px] border-l border-ink-400/5">
+                  <td className="p-2.5 num text-[13px] border-e border-ink-400/5">
                     {formatDate(i.dueDate)}
                   </td>
                   <td className="p-2.5">

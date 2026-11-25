@@ -57,7 +57,7 @@ function ReturnSourceInvoiceRow({
         type="button"
         disabled={isLockedByOtherInvoice}
         onClick={() => onToggleExpand(invoice.invoiceId)}
-        className="flex w-full items-center justify-between px-3 py-2.5 text-right hover:bg-ink-900/[0.02] transition-colors disabled:cursor-not-allowed"
+        className="flex w-full items-center justify-between px-3 py-2.5 text-start hover:bg-ink-900/[0.02] transition-colors disabled:cursor-not-allowed"
       >
         <div className="flex flex-col items-start gap-0.5">
           <span className="text-sm font-medium text-ink-900">
@@ -110,7 +110,7 @@ function ReturnSourceInvoiceRow({
           )}
 
           <div className="overflow-x-auto rounded-xl border border-ink-400/10 bg-white">
-            <table className="w-full min-w-[600px] border-collapse text-right text-sm">
+            <table className="w-full min-w-[600px] border-collapse text-start text-sm">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
                   <th className="p-2 font-medium">{t("الصنف")}</th>
@@ -274,7 +274,7 @@ function ReturnSourcePicker({
   return (
     <LedgerPanel
       title={
-        <span className="flex items-center gap-2 pr-3">
+        <span className="flex items-center gap-2 pe-3">
           <FileSearch size={15} />
           {t("الفواتير الأصلية للمرتجع")}
         </span>

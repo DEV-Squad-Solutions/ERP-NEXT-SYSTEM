@@ -114,19 +114,19 @@ export default function StoreTransfersTab({ storeId }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-ink-50/70 border-b border-ink-100 text-xs text-ink-500">
-                    <th className="px-5 py-3.5 text-right font-semibold">
+                    <th className="px-5 py-3.5 text-start font-semibold">
                       {t("رقم التحويل")}
                     </th>
 
-                    <th className="px-5 py-3.5 text-right font-semibold">
+                    <th className="px-5 py-3.5 text-start font-semibold">
                       {t("التاريخ")}
                     </th>
 
-                    <th className="px-5 py-3.5 text-right font-semibold">
+                    <th className="px-5 py-3.5 text-start font-semibold">
                       {t("من مخزن")}
                     </th>
 
-                    <th className="px-5 py-3.5 text-right font-semibold">
+                    <th className="px-5 py-3.5 text-start font-semibold">
                       {t("إلى مخزن")}
                     </th>
 

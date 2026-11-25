@@ -67,7 +67,7 @@ export default function StoreMovementsTab({ storeId }) {
           {t("اختر الصنف لعرض حركاته داخل هذا المخزن")}
         </label>
         <Select
-          isRtl
+          isRtl={getDir() === "rtl"}
           isLoading={itemsLoading}
           options={itemSelectOptions}
           value={selectedItem}
@@ -136,21 +136,21 @@ export default function StoreMovementsTab({ storeId }) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-ink-500 text-xs border-b border-ink-100">
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("التاريخ")}
                   </th>
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("نوع الحركة")}
                   </th>
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("رقم المستند")}
                   </th>
-                  <th className="py-2.5 px-3 text-right font-medium">{t("وارد")}</th>
-                  <th className="py-2.5 px-3 text-right font-medium">{t("صادر")}</th>
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">{t("وارد")}</th>
+                  <th className="py-2.5 px-3 text-start font-medium">{t("صادر")}</th>
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("الرصيد بعد الحركة")}
                   </th>
-                  <th className="py-2.5 px-3 text-right font-medium">
+                  <th className="py-2.5 px-3 text-start font-medium">
                     {t("حالة التكلفة")}
                   </th>
                 </tr>

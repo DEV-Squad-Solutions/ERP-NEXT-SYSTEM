@@ -125,17 +125,17 @@ export default function UsersTab() {
             <table className="min-w-full border-collapse text-sm">
               <thead className="bg-ink-900/[0.03]">
                 <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-400">
-                  <th className="min-w-[160px] px-4 py-3 text-right">{t("الاسم")}</th>
-                  <th className="min-w-[140px] px-4 py-3 text-right">
+                  <th className="min-w-[160px] px-4 py-3 text-start">{t("الاسم")}</th>
+                  <th className="min-w-[140px] px-4 py-3 text-start">
                     {t("اسم المستخدم")}
                   </th>
-                  <th className="min-w-[180px] px-4 py-3 text-right">
+                  <th className="min-w-[180px] px-4 py-3 text-start">
                     {t("الإيميل")}
                   </th>
-                  <th className="min-w-[160px] px-4 py-3 text-right">
+                  <th className="min-w-[160px] px-4 py-3 text-start">
                     {t("الأدوار")}
                   </th>
-                  <th className="min-w-[180px] px-4 py-3 text-right">
+                  <th className="min-w-[180px] px-4 py-3 text-start">
                     {t("الشركات")}
                   </th>
                   <th className="w-20 px-4 py-3"></th>

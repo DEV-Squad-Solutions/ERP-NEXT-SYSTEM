@@ -220,7 +220,7 @@ function ItemProfitabilityPrint({ data, filters }) {
             </p>
           </div>
 
-          <div className="text-left text-sm">
+          <div className="text-end text-sm">
             <p>
               {t("من:")} <strong>{filters.fromDate ? formatDate(filters.fromDate) : "—"}</strong>
             </p>
@@ -620,7 +620,7 @@ export default function ItemProfitabilityPage() {
           <button
             type="button"
             onClick={() => setFiltersOpen((previous) => !previous)}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-right transition hover:bg-slate-50 md:px-5"
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-start transition hover:bg-slate-50 md:px-5"
           >
             <div className="flex items-center gap-3">
               <div className="rounded-xl bg-slate-100 p-2 text-slate-600">
@@ -774,7 +774,7 @@ export default function ItemProfitabilityPage() {
                       {t("إعادة ضبط")}
                     </Button>
 
-                    <div className="mr-auto flex items-center gap-1.5 text-xs text-slate-400">
+                    <div className="me-auto flex items-center gap-1.5 text-xs text-slate-400">
                       <CalendarDays size={14} />
                       {formatDate(filters.fromDate)} — {formatDate(filters.toDate)}
                     </div>
@@ -937,7 +937,7 @@ export default function ItemProfitabilityPage() {
           <div className="overflow-x-auto">
             <table className="min-w-[1500px] w-full text-xs">
               <thead className="bg-slate-50/80">
-                <tr className="border-b border-slate-200 text-right text-slate-600">
+                <tr className="border-b border-slate-200 text-start text-slate-600">
                   <th className="px-4 py-3 font-semibold">{t("الصنف")}</th>
 
                   <th className="px-4 py-3 font-semibold">{t("الكود")}</th>

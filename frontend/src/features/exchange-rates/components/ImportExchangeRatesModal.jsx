@@ -236,12 +236,12 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
             <table className="w-full text-sm" dir={getDir()}>
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
-                  <th className="px-3 py-2 text-right font-medium">{t("العملة")}</th>
-                  <th className="px-3 py-2 text-right font-medium">{t("السعر")}</th>
-                  <th className="px-3 py-2 text-right font-medium">
+                  <th className="px-3 py-2 text-start font-medium">{t("العملة")}</th>
+                  <th className="px-3 py-2 text-start font-medium">{t("السعر")}</th>
+                  <th className="px-3 py-2 text-start font-medium">
                     {t("تاريخ السعر الفعلي")}
                   </th>
-                  <th className="px-3 py-2 text-right font-medium">{t("ملاحظة")}</th>
+                  <th className="px-3 py-2 text-start font-medium">{t("ملاحظة")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -332,10 +332,10 @@ export default function ImportExchangeRatesModal({ isOpen, onClose, onDone }) {
             <table className="w-full text-sm" dir={getDir()}>
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
-                  <th className="px-3 py-2 text-right font-medium">{t("العملة")}</th>
-                  <th className="px-3 py-2 text-right font-medium">{t("السعر")}</th>
-                  <th className="px-3 py-2 text-right font-medium">{t("الحالة")}</th>
-                  <th className="px-3 py-2 text-right font-medium">{t("السبب")}</th>
+                  <th className="px-3 py-2 text-start font-medium">{t("العملة")}</th>
+                  <th className="px-3 py-2 text-start font-medium">{t("السعر")}</th>
+                  <th className="px-3 py-2 text-start font-medium">{t("الحالة")}</th>
+                  <th className="px-3 py-2 text-start font-medium">{t("السبب")}</th>
                 </tr>
               </thead>
               <tbody>

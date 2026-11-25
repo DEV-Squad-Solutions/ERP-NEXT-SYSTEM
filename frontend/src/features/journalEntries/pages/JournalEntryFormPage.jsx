@@ -1189,9 +1189,9 @@ export default function JournalEntryFormPage() {
 
                 <span>{t("البيان")}</span>
 
-                <span className="text-left">{t("مدين")}</span>
+                <span className="text-end">{t("مدين")}</span>
 
-                <span className="text-left">{t("دائن")}</span>
+                <span className="text-end">{t("دائن")}</span>
 
                 <span />
               </div>
@@ -1260,7 +1260,7 @@ export default function JournalEntryFormPage() {
                             handleDebitChange(line.key, event.target.value)
                           }
                           placeholder="0.00"
-                          className="num w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left text-sm font-medium text-slate-700 outline-none transition-all duration-200 placeholder:text-slate-300 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+                          className="num w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-end text-sm font-medium text-slate-700 outline-none transition-all duration-200 placeholder:text-slate-300 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
                         />
                       </div>
 
@@ -1274,7 +1274,7 @@ export default function JournalEntryFormPage() {
                             handleCreditChange(line.key, event.target.value)
                           }
                           placeholder="0.00"
-                          className="num w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left text-sm font-medium text-slate-700 outline-none transition-all duration-200 placeholder:text-slate-300 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+                          className="num w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-end text-sm font-medium text-slate-700 outline-none transition-all duration-200 placeholder:text-slate-300 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
                         />
                       </div>
 

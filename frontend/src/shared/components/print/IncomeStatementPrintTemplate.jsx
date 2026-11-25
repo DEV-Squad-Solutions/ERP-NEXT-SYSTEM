@@ -33,7 +33,7 @@ export default function IncomeStatementPrintTemplate({
             {t("تاريخ الطباعة:")} {printedAt}
           </p>
         </div>
-        <div className="text-sm text-ink-400 text-left">
+        <div className="text-sm text-ink-400 text-end">
           {data?.fiscalYearName && <p>{t("السنة المالية:")} {data.fiscalYearName}</p>}
           <p>
             {t("من")} {formatDate(filters.fromDate)} {t("إلى")} {formatDate(filters.toDate)}
@@ -52,7 +52,7 @@ export default function IncomeStatementPrintTemplate({
         <span>{t("| العملة:")} {data?.baseCurrency || "EGP"}</span>
       </div>
 
-      <table className="w-full text-right text-sm border-collapse">
+      <table className="w-full text-start text-sm border-collapse">
         <thead>
           <tr className="border-b-2 border-ink-900">
             <th className="py-2 px-2">{t("بند القائمة")}</th>
@@ -76,12 +76,12 @@ export default function IncomeStatementPrintTemplate({
                   key={`${section.key}-${row.financialStatementLineId}-${row.accountId ?? idx}`}
                   className="border-b border-ink-900/10"
                 >
-                  <td className="py-2 px-2 pr-5">
+                  <td className="py-2 px-2 pe-5">
                     <span className="font-semibold">
                       {row.financialStatementLineName || "—"}
                     </span>
                     {row.financialStatementLineCode && (
-                      <span className="mr-2 font-mono text-xs text-ink-400">
+                      <span className="me-2 font-mono text-xs text-ink-400">
                         {row.financialStatementLineCode}
                       </span>
                     )}
@@ -90,7 +90,7 @@ export default function IncomeStatementPrintTemplate({
                     <td className="py-2 px-2">
                       {row.accountName || "—"}
                       {row.accountCode && (
-                        <span className="mr-2 font-mono text-xs text-ink-400">
+                        <span className="me-2 font-mono text-xs text-ink-400">
                           {row.accountCode}
                         </span>
                       )}

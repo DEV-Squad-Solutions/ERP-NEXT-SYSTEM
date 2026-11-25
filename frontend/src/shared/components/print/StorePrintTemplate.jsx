@@ -17,7 +17,7 @@ export default function StorePrintTemplate({ store, stats }) {
           <h1 className="text-xl font-bold">{store.name}</h1>
           <p className="text-sm text-ink-500 font-mono mt-1">{store.code}</p>
         </div>
-        <div className="text-left text-xs text-ink-400">
+        <div className="text-end text-xs text-ink-400">
           <p>{t("تاريخ الطباعة")}</p>
           <p>{printedAt}</p>
         </div>

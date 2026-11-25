@@ -369,23 +369,23 @@ export default function CashboxTransfersPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-ink-900/[0.025] text-ink-500">
-                  <th className="px-4 py-3 text-right font-medium">
+                  <th className="px-4 py-3 text-start font-medium">
                     {t("رقم التحويل")}
                   </th>
 
-                  <th className="px-4 py-3 text-right font-medium">{t("التاريخ")}</th>
+                  <th className="px-4 py-3 text-start font-medium">{t("التاريخ")}</th>
 
-                  <th className="px-4 py-3 text-right font-medium">{t("من خزينة")}</th>
+                  <th className="px-4 py-3 text-start font-medium">{t("من خزينة")}</th>
 
-                  <th className="px-4 py-3 text-right font-medium">
+                  <th className="px-4 py-3 text-start font-medium">
                     {t("إلى خزينة")}
                   </th>
 
-                  <th className="px-4 py-3 text-right font-medium">{t("المبلغ")}</th>
+                  <th className="px-4 py-3 text-start font-medium">{t("المبلغ")}</th>
 
-                  <th className="px-4 py-3 text-right font-medium">{t("الوصف")}</th>
+                  <th className="px-4 py-3 text-start font-medium">{t("الوصف")}</th>
 
-                  <th className="px-4 py-3 text-right font-medium">{t("إجراءات")}</th>
+                  <th className="px-4 py-3 text-start font-medium">{t("إجراءات")}</th>
                 </tr>
               </thead>
 

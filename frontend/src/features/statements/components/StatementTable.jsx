@@ -125,13 +125,13 @@ export default function StatementTable({
                 )}
               </th>
 
-              <th className="min-w-[320px] px-4 py-3 text-right">{t("البيان")}</th>
+              <th className="min-w-[320px] px-4 py-3 text-start">{t("البيان")}</th>
 
               <th className="w-36 px-4 py-3 text-center">{t("التاريخ")}</th>
 
-              <th className="w-44 px-4 py-3 text-right">{t("رقم المستند")}</th>
+              <th className="w-44 px-4 py-3 text-start">{t("رقم المستند")}</th>
 
-              <th className="min-w-[220px] px-4 py-3 text-right">{t("الملاحظات")}</th>
+              <th className="min-w-[220px] px-4 py-3 text-start">{t("الملاحظات")}</th>
             </tr>
           </thead>
 
@@ -180,7 +180,7 @@ export default function StatementTable({
                 </td>
 
                 {/* البيان */}
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-start">
                   <div className="flex items-center justify-end gap-2">
                     {item.isOpeningBalance && (
                       <span className="rounded-md bg-ink-400/10 px-1.5 py-0.5 text-[10px] font-medium text-ink-500">
@@ -200,7 +200,7 @@ export default function StatementTable({
                 </td>
 
                 {/* رقم المستند + لينك سند الخزنة (لو مسموح) */}
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-start">
                   <CashVoucherNumberLink
                     cashVoucherId={item.cashVoucherId}
                     cashboxId={item.cashboxId}
@@ -213,7 +213,7 @@ export default function StatementTable({
                 </td>
 
                 {/* الملاحظات */}
-                <td className="px-4 py-3 text-right text-ink-500">
+                <td className="px-4 py-3 text-start text-ink-500">
                   {item.notes || "—"}
                 </td>
               </tr>

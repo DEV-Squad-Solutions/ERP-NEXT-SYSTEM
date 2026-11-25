@@ -184,7 +184,7 @@ export default function StockOpeningBalanceForm({
     <div className="space-y-5">
       <LedgerPanel
         title={
-          <span className="flex items-center gap-2 pr-3">
+          <span className="flex items-center gap-2 pe-3">
             <FileText size={15} />
             {t("بيانات السند")}
           </span>
@@ -203,7 +203,7 @@ export default function StockOpeningBalanceForm({
             onChange={(e) => setHeaderField("documentDate", e.target.value)}
           />
           <div className="flex items-stretch">
-            <div className="w-28 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-l border-ink-400/10">
+            <div className="w-28 shrink-0 bg-ink-900/[0.03] px-3 py-2.5 text-sm font-medium text-ink-900 flex items-center border-e border-ink-400/10">
               {t("المخزن")} <span className="text-negative">*</span>
             </div>
             <CompactSelect
@@ -227,14 +227,14 @@ export default function StockOpeningBalanceForm({
 
       <LedgerPanel
         title={
-          <span className="flex items-center gap-2 pr-3">
+          <span className="flex items-center gap-2 pe-3">
             <StoreIcon size={15} />
             {t("الأصناف")}
           </span>
         }
       >
         <div className="overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card">
-          <table className="w-full text-right border-collapse min-w-[900px]">
+          <table className="w-full text-start border-collapse min-w-[900px]">
             <thead>
               <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
                 <th className="p-2.5 font-medium">#</th>

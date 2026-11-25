@@ -91,12 +91,12 @@ export default function UnitsPage() {
               <SlidersHorizontal size={16} />
               {t("فلاتر")}
               {hasActiveFilters && (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 mr-1" />
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-700 me-1" />
               )}
             </Button>
 
             {showFilters && (
-              <div className="absolute left-0 mt-2 w-72 bg-white border border-ink-400/10 rounded-2xl shadow-lg p-4 z-20 space-y-3">
+              <div className="absolute end-0 mt-2 w-72 bg-white border border-ink-400/10 rounded-2xl shadow-lg p-4 z-20 space-y-3">
                 <div>
                   <label className="block text-xs text-ink-400 mb-1.5">
                     {t("بحث")}
@@ -181,7 +181,7 @@ export default function UnitsPage() {
             isFetching ? "opacity-60" : ""
           }`}
         >
-          <table className="w-full text-right">
+          <table className="w-full text-start">
             <thead>
               <tr className="border-b border-ink-400/10 text-xs text-ink-400 bg-ink-400/5">
                 <th className="py-3 px-4 font-medium">{t("الاسم")}</th>

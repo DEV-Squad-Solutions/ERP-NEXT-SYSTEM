@@ -305,7 +305,7 @@ export default function AccountingReadinessPage() {
               <table className="min-w-full border-collapse text-sm">
                 <thead className="bg-slate-50">
                   <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
-                    <th className="px-4 py-2.5 text-right">{t("النوع")}</th>
+                    <th className="px-4 py-2.5 text-start">{t("النوع")}</th>
                     <th className="px-4 py-2.5 text-center">{t("الإجمالي")}</th>
                     <th className="px-4 py-2.5 text-center">{t("مُرحّل")}</th>
                     <th className="px-4 py-2.5 text-center">{t("ناقص")}</th>
@@ -317,7 +317,7 @@ export default function AccountingReadinessPage() {
                       key={s.sourceType}
                       className="border-b border-ink-400/5 last:border-0 hover:bg-slate-50"
                     >
-                      <td className="px-4 py-2.5 text-right font-medium text-ink-900">
+                      <td className="px-4 py-2.5 text-start font-medium text-ink-900">
                         {s.sourceType}
                       </td>
                       <td className="num px-4 py-2.5 text-center text-ink-600">
@@ -362,11 +362,11 @@ export default function AccountingReadinessPage() {
                 <table className="min-w-full border-collapse text-sm">
                   <thead className="bg-slate-50">
                     <tr className="border-b border-ink-400/10 text-xs font-semibold text-ink-600">
-                      <th className="px-4 py-2.5 text-right">{t("النوع")}</th>
-                      <th className="px-4 py-2.5 text-right">{t("المصدر")}</th>
+                      <th className="px-4 py-2.5 text-start">{t("النوع")}</th>
+                      <th className="px-4 py-2.5 text-start">{t("المصدر")}</th>
                       <th className="px-4 py-2.5 text-center">{t("الرقم")}</th>
                       <th className="px-4 py-2.5 text-center">{t("التاريخ")}</th>
-                      <th className="px-4 py-2.5 text-right">{t("التفاصيل")}</th>
+                      <th className="px-4 py-2.5 text-start">{t("التفاصيل")}</th>
                       <th className="px-4 py-2.5 text-center">{t("إجراء سريع")}</th>
                     </tr>
                   </thead>
@@ -380,7 +380,7 @@ export default function AccountingReadinessPage() {
                           key={`${issue.sourceType}-${issue.sourceId}-${i}`}
                           className="border-b border-ink-400/5 last:border-0 hover:bg-slate-50"
                         >
-                          <td className="px-4 py-2.5 text-right">
+                          <td className="px-4 py-2.5 text-start">
                             <span
                               className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${
                                 ISSUE_BADGE[issue.issueType] ||
@@ -390,7 +390,7 @@ export default function AccountingReadinessPage() {
                               {ISSUE_LABELS[issue.issueType] || issue.issueType}
                             </span>
                           </td>
-                          <td className="px-4 py-2.5 text-right text-ink-600">
+                          <td className="px-4 py-2.5 text-start text-ink-600">
                             {issue.sourceType}
                           </td>
                           <td className="num px-4 py-2.5 text-center">
@@ -413,7 +413,7 @@ export default function AccountingReadinessPage() {
                           <td className="num px-4 py-2.5 text-center text-ink-500">
                             {formatDate(issue.sourceDate)}
                           </td>
-                          <td className="px-4 py-2.5 text-right text-ink-600">
+                          <td className="px-4 py-2.5 text-start text-ink-600">
                             {issue.message}
                           </td>
                           <td className="px-4 py-2.5 text-center">

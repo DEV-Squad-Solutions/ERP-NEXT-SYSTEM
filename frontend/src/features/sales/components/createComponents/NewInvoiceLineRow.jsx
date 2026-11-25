@@ -871,7 +871,7 @@ function InvoiceLineRow({
             <span className="truncate">{line.itemName}</span>
 
             {line.sourceInvoiceNumber && (
-              <span className="mr-auto shrink-0 text-[11px] text-ink-400">
+              <span className="me-auto shrink-0 text-[11px] text-ink-400">
                 {t("من")} {line.sourceInvoiceNumber}
               </span>
             )}
@@ -946,7 +946,7 @@ function InvoiceLineRow({
       ===================================================== */}
 
       <td className="p-2 min-w-[130px]">
-        <div className="rounded-lg border border-ink-400/10 bg-ink-400/5 px-2.5 py-1.5 text-right transition-colors">
+        <div className="rounded-lg border border-ink-400/10 bg-ink-400/5 px-2.5 py-1.5 text-start transition-colors">
           {isReturnLine ? (
             <span className="text-sm font-medium text-ink-700">
               {t("متاح:")} {round2(line.maxReturnQuantity) ?? "-"}

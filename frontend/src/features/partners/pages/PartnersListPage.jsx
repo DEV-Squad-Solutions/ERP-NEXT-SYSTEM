@@ -145,12 +145,12 @@ export default function PartnersListPage() {
               <SlidersHorizontal size={16} />
               {t("فلاتر")}
               {hasActiveFilters && (
-                <span className="mr-1 h-1.5 w-1.5 rounded-full bg-emerald-700" />
+                <span className="me-1 h-1.5 w-1.5 rounded-full bg-emerald-700" />
               )}
             </Button>
 
             {showFilters && (
-              <div className="absolute left-0 z-20 mt-2 w-80 space-y-3 rounded-2xl border border-ink-400/10 bg-white p-4 shadow-lg">
+              <div className="absolute end-0 z-20 mt-2 w-80 space-y-3 rounded-2xl border border-ink-400/10 bg-white p-4 shadow-lg">
                 <div>
                   <label className="mb-1.5 block text-xs text-ink-400">
                     {t("بحث")}
@@ -308,7 +308,7 @@ export default function PartnersListPage() {
         {!isLoading && !isError && parties.length > 0 && (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full text-right">
+              <table className="w-full text-start">
                 <thead>
                   <tr className="bg-ink-400/5 text-xs text-ink-400">
                     <th className="px-4 py-3 font-medium">{t("الكود")}</th>

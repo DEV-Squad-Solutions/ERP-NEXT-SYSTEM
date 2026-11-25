@@ -127,9 +127,9 @@ function AnimatedNumber({ value, format }) {
 function DecorativeBlobs() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
-      <div className="absolute -top-16 -right-10 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
-      <div className="absolute -bottom-20 left-1/3 h-64 w-64 rounded-full bg-amber-400/20 blur-3xl" />
-      <div className="absolute top-1/2 -left-10 h-40 w-40 -translate-y-1/2 rounded-full bg-teal-300/20 blur-2xl" />
+      <div className="absolute -top-16 -start-10 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
+      <div className="absolute -bottom-20 end-1/3 h-64 w-64 rounded-full bg-amber-400/20 blur-3xl" />
+      <div className="absolute top-1/2 -end-10 h-40 w-40 -translate-y-1/2 rounded-full bg-teal-300/20 blur-2xl" />
     </div>
   );
 }
@@ -682,7 +682,7 @@ export default function DashboardPage() {
                 )}
                 <span>{a.message}</span>
                 {a.count > 0 && (
-                  <span className="mr-auto rounded-full bg-white/60 px-2 py-0.5 text-xs font-semibold dark:bg-black/20">
+                  <span className="me-auto rounded-full bg-white/60 px-2 py-0.5 text-xs font-semibold dark:bg-black/20">
                     {a.count}
                   </span>
                 )}

@@ -682,7 +682,7 @@ export default function FinancialStatementsPage() {
                 <div className="relative flex-1">
                   <Search
                     size={17}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"
+                    className="absolute start-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none"
                   />
 
                   <input
@@ -690,7 +690,7 @@ export default function FinancialStatementsPage() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder={t("بحث بالكود أو اسم البند...")}
-                    className="w-full h-10 rounded-xl border border-ink-400/20  pr-10 pl-3 text-sm outline-none focus:border-primary-500"
+                    className="w-full h-10 rounded-xl border border-ink-400/20  pe-10 ps-3 text-sm outline-none focus:border-primary-500"
                   />
                 </div>
 

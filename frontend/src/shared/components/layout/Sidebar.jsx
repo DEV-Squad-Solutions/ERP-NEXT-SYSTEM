@@ -175,9 +175,9 @@ const SidebarLink = memo(function SidebarLink({
           <span
             aria-hidden="true"
             className={[
-              "absolute right-0 top-1/2",
+              "absolute start-0 top-1/2",
               "-translate-y-1/2",
-              "w-[3px] rounded-l-full",
+              "w-[3px] rounded-e-full",
               "transition-[height,opacity,box-shadow]",
               "duration-300",
               isActive
@@ -250,7 +250,7 @@ const SidebarSubLink = memo(function SidebarSubLink({
       className={({ isActive }) =>
         [
           "group relative flex min-h-8.5 items-center gap-2.5",
-          "rounded-lg py-1.5 pr-3 pl-2",
+          "rounded-lg py-1.5 ps-3 pe-2",
           "text-[12px]",
           "outline-none",
           "transition-[background-color,color,transform]",
@@ -284,7 +284,7 @@ const SidebarSubLink = memo(function SidebarSubLink({
             <span
               aria-hidden="true"
               className={[
-                "absolute right-0 top-0 bottom-0",
+                "absolute start-0 top-0 bottom-0",
                 "w-px",
                 "transition-colors duration-200",
                 lineColor,
@@ -295,7 +295,7 @@ const SidebarSubLink = memo(function SidebarSubLink({
             <span
               aria-hidden="true"
               className={[
-                "absolute right-0 top-1/2",
+                "absolute start-0 top-1/2",
                 "h-px w-2",
                 "-translate-y-1/2",
                 "transition-colors duration-200",
@@ -307,7 +307,7 @@ const SidebarSubLink = memo(function SidebarSubLink({
             <span
               aria-hidden="true"
               className={[
-                "absolute right-[-2px] top-1/2",
+                "absolute start-[-2px] top-1/2",
                 "h-[5px] w-[5px]",
                 "-translate-y-1/2",
                 "rounded-full",
@@ -381,7 +381,7 @@ const SidebarNestedGroup = memo(function SidebarNestedGroup({
         aria-controls={groupId}
         className={[
           "group flex w-full min-h-8.5 items-center gap-2.5",
-          "rounded-lg py-1.5 pr-3 pl-2",
+          "rounded-lg py-1.5 ps-3 pe-2",
           "text-[12px]",
           "outline-none",
           "transition-[background-color,color]",
@@ -411,7 +411,7 @@ const SidebarNestedGroup = memo(function SidebarNestedGroup({
           />
         )}
 
-        <span className="min-w-0 flex-1 truncate text-right">{label}</span>
+        <span className="min-w-0 flex-1 truncate text-start">{label}</span>
 
         <ChevronDown
           size={13}
@@ -436,7 +436,7 @@ const SidebarNestedGroup = memo(function SidebarNestedGroup({
         ].join(" ")}
       >
         <div className="overflow-hidden">
-          <ul className="mr-3 mt-1 space-y-0.5 border-r border-white/[0.08] pr-2">
+          <ul className="ms-3 mt-1 space-y-0.5 border-s border-white/[0.08] ps-2">
             {children.map((child) =>
               child.children?.length ? (
                 <SidebarNestedGroup
@@ -545,7 +545,7 @@ const SidebarGroup = memo(function SidebarGroup({
           </span>
         )}
 
-        <span className="min-w-0 flex-1 truncate text-right">{label}</span>
+        <span className="min-w-0 flex-1 truncate text-start">{label}</span>
 
         <ChevronDown
           size={14}
@@ -570,7 +570,7 @@ const SidebarGroup = memo(function SidebarGroup({
         ].join(" ")}
       >
         <div className="overflow-hidden">
-          <ul className="mt-1 mr-3 space-y-0.5 border-r border-white/[0.08] pr-3">
+          <ul className="mt-1 ms-3 space-y-0.5 border-s border-white/[0.08] ps-3">
             {children.map((child) =>
               child.children?.length ? (
                 <SidebarNestedGroup
@@ -698,15 +698,15 @@ function Sidebar({ isOpen, onClose }) {
       <aside
         aria-label={t("القائمة الرئيسية")}
         className={[
-          "fixed top-0 right-0 z-50",
+          "fixed top-0 start-0 z-50",
           "h-screen w-[260px]",
           "flex flex-col",
-          "border-l border-white/[0.07]",
+          "border-e border-white/[0.07]",
           "bg-ink-900",
           "shadow-2xl shadow-black/30",
           "transition-transform duration-300",
           "ease-[cubic-bezier(0.22,1,0.36,1)]",
-          isOpen ? "translate-x-0" : "translate-x-full",
+          isOpen ? "translate-x-0" : "max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full",
           "lg:translate-x-0",
         ].join(" ")}
       >
@@ -722,7 +722,7 @@ function Sidebar({ isOpen, onClose }) {
 
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute right-0 bottom-0 left-0 h-px bg-gradient-to-l from-gold-500/25 via-white/[0.05] to-transparent"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-l from-gold-500/25 via-white/[0.05] to-transparent"
           />
 
           <div className="relative flex items-center gap-2">
@@ -733,7 +733,7 @@ function Sidebar({ isOpen, onClose }) {
               className={[
                 "group min-w-0 flex-1",
                 "rounded-lg p-1",
-                "text-right",
+                "text-start",
                 "outline-none",
                 "transition-colors duration-200",
                 "disabled:cursor-default",

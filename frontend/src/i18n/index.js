@@ -45,7 +45,11 @@ export const t = (text, params) => {
   let out = text;
   if (current !== "ar") {
     const hit = dictionaries[current]?.[normalize(text)];
-    if (hit !== undefined) out = hit;
+    if (hit !== undefined) {
+      const lead = text.match(/^\s*/)[0];
+      const trail = text.match(/\s*$/)[0];
+      out = lead + hit + trail;
+    }
   }
   if (params) {
     out = out.replace(/\{(\w+)\}/g, (match, key) =>

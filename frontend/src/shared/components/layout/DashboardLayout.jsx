@@ -45,7 +45,7 @@ export default function DashboardLayout() {
           "transition-[margin]",
           "duration-300",
           "ease-[cubic-bezier(0.22,1,0.36,1)]",
-          "lg:mr-[260px]",
+          "lg:ms-[260px]",
         ].join(" ")}
       >
         {/* ===================================================

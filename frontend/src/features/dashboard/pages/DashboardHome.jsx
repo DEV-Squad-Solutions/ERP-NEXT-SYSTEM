@@ -45,7 +45,7 @@ import DateInput from "../../../shared/components/ui/DateInput.jsx";
 import { formatDate } from "../../../lib/date.js";
 
 import { t } from "../../../i18n";
-import { getDir, getLocale } from "../../../i18n";
+import { getDir, getLang, getLocale } from "../../../i18n";
 /* ------------------------------------------------------------------ */
 /* توكنز التصميم — هوية "دفتر أستاذ" (Ledger): تيل داكن كأساس ماليّ    */
 /* موثوق + لمسة نحاسية/ذهبية للقيم المالية، بعيدًا عن كليشيه الإندجو  */
@@ -86,7 +86,9 @@ const CURRENCIES = [
 ];
 
 const getCurrencyLabel = (code) =>
-  CURRENCIES.find((c) => c.value === code)?.label ?? code ?? t("جنيه مصري");
+  getLang() !== "ar" && code
+    ? code
+    : CURRENCIES.find((c) => c.value === code)?.label ?? code ?? t("جنيه مصري");
 
 const fmtMoney = (v, currencyCode = "EGP") =>
   `${(v ?? 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 })} ${getCurrencyLabel(

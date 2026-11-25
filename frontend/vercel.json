@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/v1/:path*",
-      "destination": "http://ai-job-hunter.runasp.net/api/v1/:path*"
+      "destination": "https://ai-job-hunter.runasp.net/api/v1/:path*"
     },
     {
       "source": "/(.*)",

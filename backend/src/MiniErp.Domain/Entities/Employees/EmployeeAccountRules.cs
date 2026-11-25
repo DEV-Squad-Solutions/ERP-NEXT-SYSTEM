@@ -1,0 +1,65 @@
+using MiniErp.Domain.Enums;
+
+namespace MiniErp.Domain.Entities.Employees;
+
+public static class EmployeeAccountRules
+{
+    // ── Movement Classification ──────────────────────────────────────────────
+    public static bool IsCreditMovement(EmployeeMovementType type) =>
+        type is EmployeeMovementType.Credit or EmployeeMovementType.Bonus;
+
+    public static bool IsDebitMovement(EmployeeMovementType type) =>
+        type is EmployeeMovementType.Debit or EmployeeMovementType.Deduction;
+
+    // ── Debit / Credit Split ─────────────────────────────────────────────────
+    public static (decimal Debit, decimal Credit) SplitAmount(
+        EmployeeMovementType type,
+        decimal amount) =>
+        IsCreditMovement(type)
+            ? (0m, amount)
+            : (amount, 0m);
+
+    // ── Signed Amount ────────────────────────────────────────────────────────
+
+    public static decimal SignedAmount(decimal debit, decimal credit) =>
+        credit - debit;
+
+    // ── Balance Calculation ──────────────────────────────────────────────────
+    public static decimal CalculateBalance(
+        decimal totalCredits,
+        decimal totalDebits) =>
+        totalCredits - totalDebits;
+
+    // ── Movement Reversal ────────────────────────────────────────────────────
+    public static decimal GetReversalSignedAmount(
+        EmployeeMovementType type,
+        decimal debit,
+        decimal credit) =>
+        -SignedAmount(debit, credit);
+
+    public static (decimal ReversedDebit, decimal ReversedCredit) SplitReversalAmount(
+        EmployeeMovementType type,
+        decimal amount) =>
+        IsCreditMovement(type)
+            ? (amount, 0m)
+            : (0m, amount);
+
+    // ── Display Helpers ──────────────────────────────────────────────────────
+    public static string GetBalanceDescription(decimal netBalance) =>
+        netBalance > 0
+            ? "دائن (مستحق للموظف)"
+            : netBalance < 0
+                ? "مدين (مستحق على الموظف)"
+                : "متزن (صفر)";
+
+    public static string GetMovementTypeName(EmployeeMovementType type) =>
+        type switch
+        {
+            EmployeeMovementType.Credit    => "حركة دائنة",
+            EmployeeMovementType.Debit     => "حركة مدينة",
+            EmployeeMovementType.Deduction => "خصم مالي",
+            EmployeeMovementType.Bonus     => "مكافأة مالية",
+            _                              => "حركة حساب موظف"
+        };
+}
+

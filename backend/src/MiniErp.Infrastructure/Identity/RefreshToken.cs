@@ -1,0 +1,29 @@
+using MiniErp.Domain.Entities.Companies;
+
+namespace MiniErp.Infrastructure.Identity;
+
+public sealed class RefreshToken
+{
+    public Guid Id { get; set; }
+
+    public Guid UserId { get; set; }
+
+    public ApplicationUser User { get; set; } = null!;
+
+    public int? CompanyId { get; set; }
+
+    public Company? Company { get; set; }
+
+    public string TokenHash { get; set; } = string.Empty;
+
+    public DateTimeOffset CreatedAtUtc { get; set; }
+
+    public DateTimeOffset ExpiresAtUtc { get; set; }
+
+    public DateTimeOffset? RevokedAtUtc { get; set; }
+
+    public string SecurityStampSnapshot { get; set; } = string.Empty;
+
+    public byte[] RowVersion { get; set; } = [];
+
+}

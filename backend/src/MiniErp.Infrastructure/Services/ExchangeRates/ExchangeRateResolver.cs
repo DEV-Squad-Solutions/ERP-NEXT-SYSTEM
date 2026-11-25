@@ -1,0 +1,128 @@
+using Microsoft.EntityFrameworkCore;
+using MiniErp.Application.Common.Abstractions;
+using MiniErp.Application.Common.Results;
+using MiniErp.Application.Features.ExchangeRates;
+using MiniErp.Domain.Entities.Companies;
+using MiniErp.Domain.Enums;
+using MiniErp.Infrastructure.Persistence;
+using static MiniErp.Application.Features.ExchangeRates.ExchangeRateErrors;
+
+namespace MiniErp.Infrastructure.Services.ExchangeRates;
+
+public sealed class ExchangeRateResolver(
+    ApplicationDbContext dbContext,
+    ICurrentCompanyContext currentCompanyContext,
+    TimeProvider timeProvider)
+    : IExchangeRateResolver, IScopedService
+{
+    private readonly int companyId = currentCompanyContext.CompanyId;
+
+    public async Task<Result<ResolvedExchangeRate>> ResolveAsync(
+        CurrencyCode currency,
+        DateOnly date,
+        decimal? requestedRate = null,
+        CancellationToken cancellationToken = default)
+    {
+        _ = timeProvider;
+
+        if (!Enum.IsDefined(currency))
+        {
+            return Result<ResolvedExchangeRate>.Failure(InvalidCurrency());
+        }
+
+        var baseCurrency = await GetBaseCurrencyAsync(cancellationToken);
+        if (currency == baseCurrency)
+        {
+            if (requestedRate.HasValue && requestedRate.Value != 1m)
+            {
+                return Result<ResolvedExchangeRate>.Failure(
+                    BaseCurrencyRateMustBeOne());
+            }
+
+            return Result<ResolvedExchangeRate>.Success(
+                new ResolvedExchangeRate(
+                    ExchangeRateId: null,
+                    BaseCurrency: baseCurrency,
+                    Currency: currency,
+                    RequestedDate: date,
+                    RateDate: null,
+                    Rate: 1m,
+                    Source: null,
+                    IsBaseCurrency: true));
+        }
+
+        if (requestedRate.HasValue)
+        {
+            if (!ExchangeRateRules.IsValidRate(requestedRate.Value))
+            {
+                return Result<ResolvedExchangeRate>.Failure(InvalidRate());
+            }
+
+            var roundedRate = ExchangeRateRules.RoundRate(requestedRate.Value);
+
+            return Result<ResolvedExchangeRate>.Success(
+                new ResolvedExchangeRate(
+                    ExchangeRateId: null,
+                    BaseCurrency: baseCurrency,
+                    Currency: currency,
+                    RequestedDate: date,
+                    RateDate: date,
+                    Rate: roundedRate,
+                    Source: ExchangeRateSource.Manual,
+                    IsBaseCurrency: false));
+        }
+
+        var fiscalYearId = await dbContext.FiscalYears
+            .AsNoTracking()
+            .Where(year =>
+                year.CompanyId == companyId &&
+                year.StartDate <= date &&
+                year.EndDate >= date)
+            .Select(year => (int?)year.Id)
+            .SingleOrDefaultAsync(cancellationToken);
+        if (!fiscalYearId.HasValue)
+        {
+            return Result<ResolvedExchangeRate>.Failure(Missing(currency, date));
+        }
+
+        var rate = await dbContext.ExchangeRates
+            .AsNoTracking()
+            .Where(entity =>
+                entity.CompanyId == companyId &&
+                entity.FiscalYearId == fiscalYearId.Value &&
+                entity.Currency == currency &&
+                entity.RateDate <= date)
+            .OrderByDescending(entity => entity.RateDate)
+            .ThenByDescending(entity => entity.Id)
+            .Select(entity => new
+            {
+                entity.Id,
+                entity.RateDate,
+                entity.Rate,
+                entity.Source
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return rate is null
+            ? Result<ResolvedExchangeRate>.Failure(Missing(currency, date))
+            : Result<ResolvedExchangeRate>.Success(
+                new ResolvedExchangeRate(
+                    ExchangeRateId: rate.Id,
+                    BaseCurrency: baseCurrency,
+                    Currency: currency,
+                    RequestedDate: date,
+                    RateDate: rate.RateDate,
+                    Rate: rate.Rate,
+                    Source: rate.Source,
+                    IsBaseCurrency: false));
+    }
+
+    private async Task<CurrencyCode> GetBaseCurrencyAsync(
+        CancellationToken cancellationToken) =>
+        await dbContext.CompanySettings
+            .AsNoTracking()
+            .Where(settings => settings.CompanyId == companyId)
+            .Select(settings => (CurrencyCode?)settings.BaseCurrency)
+            .SingleOrDefaultAsync(cancellationToken) ??
+        CurrencyCode.EGP;
+}

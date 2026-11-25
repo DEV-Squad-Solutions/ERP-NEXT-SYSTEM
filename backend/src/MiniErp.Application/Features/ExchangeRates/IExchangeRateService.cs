@@ -1,0 +1,45 @@
+using MiniErp.Application.Common.Models;
+using MiniErp.Application.Common.Results;
+using MiniErp.Domain.Enums;
+
+namespace MiniErp.Application.Features.ExchangeRates;
+
+public interface IExchangeRateService
+{
+    Task<Result<PagedResponse<ExchangeRateResponse>>> GetAllAsync(
+        PaginationRequest pagination,
+        ExchangeRateFilterRequest? filters = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<ExchangeRateResponse>> GetByIdAsync(
+        int id,
+        int? fiscalYearId = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<ExchangeRateResolutionResponse>> ResolveAsync(
+        CurrencyCode currency,
+        DateOnly date,
+        int? fiscalYearId = null,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<ExchangeRateResponse>> AddAsync(
+        ExchangeRateRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<ExchangeRateImportResponse>> ImportAsync(
+        ExchangeRateImportRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<ExchangeRateImportPreviewResponse>> PreviewImportAsync(
+        ExchangeRateImportRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<ExchangeRateResponse>> UpdateAsync(
+        int id,
+        ExchangeRateUpdateRequest request,
+        CancellationToken cancellationToken = default);
+
+    Task<Result> DeleteAsync(
+        int id,
+        CancellationToken cancellationToken = default);
+}

@@ -1,0 +1,767 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using MiniErp.Application.Common.Abstractions;
+using MiniErp.Application.Common.Mappings;
+using MiniErp.Application.Common.Models;
+using MiniErp.Application.Features.PartnerOpeningBalances;
+using MiniErp.Domain.Entities.BusinessPartners;
+using MiniErp.Domain.Enums;
+using MiniErp.Infrastructure;
+using MiniErp.Infrastructure.Persistence;
+using MiniErp.Infrastructure.Persistence.Interceptors;
+using MiniErp.Infrastructure.Services.Pagination;
+using MiniErp.Infrastructure.Services.PartnerOpeningBalances;
+using MiniErp.Infrastructure.Services.FiscalYears;
+
+namespace MiniErp.Tests.PartnerOpeningBalances;
+
+public sealed class PartnerOpeningBalanceServiceTests
+{
+    static PartnerOpeningBalanceServiceTests()
+    {
+        MappingConfiguration.Register(
+            typeof(InfrastructureAssemblyMarker).Assembly);
+    }
+
+    [Fact]
+    public async Task GetAll_ReturnsCompleteDetailFields()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+
+        var createResult = await service.AddAsync(CreateRequest());
+        var result = await service.GetAllAsync(
+            new PaginationRequest
+            {
+                PageNumber = 1,
+                PageSize = 20
+            });
+
+        Assert.True(createResult.IsSuccess);
+        Assert.True(result.IsSuccess);
+        var item = Assert.Single(result.Value.Items);
+        Assert.Equal(createResult.Value.Id, item.Id);
+        Assert.Equal(1, item.CompanyId);
+        Assert.Equal(1, item.BusinessPartnerId);
+        Assert.Equal("Company A Partner", item.BusinessPartnerName);
+        Assert.Equal(createResult.Value.DocumentNumber, item.DocumentNumber);
+        Assert.Equal(new DateOnly(2026, 1, 1), item.DocumentDate);
+        Assert.Equal(CurrencyCode.EGP, item.Currency);
+        Assert.Equal(PartnerBalanceType.Receivable, item.BalanceType);
+        Assert.Equal(125.50m, item.Amount);
+        Assert.Equal("Opening balance", item.Notes);
+        Assert.NotEmpty(item.RowVersion);
+        Assert.False(item.IsCarriedForward);
+    }
+
+    [Fact]
+    public async Task GetAll_IncludesCarriedForwardPartnerBalanceAsReadOnly()
+    {
+        await using var database =
+            await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        await database.ConfigureSeparateFiscalYearsAsync();
+        await database.SeedCarriedForwardPartnerBalanceAsync();
+        var service = database.CreateService(companyId: 1);
+
+        var result = await service.GetAllAsync(
+            new PaginationRequest { PageNumber = 1, PageSize = 20 },
+            new PartnerOpeningBalanceFilterRequest(FiscalYearId: 100));
+
+        Assert.True(result.IsSuccess);
+        var item = Assert.Single(result.Value.Items);
+        Assert.True(item.Id < 0);
+        Assert.True(item.IsCarriedForward);
+        Assert.Equal(100, item.FiscalYearId);
+        Assert.Equal("2026", item.FiscalYearName);
+        Assert.Equal(1, item.BusinessPartnerId);
+        Assert.Equal("Company A Partner", item.BusinessPartnerName);
+        Assert.Equal(new DateOnly(2026, 1, 1), item.DocumentDate);
+        Assert.Equal(PartnerBalanceType.Payable, item.BalanceType);
+        Assert.Equal(4_500m, item.Amount);
+        Assert.Equal(4_500m, item.BaseAmount);
+        Assert.Equal(1m, item.ExchangeRate);
+        Assert.Empty(item.RowVersion);
+
+        var get = await service.GetByIdAsync(item.Id, fiscalYearId: 100);
+        var update = await service.UpdateAsync(
+            item.Id,
+            new PartnerOpeningBalanceUpdateRequest(
+                BusinessPartnerId: item.BusinessPartnerId,
+                DocumentDate: item.DocumentDate,
+                Currency: item.Currency,
+                BalanceType: item.BalanceType,
+                Amount: item.Amount,
+                Notes: item.Notes,
+                RowVersion: [1]));
+        var delete = await service.DeleteAsync(item.Id);
+
+        Assert.True(get.IsSuccess);
+        Assert.True(get.Value.IsCarriedForward);
+        Assert.Equal(
+            "PartnerOpeningBalances.CarriedForwardReadOnly",
+            update.Error.Code);
+        Assert.Equal(
+            "PartnerOpeningBalances.CarriedForwardReadOnly",
+            delete.Error.Code);
+    }
+
+    [Fact]
+    public async Task GetAll_DefaultsToCurrentFiscalYearAndAllowsHistoricalYear()
+    {
+        await using var database =
+            await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        await database.ConfigureSeparateFiscalYearsAsync();
+        var service = database.CreateService(companyId: 1);
+
+        var currentCreated = await service.AddAsync(
+            CreateRequest(documentDate: new DateOnly(2025, 1, 1)));
+        var nextCreated = await service.AddAsync(
+            CreateRequest(documentDate: new DateOnly(2026, 1, 1)));
+
+        Assert.True(currentCreated.IsSuccess);
+        Assert.True(nextCreated.IsSuccess);
+
+        var currentYear = await service.GetAllAsync(
+            new PaginationRequest { PageNumber = 1, PageSize = 20 });
+        var nextYear = await service.GetAllAsync(
+            new PaginationRequest { PageNumber = 1, PageSize = 20 },
+            new PartnerOpeningBalanceFilterRequest(FiscalYearId: 100));
+
+        Assert.True(currentYear.IsSuccess);
+        var currentItem = Assert.Single(currentYear.Value.Items);
+        Assert.Equal(currentCreated.Value.Id, currentItem.Id);
+        Assert.Equal(1, currentItem.FiscalYearId);
+        Assert.Equal("2025", currentItem.FiscalYearName);
+
+        Assert.True(nextYear.IsSuccess);
+        var nextItem = Assert.Single(nextYear.Value.Items);
+        Assert.Equal(nextCreated.Value.Id, nextItem.Id);
+        Assert.Equal(100, nextItem.FiscalYearId);
+        Assert.Equal("2026", nextItem.FiscalYearName);
+
+        var hiddenNextYearBalance = await service.GetByIdAsync(nextItem.Id);
+        var explicitNextYearBalance = await service.GetByIdAsync(
+            nextItem.Id,
+            fiscalYearId: 100);
+        var invalidCurrentYearRange = await service.GetAllAsync(
+            new PaginationRequest { PageNumber = 1, PageSize = 20 },
+            new PartnerOpeningBalanceFilterRequest(
+                FromDate: new DateOnly(2026, 1, 1)));
+        var crossYearUpdate = await service.UpdateAsync(
+            currentCreated.Value.Id,
+            new PartnerOpeningBalanceUpdateRequest(
+                BusinessPartnerId: currentCreated.Value.BusinessPartnerId,
+                DocumentDate: new DateOnly(2026, 1, 1),
+                Currency: currentCreated.Value.Currency,
+                BalanceType: currentCreated.Value.BalanceType,
+                Amount: currentCreated.Value.Amount,
+                Notes: currentCreated.Value.Notes,
+                RowVersion: currentCreated.Value.RowVersion));
+
+        Assert.True(hiddenNextYearBalance.IsFailure);
+        Assert.Equal(
+            "PartnerOpeningBalances.NotFound",
+            hiddenNextYearBalance.Error.Code);
+        Assert.True(explicitNextYearBalance.IsSuccess);
+        Assert.Equal(nextItem.Id, explicitNextYearBalance.Value.Id);
+        Assert.True(invalidCurrentYearRange.IsFailure);
+        Assert.Equal(
+            "FiscalYears.QueryDateOutsideRange",
+            invalidCurrentYearRange.Error.Code);
+        Assert.True(crossYearUpdate.IsFailure);
+        Assert.Equal(
+            "FiscalYears.QueryDateOutsideRange",
+            crossYearUpdate.Error.Code);
+    }
+
+    [Fact]
+    public async Task Add_RejectsCrossCompanyPartnerAndCurrencyMismatch()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+
+        var crossCompanyResult = await service.AddAsync(
+            CreateRequest(businessPartnerId: 3));
+        var currencyMismatchResult = await service.AddAsync(
+            CreateRequest(
+                currency: CurrencyCode.USD));
+
+        Assert.Equal(
+            "PartnerOpeningBalances.BusinessPartnerNotFound",
+            crossCompanyResult.Error.Code);
+        Assert.Equal(
+            "PartnerOpeningBalances.CurrencyMismatch",
+            currencyMismatchResult.Error.Code);
+        Assert.Equal(
+            0,
+            await database.Context.PartnerOpeningBalances.CountAsync());
+    }
+
+    [Fact]
+    public async Task Add_RejectsInactivePartnerAndGeneratesUniqueDocumentNumbers()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+        var createResult = await service.AddAsync(CreateRequest());
+
+        var inactiveResult = await service.AddAsync(
+            CreateRequest(
+                businessPartnerId: 4));
+        var secondResult = await service.AddAsync(CreateRequest());
+
+        Assert.True(createResult.IsSuccess);
+        Assert.Equal(
+            "PartnerOpeningBalances.BusinessPartnerInactive",
+            inactiveResult.Error.Code);
+        Assert.True(secondResult.IsSuccess);
+        Assert.NotEqual(
+            createResult.Value.DocumentNumber,
+            secondResult.Value.DocumentNumber);
+    }
+
+    [Fact]
+    public async Task Add_GeneratesDocumentNumberAndNormalizesBlankNotes()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+
+        var result = await service.AddAsync(
+            new PartnerOpeningBalanceRequest(
+                1,
+                new DateOnly(2026, 1, 1),
+                CurrencyCode.EGP,
+                PartnerBalanceType.Receivable,
+                125.50m,
+                "   "));
+
+        Assert.True(result.IsSuccess);
+        Assert.Matches(
+            "^POB-[0-9]{4,}$",
+            result.Value.DocumentNumber);
+        Assert.Null(result.Value.Notes);
+    }
+
+    [Fact]
+    public async Task OtherCompany_CannotReadUpdateOrDeleteOpeningBalance()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var companyOneService = database.CreateService(companyId: 1);
+        var companyTwoService = database.CreateService(companyId: 2);
+        var createResult = await companyOneService.AddAsync(CreateRequest());
+        var openingBalance = createResult.Value;
+
+        var getResult = await companyTwoService.GetByIdAsync(openingBalance.Id);
+        var updateResult = await companyTwoService.UpdateAsync(
+            openingBalance.Id,
+            new PartnerOpeningBalanceUpdateRequest(
+                openingBalance.BusinessPartnerId,
+                openingBalance.DocumentDate,
+                openingBalance.Currency,
+                openingBalance.BalanceType,
+                openingBalance.Amount,
+                openingBalance.Notes,
+                openingBalance.RowVersion));
+        var deleteResult = await companyTwoService.DeleteAsync(openingBalance.Id);
+
+        Assert.Equal("PartnerOpeningBalances.NotFound", getResult.Error.Code);
+        Assert.Equal("PartnerOpeningBalances.NotFound", updateResult.Error.Code);
+        Assert.Equal("PartnerOpeningBalances.NotFound", deleteResult.Error.Code);
+        Assert.True(
+            (await companyOneService.GetByIdAsync(openingBalance.Id)).IsSuccess);
+    }
+
+    [Fact]
+    public async Task Update_PreservesDocumentNumberAndNormalizesNotes()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+        var createResult = await service.AddAsync(CreateRequest());
+        var openingBalance = createResult.Value;
+
+        var result = await service.UpdateAsync(
+            openingBalance.Id,
+            new PartnerOpeningBalanceUpdateRequest(
+                openingBalance.BusinessPartnerId,
+                openingBalance.DocumentDate,
+                openingBalance.Currency,
+                openingBalance.BalanceType,
+                openingBalance.Amount,
+                "  Updated notes  ",
+                openingBalance.RowVersion));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(openingBalance.DocumentNumber, result.Value.DocumentNumber);
+        Assert.Equal("Updated notes", result.Value.Notes);
+    }
+
+    [Fact]
+    public async Task Update_RejectsMissingRowVersion()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+        var createResult = await service.AddAsync(CreateRequest());
+        var openingBalance = createResult.Value;
+
+        var result = await service.UpdateAsync(
+            openingBalance.Id,
+            new PartnerOpeningBalanceUpdateRequest(
+                openingBalance.BusinessPartnerId,
+                openingBalance.DocumentDate,
+                openingBalance.Currency,
+                openingBalance.BalanceType,
+                openingBalance.Amount,
+                openingBalance.Notes,
+                null));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(
+            "PartnerOpeningBalances.RowVersionRequired",
+            result.Error.Code);
+    }
+
+    [Fact]
+    public async Task RequestValidators_AcceptNormalizedMaximumLengths()
+    {
+        var notes =
+            $"  {new string('N', PartnerOpeningBalanceRequest.NotesMaximumLength)}  ";
+        var createValidator = new PartnerOpeningBalanceRequestValidator();
+        var updateValidator = new PartnerOpeningBalanceUpdateRequestValidator();
+
+        var createResult = await createValidator.ValidateAsync(
+            new PartnerOpeningBalanceRequest(
+                1,
+                new DateOnly(2026, 1, 1),
+                CurrencyCode.EGP,
+                PartnerBalanceType.Receivable,
+                1m,
+                notes));
+        var updateResult = await updateValidator.ValidateAsync(
+            new PartnerOpeningBalanceUpdateRequest(
+                1,
+                new DateOnly(2026, 1, 1),
+                CurrencyCode.EGP,
+                PartnerBalanceType.Receivable,
+                1m,
+                notes,
+                new byte[8]));
+
+        Assert.True(createResult.IsValid);
+        Assert.True(updateResult.IsValid);
+    }
+
+    [Fact]
+    public async Task Update_UsesOriginalClientTokenAndRejectsStaleToken()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+        var createResult = await service.AddAsync(CreateRequest());
+        var original = createResult.Value;
+
+        var updateResult = await service.UpdateAsync(
+            original.Id,
+            new PartnerOpeningBalanceUpdateRequest(
+                original.BusinessPartnerId,
+                original.DocumentDate,
+                original.Currency,
+                PartnerBalanceType.Payable,
+                250.75m,
+                "Updated opening balance",
+                original.RowVersion));
+
+        var staleResult = await service.UpdateAsync(
+            original.Id,
+            new PartnerOpeningBalanceUpdateRequest(
+                original.BusinessPartnerId,
+                original.DocumentDate,
+                original.Currency,
+                original.BalanceType,
+                original.Amount,
+                original.Notes,
+                original.RowVersion));
+
+        Assert.True(updateResult.IsSuccess);
+        Assert.False(original.RowVersion.SequenceEqual(updateResult.Value.RowVersion));
+        Assert.Equal(PartnerBalanceType.Payable, updateResult.Value.BalanceType);
+        Assert.Equal(250.75m, updateResult.Value.Amount);
+        Assert.True(staleResult.IsFailure);
+        Assert.Equal(
+            "PartnerOpeningBalances.Concurrency",
+            staleResult.Error.Code);
+
+        var persisted = await service.GetByIdAsync(original.Id);
+        Assert.Equal(original.DocumentNumber, persisted.Value.DocumentNumber);
+        Assert.Equal(250.75m, persisted.Value.Amount);
+    }
+
+    [Fact]
+    public async Task Update_RejectsStaleTokenWhenValuesAreUnchangedAndClearsTracking()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+        var createResult = await service.AddAsync(CreateRequest());
+        var original = createResult.Value;
+
+        await database.Context.Database.ExecuteSqlInterpolatedAsync(
+            $"UPDATE PartnerOpeningBalances SET Amount = Amount WHERE Id = {original.Id}");
+
+        var result = await service.UpdateAsync(
+            original.Id,
+            new PartnerOpeningBalanceUpdateRequest(
+                original.BusinessPartnerId,
+                original.DocumentDate,
+                original.Currency,
+                original.BalanceType,
+                original.Amount,
+                original.Notes,
+                original.RowVersion));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(
+            "PartnerOpeningBalances.Concurrency",
+            result.Error.Code);
+        Assert.Empty(
+            database.Context.ChangeTracker
+                .Entries<PartnerOpeningBalance>());
+    }
+
+    [Fact]
+    public async Task Delete_IsSoftDeleteAndExcludedFromNormalQueries()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+        var createResult = await service.AddAsync(CreateRequest());
+
+        var deleteResult = await service.DeleteAsync(createResult.Value.Id);
+        var getResult = await service.GetByIdAsync(createResult.Value.Id);
+        var deleted = await database.Context.PartnerOpeningBalances
+            .IgnoreQueryFilters()
+            .SingleAsync();
+
+        Assert.True(deleteResult.IsSuccess);
+        Assert.True(getResult.IsFailure);
+        Assert.True(deleted.IsDeleted);
+        Assert.NotNull(deleted.DeletedOn);
+    }
+
+    [Fact]
+    public async Task Delete_ConcurrencyFailureRollsBackAndClearsTracking()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync();
+        var service = database.CreateService(companyId: 1);
+        var createResult = await service.AddAsync(CreateRequest());
+
+        await database.Context.Database.ExecuteSqlInterpolatedAsync(
+            $"UPDATE PartnerOpeningBalances SET Amount = Amount WHERE Id = {createResult.Value.Id}");
+
+        var result = await service.DeleteAsync(createResult.Value.Id);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(
+            "PartnerOpeningBalances.Concurrency",
+            result.Error.Code);
+        Assert.Empty(
+            database.Context.ChangeTracker
+                .Entries<PartnerOpeningBalance>());
+
+        var persisted = await database.Context.PartnerOpeningBalances
+            .IgnoreQueryFilters()
+            .SingleAsync();
+        Assert.False(persisted.IsDeleted);
+    }
+
+    [Fact]
+    public async Task Add_WhenInsertFails_DoesNotPersistOpeningBalance()
+    {
+        await using var database = await PartnerOpeningBalanceTestDatabase.CreateAsync(
+            addForcedInsertFailureTrigger: true);
+        var service = database.CreateService(companyId: 1);
+
+        await Assert.ThrowsAsync<DbUpdateException>(
+            () => service.AddAsync(CreateRequest(amount: 13m)));
+
+        database.Context.ChangeTracker.Clear();
+        Assert.Equal(
+            0,
+            await database.Context.PartnerOpeningBalances
+                .IgnoreQueryFilters()
+                .CountAsync());
+    }
+
+    private static PartnerOpeningBalanceRequest CreateRequest(
+        int businessPartnerId = 1,
+        CurrencyCode currency = CurrencyCode.EGP,
+        PartnerBalanceType balanceType = PartnerBalanceType.Receivable,
+        decimal amount = 125.50m,
+        DateOnly? documentDate = null) =>
+        new(
+            businessPartnerId,
+            documentDate ?? new DateOnly(2026, 1, 1),
+            currency,
+            balanceType,
+            amount,
+            "Opening balance");
+
+    private sealed class PartnerOpeningBalanceTestDatabase : IAsyncDisposable
+    {
+        private PartnerOpeningBalanceTestDatabase(
+            SqliteConnection connection,
+            ApplicationDbContext context)
+        {
+            Connection = connection;
+            Context = context;
+        }
+
+        private SqliteConnection Connection { get; }
+
+        public ApplicationDbContext Context { get; }
+
+        public Task ConfigureSeparateFiscalYearsAsync() =>
+            Context.Database.ExecuteSqlRawAsync(
+                """
+                UPDATE FiscalYears
+                SET Name = '2025', StartDate = '2025-01-01',
+                    EndDate = '2025-12-31'
+                WHERE Id = 1;
+
+                INSERT INTO FiscalYears (
+                    Id, CompanyId, Name, StartDate, EndDate, Status,
+                    IsCurrent, RowVersion, CreatedById, CreatedOn,
+                    CreatedByPc, IsDeleted)
+                VALUES (
+                    100, 1, '2026', '2026-01-01', '2026-12-31', 1,
+                    0, randomblob(8), 'test', '2026-01-01', 'test', 0);
+                """);
+
+        public Task SeedCarriedForwardPartnerBalanceAsync() =>
+            Context.Database.ExecuteSqlRawAsync(
+                """
+                INSERT INTO JournalEntries (
+                    Id, CompanyId, FiscalYearId, EntryNumber, EntryDate,
+                    Description, EntryType, SourceType, SourceId, SourceNumber,
+                    Status, PostedOn, IsDeleted)
+                VALUES (
+                    1, 1, 100, 'OB-1', '2026-01-01', 'Carried forward',
+                    3, 13, 1, '2025', 1, '2026-01-01', 0);
+
+                INSERT INTO JournalEntryLines (
+                    Id, CompanyId, JournalEntryId, AccountId, PartyType,
+                    PartyId, Currency, ExchangeRate, Debit, Credit,
+                    TransactionDebit, TransactionCredit, IsDeleted)
+                VALUES (
+                    1, 1, 1, 1, 2, 1, 1, 1, 0, 4500, 0, 4500, 0);
+                """);
+
+        public static async Task<PartnerOpeningBalanceTestDatabase> CreateAsync(
+            bool addForcedInsertFailureTrigger = false)
+        {
+            var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var auditInterceptor = new AuditableEntityInterceptor(
+                new HttpContextAccessor(),
+                TimeProvider.System);
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .AddInterceptors(auditInterceptor)
+                .Options;
+            var context = new ApplicationDbContext(options);
+
+            await CreateSchemaAsync(context);
+            await SeedReferenceDataAsync(context);
+            await TestFiscalYearSchema.EnsureAsync(context);
+
+            if (addForcedInsertFailureTrigger)
+            {
+                await context.Database.ExecuteSqlRawAsync(
+                    """
+                    CREATE TRIGGER AbortPartnerOpeningBalanceInsert
+                    BEFORE INSERT ON PartnerOpeningBalances
+                    WHEN NEW.Amount = 13
+                    BEGIN
+                        SELECT RAISE(ABORT, 'forced partner opening balance failure');
+                    END;
+                    """);
+            }
+
+            return new PartnerOpeningBalanceTestDatabase(connection, context);
+        }
+
+        public PartnerOpeningBalanceService CreateService(int companyId) =>
+            new(
+                Context,
+                new TestCurrentCompanyContext(companyId),
+                new FiscalYearQueryScopeResolver(
+                    Context,
+                    new TestCurrentCompanyContext(companyId)),
+                new MiniErp.Tests.TestExchangeRateResolver());
+
+        public async ValueTask DisposeAsync()
+        {
+            await Context.DisposeAsync();
+            await Connection.DisposeAsync();
+        }
+
+        private static async Task CreateSchemaAsync(ApplicationDbContext context)
+        {
+            await context.Database.ExecuteSqlRawAsync(
+                """
+                CREATE TABLE Companies (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name TEXT NOT NULL,
+                    Address TEXT NOT NULL,
+                    CommercialRegister TEXT NOT NULL,
+                    TaxNumber TEXT NOT NULL,
+                    ManagerName TEXT NOT NULL,
+                    CreatedById TEXT NOT NULL,
+                    CreatedOn TEXT NOT NULL,
+                    CreatedByPc TEXT NOT NULL,
+                    UpdatedById TEXT NULL,
+                    UpdatedOn TEXT NULL,
+                    UpdatedByPc TEXT NULL,
+                    DeletedById TEXT NULL,
+                    DeletedOn TEXT NULL,
+                    DeletedByPc TEXT NULL,
+                    IsDeleted INTEGER NOT NULL
+                );
+
+                CREATE TABLE CompanySettings (
+                    CompanyId INTEGER NOT NULL PRIMARY KEY,
+                    BaseCurrency INTEGER NOT NULL DEFAULT 1,
+                    StockBalanceCheckMode INTEGER NOT NULL DEFAULT 1,
+                    FOREIGN KEY (CompanyId) REFERENCES Companies(Id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE BusinessPartners (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CompanyId INTEGER NOT NULL,
+                    Code TEXT NOT NULL,
+                    Name TEXT NOT NULL,
+                    PhoneNumber TEXT NULL,
+                    Email TEXT NULL,
+                    Address TEXT NULL,
+                    TaxNumber TEXT NULL,
+                    Currency INTEGER NOT NULL,
+                    CreditLimit NUMERIC NOT NULL,
+                    IsActive INTEGER NOT NULL,
+                    Special INTEGER NOT NULL DEFAULT 0,
+                    CreatedById TEXT NOT NULL,
+                    CreatedOn TEXT NOT NULL,
+                    CreatedByPc TEXT NOT NULL,
+                    UpdatedById TEXT NULL,
+                    UpdatedOn TEXT NULL,
+                    UpdatedByPc TEXT NULL,
+                    DeletedById TEXT NULL,
+                    DeletedOn TEXT NULL,
+                    DeletedByPc TEXT NULL,
+                    IsDeleted INTEGER NOT NULL
+                );
+
+                CREATE TABLE PartnerOpeningBalances (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CompanyId INTEGER NOT NULL,
+                    BusinessPartnerId INTEGER NOT NULL,
+                    DocumentNumber TEXT NOT NULL,
+                    DocumentDate TEXT NOT NULL,
+                    Currency INTEGER NOT NULL,
+                    ExchangeRateId INTEGER NULL,
+                    ExchangeRate NUMERIC NOT NULL DEFAULT 1,
+                    BalanceType INTEGER NOT NULL,
+                    Amount NUMERIC NOT NULL CHECK (Amount > 0),
+                    BaseAmount NUMERIC NOT NULL DEFAULT 0,
+                    Notes TEXT NULL,
+                    RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
+                    CreatedById TEXT NOT NULL,
+                    CreatedOn TEXT NOT NULL,
+                    CreatedByPc TEXT NOT NULL,
+                    UpdatedById TEXT NULL,
+                    UpdatedOn TEXT NULL,
+                    UpdatedByPc TEXT NULL,
+                    DeletedById TEXT NULL,
+                    DeletedOn TEXT NULL,
+                    DeletedByPc TEXT NULL,
+                    IsDeleted INTEGER NOT NULL
+                );
+
+                CREATE TABLE JournalEntries (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CompanyId INTEGER NOT NULL,
+                    FiscalYearId INTEGER NOT NULL,
+                    EntryNumber TEXT NOT NULL,
+                    EntryDate TEXT NOT NULL,
+                    Description TEXT NOT NULL,
+                    EntryType INTEGER NOT NULL,
+                    SourceType INTEGER NULL,
+                    SourceId INTEGER NULL,
+                    SourceNumber TEXT NULL,
+                    Status INTEGER NOT NULL,
+                    PostedOn TEXT NOT NULL,
+                    ReversedOn TEXT NULL,
+                    ReversalOfEntryId INTEGER NULL,
+                    IsDeleted INTEGER NOT NULL
+                );
+
+                CREATE TABLE JournalEntryLines (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CompanyId INTEGER NOT NULL,
+                    JournalEntryId INTEGER NOT NULL,
+                    AccountId INTEGER NOT NULL,
+                    PartyType INTEGER NULL,
+                    PartyId INTEGER NULL,
+                    Description TEXT NULL,
+                    Currency INTEGER NOT NULL,
+                    ExchangeRate NUMERIC NOT NULL,
+                    Debit NUMERIC NOT NULL,
+                    Credit NUMERIC NOT NULL,
+                    TransactionDebit NUMERIC NOT NULL,
+                    TransactionCredit NUMERIC NOT NULL,
+                    IsDeleted INTEGER NOT NULL
+                );
+
+                CREATE UNIQUE INDEX UX_PartnerOpeningBalances_Company_Document
+                ON PartnerOpeningBalances (CompanyId, DocumentNumber)
+                WHERE IsDeleted = 0;
+
+                CREATE TRIGGER AdvancePartnerOpeningBalanceRowVersion
+                AFTER UPDATE ON PartnerOpeningBalances
+                BEGIN
+                    UPDATE PartnerOpeningBalances
+                    SET RowVersion = randomblob(8)
+                    WHERE Id = NEW.Id;
+                END;
+                """);
+        }
+
+        private static async Task SeedReferenceDataAsync(
+            ApplicationDbContext context)
+        {
+            await context.Database.ExecuteSqlRawAsync(
+                """
+                INSERT INTO Companies (
+                    Id, Name, Address, CommercialRegister, TaxNumber,
+                    ManagerName, CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+                VALUES
+                    (1, 'Company A', '', 'CR-A', 'TX-A', 'Manager',
+                     'test', '2026-01-01', 'test', 0),
+                    (2, 'Company B', '', 'CR-B', 'TX-B', 'Manager',
+                     'test', '2026-01-01', 'test', 0);
+
+                INSERT INTO BusinessPartners (
+                    Id, CompanyId, Code, Name, Currency, CreditLimit, IsActive,
+                    CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+                VALUES
+                    (1, 1, 'BP-1', 'Company A Partner', 1, 1000, 1,
+                     'test', '2026-01-01', 'test', 0),
+                    (2, 1, 'BP-2', 'Company A USD Partner', 2, 1000, 1,
+                     'test', '2026-01-01', 'test', 0),
+                    (3, 2, 'BP-3', 'Company B Partner', 1, 1000, 1,
+                     'test', '2026-01-01', 'test', 0),
+                    (4, 1, 'BP-4', 'Company A Inactive Partner', 1, 1000, 0,
+                     'test', '2026-01-01', 'test', 0);
+                """);
+        }
+    }
+
+    private sealed record TestCurrentCompanyContext(int CompanyId)
+        : ICurrentCompanyContext;
+}

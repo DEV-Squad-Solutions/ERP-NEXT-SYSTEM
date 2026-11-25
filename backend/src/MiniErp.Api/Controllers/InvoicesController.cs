@@ -1,0 +1,199 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MiniErp.Api.Extensions;
+using MiniErp.Api.Features.Invoices.Jobs;
+using MiniErp.Api.Features.ExchangeRates.Jobs;
+using MiniErp.Application.Common.Models;
+using MiniErp.Application.Features.Invoices;
+
+namespace MiniErp.Api.Controllers;
+
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+public sealed class InvoicesController(
+    IInvoiceQueryService invoiceQueries,
+    IInvoiceService invoiceCommands)
+    : ApiControllerBase
+{
+    [HttpGet]
+    [ProducesResponseType<InvoicePagedResponse>(
+        StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] PaginationRequest pagination,
+        [FromQuery] InvoiceFilterRequest filters,
+        CancellationToken cancellationToken)
+    {
+        var result = await invoiceQueries.GetAllAsync(
+            pagination,
+            filters,
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("item-balance")]
+    [ProducesResponseType<InvoiceItemBalanceResponse>(
+        StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> GetItemBalance(
+        [FromQuery] int storeId,
+        [FromQuery] int itemId,
+        [FromQuery] DateOnly asOfDate,
+        [FromQuery] int? invoiceId,
+        CancellationToken cancellationToken)
+    {
+        var result = await invoiceQueries.GetItemBalanceAsync(
+            storeId,
+            itemId,
+            asOfDate,
+            invoiceId,
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    /// <summary>
+    /// Lists original sales or purchase invoices that still have quantities
+    /// available for the selected return invoice.
+    /// </summary>
+    /// <remarks>
+    /// SalesReturn selects from Sales invoices. PurchaseReturn selects from
+    /// Purchase invoices. Results are limited to the current company, selected
+    /// partner and store, and invoices dated on or before asOfDate. When a
+    /// A linked line defaults to the original unit price. Clients can opt into
+    /// ReturnPriceMode=ManualPrice and provide a non-empty
+    /// ReturnPriceDifferenceReason to use a different commercial price. The
+    /// original invoice discount applies only when every linked line uses
+    /// OriginalPrice and this return includes every original line at its full
+    /// original quantity.
+    /// </remarks>
+    [HttpGet("return-sources")]
+    [ProducesResponseType<PagedResponse<InvoiceReturnSourceResponse>>(
+        StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetReturnSources(
+        [FromQuery] PaginationRequest pagination,
+        [FromQuery] InvoiceReturnSourceFilterRequest filters,
+        CancellationToken cancellationToken)
+    {
+        var result = await invoiceQueries.GetReturnSourcesAsync(
+            pagination,
+            filters,
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("{id:int}")]
+    [ProducesResponseType<InvoiceResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(
+        int id,
+        [FromQuery] int? fiscalYearId,
+        CancellationToken cancellationToken)
+    {
+        var result = await invoiceQueries.GetByIdAsync(
+            id,
+            fiscalYearId,
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost]
+    [ProducesResponseType<InvoiceResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Create(
+        InvoiceRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await invoiceCommands.AddAsync(
+            request,
+            cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            var operationId = Guid.NewGuid();
+            TryEnqueueRealtime<InvoicesRealtimeJob>(
+                "Added",
+                result.Value.Id,
+                realtime => job => job.ExecuteAsync(realtime),
+                operationId: operationId);
+            if (request.ExchangeRate.HasValue ||
+                request.CashboxExchangeRate.HasValue)
+            {
+                TryEnqueueRealtime<ExchangeRatesRealtimeJob>(
+                    "Updated",
+                    $"{result.Value.Currency}:{result.Value.InvoiceDate}",
+                    realtime => job => job.ExecuteAsync(realtime),
+                    operationId: operationId);
+            }
+        }
+
+        return result.IsFailure
+            ? this.ToProblem(result.Errors)
+            : CreatedAtAction(
+                nameof(GetById),
+                new
+                {
+                    id = result.Value.Id,
+                    fiscalYearId = result.Value.FiscalYearId
+                },
+                result.Value);
+    }
+
+    [HttpPut("{id:int}")]
+    [ProducesResponseType<InvoiceResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Update(
+        int id,
+        InvoiceUpdateRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await invoiceCommands.UpdateAsync(
+            id,
+            request,
+            cancellationToken);
+        if (result.IsSuccess)
+        {
+            var operationId = Guid.NewGuid();
+            TryEnqueueRealtime<InvoicesRealtimeJob>(
+                "Updated",
+                id,
+                realtime => job => job.ExecuteAsync(realtime),
+                operationId: operationId);
+            if (request.ExchangeRate.HasValue ||
+                request.CashboxExchangeRate.HasValue)
+            {
+                TryEnqueueRealtime<ExchangeRatesRealtimeJob>(
+                    "Updated",
+                    $"{result.Value.Currency}:{result.Value.InvoiceDate}",
+                    realtime => job => job.ExecuteAsync(realtime),
+                    operationId: operationId);
+            }
+        }
+        return this.ToActionResult(result);
+    }
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Delete(
+        int id,
+        [FromQuery] byte[]? rowVersion,
+        CancellationToken cancellationToken)
+    {
+        var result = await invoiceCommands.DeleteAsync(
+            id,
+            rowVersion,
+            cancellationToken);
+        if (result.IsSuccess)
+        {
+            TryEnqueueRealtime<InvoicesRealtimeJob>(
+                "Deleted",
+                id,
+                realtime => job => job.ExecuteAsync(realtime));
+        }
+        return this.ToActionResult(result);
+    }
+}

@@ -1,0 +1,414 @@
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using MiniErp.Application.Common.Abstractions;
+using MiniErp.Application.Common.Results;
+using MiniErp.Application.Features.CashVouchers;
+using MiniErp.Application.Features.EmployeeMovements;
+using MiniErp.Application.Features.EmployeeOpeningBalances;
+using MiniErp.Application.Features.ExchangeRates;
+using MiniErp.Application.Features.FiscalYears;
+using MiniErp.Application.Features.PayrollEntries;
+using MiniErp.Application.Features.PayrollReport;
+using MiniErp.Application.Features.ProfitabilityReports;
+using MiniErp.Application.Features.Statements;
+using MiniErp.Domain.Entities.CashManagement;
+using MiniErp.Domain.Entities.Companies;
+using MiniErp.Domain.Entities.Employees;
+using MiniErp.Domain.Enums;
+using MiniErp.Infrastructure.Persistence;
+using MiniErp.Infrastructure.Services.CashVouchers;
+using MiniErp.Infrastructure.Services.EmployeeMovements;
+using MiniErp.Infrastructure.Services.EmployeeOpeningBalances;
+using MiniErp.Infrastructure.Services.ExchangeRates;
+using MiniErp.Infrastructure.Services.FiscalYears;
+using MiniErp.Infrastructure.Services.Pagination;
+using MiniErp.Infrastructure.Services.PayrollEntries;
+using MiniErp.Infrastructure.Services.PayrollReports;
+using MiniErp.Infrastructure.Services.Statements;
+using MiniErp.Tests.TestDoubles;
+using System;
+using System.Threading.Tasks;
+
+namespace MiniErp.Tests.PayrollEntries;
+
+public sealed class PayrollEntryTestDatabase : IAsyncDisposable
+{
+    private readonly SqliteConnection connection;
+    private readonly ServiceProvider serviceProvider;
+    private readonly AsyncServiceScope scope;
+
+    public ApplicationDbContext Context { get; }
+
+    internal NoOpCashVoucherPostingService CashVoucherPostingService =>
+        scope.ServiceProvider.GetRequiredService<NoOpCashVoucherPostingService>();
+
+    private PayrollEntryTestDatabase(
+        SqliteConnection connection,
+        ServiceProvider serviceProvider,
+        AsyncServiceScope scope,
+        ApplicationDbContext context)
+    {
+        this.connection = connection;
+        this.serviceProvider = serviceProvider;
+        this.scope = scope;
+        Context = context;
+    }
+
+    public static async Task<PayrollEntryTestDatabase> CreateAsync(
+        int companyId,
+        IFiscalYearPeriodGuard? fiscalYearPeriodGuard = null)
+    {
+        var connection = new SqliteConnection("DataSource=:memory:;Foreign Keys=False");
+        await connection.OpenAsync();
+        await using (var cmd = connection.CreateCommand())
+        {
+            cmd.CommandText = "PRAGMA foreign_keys = OFF;";
+            await cmd.ExecuteNonQueryAsync();
+        }
+
+        var services = new ServiceCollection();
+
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlite(connection));
+
+        services.AddSingleton(TimeProvider.System);
+        services.AddScoped<IPaginationService, PaginationService>();
+        services.AddScoped<IExchangeRateResolver, ExchangeRateResolver>();
+        services.AddScoped<IFiscalYearQueryScopeResolver,
+            FiscalYearQueryScopeResolver>();
+        services.AddScoped<ICashVoucherService, CashVoucherService>();
+        services.AddScoped<NoOpCashVoucherPostingService>();
+        services.AddScoped<ICashVoucherPostingService>(serviceProvider =>
+            serviceProvider.GetRequiredService<NoOpCashVoucherPostingService>());
+        services.AddScoped<IEmployeeOpeningBalanceService, EmployeeOpeningBalanceService>();
+        services.AddScoped<IEmployeeMovementService, EmployeeMovementService>();
+        services.AddScoped<IPayrollEntryService, PayrollEntryService>();
+        services.AddScoped<IPayrollReportService, PayrollReportService>();
+        services.AddScoped<IFinancialStatementService, FinancialStatementService>();
+        services.AddSingleton<ICurrentCompanyContext>(new TestCurrentCompanyContext(companyId));
+        if (fiscalYearPeriodGuard is not null)
+            services.AddSingleton(fiscalYearPeriodGuard);
+
+        var serviceProvider = services.BuildServiceProvider();
+        var scope = serviceProvider.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        await context.Database.EnsureCreatedAsync();
+        await context.Database.ExecuteSqlRawAsync("""
+            PRAGMA foreign_keys = OFF;
+            DROP TABLE IF EXISTS Companies;
+            CREATE TABLE Companies (Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL, Address TEXT NOT NULL, CommercialRegister TEXT NOT NULL, TaxNumber TEXT NOT NULL, ManagerName TEXT NOT NULL, RowVersion BLOB NOT NULL DEFAULT (randomblob(8)), CreatedById TEXT NOT NULL DEFAULT '', CreatedOn TEXT NOT NULL DEFAULT '2026-01-01', CreatedByPc TEXT NOT NULL DEFAULT '', UpdatedById TEXT NULL, UpdatedOn TEXT NULL, UpdatedByPc TEXT NULL, DeletedById TEXT NULL, DeletedOn TEXT NULL, DeletedByPc TEXT NULL, IsDeleted INTEGER NOT NULL DEFAULT 0);
+
+            DROP TABLE IF EXISTS ExchangeRates;
+            CREATE TABLE ExchangeRates (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                CompanyId INTEGER NOT NULL,
+                Currency INTEGER NOT NULL,
+                RateDate TEXT NOT NULL,
+                Rate NUMERIC NOT NULL,
+                Source INTEGER NOT NULL,
+                Provider TEXT NULL,
+                Notes TEXT NULL,
+                LastModifiedAt TEXT NOT NULL DEFAULT '2026-01-01',
+                RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
+                CreatedById TEXT NOT NULL DEFAULT '',
+                CreatedOn TEXT NOT NULL DEFAULT '2026-01-01',
+                CreatedByPc TEXT NOT NULL DEFAULT '',
+                UpdatedById TEXT NULL,
+                UpdatedOn TEXT NULL,
+                UpdatedByPc TEXT NULL,
+                DeletedById TEXT NULL,
+                DeletedOn TEXT NULL,
+                DeletedByPc TEXT NULL,
+                IsDeleted INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE UNIQUE INDEX IX_ExchangeRates_Company_Currency_Date
+                ON ExchangeRates (CompanyId, Currency, RateDate)
+                WHERE IsDeleted = 0;
+
+            DROP TABLE IF EXISTS Cashboxes;
+            CREATE TABLE Cashboxes (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                CompanyId INTEGER NOT NULL,
+                Code TEXT NOT NULL COLLATE NOCASE,
+                Name TEXT NOT NULL COLLATE NOCASE,
+                Currency INTEGER NOT NULL,
+                OpeningBalance NUMERIC NOT NULL,
+                OpeningBalanceDate TEXT NOT NULL DEFAULT '2026-01-01',
+                OpeningExchangeRateId INTEGER NULL,
+                OpeningExchangeRate NUMERIC NOT NULL DEFAULT 1,
+                BaseOpeningBalance NUMERIC NOT NULL DEFAULT 0,
+                IsActive INTEGER NOT NULL DEFAULT 1,
+                Notes TEXT NULL,
+                RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
+                CreatedById TEXT NOT NULL DEFAULT '',
+                CreatedOn TEXT NOT NULL DEFAULT '2026-01-01',
+                CreatedByPc TEXT NOT NULL DEFAULT '',
+                UpdatedById TEXT NULL,
+                UpdatedOn TEXT NULL,
+                UpdatedByPc TEXT NULL,
+                DeletedById TEXT NULL,
+                DeletedOn TEXT NULL,
+                DeletedByPc TEXT NULL,
+                IsDeleted INTEGER NOT NULL DEFAULT 0
+            );
+
+            DROP TABLE IF EXISTS CashVouchers;
+            CREATE TABLE CashVouchers (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                CompanyId INTEGER NOT NULL,
+                InvoiceId INTEGER NULL,
+                CashboxTransferId INTEGER NULL,
+                VoucherNumber TEXT NOT NULL COLLATE NOCASE,
+                VoucherDate TEXT NOT NULL,
+                Direction INTEGER NOT NULL,
+                CashboxId INTEGER NULL,
+                CashMovementTypeId INTEGER NULL,
+                Classification INTEGER NULL,
+                AccountId INTEGER NULL,
+                PartyType INTEGER NOT NULL,
+                EmployeeId INTEGER NULL,
+                BusinessPartnerId INTEGER NULL,
+                DriverId INTEGER NULL,
+                DriverTripId INTEGER NULL,
+                ExternalPartyName TEXT NULL,
+                Amount NUMERIC NOT NULL,
+                Currency INTEGER NOT NULL,
+                ExchangeRateId INTEGER NULL,
+                ExchangeRate NUMERIC NOT NULL DEFAULT 1,
+                BaseAmount NUMERIC NOT NULL DEFAULT 0,
+                IsPosted INTEGER NOT NULL DEFAULT 0,
+                ReferenceNumber TEXT NULL,
+                Description TEXT NULL,
+                Notes TEXT NULL,
+                LastModifiedAt TEXT NOT NULL DEFAULT '2026-01-01',
+                RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
+                CreatedById TEXT NOT NULL DEFAULT '',
+                CreatedOn TEXT NOT NULL DEFAULT '2026-01-01',
+                CreatedByPc TEXT NOT NULL DEFAULT '',
+                UpdatedById TEXT NULL,
+                UpdatedOn TEXT NULL,
+                UpdatedByPc TEXT NULL,
+                DeletedById TEXT NULL,
+                DeletedOn TEXT NULL,
+                DeletedByPc TEXT NULL,
+                IsDeleted INTEGER NOT NULL DEFAULT 0
+            );
+
+            DROP TABLE IF EXISTS EmployeeOpeningBalances;
+            CREATE TABLE EmployeeOpeningBalances (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                CompanyId INTEGER NOT NULL,
+                EmployeeId INTEGER NOT NULL,
+                PayrollEntryId INTEGER NULL,
+                DocumentNumber TEXT NOT NULL COLLATE NOCASE,
+                DocumentDate TEXT NOT NULL,
+                Currency INTEGER NOT NULL,
+                ExchangeRateId INTEGER NULL,
+                ExchangeRate NUMERIC NOT NULL DEFAULT 1,
+                BalanceType INTEGER NOT NULL,
+                Amount NUMERIC NOT NULL,
+                BaseAmount NUMERIC NOT NULL DEFAULT 0,
+                Notes TEXT NULL,
+                RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
+                CreatedById TEXT NOT NULL DEFAULT '',
+                CreatedOn TEXT NOT NULL DEFAULT '2026-01-01',
+                CreatedByPc TEXT NOT NULL DEFAULT '',
+                UpdatedById TEXT NULL,
+                UpdatedOn TEXT NULL,
+                UpdatedByPc TEXT NULL,
+                DeletedById TEXT NULL,
+                DeletedOn TEXT NULL,
+                DeletedByPc TEXT NULL,
+                IsDeleted INTEGER NOT NULL DEFAULT 0
+            );
+
+            DROP TABLE IF EXISTS EmployeeMovements;
+            CREATE TABLE EmployeeMovements (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                CompanyId INTEGER NOT NULL,
+                EmployeeId INTEGER NOT NULL,
+                CashVoucherId INTEGER NULL,
+                Type INTEGER NOT NULL,
+                MovementDate TEXT NOT NULL,
+                Currency INTEGER NOT NULL,
+                Debit NUMERIC NOT NULL DEFAULT 0,
+                Credit NUMERIC NOT NULL DEFAULT 0,
+                ExchangeRate NUMERIC NOT NULL DEFAULT 1,
+                BaseDebit NUMERIC NOT NULL DEFAULT 0,
+                BaseCredit NUMERIC NOT NULL DEFAULT 0,
+                Notes TEXT NULL,
+                CreatedById TEXT NOT NULL DEFAULT '',
+                CreatedOn TEXT NOT NULL DEFAULT '2026-01-01',
+                CreatedByPc TEXT NOT NULL DEFAULT '',
+                UpdatedById TEXT NULL,
+                UpdatedOn TEXT NULL,
+                UpdatedByPc TEXT NULL,
+                DeletedById TEXT NULL,
+                DeletedOn TEXT NULL,
+                DeletedByPc TEXT NULL,
+                IsDeleted INTEGER NOT NULL DEFAULT 0
+            );
+
+            CREATE UNIQUE INDEX IF NOT EXISTS IX_EmployeeOpeningBalances_CompanyId_PayrollEntryId 
+            ON EmployeeOpeningBalances (CompanyId, PayrollEntryId) 
+            WHERE PayrollEntryId IS NOT NULL AND IsDeleted = 0;
+        """);
+        await SeedRequiredDataAsync(context, companyId);
+        await TestFiscalYearSchema.EnsureAsync(context);
+
+        return new PayrollEntryTestDatabase(
+            connection,
+            serviceProvider,
+            scope,
+            context);
+    }
+
+    private static async Task SeedRequiredDataAsync(ApplicationDbContext context, int companyId)
+    {
+        var company = new Company
+        {
+            Id = companyId,
+            Name = "Test Company",
+            Address = "123 Test St",
+            CommercialRegister = $"CR-{companyId}",
+            TaxNumber = $"TAX-{companyId}",
+            ManagerName = "Manager"
+        };
+        context.Companies.Add(company);
+        context.Entry(company).Property(c => c.RowVersion).CurrentValue = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+        var cashbox = new Cashbox
+        {
+            Id = 1,
+            CompanyId = companyId,
+            Code = "CB01",
+            Name = "Main Cashbox",
+            Currency = CurrencyCode.EGP,
+            OpeningBalance = 100000.0m,
+            IsActive = true
+        };
+        cashbox.ApplyOpeningExchangeRate(new DateOnly(2026, 1, 1), null, 1.0m);
+        context.Cashboxes.Add(cashbox);
+
+        var emp1 = new Employee
+        {
+            Id = 1,
+            CompanyId = companyId,
+            Code = "EMP001",
+            Name = "Monthly Employee",
+            Email = "emp1@test.com",
+            PhoneNumber = "0123456789",
+            Type = EmployeeType.Monthly,
+            MonthlySalary = 6000m,
+            RequiredWorkingDaysPerMonth = 30,
+            IsActive = true
+        };
+        emp1.UpdateWorkPlace(WorkPlaceStatus.InCompany, null);
+
+        var emp2 = new Employee
+        {
+            Id = 2,
+            CompanyId = companyId,
+            Code = "EMP002",
+            Name = "Daily Employee",
+            Email = "emp2@test.com",
+            PhoneNumber = "0987654321",
+            Type = EmployeeType.Daily,
+            DailySalary = 200m,
+            IsActive = true
+        };
+        emp2.UpdateWorkPlace(WorkPlaceStatus.InCompany, null);
+
+        var emp3 = new Employee
+        {
+            Id = 3,
+            CompanyId = companyId,
+            Code = "EMP003",
+            Name = "Third Employee",
+            Email = "emp3@test.com",
+            PhoneNumber = "0112233445",
+            Type = EmployeeType.Monthly,
+            MonthlySalary = 9000m,
+            RequiredWorkingDaysPerMonth = 30,
+            IsActive = true
+        };
+        emp3.UpdateWorkPlace(WorkPlaceStatus.InCompany, null);
+
+        context.Employees.AddRange(emp1, emp2, emp3);
+        await context.SaveChangesAsync();
+    }
+
+    public IPayrollEntryService CreatePayrollService()
+    {
+        return scope.ServiceProvider.GetRequiredService<IPayrollEntryService>();
+    }
+
+    public IPayrollReportService CreatePayrollReportService() =>
+        scope.ServiceProvider.GetRequiredService<IPayrollReportService>();
+
+    public IEmployeeOpeningBalanceService CreateOpeningBalanceService()
+    {
+        return scope.ServiceProvider.GetRequiredService<IEmployeeOpeningBalanceService>();
+    }
+
+    public Task ConfigureSeparateFiscalYearsAsync() =>
+        Context.Database.ExecuteSqlRawAsync(
+            """
+            UPDATE FiscalYears
+            SET Name = '2025', StartDate = '2025-01-01',
+                EndDate = '2025-12-31'
+            WHERE Id = 1;
+
+            INSERT INTO FiscalYears (
+                Id, CompanyId, Name, StartDate, EndDate, Status,
+                IsCurrent, RowVersion, CreatedById, CreatedOn,
+                CreatedByPc, IsDeleted)
+            VALUES (
+                100, 1, '2026', '2026-01-01', '2026-12-31', 1,
+                0, randomblob(8), 'test', '2026-01-01', 'test', 0);
+            """);
+
+    public IEmployeeMovementService CreateMovementService()
+    {
+        return scope.ServiceProvider.GetRequiredService<IEmployeeMovementService>();
+    }
+
+    public IFinancialStatementService CreateStatementService()
+    {
+        return scope.ServiceProvider.GetRequiredService<IFinancialStatementService>();
+    }
+
+    public ICashVoucherService CreateCashVoucherService()
+    {
+        return scope.ServiceProvider.GetRequiredService<ICashVoucherService>();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await scope.DisposeAsync();
+        await serviceProvider.DisposeAsync();
+        await connection.CloseAsync();
+        await connection.DisposeAsync();
+    }
+
+    private sealed record TestCurrentCompanyContext(int CompanyId) : ICurrentCompanyContext;
+}
+
+internal sealed class ClosedDateFiscalYearPeriodGuard(
+    params DateOnly[] closedDates) : IFiscalYearPeriodGuard
+{
+    private readonly HashSet<DateOnly> closedDates = [.. closedDates];
+
+    public Task<Result> EnsureOpenAsync(
+        DateOnly date,
+        string fieldName,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult(closedDates.Contains(date)
+            ? Result.Failure(FiscalYearErrors.Closed(
+                date,
+                fiscalYearName: "Closed test year",
+                fieldName: fieldName))
+            : Result.Success());
+}

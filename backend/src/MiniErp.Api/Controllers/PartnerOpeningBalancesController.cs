@@ -1,0 +1,143 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MiniErp.Api.Extensions;
+using MiniErp.Api.Features.PartnerOpeningBalances.Jobs;
+using MiniErp.Api.Features.ExchangeRates.Jobs;
+using MiniErp.Application.Common.Models;
+using MiniErp.Application.Features.PartnerOpeningBalances;
+
+namespace MiniErp.Api.Controllers;
+
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+public sealed class PartnerOpeningBalancesController(
+    IPartnerOpeningBalanceService partnerOpeningBalanceService)
+    : ApiControllerBase
+{
+    [HttpGet]
+    [ProducesResponseType<PagedResponse<PartnerOpeningBalanceResponse>>(
+        StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] PaginationRequest pagination,
+        [FromQuery] PartnerOpeningBalanceFilterRequest filters,
+        CancellationToken cancellationToken)
+    {
+        var result = await partnerOpeningBalanceService.GetAllAsync(
+            pagination,
+            filters,
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("{id:int}")]
+    [ProducesResponseType<PartnerOpeningBalanceResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(
+        int id,
+        [FromQuery] int? fiscalYearId,
+        CancellationToken cancellationToken)
+    {
+        var result = await partnerOpeningBalanceService.GetByIdAsync(
+            id,
+            fiscalYearId,
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost]
+    [ProducesResponseType<PartnerOpeningBalanceResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Create(
+        PartnerOpeningBalanceRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await partnerOpeningBalanceService.AddAsync(
+            request,
+            cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            var operationId = Guid.NewGuid();
+            TryEnqueueRealtime<PartnerOpeningBalancesRealtimeJob>(
+                "Added",
+                result.Value.Id,
+                realtime => job => job.ExecuteAsync(realtime),
+                operationId: operationId);
+            if (request.ExchangeRate.HasValue)
+            {
+                TryEnqueueRealtime<ExchangeRatesRealtimeJob>(
+                    "Updated",
+                    $"{result.Value.Currency}:{result.Value.DocumentDate}",
+                    realtime => job => job.ExecuteAsync(realtime),
+                    operationId: operationId);
+            }
+        }
+
+        return result.IsFailure
+            ? this.ToProblem(result.Errors)
+            : CreatedAtAction(
+                nameof(GetById),
+                new
+                {
+                    id = result.Value.Id,
+                    fiscalYearId = result.Value.FiscalYearId
+                },
+                result.Value);
+    }
+
+    [HttpPut("{id:int}")]
+    [ProducesResponseType<PartnerOpeningBalanceResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Update(
+        int id,
+        PartnerOpeningBalanceUpdateRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await partnerOpeningBalanceService.UpdateAsync(
+            id,
+            request,
+            cancellationToken);
+        if (result.IsSuccess)
+        {
+            var operationId = Guid.NewGuid();
+            TryEnqueueRealtime<PartnerOpeningBalancesRealtimeJob>(
+                "Updated",
+                id,
+                realtime => job => job.ExecuteAsync(realtime),
+                operationId: operationId);
+            if (request.ExchangeRate.HasValue)
+            {
+                TryEnqueueRealtime<ExchangeRatesRealtimeJob>(
+                    "Updated",
+                    $"{result.Value.Currency}:{result.Value.DocumentDate}",
+                    realtime => job => job.ExecuteAsync(realtime),
+                    operationId: operationId);
+            }
+        }
+        return this.ToActionResult(result);
+    }
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Delete(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var result = await partnerOpeningBalanceService.DeleteAsync(
+            id,
+            cancellationToken);
+        if (result.IsSuccess)
+        {
+            TryEnqueueRealtime<PartnerOpeningBalancesRealtimeJob>(
+                "Deleted",
+                id,
+                realtime => job => job.ExecuteAsync(realtime));
+        }
+        return this.ToActionResult(result);
+    }
+}

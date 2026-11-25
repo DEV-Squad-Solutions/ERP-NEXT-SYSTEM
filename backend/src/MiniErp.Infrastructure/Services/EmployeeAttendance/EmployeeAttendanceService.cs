@@ -1,0 +1,844 @@
+using Microsoft.EntityFrameworkCore;
+using MiniErp.Application.Common.Abstractions;
+using MiniErp.Application.Common.Models;
+using MiniErp.Application.Common.Results;
+using MiniErp.Application.Features.EmployeeAttendance;
+using MiniErp.Application.Features.Employees;
+using MiniErp.Domain.Entities.Employees;
+using MiniErp.Domain.Enums;
+using MiniErp.Infrastructure.Persistence;
+
+namespace MiniErp.Infrastructure.Services.EmployeeAttendance;
+
+public  sealed partial class EmployeeAttendanceService(
+    ApplicationDbContext dbContext,
+    IPaginationService paginationService,
+    ICurrentCompanyContext currentCompanyContext,
+    IFiscalYearQueryScopeResolver fiscalYearQueryScopeResolver,
+    IFiscalYearPeriodGuard? fiscalYearPeriodGuard = null)
+    : IEmployeeAttendanceService, IScopedService
+{
+    private readonly int companyId = currentCompanyContext.CompanyId;
+
+    public async Task<Result<PagedResponse<EmployeeAttendanceResponse>>> GetAllAsync(
+        PaginationRequest pagination,
+        EmployeeAttendanceFilterRequest? filters = null,
+        CancellationToken cancellationToken = default)
+    {
+        filters ??= new EmployeeAttendanceFilterRequest();
+        var validationError = ValidateFilters(filters, cancellationToken);
+        if (validationError is not null)
+        {
+            return Result<PagedResponse<EmployeeAttendanceResponse>>.Failure(validationError);
+        }
+
+        var fiscalYear = await fiscalYearQueryScopeResolver.ResolveAsync(
+            filters.FiscalYearId,
+            filters.WorkDateFrom,
+            filters.WorkDateTo,
+            cancellationToken);
+        if (fiscalYear.IsFailure)
+        {
+            return Result<PagedResponse<EmployeeAttendanceResponse>>.Failure(
+                fiscalYear.Errors);
+        }
+
+        var query = dbContext.EmployeeAttendances
+            .AsNoTracking()
+            .Where(a =>
+                a.CompanyId == companyId &&
+                a.FiscalYearId == fiscalYear.Value.FiscalYearId);
+
+        if (filters.EmployeeId.HasValue)
+        {
+            query = query.Where(a => a.EmployeeId == filters.EmployeeId);
+        }
+
+        if (filters.WorkDateFrom.HasValue)
+        {
+            query = query.Where(a => a.WorkDate >= filters.WorkDateFrom);
+        }
+
+        if (filters.WorkDateTo.HasValue)
+        {
+            query = query.Where(a => a.WorkDate <= filters.WorkDateTo);
+        }
+
+        if (filters.Status.HasValue)
+        {
+            query = query.Where(a => a.Status == filters.Status);
+        }
+
+        var search = filters.Search?.Trim();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(a =>
+                a.Employee.Name.Contains(search) ||
+                a.Employee.Code.Contains(search));
+        }
+
+        var orderedQuery = query
+            .OrderByDescending(a => a.WorkDate)
+            .ThenByDescending(a => a.Id);
+
+        var pageResult = await paginationService.PaginateAsync<
+            Domain.Entities.Employees.EmployeeAttendance,
+            EmployeeAttendanceResponse>(
+            orderedQuery,
+            pagination,
+            cancellationToken);
+
+        if (pageResult.IsFailure)
+        {
+            return pageResult;
+        }
+
+        return pageResult;
+    }
+
+    public async Task<Result<EmployeeAttendanceResponse>> GetByIdAsync(
+        int id,
+        int? fiscalYearId = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (id <= 0)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                Error.Validation(
+                    "EmployeeAttendance.InvalidId",
+                    "معرف سجل الحضور غير صالح."));
+        }
+
+        var fiscalYear = await fiscalYearQueryScopeResolver.ResolveAsync(
+            fiscalYearId,
+            cancellationToken: cancellationToken);
+        if (fiscalYear.IsFailure)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                fiscalYear.Errors);
+        }
+
+        var attendance = await dbContext.EmployeeAttendances
+            .AsNoTracking()
+            .Include(a => a.Employee)
+            .FirstOrDefaultAsync(
+                employeeAttendance =>
+                    employeeAttendance.Id == id &&
+                    employeeAttendance.CompanyId == companyId &&
+                    employeeAttendance.FiscalYearId ==
+                        fiscalYear.Value.FiscalYearId,
+                cancellationToken);
+
+        if (attendance is null)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                Error.NotFound(
+                    "EmployeeAttendance.NotFound",
+                    "لم يتم العثور على سجل الحضور المطلوب."));
+        }
+
+        return Result<EmployeeAttendanceResponse>.Success(
+            new EmployeeAttendanceResponse(
+                Id: attendance.Id,
+                CompanyId: attendance.CompanyId,
+                FiscalYearId: attendance.FiscalYearId,
+                EmployeeId: attendance.EmployeeId,
+                EmployeeName: attendance.Employee.Name,
+                Status: attendance.Status,
+                WorkDate: attendance.WorkDate,
+                CheckIn: attendance.CheckIn,
+                CheckOut: attendance.CheckOut,
+                WorkHours: attendance.WorkHours,
+                WorkDayRatio: attendance.WorkDayRatio,
+                WorkOverTimeRatio: attendance.WorkOverTimeRatio,
+                WorkDaysDeductionRatio: attendance.WorkDaysDeductionRatio,
+                WorkLocation: attendance.WorkLocation,
+                Notes: attendance.Notes));
+    }
+
+    public async Task<Result<EmployeeAttendanceResponse>> AddAsync(
+        EmployeeAttendanceRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var validationError = ValidateAddAsync(request, cancellationToken);
+        if (validationError != null)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(validationError);
+        }
+
+        var periodResult = await EnsureOpenDatesAsync(
+            [request.WorkDate],
+            nameof(EmployeeAttendanceRequest.WorkDate),
+            cancellationToken);
+        if (periodResult.IsFailure)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                periodResult.Errors);
+        }
+
+        var employee = await dbContext.Employees
+            .FirstOrDefaultAsync(e => e.Id == request.EmployeeId && e.CompanyId == companyId, cancellationToken);
+
+        if (employee is null)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                Error.NotFound(
+                    "Employee.NotFound",
+                    "الموظف المحدد غير موجود."));
+        }
+
+        if (!employee.IsActive || employee.WorkPlaceStatus != WorkPlaceStatus.InCompany)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                Error.Validation(
+                    "EmployeeAttendance.EmployeeNotEligible",
+                    "لا يمكن تسجيل الحضور إلا للموظفين النشطين داخل الشركة."));
+        }
+
+        var attendance = new Domain.Entities.Employees.EmployeeAttendance
+        {
+            CompanyId = companyId,
+            EmployeeId = request.EmployeeId,
+            Status = request.Status,
+            WorkDate = request.WorkDate,
+            CheckIn = request.Status == EmployeeAttendanceStatus.Present ? request.CheckIn : null,
+            CheckOut = request.Status == EmployeeAttendanceStatus.Present ? request.CheckOut : null,
+            WorkHours = request.Status == EmployeeAttendanceStatus.Present ? CalculateWorkHours(request.CheckIn, request.CheckOut) : null,
+            WorkDayRatio = request.WorkDayRatio,
+            WorkOverTimeRatio = request.WorkOverTimeRatio,
+            WorkDaysDeductionRatio = request.WorkDaysDeductionRatio,
+            WorkLocation = string.IsNullOrWhiteSpace(request.WorkLocation) ? null : request.WorkLocation.Trim(),
+            Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim()
+        };
+
+        dbContext.EmployeeAttendances.Add(attendance);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return Result<EmployeeAttendanceResponse>.Success(
+            new EmployeeAttendanceResponse(
+                Id: attendance.Id,
+                CompanyId: attendance.CompanyId,
+                FiscalYearId: attendance.FiscalYearId,
+                EmployeeId: attendance.EmployeeId,
+                EmployeeName: employee.Name,
+                Status: attendance.Status,
+                WorkDate: attendance.WorkDate,
+                CheckIn: attendance.CheckIn,
+                CheckOut: attendance.CheckOut,
+                WorkHours: attendance.WorkHours,
+                WorkDayRatio: attendance.WorkDayRatio,
+                WorkOverTimeRatio: attendance.WorkOverTimeRatio,
+                WorkDaysDeductionRatio: attendance.WorkDaysDeductionRatio,
+                WorkLocation: attendance.WorkLocation,
+                Notes: attendance.Notes));
+    }
+
+    public async Task<Result<EmployeeAttendanceResponse>> UpdateAsync(
+        int id,
+        EmployeeAttendanceUpdateRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var validationError = ValidateUpdateAsync(request, cancellationToken);
+        if (validationError != null)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(validationError);
+        }
+
+        var attendance = await dbContext.EmployeeAttendances
+            .Include(a => a.Employee)
+            .FirstOrDefaultAsync(a => a.Id == id && a.CompanyId == companyId, cancellationToken);
+
+        if (attendance is null)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                Error.NotFound(
+                    "EmployeeAttendance.NotFound",
+                    "لم يتم العثور على سجل الحضور المطلوب."));
+        }
+
+        var periodResult = await EnsureOpenDatesAsync(
+            [attendance.WorkDate, request.WorkDate],
+            nameof(EmployeeAttendanceUpdateRequest.WorkDate),
+            cancellationToken);
+        if (periodResult.IsFailure)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                periodResult.Errors);
+        }
+
+        var fiscalYearScope = await fiscalYearQueryScopeResolver.ResolveAsync(
+            attendance.FiscalYearId,
+            request.WorkDate,
+            request.WorkDate,
+            cancellationToken);
+        if (fiscalYearScope.IsFailure)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                fiscalYearScope.Errors);
+        }
+
+        var employeeName = attendance.Employee.Name;
+        if (attendance.EmployeeId != request.EmployeeId)
+        {
+            var employee = await dbContext.Employees
+                .FirstOrDefaultAsync(e => e.Id == request.EmployeeId && e.CompanyId == companyId, cancellationToken);
+
+            if (employee is null)
+            {
+                return Result<EmployeeAttendanceResponse>.Failure(
+                    Error.NotFound(
+                        "Employee.NotFound",
+                        "الموظف المحدد غير موجود."));
+            }
+
+            if (!employee.IsActive || employee.WorkPlaceStatus != WorkPlaceStatus.InCompany)
+            {
+                return Result<EmployeeAttendanceResponse>.Failure(
+                    Error.Validation(
+                        "EmployeeAttendance.EmployeeNotEligible",
+                        "لا يمكن تسجيل الحضور إلا للموظفين النشطين داخل الشركة."));
+            }
+
+            employeeName = employee.Name;
+        }
+        else if (!attendance.Employee.IsActive || attendance.Employee.WorkPlaceStatus != WorkPlaceStatus.InCompany)
+        {
+            return Result<EmployeeAttendanceResponse>.Failure(
+                Error.Validation(
+                    "EmployeeAttendance.EmployeeNotEligible",
+                    "لا يمكن تعديل الحضور لموظف غير نشط أو ليس داخل الشركة."));
+        }
+
+        attendance.EmployeeId = request.EmployeeId;
+        attendance.Status = request.Status ?? attendance.Status;
+        attendance.WorkDate = request.WorkDate;
+
+        if (attendance.Status == EmployeeAttendanceStatus.Present)
+        {
+            attendance.CheckIn = request.CheckIn ?? attendance.CheckIn;
+            attendance.CheckOut = request.CheckOut ?? attendance.CheckOut;
+            attendance.WorkHours = CalculateWorkHours(attendance.CheckIn, attendance.CheckOut);
+        }
+        else
+        {
+            attendance.CheckIn = null;
+            attendance.CheckOut = null;
+            attendance.WorkHours = null;
+        }
+
+        attendance.WorkDayRatio = request.WorkDayRatio ?? attendance.WorkDayRatio;
+        attendance.WorkOverTimeRatio = request.WorkOverTimeRatio ?? attendance.WorkOverTimeRatio;
+        attendance.WorkDaysDeductionRatio = request.WorkDaysDeductionRatio ?? attendance.WorkDaysDeductionRatio;
+        attendance.WorkLocation = string.IsNullOrWhiteSpace(request.WorkLocation) ? null : request.WorkLocation.Trim();
+        attendance.Notes = string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim();
+
+        dbContext.EmployeeAttendances.Update(attendance);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return Result<EmployeeAttendanceResponse>.Success(
+            new EmployeeAttendanceResponse(
+                Id: attendance.Id,
+                CompanyId: attendance.CompanyId,
+                FiscalYearId: attendance.FiscalYearId,
+                EmployeeId: attendance.EmployeeId,
+                EmployeeName: employeeName,
+                Status: attendance.Status,
+                WorkDate: attendance.WorkDate,
+                CheckIn: attendance.CheckIn,
+                CheckOut: attendance.CheckOut,
+                WorkHours: attendance.WorkHours,
+                WorkDayRatio: attendance.WorkDayRatio,
+                WorkOverTimeRatio: attendance.WorkOverTimeRatio,
+                WorkDaysDeductionRatio: attendance.WorkDaysDeductionRatio,
+                WorkLocation: attendance.WorkLocation,
+                Notes: attendance.Notes));
+    }
+
+    public async Task<Result> DeleteAsync(
+        int id,
+        CancellationToken cancellationToken = default)
+    {
+        var attendance = await dbContext.EmployeeAttendances
+            .FirstOrDefaultAsync(a => a.Id == id && a.CompanyId == companyId, cancellationToken);
+
+        if (attendance is null)
+        {
+            return Result.Failure(
+                Error.NotFound(
+                    "EmployeeAttendance.NotFound",
+                    "لم يتم العثور على سجل الحضور المطلوب."));
+        }
+
+        var periodResult = await EnsureOpenDatesAsync(
+            [attendance.WorkDate],
+            nameof(EmployeeAttendanceRequest.WorkDate),
+            cancellationToken);
+        if (periodResult.IsFailure)
+        {
+            return periodResult;
+        }
+
+        dbContext.EmployeeAttendances.Remove(attendance);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    public async Task<Result<List<EmployeeAttendanceResponse>>> AddBulkAsync(
+        BulkEmployeeAttendanceRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var periodResult = await EnsureOpenDatesAsync(
+            request.Attendances.Select(attendance => attendance.WorkDate),
+            nameof(IndividualAttendanceRecordRequest.WorkDate),
+            cancellationToken);
+        if (periodResult.IsFailure)
+        {
+            return Result<List<EmployeeAttendanceResponse>>.Failure(
+                periodResult.Errors);
+        }
+
+        var employeeIds = request.Attendances
+            .Select(a => a.EmployeeId)
+            .Distinct()
+            .ToList();
+
+        var employees = await dbContext.Employees
+            .Where(e => e.CompanyId == companyId && employeeIds.Contains(e.Id))
+            .Select(e => new { e.Id, e.Name, e.IsActive, e.WorkPlaceStatus })
+            .ToListAsync(cancellationToken);
+
+        if (employees.Count != employeeIds.Count)
+        {
+            var existingIds = employees.Select(e => e.Id).ToHashSet();
+            var missingIds = employeeIds.Where(id => !existingIds.Contains(id)).ToList();
+            return Result<List<EmployeeAttendanceResponse>>.Failure(
+                Error.NotFound(
+                    "Employee.NotFound",
+                    $"بعض الموظفين المحددين غير موجودين: {string.Join(", ", missingIds)}"));
+        }
+
+        var ineligibleEmployees = employees
+            .Where(e => !e.IsActive || e.WorkPlaceStatus != WorkPlaceStatus.InCompany)
+            .Select(e => e.Name)
+            .ToList();
+
+        if (ineligibleEmployees.Count > 0)
+        {
+            return Result<List<EmployeeAttendanceResponse>>.Failure(
+                Error.Validation(
+                    "EmployeeAttendance.EmployeeNotEligible",
+                    $"لا يمكن تسجيل الحضور إلا للموظفين النشطين داخل الشركة. الموظفون غير المؤهلين: {string.Join(", ", ineligibleEmployees)}"));
+        }
+
+        var employeeMap = employees.ToDictionary(e => e.Id, e => e.Name);
+
+        var minDate = request.Attendances.Min(a => a.WorkDate);
+        var maxDate = request.Attendances.Max(a => a.WorkDate);
+
+        var existingAttendances = await dbContext.EmployeeAttendances
+            .Where(a => a.CompanyId == companyId 
+                        && employeeIds.Contains(a.EmployeeId) 
+                        && a.WorkDate >= minDate 
+                        && a.WorkDate <= maxDate)
+            .ToListAsync(cancellationToken);
+
+        var existingMap = existingAttendances.ToDictionary(
+            a => (a.EmployeeId, a.WorkDate));
+
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        var processedEntities = new List<(Domain.Entities.Employees.EmployeeAttendance Entity, int EmployeeId)>();
+
+        foreach (var item in request.Attendances)
+        {
+            var key = (item.EmployeeId, item.WorkDate);
+            Domain.Entities.Employees.EmployeeAttendance attendance;
+
+            if (existingMap.TryGetValue(key, out var existingRecord))
+            {
+                attendance = existingRecord;
+                attendance.Status = item.Status;
+                attendance.CheckIn = item.Status == EmployeeAttendanceStatus.Present ? item.CheckIn : null;
+                attendance.CheckOut = item.Status == EmployeeAttendanceStatus.Present ? item.CheckOut : null;
+                attendance.WorkHours = item.Status == EmployeeAttendanceStatus.Present ? CalculateWorkHours(item.CheckIn, item.CheckOut) : null;
+                attendance.WorkDayRatio = item.WorkDayRatio;
+                attendance.WorkOverTimeRatio = item.WorkOverTimeRatio;
+                attendance.WorkDaysDeductionRatio = item.WorkDaysDeductionRatio;
+                attendance.WorkLocation = string.IsNullOrWhiteSpace(item.WorkLocation) ? null : item.WorkLocation.Trim();
+                attendance.Notes = string.IsNullOrWhiteSpace(item.Notes) ? null : item.Notes.Trim();
+
+                dbContext.EmployeeAttendances.Update(attendance);
+            }
+            else
+            {
+                attendance = new Domain.Entities.Employees.EmployeeAttendance
+                {
+                    CompanyId = companyId,
+                    EmployeeId = item.EmployeeId,
+                    Status = item.Status,
+                    WorkDate = item.WorkDate,
+                    CheckIn = item.Status == EmployeeAttendanceStatus.Present ? item.CheckIn : null,
+                    CheckOut = item.Status == EmployeeAttendanceStatus.Present ? item.CheckOut : null,
+                    WorkHours = item.Status == EmployeeAttendanceStatus.Present ? CalculateWorkHours(item.CheckIn, item.CheckOut) : null,
+                    WorkDayRatio = item.WorkDayRatio,
+                    WorkOverTimeRatio = item.WorkOverTimeRatio,
+                    WorkDaysDeductionRatio = item.WorkDaysDeductionRatio,
+                    WorkLocation = string.IsNullOrWhiteSpace(item.WorkLocation) ? null : item.WorkLocation.Trim(),
+                    Notes = string.IsNullOrWhiteSpace(item.Notes) ? null : item.Notes.Trim()
+                };
+
+                dbContext.EmployeeAttendances.Add(attendance);
+            }
+
+            processedEntities.Add((attendance, item.EmployeeId));
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+
+        var responses = processedEntities.Select(x => new EmployeeAttendanceResponse(
+            x.Entity.Id,
+            x.Entity.CompanyId,
+            x.Entity.FiscalYearId,
+            x.Entity.EmployeeId,
+            employeeMap.GetValueOrDefault(x.EmployeeId) ?? string.Empty,
+            x.Entity.Status,
+            x.Entity.WorkDate,
+            x.Entity.CheckIn,
+            x.Entity.CheckOut,
+            x.Entity.WorkHours,
+            x.Entity.WorkDayRatio,
+            x.Entity.WorkOverTimeRatio,
+            x.Entity.WorkDaysDeductionRatio,
+            x.Entity.WorkLocation,
+            x.Entity.Notes
+        )).ToList();
+
+        return Result<List<EmployeeAttendanceResponse>>.Success(responses);
+    }
+
+    public async Task<Result<List<EmployeeAttendanceResponse>>> UpdateBulkAsync(
+        BulkEmployeeAttendanceUpdateRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request.Attendances is null || request.Attendances.Count == 0)
+        {
+            return Result<List<EmployeeAttendanceResponse>>.Failure(
+                Error.Validation("EmployeeAttendance.EmptyBulkRequest", "يجب إرسال سجل حضور واحد على الأقل للتعديل."));
+        }
+
+        var ids = request.Attendances.Select(a => a.Id).Distinct().ToList();
+        var employeeIds = request.Attendances.Select(a => a.EmployeeId).Distinct().ToList();
+
+        var employees = await dbContext.Employees
+            .Where(e => e.CompanyId == companyId && employeeIds.Contains(e.Id))
+            .Select(e => new { e.Id, e.Name, e.IsActive, e.WorkPlaceStatus })
+            .ToDictionaryAsync(e => e.Id, e => e, cancellationToken);
+
+        if (employees.Count != employeeIds.Count)
+        {
+            var missing = employeeIds.Where(id => !employees.ContainsKey(id)).ToList();
+            return Result<List<EmployeeAttendanceResponse>>.Failure(
+                Error.NotFound("Employee.NotFound", $"بعض الموظفين المحددين غير موجودين: {string.Join(", ", missing)}"));
+        }
+
+        var ineligibleBulk = employees.Values
+            .Where(e => !e.IsActive || e.WorkPlaceStatus != WorkPlaceStatus.InCompany)
+            .Select(e => e.Name)
+            .ToList();
+
+        if (ineligibleBulk.Count > 0)
+        {
+            return Result<List<EmployeeAttendanceResponse>>.Failure(
+                Error.Validation(
+                    "EmployeeAttendance.EmployeeNotEligible",
+                    $"لا يمكن تسجيل أو تعديل الحضور إلا للموظفين النشطين داخل الشركة. الموظفون غير المؤهلين: {string.Join(", ", ineligibleBulk)}"));
+        }
+
+        var existingAttendances = await dbContext.EmployeeAttendances
+            .Include(a => a.Employee)
+            .Where(a => a.CompanyId == companyId && ids.Contains(a.Id))
+            .ToListAsync(cancellationToken);
+
+        var existingMap = existingAttendances.ToDictionary(a => a.Id);
+
+        if (existingAttendances.Count != ids.Count)
+        {
+            var missingIds = ids.Where(id => !existingMap.ContainsKey(id)).ToList();
+            return Result<List<EmployeeAttendanceResponse>>.Failure(
+                Error.NotFound("EmployeeAttendance.NotFound", $"بعض سجلات الحضور المحددة غير موجودة: {string.Join(", ", missingIds)}"));
+        }
+
+        var periodResult = await EnsureOpenDatesAsync(
+            existingAttendances.Select(attendance => attendance.WorkDate)
+                .Concat(request.Attendances.Select(attendance =>
+                    attendance.WorkDate)),
+            nameof(IndividualAttendanceRecordUpdateRequest.WorkDate),
+            cancellationToken);
+        if (periodResult.IsFailure)
+        {
+            return Result<List<EmployeeAttendanceResponse>>.Failure(
+                periodResult.Errors);
+        }
+
+        foreach (var item in request.Attendances)
+        {
+            var existingAttendance = existingMap[item.Id];
+            var fiscalYearScope = await fiscalYearQueryScopeResolver.ResolveAsync(
+                existingAttendance.FiscalYearId,
+                item.WorkDate,
+                item.WorkDate,
+                cancellationToken);
+            if (fiscalYearScope.IsFailure)
+            {
+                return Result<List<EmployeeAttendanceResponse>>.Failure(
+                    fiscalYearScope.Errors);
+            }
+        }
+
+        await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+
+        foreach (var item in request.Attendances)
+        {
+            var attendance = existingMap[item.Id];
+            attendance.EmployeeId = item.EmployeeId;
+            attendance.Status = item.Status ?? attendance.Status;
+            attendance.WorkDate = item.WorkDate;
+
+            if (attendance.Status == EmployeeAttendanceStatus.Present)
+            {
+                attendance.CheckIn = item.CheckIn ?? attendance.CheckIn;
+                attendance.CheckOut = item.CheckOut ?? attendance.CheckOut;
+                attendance.WorkHours = CalculateWorkHours(attendance.CheckIn, attendance.CheckOut);
+            }
+            else
+            {
+                attendance.CheckIn = null;
+                attendance.CheckOut = null;
+                attendance.WorkHours = null;
+            }
+
+            attendance.WorkDayRatio = item.WorkDayRatio ?? attendance.WorkDayRatio;
+            attendance.WorkOverTimeRatio = item.WorkOverTimeRatio ?? attendance.WorkOverTimeRatio;
+            attendance.WorkDaysDeductionRatio = item.WorkDaysDeductionRatio ?? attendance.WorkDaysDeductionRatio;
+            attendance.WorkLocation = string.IsNullOrWhiteSpace(item.WorkLocation) ? null : item.WorkLocation.Trim();
+            attendance.Notes = string.IsNullOrWhiteSpace(item.Notes) ? null : item.Notes.Trim();
+
+            dbContext.EmployeeAttendances.Update(attendance);
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+
+        var responses = existingAttendances.Select(a => new EmployeeAttendanceResponse(
+            a.Id,
+            a.CompanyId,
+            a.FiscalYearId,
+            a.EmployeeId,
+            employees.GetValueOrDefault(a.EmployeeId)?.Name ?? a.Employee?.Name ?? string.Empty,
+            a.Status,
+            a.WorkDate,
+            a.CheckIn,
+            a.CheckOut,
+            a.WorkHours,
+            a.WorkDayRatio,
+            a.WorkOverTimeRatio,
+            a.WorkDaysDeductionRatio,
+            a.WorkLocation,
+            a.Notes
+        )).ToList();
+
+        return Result<List<EmployeeAttendanceResponse>>.Success(responses);
+    }
+
+    public async Task<Result> DeleteBulkAsync(
+        BulkEmployeeAttendanceDeleteRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request.AttendanceIds is null || request.AttendanceIds.Count == 0)
+        {
+            return Result.Failure(
+                Error.Validation("EmployeeAttendance.EmptyBulkRequest", "يجب تحديد معرفات سجلات الحضور المراد حذفها."));
+        }
+
+        var distinctIds = request.AttendanceIds.Distinct().ToList();
+
+        var attendances = await dbContext.EmployeeAttendances
+            .Where(a => a.CompanyId == companyId && distinctIds.Contains(a.Id))
+            .ToListAsync(cancellationToken);
+
+        if (attendances.Count != distinctIds.Count)
+        {
+            var existingIds = attendances.Select(a => a.Id).ToHashSet();
+            var missingIds = distinctIds.Where(id => !existingIds.Contains(id)).ToList();
+            return Result.Failure(
+                Error.NotFound("EmployeeAttendance.NotFound", $"بعض سجلات الحضور المحددة غير موجودة: {string.Join(", ", missingIds)}"));
+        }
+
+        var periodResult = await EnsureOpenDatesAsync(
+            attendances.Select(attendance => attendance.WorkDate),
+            nameof(EmployeeAttendanceRequest.WorkDate),
+            cancellationToken);
+        if (periodResult.IsFailure)
+        {
+            return periodResult;
+        }
+
+        dbContext.EmployeeAttendances.RemoveRange(attendances);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+
+    private async Task<Result> EnsureOpenDatesAsync(
+        IEnumerable<DateOnly> dates,
+        string fieldName,
+        CancellationToken cancellationToken)
+    {
+        if (fiscalYearPeriodGuard is null)
+        {
+            return Result.Success();
+        }
+
+        foreach (var date in dates.Distinct())
+        {
+            var result = await fiscalYearPeriodGuard.EnsureOpenAsync(
+                date,
+                fieldName,
+                cancellationToken);
+            if (result.IsFailure)
+            {
+                return result;
+            }
+        }
+
+        return Result.Success();
+    }
+
+    public async Task<Result<EmployeeAttendanceReportResponse>> GetReportAsync(
+        EmployeeAttendanceReportRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request.StartDate > request.EndDate)
+        {
+            return Result<EmployeeAttendanceReportResponse>.Failure(
+                Error.Validation(
+                    "EmployeeAttendance.InvalidDateRange",
+                    "تاريخ البداية يجب أن يكون قبل أو يساوي تاريخ النهاية."));
+        }
+
+        var fiscalYear = await fiscalYearQueryScopeResolver.ResolveAsync(
+            request.FiscalYearId,
+            request.StartDate,
+            request.EndDate,
+            cancellationToken);
+        if (fiscalYear.IsFailure)
+        {
+            return Result<EmployeeAttendanceReportResponse>.Failure(
+                fiscalYear.Errors);
+        }
+
+        var query = dbContext.EmployeeAttendances
+            .AsNoTracking()
+            .Where(a => a.CompanyId == companyId &&
+                        a.FiscalYearId == fiscalYear.Value.FiscalYearId &&
+                        a.WorkDate >= request.StartDate &&
+                        a.WorkDate <= request.EndDate);
+
+        if (request.EmployeeId.HasValue)
+        {
+            query = query.Where(a => a.EmployeeId == request.EmployeeId.Value);
+        }
+
+        var attendances = await query
+            .Select(a => new
+            {
+                a.EmployeeId,
+                a.Employee.Code,
+                a.Employee.Name,
+                a.Status,
+                a.WorkDayRatio,
+                a.WorkOverTimeRatio,
+                a.WorkDaysDeductionRatio
+            })
+            .ToListAsync(cancellationToken);
+
+        var employeeGroups = attendances
+            .GroupBy(a => (a.EmployeeId, a.Code, a.Name))
+            .Select(g => new EmployeeAttendanceReportLine(
+                EmployeeId: g.Key.EmployeeId,
+                EmployeeCode: g.Key.Code,
+                EmployeeName: g.Key.Name,
+                PresentDays: g.Count(a => a.Status == EmployeeAttendanceStatus.Present),
+                AbsentDays: g.Count(a => a.Status == EmployeeAttendanceStatus.Absent),
+                WorkedUnits: g.Where(a => a.Status == EmployeeAttendanceStatus.Present).Sum(a => GetRatioValue(a.WorkDayRatio)),
+                OvertimeUnits: g.Where(a => a.Status == EmployeeAttendanceStatus.Present).Sum(a => GetRatioValue(a.WorkOverTimeRatio)),
+                DeductionUnits: g.Where(a => a.Status == EmployeeAttendanceStatus.Present).Sum(a => GetRatioValue(a.WorkDaysDeductionRatio))))
+            .OrderBy(e => e.EmployeeName)
+            .ToList();
+
+        var response = new EmployeeAttendanceReportResponse(
+            StartDate: request.StartDate,
+            EndDate: request.EndDate,
+            TotalEmployees: employeeGroups.Count,
+            TotalPresentDays: employeeGroups.Sum(e => e.PresentDays),
+            TotalAbsentDays: employeeGroups.Sum(e => e.AbsentDays),
+            TotalWorkedUnits: employeeGroups.Sum(e => e.WorkedUnits),
+            TotalOvertimeUnits: employeeGroups.Sum(e => e.OvertimeUnits),
+            TotalDeductionUnits: employeeGroups.Sum(e => e.DeductionUnits),
+            Employees: employeeGroups);
+
+        return Result<EmployeeAttendanceReportResponse>.Success(response);
+    }
+
+    public async Task<Result<IReadOnlyList<SelectResponse>>> GetEmployeeSelectAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var employees = await dbContext.Employees
+            .AsNoTracking()
+            .Where(e => e.CompanyId == companyId
+                        && e.IsActive
+                        && e.WorkPlaceStatus == WorkPlaceStatus.InCompany)
+            .OrderBy(e => e.Name)
+            .Select(e => new SelectResponse(e.Id, e.Name))
+            .ToListAsync(cancellationToken);
+
+        return Result<IReadOnlyList<SelectResponse>>.Success(employees.AsReadOnly());
+    }
+
+    private static decimal GetRatioValue(WorkDayRatio? ratio) =>
+        ratio switch
+        {
+            WorkDayRatio.OneDay          => 1m,
+            WorkDayRatio.TwoDays         => 2m,
+            WorkDayRatio.ThreeDays       => 3m,
+            WorkDayRatio.FourDays        => 4m,
+            WorkDayRatio.FiveDays        => 5m,
+            WorkDayRatio.ThreeQuarterDay => 0.75m,
+            WorkDayRatio.TwoThirdsDay    => 2m / 3m,
+            WorkDayRatio.HalfDay         => 0.5m,
+            WorkDayRatio.ThirdDay        => 1m / 3m,
+            WorkDayRatio.QuarterDay      => 0.25m,
+            _                            => 0m
+        };
+
+    private static TimeOnly? CalculateWorkHours(TimeOnly? checkIn, TimeOnly? checkOut)
+    {
+        // Convert to TimeSpan
+        TimeSpan inSpan = checkIn?.ToTimeSpan() ?? TimeSpan.Zero;
+        TimeSpan outSpan = checkOut?.ToTimeSpan() ?? TimeSpan.Zero;
+
+        // Handle overnight shifts (checkout after midnight)
+        if (outSpan < inSpan)
+        {
+            outSpan = outSpan.Add(TimeSpan.FromDays(1));
+        }
+
+        // Calculate duration
+        TimeSpan duration = outSpan - inSpan;
+
+        // Convert back to TimeOnly (hours/minutes of work)
+        return TimeOnly.FromTimeSpan(duration);
+    }
+}

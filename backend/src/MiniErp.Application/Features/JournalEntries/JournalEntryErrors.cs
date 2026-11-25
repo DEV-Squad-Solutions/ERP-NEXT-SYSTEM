@@ -1,0 +1,175 @@
+using MiniErp.Application.Common.Results;
+using MiniErp.Domain.Enums;
+
+namespace MiniErp.Application.Features.JournalEntries;
+
+public static class JournalEntryErrors
+{
+    public static Error FiscalYearCannotBeChanged() =>
+        Error.Validation(
+            "JournalEntries.FiscalYearCannotBeChanged",
+            "لا يمكن نقل القيد إلى سنة مالية أخرى بعد إنشائه.",
+            "FiscalYearId");
+
+    public static Error InvalidId() => Error.Validation(
+        "JournalEntries.InvalidId",
+        "يجب أن يكون رقم القيد أكبر من صفر.");
+
+    public static Error NotFound(int id) => Error.NotFound(
+        "JournalEntries.NotFound",
+        $"لم يتم العثور على القيد رقم {id}.");
+
+    public static Error FiscalYearNotFound(int id) => Error.Validation(
+        "JournalEntries.FiscalYearNotFound",
+        $"السنة المالية رقم {id} غير موجودة في الشركة الحالية.",
+        nameof(JournalEntryRequest.FiscalYearId));
+
+    public static Error EntryDateOutsideFiscalYear() => Error.Validation(
+        "JournalEntries.EntryDateOutsideFiscalYear",
+        "تاريخ القيد يجب أن يكون داخل نطاق السنة المالية المختارة.",
+        nameof(JournalEntryRequest.EntryDate));
+
+    public static Error FiscalYearClosed() => Error.Conflict(
+        "JournalEntries.FiscalYearClosed",
+        "لا يمكن إضافة أو تعديل أو حذف قيد داخل سنة مالية مغلقة.",
+        nameof(JournalEntryRequest.FiscalYearId));
+
+    public static Error AccountNotFound(int accountId, int lineIndex) =>
+        Error.Validation(
+            "JournalEntries.AccountNotFound",
+            $"الحساب رقم {accountId} غير موجود في الشركة الحالية.",
+            $"Lines[{lineIndex}].AccountId");
+
+    public static Error AccountInactive(int accountId, int lineIndex) =>
+        Error.Validation(
+            "JournalEntries.AccountInactive",
+            $"الحساب رقم {accountId} غير فعال.",
+            $"Lines[{lineIndex}].AccountId");
+
+    public static Error AccountNotPosting(int accountId, int lineIndex) =>
+        Error.Validation(
+            "JournalEntries.AccountNotPosting",
+            $"الحساب رقم {accountId} حساب رئيسي ولا يسمح بالتسجيل عليه.",
+            $"Lines[{lineIndex}].AccountId");
+
+    public static Error AccountMustBeChild(int accountId, int lineIndex) =>
+        Error.Validation(
+            "JournalEntries.AccountMustBeChild",
+            $"الحساب رقم {accountId} حساب رئيسي. القيود اليومية تُسجل على الحسابات الفرعية فقط.",
+            $"Lines[{lineIndex}].AccountId");
+
+    public static Error PartyRequired(int accountId, int lineIndex) =>
+        Error.Validation(
+            "JournalEntries.PartyRequired",
+            $"يجب اختيار الطرف عند التسجيل على الحساب رقم {accountId}.",
+            $"Lines[{lineIndex}].PartyId");
+
+    public static Error PartyShapeInvalid(int lineIndex) => Error.Validation(
+        "JournalEntries.PartyShapeInvalid",
+        "يجب إرسال نوع الطرف ورقم الطرف معًا.",
+        $"Lines[{lineIndex}].PartyId");
+
+    public static Error PartyNotAllowed(int accountId, int lineIndex) =>
+        Error.Validation(
+            "JournalEntries.PartyNotAllowed",
+            $"الحساب رقم {accountId} لا يقبل ربط طرف.",
+            $"Lines[{lineIndex}].PartyId");
+
+    public static Error PartyTypeNotAllowed(int accountId, int lineIndex) =>
+        Error.Validation(
+            "JournalEntries.PartyTypeNotAllowed",
+            $"نوع الطرف لا يطابق تعريف الحساب رقم {accountId} في السنة المالية.",
+            $"Lines[{lineIndex}].PartyType");
+
+    public static Error PartyNotFound(int partyId, int lineIndex) =>
+        Error.Validation(
+            "JournalEntries.PartyNotFound",
+            $"الطرف رقم {partyId} غير موجود في الشركة الحالية.",
+            $"Lines[{lineIndex}].PartyId");
+
+    public static Error PartyInactive(int partyId, int lineIndex) =>
+        Error.Validation(
+            "JournalEntries.PartyInactive",
+            $"الطرف رقم {partyId} غير فعال.",
+            $"Lines[{lineIndex}].PartyId");
+
+    public static Error PartyCurrencyMismatch(
+        CurrencyCode partyCurrency,
+        int lineIndex) => Error.Validation(
+            "JournalEntries.PartyCurrencyMismatch",
+            $"يجب أن تطابق عملة السطر عملة الطرف ({partyCurrency}).",
+            $"Lines[{lineIndex}].Currency");
+
+    public static Error Unbalanced() => Error.Validation(
+        "JournalEntries.Unbalanced",
+        "إجمالي المدين يجب أن يساوي إجمالي الدائن ويكون أكبر من صفر.",
+        nameof(JournalEntryRequest.Lines));
+
+    public static Error CurrencyMetadataIncomplete(int lineIndex) => Error.Validation(
+        "JournalEntries.CurrencyMetadataIncomplete",
+        "يجب إرسال العملة وسعر الصرف والمدين والدائن بالعملة الأصلية معًا.",
+        $"Lines[{lineIndex}].Currency");
+
+    public static Error CurrencyInvalid(int lineIndex) => Error.Validation(
+        "JournalEntries.CurrencyInvalid",
+        "عملة السطر غير صحيحة.",
+        $"Lines[{lineIndex}].Currency");
+
+    public static Error ExchangeRateInvalid(int lineIndex) => Error.Validation(
+        "JournalEntries.ExchangeRateInvalid",
+        "سعر الصرف يجب أن يكون أكبر من صفر وبالدقة المسموحة.",
+        $"Lines[{lineIndex}].ExchangeRate");
+
+    public static Error BaseCurrencyRateMustBeOne(int lineIndex) => Error.Validation(
+        "JournalEntries.BaseCurrencyRateMustBeOne",
+        "سعر صرف عملة الشركة الأساسية يجب أن يساوي 1.",
+        $"Lines[{lineIndex}].ExchangeRate");
+
+    public static Error TransactionAmountShapeInvalid(int lineIndex) => Error.Validation(
+        "JournalEntries.TransactionAmountShapeInvalid",
+        "يجب إدخال مدين أو دائن بالعملة الأصلية فقط وبما يطابق اتجاه السطر.",
+        $"Lines[{lineIndex}].TransactionDebit");
+
+    public static Error TransactionConversionMismatch(int lineIndex) => Error.Validation(
+        "JournalEntries.TransactionConversionMismatch",
+        "المبلغ بالعملة الأصلية مع سعر الصرف لا يساوي مبلغ السطر بالعملة الأساسية.",
+        $"Lines[{lineIndex}].ExchangeRate");
+
+    public static Error RowVersionRequired() => Error.Validation(
+        "JournalEntries.RowVersionRequired",
+        "يجب إرسال إصدار القيد الحالي قبل تعديله أو حذفه.",
+        nameof(JournalEntryUpdateRequest.RowVersion));
+
+    public static Error Concurrency() => Error.Conflict(
+        "JournalEntries.Concurrency",
+        "تغير القيد بواسطة مستخدم آخر. أعد تحميل البيانات ثم حاول مرة أخرى.");
+
+    public static Error AutomaticReadOnly() => Error.Conflict(
+        "JournalEntries.AutomaticReadOnly",
+        "لا يمكن تعديل أو حذف القيد التلقائي مباشرة. عدّل الحركة المصدر أولًا.");
+
+    public static Error DriverCarryForwardReadOnly() => Error.Conflict(
+        "JournalEntries.DriverCarryForwardReadOnly",
+        "لا يمكن تعديل أو حذف قيد ترحيل أرصدة السائقين مباشرة. أعد فتح السنة المالية المصدر لمعالجة الرصيد.");
+
+    public static Error DriverOpeningBalanceConflict() => Error.Conflict(
+        "JournalEntries.DriverOpeningBalanceConflict",
+        "يوجد رصيد افتتاحي مسجل أو مرحّل لأحد السائقين في السنة المالية المحددة.");
+
+    public static Error AutomaticCannotBeCreatedManually() => Error.Validation(
+        "JournalEntries.AutomaticCannotBeCreatedManually",
+        "القيد التلقائي يتم إنشاؤه من الحركة المصدر فقط.",
+        nameof(JournalEntryRequest.EntryType));
+
+    public static Error AutomaticSourceRequired() => Error.Validation(
+        "JournalEntries.AutomaticSourceRequired",
+        "يجب تحديد مصدر القيد التلقائي ورقم الحركة.");
+
+    public static Error AutomaticDuplicate() => Error.Conflict(
+        "JournalEntries.AutomaticDuplicate",
+        "يوجد قيد تلقائي فعال لنفس الحركة بالفعل.");
+
+    public static Error ReversedReadOnly() => Error.Conflict(
+        "JournalEntries.ReversedReadOnly",
+        "لا يمكن تعديل أو حذف قيد تم عكسه.");
+}

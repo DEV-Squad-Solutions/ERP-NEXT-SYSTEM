@@ -1,0 +1,634 @@
+using System.Data;
+using static MiniErp.Application.Features.Invoices.InvoiceErrors;
+using Mapster;
+using Microsoft.EntityFrameworkCore;
+using MiniErp.Application.Common.Abstractions;
+using MiniErp.Application.Common.Results;
+using MiniErp.Application.Features.ExchangeRates;
+using MiniErp.Application.Features.Invoices;
+using MiniErp.Application.Features.DriverTrips;
+using MiniErp.Domain.Entities.Invoicing;
+using MiniErp.Domain.Enums;
+using MiniErp.Infrastructure.Persistence;
+using MiniErp.Infrastructure.Services.Cashboxes;
+
+namespace MiniErp.Infrastructure.Services.Invoices;
+
+public sealed partial class InvoiceService(
+    ApplicationDbContext dbContext,
+    ICurrentCompanyContext currentCompanyContext,
+    IInvoiceQueryService invoiceQueryService,
+    IExchangeRateResolver exchangeRateResolver,
+    IInvoiceInventoryService invoiceInventoryService,
+    TimeProvider timeProvider,
+    IFiscalYearPeriodGuard? fiscalYearPeriodGuard = null,
+    IInvoicePostingService? invoicePostingService = null,
+    IDriverTripPostingService? driverTripPostingService = null,
+    ICashboxAccessService? cashboxAccessService = null)
+    : IInvoiceService, IScopedService
+{
+    private static readonly ItemMovementType[] InvoiceItemMovementTypes =
+    [
+        ItemMovementType.Sales,
+        ItemMovementType.SalesReturn,
+        ItemMovementType.Purchase,
+        ItemMovementType.PurchaseReturn
+    ];
+
+    private readonly int companyId = currentCompanyContext.CompanyId;
+
+    private async Task<Result> EnsurePaymentCashboxesExecuteAsync(int invoiceId, CancellationToken cancellationToken)
+    {
+        var ids = await dbContext.CashVouchers.AsNoTracking()
+            .Where(voucher => voucher.CompanyId == companyId &&
+                (voucher.InvoiceId == invoiceId || (voucher.InvoicePayment != null && voucher.InvoicePayment.InvoiceId == invoiceId)))
+            .Select(voucher => voucher.CashboxId).Distinct().ToListAsync(cancellationToken);
+        foreach (var cashboxId in ids)
+        {
+            if (cashboxId.HasValue)
+            {
+                var access = await CashboxPermissionGuard.ExecuteAsync(cashboxAccessService, cashboxId.Value, cancellationToken);
+                if (access.IsFailure) return access;
+            }
+            else
+            {
+                var access = await CashboxPermissionGuard.ScopeAsync(cashboxAccessService, cancellationToken);
+                if (access.IsFailure) return Result.Failure(access.Errors);
+                if (!access.Value.HasAllCashboxes) return Result.Failure(CashboxPermissionGuard.Forbidden());
+            }
+        }
+        return Result.Success();
+    }
+
+    public async Task<Result<InvoiceResponse>> AddAsync(
+        InvoiceRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (request.CashboxId is int cashboxId)
+        {
+            var access = await CashboxPermissionGuard.ExecuteAsync(cashboxAccessService, cashboxId, cancellationToken);
+            if (access.IsFailure) return Result<InvoiceResponse>.Failure(access.Errors);
+        }
+        var invoice = request.Adapt<Invoice>();
+
+        await using var transaction = await dbContext.Database
+            .BeginTransactionAsync(
+                IsolationLevel.Serializable,
+                cancellationToken);
+
+        if (fiscalYearPeriodGuard is not null)
+        {
+            var fiscalYearResult = await fiscalYearPeriodGuard.EnsureOpenAsync(
+                invoice.InvoiceDate,
+                nameof(InvoiceRequest.InvoiceDate),
+                cancellationToken);
+            if (fiscalYearResult.IsFailure)
+            {
+                return Result<InvoiceResponse>.Failure(
+                    fiscalYearResult.Errors);
+            }
+        }
+
+        await invoiceInventoryService.LockCostingAsync(
+            request.Lines
+                .Where(line => line.ItemId.HasValue)
+                .Select(line => new InventoryCostingKey(
+                    request.StoreId,
+                    line.ItemId!.Value))
+                .Distinct()
+                .ToArray(),
+            cancellationToken);
+
+        var preparation = await PrepareAsync(
+            invoice,
+            request.Lines,
+            request.ContainerLines,
+            currentInvoiceId: null,
+            currentInvoiceNumber: null,
+            cancellationToken);
+        if (preparation.IsFailure)
+        {
+            return Result<InvoiceResponse>.Failure(preparation.Error);
+        }
+
+        invoice.CompanyId = companyId;
+        invoice.Currency = preparation.Value.Currency;
+        ApplyPreparedReturnDiscount(invoice, preparation.Value);
+
+        var exchangeRateResult = await exchangeRateResolver.ResolveAsync(
+            invoice.Currency,
+            invoice.InvoiceDate,
+            request.ExchangeRate,
+            cancellationToken);
+        if (exchangeRateResult.IsFailure)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(
+                exchangeRateResult.Error);
+        }
+
+        AddLines(invoice, request, preparation.Value);
+        AddContainerLines(invoice, request);
+        invoice.CalculateTotal();
+        invoice.ApplyExchangeRate(
+            exchangeRateResult.Value.ExchangeRateId,
+            exchangeRateResult.Value.Rate);
+        var amountError = ValidateAmounts(
+            invoice,
+            requestedWBTotal: request.WBTotal);
+        if (amountError is not null)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(amountError);
+        }
+
+        var paymentPreparation = await PreparePaymentAsync(
+            invoice,
+            request.CashboxId,
+            request.CashboxExchangeRate,
+            currentInvoiceId: null,
+            cancellationToken);
+        if (paymentPreparation.IsFailure)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(
+                paymentPreparation.Error);
+        }
+
+        invoice.Touch(timeProvider.GetUtcNow().UtcDateTime);
+
+        dbContext.Invoices.Add(invoice);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        var sideEffectsResult = await SaveSideEffectsAsync(
+            invoice,
+            paymentPreparation.Value,
+            cancellationToken);
+        if (sideEffectsResult.IsFailure)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(sideEffectsResult.Errors);
+        }
+
+        var costingError = await invoiceInventoryService.RecalculateCostingAsync(
+            GetCostingKeys(invoice),
+            cancellationToken);
+        if (costingError is not null)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(costingError);
+        }
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        if (invoicePostingService is not null)
+        {
+            var postingResult = await invoicePostingService.SynchronizeAsync(
+                invoice.Id,
+                cancellationToken);
+            if (postingResult.IsFailure)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                dbContext.ChangeTracker.Clear();
+                return Result<InvoiceResponse>.Failure(postingResult.Errors);
+            }
+        }
+
+        var responseResult = await invoiceQueryService.GetByIdAsync(
+            invoice.Id,
+            fiscalYearId: invoice.FiscalYearId,
+            cancellationToken: cancellationToken);
+        if (responseResult.IsFailure)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(responseResult.Error);
+        }
+
+        await transaction.CommitAsync(cancellationToken);
+        return responseResult;
+    }
+
+    public async Task<Result<InvoiceResponse>> UpdateAsync(
+        int id,
+        InvoiceUpdateRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        if (id <= 0)
+        {
+            return Result<InvoiceResponse>.Failure(InvalidId());
+        }
+
+        if (request.RowVersion is not { Length: 8 })
+        {
+            return Result<InvoiceResponse>.Failure(RowVersionRequired());
+        }
+
+        var requestedValues = request.Adapt<Invoice>();
+        var access = await EnsurePaymentCashboxesExecuteAsync(id, cancellationToken);
+        if (access.IsFailure) return Result<InvoiceResponse>.Failure(access.Errors);
+        if (request.CashboxId is int cashboxId)
+        {
+            access = await CashboxPermissionGuard.ExecuteAsync(cashboxAccessService, cashboxId, cancellationToken);
+            if (access.IsFailure) return Result<InvoiceResponse>.Failure(access.Errors);
+        }
+
+        await using var transaction = await dbContext.Database
+            .BeginTransactionAsync(
+                IsolationLevel.Serializable,
+                cancellationToken);
+
+        var invoice = await LoadForWriteAsync(id, cancellationToken);
+        if (invoice is null)
+        {
+            return Result<InvoiceResponse>.Failure(NotFound(id));
+        }
+
+        if (!invoice.RowVersion.SequenceEqual(request.RowVersion))
+        {
+            return Result<InvoiceResponse>.Failure(Concurrency());
+        }
+
+        if (fiscalYearPeriodGuard is not null)
+        {
+            var fiscalYearResult = await fiscalYearPeriodGuard.EnsureOpenAsync(
+                invoice.InvoiceDate,
+                nameof(InvoiceRequest.InvoiceDate),
+                cancellationToken);
+            if (fiscalYearResult.IsFailure)
+            {
+                return Result<InvoiceResponse>.Failure(
+                    fiscalYearResult.Errors);
+            }
+
+            fiscalYearResult = await fiscalYearPeriodGuard.EnsureOpenAsync(
+                request.InvoiceDate,
+                nameof(InvoiceUpdateRequest.InvoiceDate),
+                cancellationToken);
+            if (fiscalYearResult.IsFailure)
+            {
+                return Result<InvoiceResponse>.Failure(
+                    fiscalYearResult.Errors);
+            }
+        }
+
+        var linkedReturns = await LoadActiveLinkedReturnsAsync(
+            invoice.Lines.Select(line => line.Id).ToArray(),
+            cancellationToken);
+        if (linkedReturns.Count > 0)
+        {
+            foreach (var linkedReturn in linkedReturns)
+            {
+                access = await EnsurePaymentCashboxesExecuteAsync(linkedReturn.Id, cancellationToken);
+                if (access.IsFailure) return Result<InvoiceResponse>.Failure(access.Errors);
+            }
+            var linkedReturnSourceError =
+                ValidateLinkedReturnSourceUpdate(
+                    invoice,
+                    request,
+                    linkedReturns);
+            if (linkedReturnSourceError is not null)
+            {
+                return Result<InvoiceResponse>.Failure(
+                    linkedReturnSourceError);
+            }
+        }
+
+        if (invoice.DriverId != request.DriverId &&
+            await HasCashVoucherTripReferencesAsync(id, cancellationToken))
+        {
+            return Result<InvoiceResponse>.Failure(
+                DriverTripHasCashVouchers());
+        }
+
+        var oldItemMovements = await LoadItemMovementsAsync(
+            id,
+            cancellationToken);
+        var oldCostingKeys = GetCostingKeys(oldItemMovements);
+        await invoiceInventoryService.LockCostingAsync(
+            oldCostingKeys
+                .Concat(request.Lines
+                    .Where(line => line.ItemId.HasValue)
+                    .Select(line =>
+                        new InventoryCostingKey(
+                            request.StoreId,
+                            line.ItemId!.Value)))
+                .Distinct()
+                .ToArray(),
+            cancellationToken);
+
+        var entry = dbContext.Entry(invoice);
+        entry.Property(item => item.RowVersion).OriginalValue = request.RowVersion;
+
+        var preparation = await PrepareAsync(
+            requestedValues,
+            request.Lines,
+            request.ContainerLines,
+            currentInvoiceId: id,
+            currentInvoiceNumber: invoice.InvoiceNumber,
+            cancellationToken);
+        if (preparation.IsFailure)
+        {
+            return Result<InvoiceResponse>.Failure(preparation.Error);
+        }
+
+        request.Adapt(invoice);
+        NormalizeDriverValues(invoice);
+        invoice.Currency = preparation.Value.Currency;
+        ApplyPreparedReturnDiscount(invoice, preparation.Value);
+
+        var exchangeRateResult = await exchangeRateResolver.ResolveAsync(
+            invoice.Currency,
+            invoice.InvoiceDate,
+            request.ExchangeRate,
+            cancellationToken);
+        if (exchangeRateResult.IsFailure)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(
+                exchangeRateResult.Error);
+        }
+
+        ReplaceLines(invoice, request, preparation.Value);
+        ReplaceContainerLines(invoice, request);
+        invoice.CalculateTotal();
+        invoice.ApplyExchangeRate(
+            exchangeRateResult.Value.ExchangeRateId,
+            exchangeRateResult.Value.Rate);
+        var amountError = ValidateAmounts(
+            invoice,
+            requestedWBTotal: request.WBTotal);
+        if (amountError is not null)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(amountError);
+        }
+
+        var paymentPreparation = await PreparePaymentAsync(
+            invoice,
+            request.CashboxId,
+            request.CashboxExchangeRate,
+            currentInvoiceId: id,
+            cancellationToken);
+        if (paymentPreparation.IsFailure)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(
+                paymentPreparation.Error);
+        }
+
+        IReadOnlyList<int> changedLinkedReturnIds = [];
+        if (linkedReturns.Count > 0)
+        {
+            var linkedReturnFinancialResult =
+                await SynchronizeLinkedReturnFinancialsAsync(
+                    invoice,
+                    linkedReturns,
+                    cancellationToken);
+            if (linkedReturnFinancialResult.IsFailure)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                dbContext.ChangeTracker.Clear();
+                return Result<InvoiceResponse>.Failure(
+                    linkedReturnFinancialResult.Errors);
+            }
+
+            changedLinkedReturnIds = linkedReturnFinancialResult.Value;
+        }
+
+        invoice.Touch(timeProvider.GetUtcNow().UtcDateTime);
+        entry.Property(item => item.LastModifiedAt).IsModified = true;
+
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            var removalResult = await RemoveSideEffectsAsync(
+                invoice,
+                removeItemMovements: false,
+                removeDriverTrip: false,
+                cancellationToken);
+            if (removalResult.IsFailure)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                dbContext.ChangeTracker.Clear();
+                return Result<InvoiceResponse>.Failure(removalResult.Errors);
+            }
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            var sideEffectsResult = await SaveSideEffectsAsync(
+                invoice,
+                paymentPreparation.Value,
+                cancellationToken);
+            if (sideEffectsResult.IsFailure)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                dbContext.ChangeTracker.Clear();
+                return Result<InvoiceResponse>.Failure(
+                    sideEffectsResult.Errors);
+            }
+
+            var costingError = await invoiceInventoryService.RecalculateCostingAsync(
+                oldCostingKeys
+                    .Concat(GetCostingKeys(invoice))
+                    .Distinct()
+                    .ToArray(),
+                cancellationToken);
+            if (costingError is not null)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                dbContext.ChangeTracker.Clear();
+                return Result<InvoiceResponse>.Failure(costingError);
+            }
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            if (invoicePostingService is not null)
+            {
+                var postingInvoiceIds = linkedReturns
+                    .Where(linkedReturn =>
+                        changedLinkedReturnIds.Contains(linkedReturn.Id))
+                    .Select(linkedReturn => linkedReturn.Id)
+                    .Prepend(invoice.Id)
+                    .Distinct()
+                    .ToArray();
+                foreach (var postingInvoiceId in postingInvoiceIds)
+                {
+                    var postingResult =
+                        await invoicePostingService.SynchronizeAsync(
+                            postingInvoiceId,
+                            cancellationToken);
+                    if (postingResult.IsFailure)
+                    {
+                        await transaction.RollbackAsync(cancellationToken);
+                        dbContext.ChangeTracker.Clear();
+                        return Result<InvoiceResponse>.Failure(
+                            postingResult.Errors);
+                    }
+                }
+            }
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(Concurrency());
+        }
+
+        var responseResult = await invoiceQueryService.GetByIdAsync(
+            id,
+            fiscalYearId: invoice.FiscalYearId,
+            cancellationToken: cancellationToken);
+        if (responseResult.IsFailure)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result<InvoiceResponse>.Failure(responseResult.Error);
+        }
+
+        await transaction.CommitAsync(cancellationToken);
+        return responseResult;
+    }
+
+    public async Task<Result> DeleteAsync(
+        int id,
+        byte[]? rowVersion,
+        CancellationToken cancellationToken = default)
+    {
+        var access = await EnsurePaymentCashboxesExecuteAsync(id, cancellationToken);
+        if (access.IsFailure) return access;
+        if (id <= 0)
+        {
+            return Result.Failure(InvalidId());
+        }
+
+        if (rowVersion is not { Length: 8 })
+        {
+            return Result.Failure(RowVersionRequired());
+        }
+
+        await using var transaction = await dbContext.Database
+            .BeginTransactionAsync(
+                IsolationLevel.Serializable,
+                cancellationToken);
+
+        var invoice = await LoadForWriteAsync(id, cancellationToken);
+        if (invoice is null)
+        {
+            return Result.Failure(NotFound(id));
+        }
+
+        if (!invoice.RowVersion.SequenceEqual(rowVersion))
+        {
+            return Result.Failure(Concurrency());
+        }
+
+        if (fiscalYearPeriodGuard is not null)
+        {
+            var fiscalYearResult = await fiscalYearPeriodGuard.EnsureOpenAsync(
+                invoice.InvoiceDate,
+                nameof(InvoiceRequest.InvoiceDate),
+                cancellationToken);
+            if (fiscalYearResult.IsFailure)
+            {
+                return Result.Failure(fiscalYearResult.Errors);
+            }
+        }
+
+        if (await HasCashVoucherTripReferencesAsync(id, cancellationToken))
+        {
+            return Result.Failure(DriverTripHasCashVouchers());
+        }
+
+        if (await HasActiveLinkedReturnsAsync(
+                invoice.Lines.Select(line => line.Id).ToArray(),
+                cancellationToken))
+        {
+            return Result.Failure(LinkedSalesReturnsExist());
+        }
+
+        var oldItemMovements = await LoadItemMovementsAsync(
+            id,
+            cancellationToken);
+        var costingKeys = GetCostingKeys(oldItemMovements);
+        await invoiceInventoryService.LockCostingAsync(
+            costingKeys,
+            cancellationToken);
+
+        var stockError = await ValidateStockAsync(
+            invoice,
+            [],
+            currentInvoiceId: invoice.Id,
+            currentInvoiceNumber: invoice.InvoiceNumber,
+            cancellationToken);
+        if (stockError is not null)
+        {
+            return Result.Failure(stockError);
+        }
+
+        var removalResult = await RemoveSideEffectsAsync(
+            invoice,
+            removeItemMovements: true,
+            removeDriverTrip: true,
+            cancellationToken);
+        if (removalResult.IsFailure)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result.Failure(removalResult.Errors);
+        }
+
+        var entry = dbContext.Entry(invoice);
+        entry.Property(item => item.RowVersion).OriginalValue = rowVersion;
+
+        dbContext.InvoiceLines.RemoveRange(invoice.Lines);
+        dbContext.InvoiceContainerLines.RemoveRange(invoice.ContainerLines);
+        dbContext.Invoices.Remove(invoice);
+        try
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            var costingError = await invoiceInventoryService.RecalculateCostingAsync(
+                costingKeys,
+                cancellationToken);
+            if (costingError is not null)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                dbContext.ChangeTracker.Clear();
+                return Result.Failure(costingError);
+            }
+
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            if (invoicePostingService is not null)
+            {
+                var postingResult = await invoicePostingService.DeleteAsync(
+                    invoice.Id,
+                    cancellationToken);
+                if (postingResult.IsFailure)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    dbContext.ChangeTracker.Clear();
+                    return Result.Failure(postingResult.Errors);
+                }
+            }
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            dbContext.ChangeTracker.Clear();
+            return Result.Failure(Concurrency());
+        }
+
+        await transaction.CommitAsync(cancellationToken);
+        return Result.Success();
+    }
+}

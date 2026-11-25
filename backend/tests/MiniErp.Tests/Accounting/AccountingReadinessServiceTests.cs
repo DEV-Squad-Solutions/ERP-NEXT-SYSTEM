@@ -1,0 +1,546 @@
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
+using MiniErp.Application.Common.Abstractions;
+using MiniErp.Application.Common.Results;
+using MiniErp.Application.Features.AccountMappings;
+using MiniErp.Infrastructure.Persistence;
+using MiniErp.Infrastructure.Services.AccountingReadiness;
+using MiniErp.Infrastructure.Services.AccountMappings;
+using MiniErp.Infrastructure.Services.CashboxTransfers;
+using MiniErp.Infrastructure.Services.CashVouchers;
+using MiniErp.Infrastructure.Services.DriverTrips;
+using MiniErp.Infrastructure.Services.Invoices;
+using MiniErp.Infrastructure.Services.JournalEntries;
+
+namespace MiniErp.Tests.Accounting;
+
+public sealed class AccountingReadinessServiceTests
+{
+    [Fact]
+    public async Task Backfill_GeneratedCarryExcludesJournalAndMappingRequirementsAndRepairsObsoleteJournal()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        await database.Context.Database.ExecuteSqlRawAsync(
+            """
+            INSERT INTO Stores (Id,CompanyId,Code,Name,IsContainerStore,IsActive,CreatedById,CreatedOn,CreatedByPc,IsDeleted)
+            VALUES (1,1,'MAIN','Main',0,1,'test','2026-01-01','test',0);
+            INSERT INTO ItemUnits (Id,CompanyId,Name,IsActive,CreatedById,CreatedOn,CreatedByPc,IsDeleted)
+            VALUES (1,1,'Piece',1,'test','2026-01-01','test',0);
+            INSERT INTO Items (Id,CompanyId,ItemUnitId,Code,Name,IsActive,CreatedById,CreatedOn,CreatedByPc,IsDeleted)
+            VALUES (1,1,1,'ITEM','Item',1,'test','2026-01-01','test',0);
+            INSERT INTO StockOpeningBalances (Id,CompanyId,FiscalYearId,StoreId,DocumentNumber,DocumentDate,
+                Notes,RowVersion,CreatedById,CreatedOn,CreatedByPc,IsDeleted)
+            VALUES (1,1,1,1,'FYOB-8-1','2026-01-01','legacy notes edited',randomblob(8),'test','2026-01-01','test',0);
+            INSERT INTO StockOpeningBalanceLines (Id,CompanyId,StockOpeningBalanceId,ItemId,ItemUnitId,
+                Count,Weight,Quantity,Price,Total,CreatedById,CreatedOn,CreatedByPc,IsDeleted)
+            VALUES (1,1,1,1,1,1,5,5,10,50,'test','2026-01-01','test',0);
+            INSERT INTO ItemMovements (Id,CompanyId,FiscalYearId,StoreId,ItemId,ItemUnitId,MovementType,
+                ReferenceId,ReferenceNumber,MovementDate,QuantityIn,QuantityOut,CostStatus,PendingCostQuantity,
+                UnitCost,TotalCost,QuantityAfter,AverageCostAfter,InventoryValueAfter,CreatedById,CreatedOn,CreatedByPc,IsDeleted)
+            VALUES (1,1,1,1,1,1,5,1,'FYOB-8-1','2026-01-01',5,0,1,0,10,50,5,10,50,'test','2026-01-01','test',0);
+            """);
+
+        var before = await database.Service.GetAsync(1);
+        Assert.True(before.IsSuccess);
+        Assert.True(before.Value.IsReady);
+        Assert.Equal(0, before.Value.TotalSources);
+        Assert.Equal(0, before.Value.MissingJournalSources);
+        Assert.Equal(0, before.Value.MissingOrInvalidMappings);
+
+        await database.Context.Database.ExecuteSqlRawAsync(
+            """
+            INSERT INTO Accounts (Id,CompanyId,Code,Name,ParentAccountId,AccountType,NormalBalance,
+                IsPosting,IsActive,RowVersion,CreatedById,CreatedOn,CreatedByPc,IsDeleted)
+            VALUES (1,1,'1110','Inventory',NULL,1,1,1,1,randomblob(8),'test','2026-01-01','test',0),
+                   (2,1,'3100','Equity',NULL,3,2,1,1,randomblob(8),'test','2026-01-01','test',0);
+            INSERT INTO JournalEntries (Id,CompanyId,FiscalYearId,EntryNumber,EntryDate,Description,EntryType,
+                SourceType,SourceId,SourceNumber,Status,PostedOn,RowVersion,CreatedById,CreatedOn,CreatedByPc,IsDeleted)
+            VALUES (1,1,1,'JV-BUG-CARRY','2026-01-01','Obsolete duplicate',4,6,1,'FYOB-8-1',1,
+                '2026-01-01',randomblob(8),'test','2026-01-01','test',0);
+            INSERT INTO JournalEntryLines (Id,CompanyId,JournalEntryId,AccountId,Description,Debit,Credit,
+                Currency,ExchangeRate,TransactionDebit,TransactionCredit,CreatedById,CreatedOn,CreatedByPc,IsDeleted)
+            VALUES (1,1,1,1,'Inventory',50,0,1,1,50,0,'test','2026-01-01','test',0),
+                   (2,1,1,2,'Equity',0,50,1,1,0,50,'test','2026-01-01','test',0);
+            """);
+
+        var repaired = await database.Service.BackfillAsync(1);
+        var repeated = await database.Service.BackfillAsync(1);
+        Assert.True(repaired.IsSuccess, repaired.Error.Description);
+        Assert.True(repeated.IsSuccess, repeated.Error.Description);
+        Assert.True(repaired.Value.Readiness.IsReady);
+        Assert.Equal(0, repeated.Value.CreatedJournals);
+        Assert.False(await database.Context.JournalEntries.AnyAsync(entry =>
+            entry.SourceType == MiniErp.Domain.Enums.JournalEntrySourceType.StockOpeningBalance));
+        Assert.Single(await database.Context.ItemMovements.ToListAsync());
+    }
+
+    [Fact]
+    public async Task Backfill_WithNoSources_IsIdempotentAndReady()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+
+        var first = await database.Service.BackfillAsync(1);
+        var second = await database.Service.BackfillAsync(1);
+
+        Assert.True(first.IsSuccess);
+        Assert.True(second.IsSuccess);
+        Assert.Equal(0, first.Value.ProcessedSources);
+        Assert.Equal(0, first.Value.CreatedJournals);
+        Assert.Equal(0, first.Value.UpdatedJournals);
+        Assert.True(first.Value.Readiness.IsReady);
+        Assert.True(second.Value.Readiness.IsReady);
+        Assert.Empty(second.Value.Readiness.Issues);
+    }
+
+    [Fact]
+    public async Task Readiness_FlagsOrphanAndEveryUnbalancedPostedEntry()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        await database.Context.Database.ExecuteSqlRawAsync(
+            """
+            INSERT INTO Accounts (
+                Id, CompanyId, Code, Name, ParentAccountId, AccountType,
+                NormalBalance, IsPosting, IsActive, RowVersion,
+                CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+            VALUES
+                (1, 1, '1110', 'Debit account', NULL, 1, 1, 1, 1,
+                 randomblob(8), 'test', '2026-01-01', 'test', 0),
+                (2, 1, '3100', 'Credit account', NULL, 3, 2, 1, 1,
+                 randomblob(8), 'test', '2026-01-01', 'test', 0);
+
+            INSERT INTO JournalEntries (
+                Id, CompanyId, FiscalYearId, EntryNumber, EntryDate,
+                Description, EntryType, SourceType, SourceId, SourceNumber,
+                Status, PostedOn, RowVersion, CreatedById, CreatedOn,
+                CreatedByPc, IsDeleted)
+            VALUES
+                (1, 1, 1, 'JV-ORPHAN', '2026-03-01', 'Orphan automatic', 4,
+                 1, 999, 'INV-999', 1, '2026-03-01', randomblob(8),
+                 'test', '2026-03-01', 'test', 0),
+                (2, 1, 1, 'JV-UNBALANCED', '2026-03-02', 'Manual imbalance', 1,
+                 NULL, NULL, NULL, 1, '2026-03-02', randomblob(8),
+                 'test', '2026-03-02', 'test', 0);
+
+            INSERT INTO JournalEntryLines (
+                Id, CompanyId, JournalEntryId, AccountId, Description,
+                Debit, Credit, Currency, ExchangeRate, TransactionDebit,
+                TransactionCredit, CreatedById, CreatedOn, CreatedByPc,
+                IsDeleted)
+            VALUES
+                (1, 1, 1, 1, NULL, 100, 0, 1, 1, 100, 0,
+                 'test', '2026-03-01', 'test', 0),
+                (2, 1, 1, 2, NULL, 0, 100, 1, 1, 0, 100,
+                 'test', '2026-03-01', 'test', 0),
+                (3, 1, 2, 1, NULL, 25, 0, 1, 1, 25, 0,
+                 'test', '2026-03-02', 'test', 0);
+            """);
+
+        var result = await database.Service.GetAsync(1);
+
+        Assert.True(result.IsSuccess);
+        Assert.False(result.Value.IsReady);
+        Assert.Equal(1, result.Value.OrphanAutomaticJournals);
+        Assert.Equal(1, result.Value.UnbalancedAutomaticJournals);
+        Assert.Contains(result.Value.Issues, issue =>
+            issue.IssueType == "OrphanJournal" &&
+            issue.SourceId == 999);
+        Assert.Contains(result.Value.Issues, issue =>
+            issue.IssueType == "UnbalancedJournal" &&
+            issue.SourceNumber == "JV-UNBALANCED");
+    }
+
+    [Fact]
+    public async Task Readiness_IgnoresMovementOwnedByAnotherFiscalYear()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        await database.Context.Database.ExecuteSqlRawAsync(
+            """
+            INSERT INTO FiscalYears (
+                Id, CompanyId, Name, StartDate, EndDate, Status,
+                IsCurrent, RowVersion, CreatedById, CreatedOn,
+                CreatedByPc, IsDeleted)
+            VALUES (
+                2, 1, '2025', '2025-01-01', '2025-12-31', 1, 0,
+                randomblob(8), 'test', '2025-01-01', 'test', 0);
+
+            INSERT INTO Stores (
+                Id, CompanyId, Code, Name, IsContainerStore, IsActive,
+                CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+            VALUES (1, 1, 'MAIN', 'Main Store', 0, 1,
+                    'test', '2026-01-01', 'test', 0);
+
+            INSERT INTO ItemUnits (
+                Id, CompanyId, Name, IsActive, CreatedById, CreatedOn,
+                CreatedByPc, IsDeleted)
+            VALUES (1, 1, 'Piece', 1, 'test', '2026-01-01', 'test', 0);
+
+            INSERT INTO Items (
+                Id, CompanyId, ItemUnitId, Code, Name, IsActive,
+                CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+            VALUES (1, 1, 1, 'ITEM-1', 'Item One', 1,
+                    'test', '2026-01-01', 'test', 0);
+
+            INSERT INTO ItemMovements (
+                CompanyId, FiscalYearId, StoreId, ItemId,
+                MovementType, ReferenceId, ReferenceNumber,
+                MovementDate, QuantityIn, QuantityOut, CostStatus,
+                PendingCostQuantity, UnitCost, TotalCost,
+                QuantityAfter, AverageCostAfter, InventoryValueAfter,
+                CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+            VALUES (
+                1, 2, 1, 1, 5, 1, 'OLD-MOVEMENT',
+                '2026-03-01', 1, 0, 3, 1, NULL, 0,
+                1, 0, 0, 'test', '2026-03-01', 'test', 0);
+            """);
+
+        var result = await database.Service.GetAsync(1);
+
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Value.IsReady);
+        Assert.Equal(0, result.Value.PendingInventoryCosts);
+    }
+
+    [Fact]
+    public async Task Readiness_RecognizesImmutableRevaluationJournalsAsSources()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        await database.SeedRevaluationsAsync(includeJournals: true);
+
+        var readiness = await database.Service.GetAsync(1);
+        var backfill = await database.Service.BackfillAsync(1);
+
+        Assert.True(readiness.IsSuccess, readiness.Error.Description);
+        Assert.DoesNotContain(readiness.Value.Issues, issue =>
+            issue.IssueType == "OrphanJournal" &&
+            issue.SourceType ==
+                MiniErp.Domain.Enums.JournalEntrySourceType.CashboxRevaluation &&
+            issue.SourceId == 1);
+        Assert.DoesNotContain(readiness.Value.Issues, issue =>
+            issue.IssueType == "MissingJournal" &&
+            issue.SourceType ==
+                MiniErp.Domain.Enums.JournalEntrySourceType.CashboxRevaluation &&
+            issue.SourceId == 1);
+        Assert.DoesNotContain(readiness.Value.Issues, issue =>
+            issue.IssueType == "OrphanJournal" &&
+            issue.SourceType == MiniErp.Domain.Enums.JournalEntrySourceType
+                .MonetaryAccountRevaluation &&
+            issue.SourceId == 1);
+        Assert.DoesNotContain(readiness.Value.Issues, issue =>
+            issue.IssueType == "MissingJournal" &&
+            issue.SourceType == MiniErp.Domain.Enums.JournalEntrySourceType
+                .MonetaryAccountRevaluation &&
+            issue.SourceId == 1);
+        Assert.True(backfill.IsSuccess, backfill.Error.Description);
+        Assert.Equal(0, backfill.Value.CreatedJournals);
+        Assert.Equal(0, backfill.Value.UpdatedJournals);
+    }
+
+    [Fact]
+    public async Task Readiness_FlagsMissingImmutableRevaluationJournals()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        await database.SeedRevaluationsAsync(includeJournals: false);
+
+        var readiness = await database.Service.GetAsync(1);
+        var backfill = await database.Service.BackfillAsync(1);
+
+        Assert.True(readiness.IsSuccess, readiness.Error.Description);
+        Assert.False(readiness.Value.IsReady);
+        Assert.Contains(readiness.Value.Issues, issue =>
+            issue.IssueType == "MissingJournal" &&
+            issue.SourceType ==
+                MiniErp.Domain.Enums.JournalEntrySourceType.CashboxRevaluation &&
+            issue.SourceId == 1);
+        Assert.Contains(readiness.Value.Issues, issue =>
+            issue.IssueType == "MissingJournal" &&
+            issue.SourceType == MiniErp.Domain.Enums.JournalEntrySourceType
+                .MonetaryAccountRevaluation &&
+            issue.SourceId == 1);
+        Assert.True(backfill.IsFailure);
+        Assert.Equal(
+            "AccountingReadiness.ImmutableRevaluationJournalMissing",
+            backfill.Error.Code);
+    }
+
+    [Fact]
+    public async Task Backfill_CreatesMissingCanonicalOpeningMovement()
+    {
+        await using var database = await TestDatabase.CreateAsync();
+        await database.Context.Database.ExecuteSqlRawAsync(
+            """
+            INSERT INTO Stores (
+                Id, CompanyId, Code, Name, IsContainerStore, IsActive,
+                CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+            VALUES (1, 1, 'MAIN', 'Main Store', 0, 1,
+                    'test', '2026-01-01', 'test', 0);
+
+            INSERT INTO ItemUnits (
+                Id, CompanyId, Name, IsActive, CreatedById, CreatedOn,
+                CreatedByPc, IsDeleted)
+            VALUES (1, 1, 'Piece', 1, 'test', '2026-01-01', 'test', 0);
+
+            INSERT INTO Items (
+                Id, CompanyId, ItemUnitId, Code, Name, IsActive,
+                CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+            VALUES (1, 1, 1, 'ITEM-1', 'Item One', 1,
+                    'test', '2026-01-01', 'test', 0);
+
+            INSERT INTO StockOpeningBalances (
+                Id, CompanyId, FiscalYearId, StoreId, DocumentNumber, DocumentDate,
+                RowVersion, CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+            VALUES (1, 1, 1, 1, 'OPEN-1', '2026-01-01', randomblob(8),
+                    'test', '2026-01-01', 'test', 0);
+
+            INSERT INTO StockOpeningBalanceLines (
+                Id, CompanyId, StockOpeningBalanceId, ItemId, ItemUnitId,
+                Count, Weight, Quantity, Price, Total,
+                CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+            VALUES (1, 1, 1, 1, 1, 1, 5, 5, 10, 50,
+                    'test', '2026-01-01', 'test', 0);
+            """);
+
+        var before = await database.Service.GetAsync(1);
+        Assert.True(before.IsSuccess, before.Error.Description);
+        Assert.False(before.Value.IsReady);
+        Assert.Contains(before.Value.Issues, issue =>
+            issue.IssueType == "MissingInventoryMovement" &&
+            issue.SourceId == 1);
+
+        var backfill = await database.Service.BackfillAsync(1);
+
+        Assert.True(backfill.IsSuccess, backfill.Error.Description);
+        var movement = await database.Context.ItemMovements
+            .AsNoTracking()
+            .SingleAsync(value =>
+                value.MovementType ==
+                    MiniErp.Domain.Enums.ItemMovementType.OpeningBalance &&
+                value.ReferenceId == 1 &&
+                value.ItemId == 1);
+        Assert.Equal(5m, movement.QuantityIn);
+        var after = await database.Service.GetAsync(1);
+        Assert.True(after.IsSuccess, after.Error.Description);
+        Assert.DoesNotContain(after.Value.Issues, issue =>
+            issue.IssueType == "MissingInventoryMovement");
+    }
+
+    private sealed class TestDatabase : IAsyncDisposable
+    {
+        private readonly SqliteConnection connection;
+
+        private TestDatabase(
+            SqliteConnection connection,
+            ApplicationDbContext context,
+            AccountingReadinessService service)
+        {
+            this.connection = connection;
+            Context = context;
+            Service = service;
+        }
+
+        public ApplicationDbContext Context { get; }
+
+        public AccountingReadinessService Service { get; }
+
+        public async Task SeedRevaluationsAsync(bool includeJournals)
+        {
+            await Context.Database.ExecuteSqlRawAsync(
+                """
+                INSERT INTO Accounts (
+                    Id, CompanyId, Code, Name, ParentAccountId, AccountType,
+                    NormalBalance, IsPosting, IsActive, RowVersion,
+                    CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+                VALUES
+                    (1, 1, '1110', 'Cash account', NULL, 1, 1, 1, 1,
+                     randomblob(8), 'test', '2026-01-01', 'test', 0),
+                    (2, 1, '4900', 'Exchange gain', NULL, 4, 2, 1, 1,
+                     randomblob(8), 'test', '2026-01-01', 'test', 0);
+
+                INSERT INTO Cashboxes (
+                    Id, CompanyId, Code, Name, Currency, OpeningBalance,
+                    OpeningBalanceDate, OpeningExchangeRate,
+                    BaseOpeningBalance, IsActive, RowVersion,
+                    CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+                VALUES (
+                    1, 1, 'CB-USD', 'USD Cashbox', 2, 0,
+                    '2025-12-31', 1, 0, 1, randomblob(8),
+                    'test', '2026-01-01', 'test', 0);
+
+                INSERT INTO CashboxRevaluations (
+                    Id, CompanyId, FiscalYearId, CashboxId, RevaluationDate, ClosingRate,
+                    ForeignAmount, CarryingBaseAmount, TargetBaseAmount,
+                    DeltaBaseAmount, JournalEntryId,
+                    CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+                VALUES (
+                    1, 1, 1, 1, '2026-12-31', 51, 10, 500, 510, 10, NULL,
+                    'test', '2026-12-31', 'test', 0);
+
+                INSERT INTO MonetaryAccountRevaluations (
+                    Id, CompanyId, FiscalYearId, AccountId, Currency, PartyType, PartyId,
+                    RevaluationDate, ClosingRate, ForeignAmount,
+                    CarryingBaseAmount, TargetBaseAmount, DeltaBaseAmount,
+                    JournalEntryId, CreatedById, CreatedOn, CreatedByPc,
+                    IsDeleted)
+                VALUES (
+                    1, 1, 1, 1, 2, NULL, NULL, '2026-12-31', 51, 4,
+                    200, 204, 4, NULL, 'test', '2026-12-31', 'test', 0);
+                """);
+
+            if (!includeJournals)
+            {
+                return;
+            }
+
+            await Context.Database.ExecuteSqlRawAsync(
+                """
+                INSERT INTO JournalEntries (
+                    Id, CompanyId, FiscalYearId, EntryNumber, EntryDate,
+                    Description, EntryType, SourceType, SourceId,
+                    SourceNumber, Status, PostedOn, RowVersion,
+                    CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+                VALUES (
+                    1, 1, 1, 'RV-0001', '2026-12-31',
+                    'Cashbox revaluation', 4, 14, 1,
+                    'CB-USD', 1, '2026-12-31', randomblob(8),
+                    'test', '2026-12-31', 'test', 0),
+                    (2, 1, 1, 'RV-0002', '2026-12-31',
+                    'Monetary account revaluation', 4, 15, 1,
+                    '1110', 1, '2026-12-31', randomblob(8),
+                    'test', '2026-12-31', 'test', 0);
+
+                INSERT INTO JournalEntryLines (
+                    Id, CompanyId, JournalEntryId, AccountId, Description,
+                    Debit, Credit, Currency, ExchangeRate,
+                    TransactionDebit, TransactionCredit,
+                    CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+                VALUES
+                    (1, 1, 1, 1, 'Cashbox gain', 10, 0, 1, 1, 10, 0,
+                     'test', '2026-12-31', 'test', 0),
+                    (2, 1, 1, 2, 'Exchange gain', 0, 10, 1, 1, 0, 10,
+                     'test', '2026-12-31', 'test', 0),
+                    (3, 1, 2, 1, 'Monetary gain', 4, 0, 1, 1, 4, 0,
+                     'test', '2026-12-31', 'test', 0),
+                    (4, 1, 2, 2, 'Exchange gain', 0, 4, 1, 1, 0, 4,
+                     'test', '2026-12-31', 'test', 0);
+
+                UPDATE CashboxRevaluations
+                SET JournalEntryId = 1
+                WHERE Id = 1;
+
+                UPDATE MonetaryAccountRevaluations
+                SET JournalEntryId = 2
+                WHERE Id = 1;
+                """);
+        }
+
+        public static async Task<TestDatabase> CreateAsync()
+        {
+            var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseSqlite(connection)
+                .Options;
+            var context = new ApplicationDbContext(options);
+            await context.Database.EnsureCreatedAsync();
+            // SQLite maps model decimal columns to TEXT during EnsureCreated,
+            // which makes numeric check constraints compare different storage
+            // classes. SQL Server enforces these constraints in production.
+            await context.Database.ExecuteSqlRawAsync(
+                "PRAGMA ignore_check_constraints = ON;");
+            await context.Database.ExecuteSqlRawAsync(
+                """
+                INSERT INTO Companies (
+                    Id, Name, Address, CommercialRegister, TaxNumber,
+                    ManagerName, RowVersion, CreatedById, CreatedOn,
+                    CreatedByPc, IsDeleted)
+                VALUES (
+                    1, 'Readiness Test Company', 'Test Address',
+                    'CR-READINESS', 'TAX-READINESS', 'Test Manager',
+                    randomblob(8), 'test', '2026-01-01', 'test', 0);
+
+                INSERT INTO FiscalYears (
+                    Id, CompanyId, Name, StartDate, EndDate, Status, IsCurrent,
+                    RowVersion, CreatedById, CreatedOn, CreatedByPc, IsDeleted)
+                VALUES (
+                    1, 1, '2026', '2026-01-01', '2026-12-31', 1, 1,
+                    randomblob(8), 'test', '2026-01-01', 'test', 0);
+                """);
+
+            var currentCompany = new TestCurrentCompanyContext(1);
+            var resolver = new AccountMappingResolver(context, currentCompany);
+            var automaticPosting = new AutomaticPostingService(
+                context,
+                currentCompany,
+                TimeProvider.System,
+                NullLogger<AutomaticPostingService>.Instance);
+            var service = new AccountingReadinessService(
+                context,
+                currentCompany,
+                new NoOpInventoryCostingService(),
+                new InvoicePostingService(
+                    context,
+                    currentCompany,
+                    resolver,
+                    automaticPosting),
+                new CashVoucherPostingService(
+                    context,
+                    currentCompany,
+                    resolver,
+                    automaticPosting),
+                new CashboxTransferPostingService(
+                    context,
+                    currentCompany,
+                    resolver,
+                    automaticPosting),
+                new InventoryPostingService(
+                    context,
+                    currentCompany,
+                    resolver,
+                    automaticPosting),
+                new OpeningBalancePostingService(
+                    context,
+                    currentCompany,
+                    resolver,
+                    automaticPosting),
+                new DriverTripPostingService(
+                    context,
+                    currentCompany,
+                    resolver,
+                    automaticPosting),
+                NullLogger<AccountingReadinessService>.Instance);
+            return new TestDatabase(connection, context, service);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            await Context.DisposeAsync();
+            await connection.DisposeAsync();
+        }
+
+        private sealed record TestCurrentCompanyContext(int CompanyId)
+            : ICurrentCompanyContext;
+
+        private sealed class NoOpInventoryCostingService
+            : IInventoryCostingService
+        {
+            public Task LockAsync(
+                IReadOnlyCollection<InventoryCostingKey> keys,
+                CancellationToken cancellationToken = default) =>
+                Task.CompletedTask;
+
+            public Task<Error?> RecalculateAsync(
+                IReadOnlyCollection<InventoryCostingKey> keys,
+                CancellationToken cancellationToken = default) =>
+                Task.FromResult<Error?>(null);
+
+            public Task<IReadOnlyDictionary<int, InventoryCostSnapshot>>
+                GetSnapshotsAsync(
+                    int storeId,
+                    IReadOnlyCollection<int> itemIds,
+                    DateOnly asOfDate,
+                    CancellationToken cancellationToken = default) =>
+                Task.FromResult<IReadOnlyDictionary<int, InventoryCostSnapshot>>(
+                    new Dictionary<int, InventoryCostSnapshot>());
+        }
+    }
+}

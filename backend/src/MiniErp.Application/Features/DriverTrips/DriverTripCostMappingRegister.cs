@@ -1,0 +1,37 @@
+using Mapster;
+using MiniErp.Domain.Entities.Logistics;
+using MiniErp.Domain.Enums;
+
+namespace MiniErp.Application.Features.DriverTrips;
+
+public sealed class DriverTripCostMappingRegister : IRegister
+{
+    public void Register(TypeAdapterConfig config)
+    {
+        config.ForType<DriverTrip, DriverTripCostResponse>()
+            .Map(response => response.DriverTripId, trip => trip.Id)
+            .Map(
+                response => response.TripNumber,
+                trip => "TR-" + trip.Id)
+            .Map(
+                response => response.FiscalYearName,
+                trip => trip.FiscalYear.Name)
+            .Map(
+                response => response.BusinessPartnerId,
+                trip => trip.BusinessPartnerId)
+            .Map(
+                response => response.BusinessPartnerName,
+                trip => trip.BusinessPartner == null ? null : trip.BusinessPartner.Name)
+            .Map(
+                response => response.DriverName,
+                trip => trip.Driver.Name)
+            .Map(
+                response => response.CountryName,
+                trip => trip.Invoice == null || trip.Invoice.Country == null
+                    ? null
+                    : trip.Invoice.Country.Name)
+            .Map(response => response.CostNotes, trip => trip.CostNotes)
+            .Map(response => response.IsReadOnly, trip => trip.FiscalYear.Status != FiscalYearStatus.Open)
+            .Map(response => response.BaseCurrency, trip => trip.Company.Settings == null ? CurrencyCode.EGP : trip.Company.Settings.BaseCurrency);
+    }
+}

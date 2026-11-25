@@ -1,0 +1,431 @@
+using MiniErp.Domain.Enums;
+
+namespace MiniErp.Application.Features.Statements;
+
+public sealed record CashboxStatementItemResponse(
+    int? CashVoucherId,
+    DateOnly Date,
+    string VoucherNumber,
+    string MovementName,
+    string? Description,
+    string? PartyName,
+    decimal ReceiptAmount,
+    decimal PaymentAmount,
+    decimal Balance,
+    string? ReferenceNumber)
+{
+    public bool IsOpeningBalance { get; init; }
+
+    public bool IsReadOnly { get; init; }
+
+    public int? JournalEntryId { get; init; }
+
+    public int? JournalEntryLineId { get; init; }
+
+    public JournalEntrySourceType? SourceType { get; init; }
+
+    public CurrencyCode Currency { get; init; }
+
+    public CurrencyCode BaseCurrency { get; init; }
+
+    public decimal ExchangeRate { get; init; }
+
+    public bool IsBaseCurrency { get; init; }
+
+    public decimal BaseReceiptAmount { get; init; }
+
+    public decimal BasePaymentAmount { get; init; }
+
+    public decimal BaseBalance { get; init; }
+}
+
+public sealed record CashboxStatementSummaryResponse(
+    decimal OpeningBalance,
+    decimal TotalReceipts,
+    decimal TotalPayments,
+    decimal ClosingBalance)
+{
+    public decimal BaseOpeningBalance { get; init; }
+
+    public decimal BaseTotalReceipts { get; init; }
+
+    public decimal BaseTotalPayments { get; init; }
+
+    public decimal BaseClosingBalance { get; init; }
+}
+
+public sealed record CashboxStatementResponse(
+    int CashboxId,
+    string CashboxName,
+    CurrencyCode Currency,
+    IReadOnlyList<CashboxStatementItemResponse> Items,
+    int PageNumber,
+    int PageSize,
+    int TotalCount,
+    int TotalPages,
+    CashboxStatementSummaryResponse Summary)
+{
+    public CurrencyCode BaseCurrency { get; init; }
+
+    public DateOnly OpeningBalanceDate { get; init; }
+
+    public decimal OpeningExchangeRate { get; init; }
+
+    public bool IsBaseCurrency { get; init; }
+}
+
+public sealed record PartnerStatementItemResponse(
+    DateOnly Date,
+    string DocumentNumber,
+    string MovementName,
+    string? Description,
+    decimal DebitAmount,
+    decimal CreditAmount,
+    decimal BalanceAmount,
+    string BalanceDescription,
+    string? ReferenceNumber)
+{
+    public bool IsOpeningBalance { get; init; }
+
+    public bool IsReadOnly { get; init; }
+
+    public int? JournalEntryId { get; init; }
+
+    public int? JournalEntryLineId { get; init; }
+
+    public PartnerStatementSourceType SourceType { get; init; }
+    public int? CashVoucherId { get; init; }
+    public int? CashboxId { get; init; }
+    public string? CashboxName { get; init; }
+    public CashDirection? CashDirection { get; init; }
+    public int? FiscalYearId { get; init; }
+
+    public decimal ExchangeRate { get; init; }
+
+    public decimal BaseDebitAmount { get; init; }
+
+    public decimal BaseCreditAmount { get; init; }
+
+    public decimal BaseBalanceAmount { get; init; }
+}
+
+public sealed record PartnerStatementSummaryResponse(
+    decimal OpeningBalanceAmount,
+    string OpeningBalanceDescription,
+    decimal ClosingBalanceAmount,
+    string ClosingBalanceDescription)
+{
+    public decimal BaseOpeningBalanceAmount { get; init; }
+
+    public decimal BaseClosingBalanceAmount { get; init; }
+}
+
+public sealed record PartnerStatementResponse(
+    int BusinessPartnerId,
+    string BusinessPartnerName,
+    CurrencyCode Currency,
+    IReadOnlyList<PartnerStatementItemResponse> Items,
+    int PageNumber,
+    int PageSize,
+    int TotalCount,
+    int TotalPages,
+    PartnerStatementSummaryResponse Summary)
+{
+    public CurrencyCode BaseCurrency { get; init; }
+}
+
+public sealed record DriverStatementItemResponse(
+    int SourceId,
+    DateOnly Date,
+    string DocumentNumber,
+    string SourceName,
+    string? InvoiceNumber,
+    int? DriverTripId,
+    string? DriverTripNumber,
+    string MovementName,
+    string? Description,
+    decimal AmountPaidToDriver,
+    decimal AmountReceivedFromDriver,
+    decimal TripCost,
+    decimal BalanceAmount,
+    string BalanceDescription,
+    string? CashboxName,
+    string? ReferenceNumber)
+{
+    public bool IsOpeningBalance { get; init; }
+
+    public bool IsReadOnly { get; init; }
+
+    public int? JournalEntryId { get; init; }
+
+    public int? JournalEntryLineId { get; init; }
+
+    public DriverStatementSourceType SourceType { get; init; }
+
+    public decimal DebitAmount { get; init; }
+
+    public decimal CreditAmount { get; init; }
+
+    public int? BusinessPartnerId { get; init; }
+
+    public string? BusinessPartnerName { get; init; }
+
+    public string? CountryName { get; init; }
+}
+
+public sealed record DriverStatementSummaryResponse(
+    decimal OpeningBalanceAmount,
+    string OpeningBalanceDescription,
+    decimal TotalPaidToDriver,
+    decimal TotalReceivedFromDriver,
+    decimal TotalTripCost,
+    decimal ClosingBalanceAmount,
+    string ClosingBalanceDescription)
+{
+    public decimal TotalDebits { get; init; }
+
+    public decimal TotalCredits { get; init; }
+}
+
+public sealed record DriverStatementResponse(
+    int DriverId,
+    string DriverName,
+    IReadOnlyList<DriverStatementItemResponse> Items,
+    int PageNumber,
+    int PageSize,
+    int TotalCount,
+    int TotalPages,
+    DriverStatementSummaryResponse Summary)
+{
+    public CurrencyCode BaseCurrency { get; init; }
+}
+
+public sealed record ContainerStorePartnerResponse(
+    int Id,
+    string Code,
+    string Name,
+    string? PhoneNumber,
+    string? Email,
+    string? Address,
+    string? TaxNumber,
+    CurrencyCode Currency,
+    bool IsActive);
+
+public sealed record ContainerStoreHeaderResponse(
+    int Id,
+    string Code,
+    string Name,
+    string? Address,
+    bool IsActive);
+
+public sealed record ContainerStoreStatementItemResponse(
+    int MovementId,
+    DateOnly MovementDate,
+    int? InvoiceId,
+    string? InvoiceNumber,
+    string? PartnerInvoiceNumber,
+    InvoiceType? InvoiceType,
+    ContainerMovementSourceType SourceType,
+    int ContainerId,
+    string ContainerCode,
+    string ContainerName,
+    string? ContainerDescription,
+    bool IsContainerActive,
+    bool IsCurrentlyAssignedToStore,
+    int OutgoingUnits,
+    int IncomingUnits,
+    int NetUnits,
+    int RunningBalanceUnits,
+    string? MovementDescription,
+    DateTime CreatedOn,
+    byte[] RowVersion);
+
+public sealed record ContainerStoreContainerSummaryResponse(
+    int ContainerId,
+    string ContainerCode,
+    string ContainerName,
+    string? ContainerDescription,
+    bool IsContainerActive,
+    bool IsCurrentlyAssignedToStore,
+    int OpeningUnits,
+    int PeriodOutgoingUnits,
+    int PeriodIncomingUnits,
+    int PeriodNetUnits,
+    int ClosingUnits);
+
+public sealed record ContainerStoreStatementSummaryResponse(
+    int OpeningUnits,
+    int TotalOutgoingUnits,
+    int TotalIncomingUnits,
+    int NetUnits,
+    int ClosingUnits,
+    int DistinctContainerCount,
+    int MovementCount);
+
+public sealed record ContainerStoreStatementResponse(
+    ContainerStorePartnerResponse BusinessPartner,
+    ContainerStoreHeaderResponse ContainerStore,
+    IReadOnlyList<ContainerStoreStatementItemResponse> Items,
+    IReadOnlyList<ContainerStoreContainerSummaryResponse> Containers,
+    int PageNumber,
+    int PageSize,
+    int TotalCount,
+    int TotalPages,
+    ContainerStoreStatementSummaryResponse Summary);
+
+public sealed record EmployeeStatementItemResponse(
+    int SourceId,
+    EmployeeStatementSourceType SourceType,
+    DateOnly Date,
+    string DocumentNumber,
+    string MovementName,
+    string? Description,
+    decimal DebitAmount,
+    decimal CreditAmount,
+    decimal BalanceAmount,
+    string BalanceDescription,
+    string? ReferenceNumber)
+{
+    public bool IsOpeningBalance { get; init; }
+
+    public bool IsReadOnly { get; init; }
+
+    public int? JournalEntryId { get; init; }
+
+    public int? JournalEntryLineId { get; init; }
+
+    public CurrencyCode Currency { get; init; } = CurrencyCode.EGP;
+
+    public decimal OriginalAmount { get; init; }
+
+    public decimal EgpAmount { get; init; }
+
+    public decimal RunningBalance { get; init; }
+
+    public decimal Debit => DebitAmount;
+
+    public decimal Credit => CreditAmount;
+
+    public int? CashVoucherId { get; init; }
+
+    public string? CashVoucherNumber { get; init; }
+
+    public decimal ExchangeRate { get; init; }
+
+    public decimal BaseDebitAmount { get; init; }
+
+    public decimal BaseCreditAmount { get; init; }
+
+    public decimal BaseBalanceAmount { get; init; }
+}
+
+public sealed record EmployeeStatementSummaryResponse(
+    decimal OpeningBalanceAmount,
+    string OpeningBalanceDescription,
+    decimal TotalDebits,
+    decimal TotalCredits,
+    decimal ClosingBalanceAmount,
+    string ClosingBalanceDescription)
+{
+    public decimal BaseOpeningBalanceAmount { get; init; }
+
+    public decimal BaseTotalDebits { get; init; }
+
+    public decimal BaseTotalCredits { get; init; }
+
+    public decimal BaseClosingBalanceAmount { get; init; }
+}
+
+public sealed record EmployeeStatementResponse(
+    int EmployeeId,
+    string EmployeeCode,
+    string EmployeeName,
+    CurrencyCode Currency,
+    IReadOnlyList<EmployeeStatementItemResponse> Items,
+    int PageNumber,
+    int PageSize,
+    int TotalCount,
+    int TotalPages,
+    EmployeeStatementSummaryResponse Summary)
+{
+    public CurrencyCode BaseCurrency { get; init; }
+    public int FiscalYearId { get; init; }
+    public string FiscalYearName { get; init; } = string.Empty;
+}
+
+public sealed record EmployeeAccountBalanceResponse(
+    int EmployeeId,
+    string EmployeeCode,
+    string EmployeeName,
+    CurrencyCode Currency,
+    decimal BalanceAmount,
+    string BalanceDescription,
+    decimal TotalCredits,
+    decimal TotalDebits,
+    DateOnly? LastMovementDate)
+{
+    public int FiscalYearId { get; init; }
+    public string FiscalYearName { get; init; } = string.Empty;
+}
+
+public sealed record EmployeeProfileResponse(
+    int Id,
+    int CompanyId,
+    string Code,
+    string Name,
+    string? JobTitle,
+    string? PhoneNumber,
+    string? Email,
+    string? Address,
+    EmployeeType Type,
+    decimal? DailySalary,
+    decimal? MonthlySalary,
+    int? RequiredWorkingDaysPerMonth,
+    DateOnly? LastDayOfReceivingSalary,
+    bool IsActive,
+    DateTime CreatedOn);
+
+public sealed record EmployeeAccountRecentMovementResponse(
+    int Id,
+    DateOnly Date,
+    EmployeeMovementType Type,
+    string TypeName,
+    decimal Amount,
+    decimal Debit,
+    decimal Credit,
+    CurrencyCode Currency,
+    decimal ExchangeRate,
+    int? CashVoucherId,
+    string? CashVoucherNumber,
+    string? Notes);
+
+public sealed record EmployeeAccountPayrollTransactionResponse(
+    int Id,
+    DateOnly StartDate,
+    DateOnly EndDate,
+    decimal NetSalary,
+    bool IsSalaryMoveToEmployeeAccount,
+    DateOnly? SalaryMovedOn,
+    string? Notes);
+
+public sealed record EmployeeAccountSummaryResponse(
+    EmployeeProfileResponse Employee,
+    CurrencyCode Currency,
+    decimal OpeningBalance,
+    decimal CurrentBalance,
+    string BalanceDescription,
+    decimal TotalCredits,
+    decimal TotalDebits,
+    decimal TotalAdvances,
+    decimal TotalDeductions,
+    decimal TotalBonuses,
+    decimal TotalSalaryPosted,
+    decimal TotalSalaryMoved,
+    DateOnly? LastMovementDate,
+    decimal TotalWithdrawals = 0m,
+    IReadOnlyList<EmployeeAccountRecentMovementResponse>? RecentMovements = null,
+    IReadOnlyList<EmployeeAccountPayrollTransactionResponse>? PayrollSalaryTransactions = null)
+{
+    public int FiscalYearId { get; init; }
+    public string FiscalYearName { get; init; } = string.Empty;
+}

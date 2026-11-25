@@ -1,0 +1,115 @@
+using Microsoft.EntityFrameworkCore;
+using MiniErp.Application.Features.PayrollEntries;
+using MiniErp.Domain.Entities.Payroll;
+using MiniErp.Domain.Enums;
+
+namespace MiniErp.Infrastructure.Services.PayrollEntries;
+
+public sealed partial class PayrollEntryService
+{
+    private static IOrderedQueryable<PayrollEntry> ApplyFilters(
+        IQueryable<PayrollEntry> baseQuery,
+        PayrollEntryFilterRequest filters)
+    {
+        var search = filters.Search?.Trim();
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            baseQuery = baseQuery.Where(e =>
+                e.EmployeeCode.Contains(search) ||
+                e.EmployeeName.Contains(search));
+        }
+
+        if (filters.StartDate.HasValue)
+            baseQuery = baseQuery.Where(e => e.StartDate >= filters.StartDate.Value);
+
+        if (filters.EndDate.HasValue)
+            baseQuery = baseQuery.Where(e => e.EndDate <= filters.EndDate.Value);
+
+        if (filters.EmployeeId.HasValue)
+            baseQuery = baseQuery.Where(e => e.EmployeeId == filters.EmployeeId.Value);
+
+        if (filters.EmployeeType.HasValue)
+            baseQuery = baseQuery.Where(e => e.EmployeeType == filters.EmployeeType.Value);
+        if (filters.IsSalaryMoveToEmployeeAccount.HasValue)
+            baseQuery = baseQuery.Where(e => e.IsSalaryMoveToEmployeeAccount == filters.IsSalaryMoveToEmployeeAccount.Value);
+        return baseQuery
+            .OrderByDescending(e => e.EndDate)
+            .ThenByDescending(e => e.Id);
+    }
+
+    private async Task<AttendanceSummary> GetAttendanceSummaryAsync(
+        int employeeId,
+        int companyId,
+        DateOnly startDate,
+        DateOnly endDate,
+        CancellationToken cancellationToken)
+    {
+        var attendances = await dbContext.EmployeeAttendances
+            .Where(a =>
+                a.EmployeeId == employeeId &&
+                a.CompanyId == companyId &&
+                a.WorkDate >= startDate &&
+                a.WorkDate <= endDate)
+            .Select(a => new
+            {
+                a.Status,
+                a.WorkDayRatio,
+                a.WorkOverTimeRatio,
+                a.WorkDaysDeductionRatio
+            })
+            .ToListAsync(cancellationToken);
+
+        return new AttendanceSummary(
+            PresentDays: attendances.Count(a => a.Status == EmployeeAttendanceStatus.Present),
+            AbsentDays: attendances.Count(a => a.Status == EmployeeAttendanceStatus.Absent),
+            TotalPresentDays: attendances
+                .Where(a => a.Status == EmployeeAttendanceStatus.Present)
+                .Sum(a => GetRatioValue(a.WorkDayRatio)),
+            TotalOvertimeDays: attendances
+                .Where(a => a.Status == EmployeeAttendanceStatus.Present)
+                .Sum(a => GetRatioValue(a.WorkOverTimeRatio)),
+            TotalDeductionDays: attendances
+                .Where(a => a.Status == EmployeeAttendanceStatus.Present)
+                .Sum(a => GetRatioValue(a.WorkDaysDeductionRatio)));
+    }
+
+    private static decimal GetRatioValue(WorkDayRatio? ratio) =>
+        ratio switch
+        {
+            
+            WorkDayRatio.FullDay         => 1m,
+            WorkDayRatio.TwoDays         => 2m,
+            WorkDayRatio.ThreeDays       => 3m,
+            WorkDayRatio.FourDays        => 4m,
+            WorkDayRatio.FiveDays        => 5m,
+            WorkDayRatio.ThreeQuarterDay => 0.75m,
+            WorkDayRatio.TwoThirdsDay    => 2m / 3m,
+            WorkDayRatio.HalfDay         => 0.5m,
+            WorkDayRatio.ThirdDay        => 1m / 3m,
+            WorkDayRatio.QuarterDay      => 0.25m,
+            _                            => 0m
+        };
+
+    /// <summary>
+    /// Computes (grossSalary, calculatedSalary) from an employee and their attendance summary.
+    /// Returns (-1, -1) when the employee's salary configuration is incomplete.
+    /// </summary>
+
+    private static (decimal GrossSalary, decimal CalculatedSalary, decimal NetSalary, decimal? SalaryPerDay) CalculateSalaryWithExtras(
+        Domain.Entities.Employees.Employee employee,
+        AttendanceSummary summary,
+        decimal? bonus = null,
+        decimal? deduction = null)
+    {
+        var workedUnits = summary.TotalPresentDays
+            + (summary.TotalOvertimeDays  ?? 0m)
+            - (summary.TotalDeductionDays ?? 0m);
+
+        var calc = PayrollCalculator.Calculate(employee, workedUnits, bonus, deduction);
+        return (
+            GrossSalary: calc.GrossSalary,
+            CalculatedSalary: calc.CalculatedSalary,
+            NetSalary: calc.NetSalary,
+            SalaryPerDay: calc.SalaryPerDay);
+    }
+}

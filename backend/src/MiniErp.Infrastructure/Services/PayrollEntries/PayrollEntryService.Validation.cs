@@ -1,0 +1,173 @@
+using MiniErp.Application.Common.Results;
+using MiniErp.Application.Features.EmployeeAttendance;
+using MiniErp.Application.Features.PayrollEntries;
+using MiniErp.Domain.Entities.Payroll;
+using MiniErp.Domain.Enums;
+using static MiniErp.Application.Features.FiscalYears.FiscalYearErrors;
+
+namespace MiniErp.Infrastructure.Services.PayrollEntries;
+
+public sealed partial class PayrollEntryService
+{
+    private async Task<Result> EnsurePayrollPeriodOpenAsync(
+        DateOnly startDate,
+        DateOnly endDate,
+        int? fiscalYearId,
+        CancellationToken cancellationToken)
+    {
+        var fiscalYearResult = await fiscalYearQueryScopeResolver.ResolveAsync(
+            fiscalYearId,
+            startDate,
+            endDate,
+            cancellationToken);
+        if (fiscalYearResult.IsFailure)
+            return Result.Failure(fiscalYearResult.Errors);
+
+        var fiscalYear = fiscalYearResult.Value;
+        return fiscalYear.Status == FiscalYearStatus.Open
+            ? Result.Success()
+            : Result.Failure(Closed(
+                startDate,
+                fiscalYear.FiscalYearName,
+                nameof(PayrollEntry.StartDate)));
+    }
+
+    private static Error? ValidateFilters(PayrollEntryFilterRequest filters, CancellationToken cancellationToken)
+    {
+        if (!string.IsNullOrWhiteSpace(filters.Search) && filters.Search.Length > 100)
+            return Error.Validation(
+                "PayrollEntry.SearchTooLong",
+                "عبارة البحث طويلة جدًا.",
+                nameof(filters.Search));
+
+        if (filters.EmployeeId != null && filters.EmployeeId <= 0)
+            return Error.Validation(
+                "PayrollEntry.InvalidEmployeeId",
+                "معرف الموظف غير صالح.",
+                nameof(filters.EmployeeId));
+
+        if (filters.StartDate != null && filters.EndDate != null && filters.StartDate > filters.EndDate)
+            return Error.Validation(
+                "PayrollEntry.InvalidDateRange",
+                "تاريخ البدء لا يمكن أن يكون بعد تاريخ الانتهاء.",
+                nameof(filters.StartDate));
+
+        if (filters.EmployeeType != null && !Enum.IsDefined(typeof(EmployeeType), filters.EmployeeType))
+            return Error.Validation(
+                "PayrollEntry.InvalidEmployeeType",
+                "نوع الموظف المحدد غير صالح.",
+                nameof(filters.EmployeeType));
+
+        if (filters.FiscalYearId is <= 0)
+            return Error.Validation(
+                "FiscalYears.InvalidId",
+                "معرف السنة المالية غير صالح.",
+                nameof(filters.FiscalYearId));
+
+        return null;
+    }
+
+    private static Error? ValidateAddAsync(PayrollEntryCreateRequest request, CancellationToken cancellationToken)
+    {
+        if (request.EmployeeId <= 0)
+            return Error.Validation(
+                "PayrollEntry.InvalidEmployeeId",
+                "معرف الموظف غير صالح.",
+                nameof(request.EmployeeId));
+
+        if (request.Bonus.HasValue && request.Bonus.Value < 0)
+            return Error.Validation(
+                "PayrollEntry.InvalidBonus",
+                "المكافأة يجب أن تكون أكبر من أو تساوي صفر.",
+                nameof(request.Bonus));
+
+        if (request.Deduction.HasValue && request.Deduction.Value < 0)
+            return Error.Validation(
+                "PayrollEntry.InvalidDeduction",
+                "الخصم يجب أن يكون أكبر من أو تساوي صفر.",
+                nameof(request.Deduction));
+
+        return null;
+    }
+
+    private static Error? ValidateAddBulkAsync(BulkPayrollEntryCreateRequest request)
+    {
+        if (request.Entries is null || request.Entries.Count == 0)
+            return Error.Validation(
+                "PayrollEntry.EmptyBulkRequest",
+                "يجب إرسال مدخل راتب واحد على الأقل.");
+
+        var duplicateEmployees = request.Entries
+            .GroupBy(e => e.EmployeeId)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key)
+            .ToList();
+
+        if (duplicateEmployees.Count > 0)
+            return Error.Validation(
+                "PayrollEntry.DuplicateEmployee",
+                $"لا يجوز تكرار نفس الموظف داخل الطلب الواحد: {string.Join(", ", duplicateEmployees)}");
+
+        return null;
+    }
+
+    private static Error? ValidateBulkPaymentAsync(BulkPayrollEntrySalaryPaymentRequest request)
+    {
+        var hasEntries = request.Entries is { Count: > 0 };
+        var hasIds = request.PayrollEntryIds is { Count: > 0 };
+
+        if (!hasEntries && !hasIds)
+            return Error.Validation(
+                "PayrollEntry.EmptyBulkPaymentRequest",
+                "يجب تحديد قيود الرواتب المطلوب صرفها.");
+
+        if (hasEntries)
+        {
+            var duplicateIds = request.Entries!
+                .GroupBy(e => e.PayrollEntryId)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            if (duplicateIds.Count > 0)
+                return Error.Validation(
+                    "PayrollEntry.DuplicateEntryId",
+                    $"لا يجوز تكرار قيد الراتب داخل الطلب الواحد: {string.Join(", ", duplicateIds)}");
+        }
+
+        if (hasIds)
+        {
+            var duplicateIds = request.PayrollEntryIds!
+                .GroupBy(id => id)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            if (duplicateIds.Count > 0)
+                return Error.Validation(
+                    "PayrollEntry.DuplicateEntryId",
+                    $"لا يجوز تكرار قيد الراتب داخل الطلب الواحد: {string.Join(", ", duplicateIds)}");
+        }
+
+        return null;
+    }
+
+    private static Error? ValidateForPayment(PayrollEntry entry)
+    {
+        if (entry.IsSalaryMovedToEmployeeAccount)
+        {
+            return Error.Conflict(
+                "PayrollEntry.AlreadyPaid",
+                $"تم تحويل راتب القيد رقم {entry.Id} إلى حساب الموظف مسبقًا.");
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Guards UpdateAsync / RecalculateAsync — entry must not have been paid yet.
+    /// Delegates to the centralized EnsureEditable business rule.
+    /// </summary>
+    private static Error? ValidateForUpdate(PayrollEntry entry) =>
+        entry.EnsureEditable();
+}

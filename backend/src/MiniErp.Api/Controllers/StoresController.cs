@@ -1,0 +1,137 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MiniErp.Api.Extensions;
+using MiniErp.Api.Features.Stores.Jobs;
+using MiniErp.Application.Common.Models;
+using MiniErp.Application.Features.Stores;
+
+namespace MiniErp.Api.Controllers;
+
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+public sealed class StoresController(IStoreService storeService)
+    : ApiControllerBase
+{
+    [HttpGet]
+    [ProducesResponseType<PagedResponse<StoreResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] PaginationRequest pagination,
+        [FromQuery] StoreFilterRequest filters,
+        CancellationToken cancellationToken)
+    {
+        var result = await storeService.GetAllAsync(
+            pagination,
+            filters,
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("select")]
+    [ProducesResponseType<IReadOnlyList<SelectResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetSelect(CancellationToken cancellationToken)
+    {
+        var result = await storeService.GetSelectAsync(cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("container-select")]
+    [ProducesResponseType<IReadOnlyList<SelectResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetContainerSelect(
+        CancellationToken cancellationToken)
+    {
+        var result = await storeService.GetContainerSelectAsync(cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpGet("{id:int}")]
+    [ProducesResponseType<StoreResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var result = await storeService.GetByIdAsync(id, cancellationToken);
+        return this.ToActionResult(result);
+    }
+
+    [HttpPost]
+    [ProducesResponseType<StoreResponse>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Create(
+        StoreRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await storeService.AddAsync(request, cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            TryEnqueueRealtime<StoresRealtimeJob>(
+                "Added",
+                result.Value.Id,
+                realtime => job => job.ExecuteAsync(realtime));
+        }
+
+        return result.IsFailure
+            ? this.ToProblem(result.Errors)
+            : CreatedAtAction(
+                nameof(GetById),
+                new { id = result.Value.Id },
+                result.Value);
+    }
+
+    [HttpPut("{id:int}")]
+    [ProducesResponseType<StoreResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Update(
+        int id,
+        StoreRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await storeService.UpdateAsync(id, request, cancellationToken);
+        if (result.IsSuccess)
+        {
+            TryEnqueueRealtime<StoresRealtimeJob>(
+                "Updated",
+                id,
+                realtime => job => job.ExecuteAsync(realtime));
+        }
+        return this.ToActionResult(result);
+    }
+
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Delete(
+        int id,
+        CancellationToken cancellationToken)
+    {
+        var result = await storeService.DeleteAsync(id, cancellationToken);
+        if (result.IsSuccess)
+        {
+            TryEnqueueRealtime<StoresRealtimeJob>(
+                "Deleted",
+                id,
+                realtime => job => job.ExecuteAsync(realtime));
+        }
+        return this.ToActionResult(result);
+    }
+}

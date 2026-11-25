@@ -1,0 +1,142 @@
+using MiniErp.Application.Features.JournalEntries;
+using MiniErp.Domain.Enums;
+
+namespace MiniErp.Tests.Accounting;
+
+public sealed class JournalEntryValidatorTests
+{
+    [Fact]
+    public void RequestValidator_AcceptsBalancedEntry()
+    {
+        var result = new JournalEntryRequestValidator().Validate(
+            CreateRequest(100m, 100m));
+
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
+    public void RequestValidator_RejectsUnbalancedEntry()
+    {
+        var result = new JournalEntryRequestValidator().Validate(
+            CreateRequest(100m, 90m));
+
+        Assert.Contains(
+            result.Errors,
+            error => error.PropertyName == nameof(JournalEntryRequest.Lines));
+    }
+
+    [Fact]
+    public void RequestValidator_RejectsDebitAndCreditOnSameLine()
+    {
+        var request = CreateRequest(100m, 100m) with
+        {
+            Lines =
+            [
+                new JournalEntryLineRequest(
+                    AccountId: 1,
+                    Description: null,
+                    Debit: 100m,
+                    Credit: 100m),
+                new JournalEntryLineRequest(
+                    AccountId: 2,
+                    Description: null,
+                    Debit: 0m,
+                    Credit: 100m)
+            ]
+        };
+
+        var result = new JournalEntryRequestValidator().Validate(request);
+
+        Assert.Contains(
+            result.Errors,
+            error => error.PropertyName.Contains(
+                "Amount",
+                StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void RequestValidator_RejectsAutomaticEntryFromManualEndpoint()
+    {
+        var result = new JournalEntryRequestValidator().Validate(
+            CreateRequest(100m, 100m) with
+            {
+                EntryType = JournalEntryType.Automatic
+            });
+
+        Assert.Contains(
+            result.Errors,
+            error => error.ErrorMessage.Contains(
+                "التلقائي",
+                StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void RequestValidator_RequiresPartyTypeAndIdTogether()
+    {
+        var request = CreateRequest(100m, 100m) with
+        {
+            Lines =
+            [
+                new JournalEntryLineRequest(
+                    AccountId: 1,
+                    Description: null,
+                    Debit: 100m,
+                    Credit: 0m,
+                    PartyType: JournalPartyType.Customer,
+                    PartyId: null),
+                new JournalEntryLineRequest(
+                    AccountId: 2,
+                    Description: null,
+                    Debit: 0m,
+                    Credit: 100m)
+            ]
+        };
+
+        var result = new JournalEntryRequestValidator().Validate(request);
+
+        Assert.Contains(
+            result.Errors,
+            error => error.PropertyName.Contains(
+                nameof(JournalEntryLineRequest.PartyId),
+                StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void UpdateValidator_RequiresRowVersion()
+    {
+        var result = new JournalEntryUpdateRequestValidator().Validate(
+            new JournalEntryUpdateRequest(
+                FiscalYearId: 1,
+                EntryDate: new DateOnly(2026, 8, 31),
+                Description: "تعديل اختبار",
+                Lines: CreateRequest(100m, 100m).Lines,
+                RowVersion: [1]));
+
+        Assert.Contains(
+            result.Errors,
+            error => error.PropertyName ==
+                nameof(JournalEntryUpdateRequest.RowVersion));
+    }
+
+    private static JournalEntryRequest CreateRequest(
+        decimal debit,
+        decimal credit) =>
+        new(
+            FiscalYearId: 1,
+            EntryDate: new DateOnly(2026, 8, 31),
+            Description: "قيد اختبار",
+            EntryType: JournalEntryType.Manual,
+            Lines:
+            [
+                new JournalEntryLineRequest(
+                    AccountId: 1,
+                    Description: null,
+                    Debit: debit,
+                    Credit: 0m),
+                new JournalEntryLineRequest(
+                    AccountId: 2,
+                    Description: null,
+                    Debit: 0m,
+                    Credit: credit)
+            ]);
+}

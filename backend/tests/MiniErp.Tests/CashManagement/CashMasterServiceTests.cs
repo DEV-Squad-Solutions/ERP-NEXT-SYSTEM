@@ -1,0 +1,479 @@
+using Microsoft.EntityFrameworkCore;
+using MiniErp.Application.Common.Mappings;
+using MiniErp.Application.Common.Models;
+using MiniErp.Application.Common.Results;
+using MiniErp.Application.Features.CashMovementTypes;
+using MiniErp.Application.Features.CashVouchers;
+using MiniErp.Application.Features.Cashboxes;
+using MiniErp.Domain.Enums;
+using MiniErp.Infrastructure;
+
+namespace MiniErp.Tests.CashManagement;
+
+public sealed class CashMasterServiceTests
+{
+    static CashMasterServiceTests()
+    {
+        MappingConfiguration.Register(
+            typeof(InfrastructureAssemblyMarker).Assembly);
+    }
+
+    [Fact]
+    public async Task Cashbox_GeneratesTenantScopedCodesAndRejectsDuplicateNames()
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var companyOne = database.CreateCashboxService(companyId: 1);
+        var companyTwo = database.CreateCashboxService(companyId: 2);
+
+        var generated = await companyOne.AddAsync(
+            CreateCashbox("Different"));
+        var duplicateName = await companyOne.AddAsync(
+            CreateCashbox(" main cashbox "));
+        var sameCodeInOtherCompany = await companyTwo.AddAsync(
+            CreateCashbox("Second Company Box"));
+
+        Assert.True(generated.IsSuccess);
+        Assert.Matches(
+            "^CBX-[0-9]{4,}$",
+            generated.Value.Code);
+        Assert.Equal("Cashboxes.NameExists", duplicateName.Error.Code);
+        Assert.Single(duplicateName.Errors);
+        Assert.True(sameCodeInOtherCompany.IsSuccess);
+        Assert.Equal(2, sameCodeInOtherCompany.Value.CompanyId);
+        Assert.Matches(
+            "^CBX-[0-9]{4,}$",
+            sameCodeInOtherCompany.Value.Code);
+    }
+
+    [Fact]
+    public async Task Cashbox_GetAllCombinesSearchAndTypedFilters()
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var service = database.CreateCashboxService(companyId: 1);
+
+        var result = await service.GetAllAsync(
+            new PaginationRequest
+            {
+                PageNumber = 1,
+                PageSize = 20
+            },
+            new CashboxFilterRequest(
+                Search: "Main",
+                Currency: CurrencyCode.EGP,
+                IsActive: true));
+
+        Assert.True(result.IsSuccess);
+        var cashbox = Assert.Single(result.Value.Items);
+        Assert.Equal("MAIN", cashbox.Code);
+        Assert.Equal(1000m, cashbox.CurrentBalance);
+    }
+
+    [Fact]
+    public async Task Cashbox_WithVoucherBlocksOpeningBalanceChangeAndDelete()
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var vouchers = database.CreateVoucherService(companyId: 1);
+        var cashboxes = database.CreateCashboxService(companyId: 1);
+
+        var created = await AddVoucherAsync(vouchers,
+            CreateGeneralVoucher(
+                "CV-MASTER-1",
+                CashDirection.Receipt,
+                cashboxId: 1,
+                movementTypeId: 9,
+                amount: 25m));
+        var cashbox = await cashboxes.GetByIdAsync(1);
+
+        var update = await cashboxes.UpdateAsync(
+            1,
+            new CashboxUpdateRequest(
+                cashbox.Value.Name,
+                cashbox.Value.Currency,
+                1200m,
+                true,
+                cashbox.Value.Notes,
+                cashbox.Value.RowVersion));
+        var delete = await cashboxes.DeleteAsync(1);
+
+        Assert.True(created.IsSuccess);
+        Assert.Equal(
+            "Cashboxes.OpeningOrCurrencyChangeNotAllowed",
+            update.Error.Code);
+        Assert.Equal("Cashboxes.HasVouchers", delete.Error.Code);
+    }
+
+    [Fact]
+    public async Task MovementType_DuplicateAndUsedSemanticsRulesAreEnforced()
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var types = database.CreateMovementTypeService(companyId: 1);
+        var vouchers = database.CreateVoucherService(companyId: 1);
+
+        var duplicate = await types.AddAsync(
+            new CashMovementTypeRequest(
+                " customer collection ",
+                CashDirection.Receipt,
+                CashMovementClassification.PartnerSettlement,
+                ForPartner: true,
+                IsActive: true,
+                IsDefaultForSales: false,
+                IsDefaultForPurchase: false,
+                IsDefaultForSalesReturn: false,
+                IsDefaultForPurchaseReturn: false,
+                Notes: null));
+        var createdVoucher = await AddVoucherAsync(vouchers,
+            CreateGeneralVoucher(
+                "CV-TYPE-1",
+                CashDirection.Receipt,
+                cashboxId: 1,
+                movementTypeId: 9,
+                amount: 10m));
+        var movementType = await types.GetByIdAsync(9);
+        var semanticChange = await types.UpdateAsync(
+            9,
+            new CashMovementTypeUpdateRequest(
+                movementType.Value.Name,
+                movementType.Value.Direction,
+                CashMovementClassification.Other,
+                ForPartner: false,
+                IsActive: true,
+                IsDefaultForSales: false,
+                IsDefaultForPurchase: false,
+                IsDefaultForSalesReturn: false,
+                IsDefaultForPurchaseReturn: false,
+                Notes: movementType.Value.Notes,
+                RowVersion: movementType.Value.RowVersion));
+        var delete = await types.DeleteAsync(9);
+
+        Assert.Equal("CashMovementTypes.NameExists", duplicate.Error.Code);
+        Assert.Single(duplicate.Errors);
+        Assert.True(createdVoucher.IsSuccess);
+        Assert.Equal(
+            "CashMovementTypes.UsedSemanticsChangeNotAllowed",
+            semanticChange.Error.Code);
+        Assert.Equal("CashMovementTypes.HasVouchers", delete.Error.Code);
+    }
+
+    [Fact]
+    public async Task MovementType_SelectFiltersDirectionAndPartnerUse()
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var service = database.CreateMovementTypeService(companyId: 1);
+
+        var partnerReceipts = await service.GetSelectAsync(
+            new CashMovementTypeSelectRequest(
+                CashDirection.Receipt,
+                Classification: null,
+                ForPartner: true));
+        var generalPayments = await service.GetSelectAsync(
+            new CashMovementTypeSelectRequest(
+                CashDirection.Payment,
+                Classification: null,
+                ForPartner: false));
+
+        Assert.All(
+            partnerReceipts.Value,
+            item =>
+            {
+                Assert.Equal(CashDirection.Receipt, item.Direction);
+            });
+        Assert.Contains(
+            generalPayments.Value,
+            item => item.Name == "Driver Advance");
+        Assert.DoesNotContain(
+            generalPayments.Value,
+            item => item.Name == "Inactive Payment");
+    }
+
+    [Fact]
+    public async Task MovementType_ModelRequiresClassification()
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var entityType = database.Context.Model.FindEntityType(
+            typeof(MiniErp.Domain.Entities.CashManagement.CashMovementType));
+        var property = entityType!.FindProperty("Classification");
+
+        Assert.NotNull(property);
+        Assert.False(property.IsNullable);
+        Assert.Equal(typeof(CashMovementClassification), property.ClrType);
+    }
+
+    [Fact]
+    public async Task MovementType_ListAndSelectFilterClassification()
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var service = database.CreateMovementTypeService(companyId: 1);
+
+        var list = await service.GetAllAsync(
+            new PaginationRequest { PageNumber = 1, PageSize = 20 },
+            new CashMovementTypeFilterRequest(
+                Classification: CashMovementClassification.Other,
+                IsActive: true));
+        var select = await service.GetSelectAsync(
+            new CashMovementTypeSelectRequest(
+                Classification: CashMovementClassification.Other));
+
+        Assert.True(list.IsSuccess);
+        Assert.All(list.Value.Items, item =>
+            Assert.Equal(CashMovementClassification.Other,
+                item.Classification));
+        Assert.Equal(2, list.Value.Items.Count);
+        Assert.All(select.Value, item =>
+        {
+            Assert.Equal(CashMovementClassification.Other,
+                item.Classification);
+            Assert.False(item.ForPartner);
+        });
+        Assert.DoesNotContain(select.Value, item => item.Id == 6);
+    }
+
+    [Fact]
+    public async Task MovementType_NewInvoiceDefaultReplacesExactInvoiceTypeOnly()
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var service = database.CreateMovementTypeService(companyId: 1);
+
+        var created = await service.AddAsync(
+            new CashMovementTypeRequest(
+                "Alternative Collection",
+                CashDirection.Receipt,
+                CashMovementClassification.PartnerSettlement,
+                ForPartner: true,
+                IsActive: true,
+                IsDefaultForSales: true,
+                IsDefaultForPurchase: false,
+                IsDefaultForSalesReturn: false,
+                IsDefaultForPurchaseReturn: false,
+                Notes: null));
+        var defaults = await database.Context.CashMovementTypes
+            .Where(movementType =>
+                movementType.IsDefaultForSales ||
+                movementType.IsDefaultForPurchase ||
+                movementType.IsDefaultForSalesReturn ||
+                movementType.IsDefaultForPurchaseReturn)
+            .OrderBy(movementType => movementType.Id)
+            .Select(movementType => new
+            {
+                movementType.Id,
+                movementType.IsDefaultForSales,
+                movementType.IsDefaultForPurchase,
+                movementType.IsDefaultForSalesReturn,
+                movementType.IsDefaultForPurchaseReturn
+            })
+            .ToListAsync();
+
+        Assert.True(created.IsSuccess);
+        Assert.Equal(4, defaults.Count);
+        Assert.Contains(defaults, item =>
+            item.Id == created.Value.Id &&
+            item.IsDefaultForSales);
+        Assert.Contains(defaults, item =>
+            item.Id == 2 &&
+            item.IsDefaultForPurchase);
+        Assert.Contains(defaults, item =>
+            item.Id == 7 &&
+            item.IsDefaultForPurchaseReturn);
+        Assert.Contains(defaults, item =>
+            item.Id == 8 &&
+            item.IsDefaultForSalesReturn);
+        Assert.DoesNotContain(defaults, item => item.Id == 1);
+    }
+
+    [Theory]
+    [InlineData(
+        CashDirection.Receipt,
+        true,
+        PartnerAccountEffect.Credit)]
+    [InlineData(
+        CashDirection.Payment,
+        true,
+        PartnerAccountEffect.Debit)]
+    [InlineData(
+        CashDirection.Receipt,
+        false,
+        PartnerAccountEffect.None)]
+    [InlineData(
+        CashDirection.Payment,
+        false,
+        PartnerAccountEffect.None)]
+    public async Task MovementType_DerivesPartnerEffect(
+        CashDirection direction,
+        bool forPartner,
+        PartnerAccountEffect expectedEffect)
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var service = database.CreateMovementTypeService(companyId: 1);
+
+        var result = await service.AddAsync(
+            new CashMovementTypeRequest(
+                $"Derived {direction} {forPartner}",
+                direction,
+                CashMovementClassification.Other,
+                forPartner,
+                IsActive: true,
+                IsDefaultForSales: false,
+                IsDefaultForPurchase: false,
+                IsDefaultForSalesReturn: false,
+                IsDefaultForPurchaseReturn: false,
+                Notes: null));
+        var storedEffect = await database.Context.CashMovementTypes
+            .Where(entity => entity.Id == result.Value.Id)
+            .Select(entity => entity.PartnerEffect)
+            .SingleAsync();
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(forPartner, result.Value.ForPartner);
+        Assert.Equal(expectedEffect, storedEffect);
+    }
+
+    [Theory]
+    [InlineData(
+        CashDirection.Receipt,
+        false,
+        CashMovementClassification.Revenue)]
+    [InlineData(
+        CashDirection.Payment,
+        false,
+        CashMovementClassification.Expense)]
+    [InlineData(
+        CashDirection.Receipt,
+        true,
+        CashMovementClassification.PartnerSettlement)]
+    public async Task MovementType_CreatePersistsInferredClassification(
+        CashDirection direction,
+        bool forPartner,
+        CashMovementClassification expectedClassification)
+    {
+        await using var database =
+            await CashManagementTestDatabase.CreateAsync();
+        var service = database.CreateMovementTypeService(companyId: 1);
+        var request = new CashMovementTypeRequest(
+            Name: $"Inferred {direction} {forPartner}",
+            Direction: direction,
+            Classification: null,
+            ForPartner: forPartner,
+            IsActive: true,
+            IsDefaultForSales: false,
+            IsDefaultForPurchase: false,
+            IsDefaultForSalesReturn: false,
+            IsDefaultForPurchaseReturn: false,
+            Notes: null);
+
+        var result = await service.AddAsync(request);
+        var storedClassification = await database.Context.CashMovementTypes
+            .Where(entity => entity.Id == result.Value.Id)
+            .Select(entity => entity.Classification)
+            .SingleAsync();
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(expectedClassification, result.Value.Classification);
+        Assert.Equal(expectedClassification, storedClassification);
+    }
+
+    private static CashboxRequest CreateCashbox(string name) =>
+        new(
+            name,
+            CurrencyCode.EGP,
+            0m,
+            true,
+            null);
+
+    private static VoucherTestRequest CreateGeneralVoucher(
+        string number,
+        CashDirection direction,
+        int cashboxId,
+        int movementTypeId,
+        decimal amount) =>
+        new(
+            VoucherDate: new DateOnly(2026, 7, 27),
+            Direction: direction,
+            CashboxId: cashboxId,
+            CashMovementTypeId: movementTypeId,
+            EmployeeId: null,
+            BusinessPartnerId: null,
+            DriverId: null,
+            DriverTripId: null,
+            ExternalPartyName: null,
+            Amount: amount,
+            ReferenceNumber: null,
+            Description: null,
+            Notes: null);
+
+    private static async Task<Result<CashVoucherResponse>> AddVoucherAsync(
+        ICashVoucherService service,
+        VoucherTestRequest request)
+    {
+        var draft = await service.AddAsync(
+            new CashVoucherRequest(
+                VoucherDate: request.VoucherDate,
+                Direction: request.Direction,
+                CashboxId: request.CashboxId,
+                Amount: request.Amount,
+                Description: request.Description,
+                CashMovementTypeId: request.CashMovementTypeId,
+                EmployeeId: request.EmployeeId,
+                BusinessPartnerId: request.BusinessPartnerId,
+                DriverId: request.DriverId,
+                DriverTripId: request.DriverTripId,
+                ExternalPartyName: request.ExternalPartyName,
+                ReferenceNumber: request.ReferenceNumber,
+                Notes: request.Notes,
+                AccountId: request.BusinessPartnerId.HasValue ||
+                    request.EmployeeId.HasValue ||
+                    request.DriverId.HasValue ||
+                    !string.IsNullOrWhiteSpace(request.ExternalPartyName)
+                        ? null
+                        : request.Direction == CashDirection.Receipt ? 1 : 2,
+                EmployeeMovementType: request.EmployeeId.HasValue
+                    ? request.Direction == CashDirection.Receipt
+                        ? EmployeeMovementType.Credit
+                        : EmployeeMovementType.Debit
+                    : null));
+        if (draft.IsFailure)
+        {
+            return draft;
+        }
+
+        return await service.UpdateAsync(
+            draft.Value.Id,
+            new CashVoucherUpdateRequest(
+                VoucherDate: request.VoucherDate,
+                Direction: request.Direction,
+                CashboxId: request.CashboxId,
+                CashMovementTypeId: request.CashMovementTypeId,
+                EmployeeId: request.EmployeeId,
+                BusinessPartnerId: request.BusinessPartnerId,
+                DriverId: request.DriverId,
+                DriverTripId: request.DriverTripId,
+                ExternalPartyName: request.ExternalPartyName,
+                Amount: request.Amount,
+                ReferenceNumber: request.ReferenceNumber,
+                Description: request.Description,
+                Notes: request.Notes,
+                RowVersion: draft.Value.RowVersion));
+    }
+
+    private sealed record VoucherTestRequest(
+        DateOnly VoucherDate,
+        CashDirection Direction,
+        int CashboxId,
+        int CashMovementTypeId,
+        int? EmployeeId,
+        int? BusinessPartnerId,
+        int? DriverId,
+        int? DriverTripId,
+        string? ExternalPartyName,
+        decimal Amount,
+        string? ReferenceNumber,
+        string? Description,
+        string? Notes);
+}

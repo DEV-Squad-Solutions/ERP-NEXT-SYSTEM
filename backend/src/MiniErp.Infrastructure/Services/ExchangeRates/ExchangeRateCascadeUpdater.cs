@@ -1,0 +1,307 @@
+using Microsoft.EntityFrameworkCore;
+using MiniErp.Application.Common.Results;
+using MiniErp.Infrastructure.Persistence;
+
+namespace MiniErp.Infrastructure.Services.ExchangeRates;
+
+internal static class ExchangeRateCascadeUpdater
+{
+    internal static async Task<Error?> UpdateAsync(
+        ApplicationDbContext dbContext,
+        int companyId,
+        TimeProvider timeProvider,
+        int exchangeRateId,
+        decimal exchangeRate,
+        Error invalidLinkedTransferError,
+        CancellationToken cancellationToken)
+    {
+        var roundedRate = Domain.Entities.Companies.ExchangeRateRules
+            .RoundRate(exchangeRate);
+        var rate = await dbContext.ExchangeRates
+            .SingleAsync(
+                entity =>
+                    entity.CompanyId == companyId &&
+                    entity.Id == exchangeRateId,
+                cancellationToken);
+
+        if (rate.Rate == roundedRate)
+        {
+            return null;
+        }
+
+        // Documents using this rate are dated on or after its date. A later
+        // revaluation of the currency already fixed its gain/loss from the
+        // old base amounts, so rewriting them would leave that delta wrong.
+        if (await LaterRevaluationExistsAsync(
+                dbContext,
+                companyId,
+                rate,
+                cancellationToken))
+        {
+            return Application.Features.ExchangeRates.ExchangeRateErrors
+                .LaterRevaluationExists();
+        }
+
+        var invoices = await dbContext.Invoices
+            .IgnoreQueryFilters()
+            .Include(invoice => invoice.Lines)
+            .Where(invoice =>
+                invoice.CompanyId == companyId &&
+                invoice.ExchangeRateId == exchangeRateId)
+            .ToListAsync(cancellationToken);
+        // Unposted vouchers are updated too: they keep the rate id, so they
+        // must carry the new value when they are posted later.
+        var linkedVouchers = await dbContext.CashVouchers
+            .IgnoreQueryFilters()
+            .Where(voucher =>
+                voucher.CompanyId == companyId &&
+                (!voucher.IsPosted || voucher.InvoiceId.HasValue || voucher.CashboxTransferId.HasValue) &&
+                (voucher.ExchangeRateId == exchangeRateId ||
+                 voucher.PartnerExchangeRateId == exchangeRateId))
+            .ToListAsync(cancellationToken);
+        var transferIds = linkedVouchers
+            .Where(voucher => voucher.CashboxTransferId.HasValue)
+            .Select(voucher => voucher.CashboxTransferId!.Value)
+            .Distinct()
+            .ToArray();
+        var transferVouchers = transferIds.Length == 0
+            ? []
+            : await dbContext.CashVouchers
+                .IgnoreQueryFilters()
+                .Where(voucher =>
+                    voucher.CompanyId == companyId &&
+                    voucher.CashboxTransferId.HasValue &&
+                    transferIds.Contains(voucher.CashboxTransferId.Value))
+                .ToListAsync(cancellationToken);
+        var transferVoucherGroups = transferVouchers
+            .GroupBy(voucher => voucher.CashboxTransferId!.Value)
+            .ToArray();
+        if (transferVoucherGroups.Any(group =>
+                group.Count() != 2 ||
+                group.Count(voucher =>
+                    voucher.Direction == Domain.Enums.CashDirection.Payment) != 1 ||
+                group.Count(voucher =>
+                    voucher.Direction == Domain.Enums.CashDirection.Receipt) != 1))
+        {
+            return invalidLinkedTransferError;
+        }
+        var partnerOpeningBalances = await dbContext.PartnerOpeningBalances
+            .IgnoreQueryFilters()
+            .Where(balance =>
+                balance.CompanyId == companyId &&
+                balance.ExchangeRateId == exchangeRateId)
+            .ToListAsync(cancellationToken);
+        var employeeOpeningBalances = await dbContext.EmployeeOpeningBalances
+            .IgnoreQueryFilters()
+            .Where(balance =>
+                balance.CompanyId == companyId &&
+                balance.ExchangeRateId == exchangeRateId)
+            .ToListAsync(cancellationToken);
+        var cashboxes = await dbContext.Cashboxes
+            .IgnoreQueryFilters()
+            .Where(entity =>
+                entity.CompanyId == companyId &&
+                entity.OpeningExchangeRateId == exchangeRateId)
+            .ToListAsync(cancellationToken);
+
+        foreach (var invoice in invoices)
+        {
+            invoice.ApplyExchangeRate(exchangeRateId, roundedRate);
+        }
+
+        foreach (var voucher in linkedVouchers.Where(voucher =>
+                     !voucher.CashboxTransferId.HasValue))
+        {
+            if (voucher.ExchangeRateId == exchangeRateId)
+                voucher.ApplyExchangeRate(exchangeRateId, roundedRate);
+            if (voucher.PartnerCurrency.HasValue)
+                voucher.ApplyPartnerSettlement(
+                    voucher.PartnerCurrency.Value,
+                    voucher.PartnerExchangeRateId,
+                    voucher.PartnerExchangeRateId == exchangeRateId
+                        ? roundedRate : voucher.PartnerExchangeRate!.Value,
+                    preserveAmount: true);
+        }
+
+        foreach (var transferVoucherGroup in transferVoucherGroups)
+        {
+            var paymentVoucher = transferVoucherGroup.Single(voucher =>
+                voucher.Direction == Domain.Enums.CashDirection.Payment);
+            var receiptVoucher = transferVoucherGroup.Single(voucher =>
+                voucher.Direction == Domain.Enums.CashDirection.Receipt);
+            var paymentRate = paymentVoucher.ExchangeRateId == exchangeRateId
+                ? roundedRate
+                : paymentVoucher.ExchangeRate;
+            var receiptRate = receiptVoucher.ExchangeRateId == exchangeRateId
+                ? roundedRate
+                : receiptVoucher.ExchangeRate;
+
+            paymentVoucher.ApplyExchangeRate(
+                paymentVoucher.ExchangeRateId,
+                paymentRate);
+            // A transfer's receipt amount is the physical amount actually
+            // received.  Updating a daily rate may change its base carrying
+            // value, but must never rewrite the historical foreign quantity
+            // (for example, 90 EUR received stays 90 EUR).  The posting
+            // synchronizer balances the resulting base-currency difference
+            // through the exchange gain/loss mapping.
+            receiptVoucher.ApplyExchangeRate(
+                receiptVoucher.ExchangeRateId,
+                receiptRate);
+        }
+
+        foreach (var balance in partnerOpeningBalances)
+        {
+            balance.ApplyExchangeRate(exchangeRateId, roundedRate);
+        }
+
+        foreach (var balance in employeeOpeningBalances)
+        {
+            balance.ApplyExchangeRate(exchangeRateId, roundedRate);
+        }
+
+        foreach (var linkedCashbox in cashboxes)
+        {
+            linkedCashbox.ApplyOpeningExchangeRate(
+                linkedCashbox.OpeningBalanceDate,
+                exchangeRateId,
+                roundedRate);
+        }
+
+        var invoiceIds = invoices.Select(invoice => invoice.Id).ToArray();
+        var affectedVouchers = linkedVouchers
+            .Concat(transferVouchers)
+            .DistinctBy(voucher => voucher.Id)
+            .ToArray();
+        var voucherIds = affectedVouchers
+            .Select(voucher => voucher.Id)
+            .ToArray();
+
+        var invoicePayments = await dbContext.InvoicePayments
+            .IgnoreQueryFilters()
+            .Include(payment => payment.Invoice)
+            .Include(payment => payment.CashVoucher)
+            .Where(payment =>
+                payment.CompanyId == companyId &&
+                (invoiceIds.Contains(payment.InvoiceId) ||
+                 voucherIds.Contains(payment.CashVoucherId)))
+            .ToListAsync(cancellationToken);
+        foreach (var payment in invoicePayments)
+        {
+            payment.Apply(
+                invoiceCurrency: payment.InvoiceCurrency,
+                appliedAmount: payment.AppliedAmount,
+                cashboxCurrency: payment.CashboxCurrency,
+                cashboxAmount: payment.CashboxAmount,
+                invoiceToBaseRate: payment.Invoice.ExchangeRate,
+                cashboxToBaseRate: payment.CashVoucher.ExchangeRate);
+        }
+
+        var affectedInvoiceRates = invoices.ToDictionary(
+            invoice => invoice.Id,
+            invoice => invoice.ExchangeRate);
+        var invoicePaymentRates = invoicePayments.ToDictionary(
+            payment => payment.CashVoucherId,
+            payment => payment.Invoice.ExchangeRate);
+        var affectedVoucherRates = affectedVouchers.ToDictionary(
+            voucher => voucher.Id,
+            voucher => voucher.ExchangeRate);
+        var affectedPartnerRates = affectedVouchers.ToDictionary(
+            voucher => voucher.Id,
+            voucher => voucher.PartnerExchangeRate ?? voucher.ExchangeRate);
+        var invoicePaymentVoucherIds = invoicePaymentRates.Keys.ToArray();
+
+        var partnerMovements = await dbContext.BusinessPartnerMovements
+            .IgnoreQueryFilters()
+            .Where(movement =>
+                movement.CompanyId == companyId &&
+                ((movement.InvoiceId.HasValue &&
+                  invoiceIds.Contains(movement.InvoiceId.Value)) ||
+                 (movement.CashVoucherId.HasValue &&
+                  (voucherIds.Contains(movement.CashVoucherId.Value) ||
+                   invoicePaymentVoucherIds.Contains(
+                       movement.CashVoucherId.Value)))))
+            .ToListAsync(cancellationToken);
+        foreach (var movement in partnerMovements)
+        {
+            if (movement.InvoiceId is int invoiceId &&
+                affectedInvoiceRates.TryGetValue(
+                    invoiceId,
+                    out var invoiceRate))
+            {
+                movement.ApplyExchangeRate(invoiceRate);
+                continue;
+            }
+
+            if (movement.CashVoucherId is not int voucherId)
+            {
+                continue;
+            }
+
+            if (invoicePaymentRates.TryGetValue(
+                    voucherId,
+                    out var paymentInvoiceRate))
+            {
+                movement.ApplyExchangeRate(paymentInvoiceRate);
+                continue;
+            }
+
+            if (affectedPartnerRates.TryGetValue(
+                    voucherId,
+                    out var voucherRate))
+            {
+                movement.ApplyExchangeRate(voucherRate);
+            }
+        }
+
+        var employeeMovements = await dbContext.EmployeeMovements
+            .IgnoreQueryFilters()
+            .Where(movement =>
+                movement.CompanyId == companyId &&
+                movement.CashVoucherId.HasValue &&
+                voucherIds.Contains(movement.CashVoucherId.Value))
+            .ToListAsync(cancellationToken);
+        foreach (var movement in employeeMovements)
+        {
+            movement.ApplyExchangeRate(
+                affectedVoucherRates[movement.CashVoucherId!.Value]);
+        }
+
+        rate.Rate = roundedRate;
+        rate.Source = Domain.Enums.ExchangeRateSource.Manual;
+        rate.Provider = null;
+        rate.Touch(timeProvider.GetUtcNow().UtcDateTime);
+        dbContext.Entry(rate)
+            .Property(entity => entity.LastModifiedAt)
+            .IsModified = true;
+
+        return null;
+    }
+
+    private static async Task<bool> LaterRevaluationExistsAsync(
+        ApplicationDbContext dbContext,
+        int companyId,
+        Domain.Entities.Companies.ExchangeRate rate,
+        CancellationToken cancellationToken) =>
+        await dbContext.MonetaryAccountRevaluations
+            .AsNoTracking()
+            .AnyAsync(
+                revaluation =>
+                    revaluation.CompanyId == companyId &&
+                    revaluation.FiscalYearId == rate.FiscalYearId &&
+                    revaluation.Currency == rate.Currency &&
+                    revaluation.RevaluationDate >= rate.RateDate &&
+                    !revaluation.IsDeleted,
+                cancellationToken) ||
+        await dbContext.CashboxRevaluations
+            .AsNoTracking()
+            .AnyAsync(
+                revaluation =>
+                    revaluation.CompanyId == companyId &&
+                    revaluation.FiscalYearId == rate.FiscalYearId &&
+                    revaluation.Cashbox.Currency == rate.Currency &&
+                    revaluation.RevaluationDate >= rate.RateDate &&
+                    !revaluation.IsDeleted,
+                cancellationToken);
+}
+

@@ -474,6 +474,12 @@ public static class DevelopmentDataSeeder
                 company,
                 cancellationToken);
 
+            await DevelopmentOperationsSeeder.SeedAsync(
+                scope.ServiceProvider,
+                dbContext,
+                company.Id,
+                cancellationToken);
+
             await SeedEmployeesAsync(
                 dbContext,
                 company,

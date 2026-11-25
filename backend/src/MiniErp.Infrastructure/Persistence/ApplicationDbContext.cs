@@ -183,6 +183,8 @@ public sealed partial class ApplicationDbContext
 
             entity.Property(user => user.ThemeMode).HasMaxLength(10);
 
+            entity.Property(user => user.HiddenScreens).HasMaxLength(4000);
+
             entity.Property(user => user.FirstName)
                 .HasMaxLength(100)
                 .IsRequired();

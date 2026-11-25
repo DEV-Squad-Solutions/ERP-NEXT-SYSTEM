@@ -5557,6 +5557,10 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("HiddenScreens")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)

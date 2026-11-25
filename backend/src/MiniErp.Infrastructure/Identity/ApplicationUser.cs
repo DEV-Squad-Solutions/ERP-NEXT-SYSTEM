@@ -14,6 +14,8 @@ public sealed class ApplicationUser : IdentityUser<Guid>
 
     public string? ThemeMode { get; set; }
 
+    public string? HiddenScreens { get; set; }
+
     public string ProfileImage { get; set; } = string.Empty;
 
     public ICollection<RefreshToken> RefreshTokens { get; set; } = [];

@@ -187,9 +187,11 @@
     filter: brightness(1.05);
   }
 
+  /* individual `scale`/`translate` properties: they never clobber
+     Tailwind's transform (centered/absolute buttons keep their position) */
   button:not(:disabled):active,
   [role="button"]:not([aria-disabled="true"]):active {
-    transform: scale(0.97);
+    scale: 0.97;
   }
 
   tbody tr {
@@ -266,3 +268,102 @@ html.dark .compact-select__menu { background-color: #0e1827; border: 1px solid r
 html.dark .compact-select__option { background-color: transparent; color: #e5eaf1; }
 html.dark .compact-select__option--is-focused { background-color: #152236; }
 html.dark .compact-select__option--is-selected { background-color: #1a7a5e; color: #fff; }
+
+/* =========================================================
+   MOTION LAYER (subtle, fast, direction-agnostic)
+   ========================================================= */
+@media (prefers-reduced-motion: no-preference) {
+  :where(a) {
+    transition: color 0.18s ease, background-color 0.18s ease,
+      opacity 0.18s ease, box-shadow 0.18s ease;
+  }
+  :where(input, select, textarea) {
+    transition: border-color 0.18s ease, box-shadow 0.18s ease,
+      background-color 0.18s ease;
+  }
+
+  /* primary / gold buttons lift a little on hover */
+  button:not(:disabled):not(.no-motion)[class*="bg-primary-"]:hover,
+  button:not(:disabled):not(.no-motion)[class*="bg-gold-"]:hover {
+    translate: 0 -1px;
+    box-shadow: 0 6px 16px rgba(10, 37, 64, 0.16);
+  }
+  button:not(:disabled)[class*="bg-primary-"]:active,
+  button:not(:disabled)[class*="bg-gold-"]:active {
+    translate: 0 0;
+    box-shadow: none;
+  }
+
+  /* cards react to hover, only the ones that are meant to be cards */
+  :where([class*="rounded-2xl"][class*="shadow-card"]) {
+    transition: box-shadow 0.22s ease, translate 0.22s ease,
+      border-color 0.22s ease;
+  }
+  :where([class*="rounded-2xl"][class*="shadow-card"]):hover {
+    box-shadow: 0 2px 4px rgba(10, 37, 64, 0.06),
+      0 10px 28px rgba(10, 37, 64, 0.1);
+  }
+
+  /* table rows */
+  tbody tr {
+    transition: background-color 0.15s ease;
+  }
+  tbody tr:hover {
+    background-color: rgb(var(--c-primary-500) / 0.045);
+  }
+
+  /* dropdown / select / popover menus */
+  @keyframes menu-in {
+    from { opacity: 0; translate: 0 -4px; scale: 0.98; }
+    to { opacity: 1; translate: 0 0; scale: 1; }
+  }
+  [role="menu"],
+  [role="listbox"],
+  .rs__menu,
+  .compact-select__menu {
+    animation: menu-in 0.14s ease-out both;
+    transform-origin: top;
+  }
+
+  /* skeleton shimmer for pulse placeholders */
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .animate-pulse[class*="bg-ink-400/10"] {
+    animation: shimmer 1.4s linear infinite;
+    background-image: linear-gradient(
+      90deg,
+      transparent 25%,
+      rgba(127, 127, 127, 0.14) 50%,
+      transparent 75%
+    );
+    background-size: 200% 100%;
+  }
+}
+
+/* keyboard focus: visible, themed, never for mouse clicks */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--c-primary-400) / 0.75);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin),
+  *:not(.animate-spin)::before,
+  *:not(.animate-spin)::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* empty states: soft tint instead of a bare dashed box */
+:where([class*="border-dashed"][class*="rounded-"]):not([class*="bg-"]) {
+  background-image: linear-gradient(
+    180deg,
+    rgb(var(--c-primary-500) / 0.025),
+    transparent
+  );
+}

@@ -45,7 +45,16 @@ public static class DevelopmentDataSeeder
             "user@minierp.local",
             ["User"],
             "Application",
-            "User")
+            "User"),
+        new("accountant1", "accountant1@minierp.local", ["Accountant"], "Hoda", "Mansour", "/dashboard/payroll;/dashboard/permissions"),
+        new("accountant2", "accountant2@minierp.local", ["Accountant"], "Tamer", "Gaber"),
+        new("cashier1", "cashier1@minierp.local", ["Cashier"], "Rania", "Salem", "/dashboard/payroll;/dashboard/partners/opening-balances"),
+        new("cashier2", "cashier2@minierp.local", ["Cashier"], "Walid", "Farouk"),
+        new("sales1", "sales1@minierp.local", ["User"], "Dina", "Ashraf", "/dashboard/treasury"),
+        new("sales2", "sales2@minierp.local", ["User"], "Hazem", "Lotfy"),
+        new("warehouse1", "warehouse1@minierp.local", ["User"], "Sherif", "Mounir", "/dashboard/treasury;/dashboard/payroll"),
+        new("shipping1", "shipping1@minierp.local", ["User"], "Maged", "Zaki"),
+        new("manager1", "manager1@minierp.local", ["Admin", "User"], "Laila", "Hamdy")
     ];
 
     private static readonly SeedCompany[] AdditionalSeedCompanies =
@@ -233,7 +242,17 @@ public static class DevelopmentDataSeeder
         new("BP-007", "Suez Shipping Agency", "789012", CurrencyCode.EGP, 70_000m),
         new("BP-008", "Mediterranean Citrus Imports SpA", "890123", CurrencyCode.USD, 85_000m),
         new("BP-009", "Nile Cold Storage", "901234", CurrencyCode.EGP, 65_000m),
-        new("BP-010", "Sinai Dates Packing", "012345", CurrencyCode.EGP, 110_000m)
+        new("BP-010", "Sinai Dates Packing", "012345", CurrencyCode.EGP, 110_000m),
+        new("BP-011", "Nile Valley Onion Growers", "112233", CurrencyCode.EGP, 55_000m),
+        new("BP-012", "Hamburg Fresh Fruit Import GmbH", "223344", CurrencyCode.USD, 120_000m),
+        new("BP-013", "Gulf Supermarkets Group", "334455", CurrencyCode.USD, 95_000m),
+        new("BP-014", "Cairo Wholesale Market Traders", "445566", CurrencyCode.EGP, 70_000m),
+        new("BP-015", "Rotterdam Produce BV", "556677", CurrencyCode.USD, 110_000m),
+        new("BP-016", "Beheira Potato Farms", "667788", CurrencyCode.EGP, 45_000m),
+        new("BP-017", "Jeddah Foodstuff Distribution", "778899", CurrencyCode.USD, 90_000m),
+        new("BP-018", "Alexandria Cold Chain Logistics", "889900", CurrencyCode.EGP, 85_000m),
+        new("BP-019", "Fayoum Pomegranate Cooperative", "990011", CurrencyCode.EGP, 60_000m),
+        new("BP-020", "London Halal Imports Ltd", "101112", CurrencyCode.USD, 100_000m)
     ];
 
     private static readonly SeedEmployee[] DefaultEmployees =
@@ -297,7 +316,17 @@ public static class DevelopmentDataSeeder
             Name: "Mostafa Emad",
             JobTitle: "Maintenance Worker",
             Type: EmployeeType.Daily,
-            Salary: 350m)
+            Salary: 350m),
+        new(Key: "11", Name: "Dalia Samy", JobTitle: "Import Accountant", Type: EmployeeType.Monthly, Salary: 8_200m),
+        new(Key: "12", Name: "Hesham Raafat", JobTitle: "Customs Clearance Officer", Type: EmployeeType.Monthly, Salary: 9_500m),
+        new(Key: "13", Name: "Aya Magdy", JobTitle: "Sales Coordinator", Type: EmployeeType.Monthly, Salary: 7_800m),
+        new(Key: "14", Name: "Bassem Tarek", JobTitle: "Fleet Supervisor", Type: EmployeeType.Monthly, Salary: 10_000m),
+        new(Key: "15", Name: "Reem Ayman", JobTitle: "Cashier", Type: EmployeeType.Monthly, Salary: 7_000m),
+        new(Key: "16", Name: "Ismail Gamal", JobTitle: "Forklift Operator", Type: EmployeeType.Daily, Salary: 320m),
+        new(Key: "17", Name: "Hany Zakaria", JobTitle: "Sorting Worker", Type: EmployeeType.Daily, Salary: 280m),
+        new(Key: "18", Name: "Fatma Nasser", JobTitle: "Quality Inspector", Type: EmployeeType.Daily, Salary: 340m),
+        new(Key: "19", Name: "Adel Mostafa", JobTitle: "Security Guard", Type: EmployeeType.Daily, Salary: 260m),
+        new(Key: "20", Name: "Sameh Yassin", JobTitle: "Loading Worker", Type: EmployeeType.Daily, Salary: 310m)
     ];
 
     public static async Task SeedAsync(
@@ -597,6 +626,15 @@ public static class DevelopmentDataSeeder
             }
 
             await SetRolesAsync(userManager, user, seedUser.Roles);
+
+            if (user.HiddenScreens != seedUser.HiddenScreens)
+            {
+                user.HiddenScreens = seedUser.HiddenScreens;
+                var screensResult = await userManager.UpdateAsync(user);
+                EnsureSucceeded(
+                    screensResult,
+                    $"setting visible screens for '{seedUser.UserName}'");
+            }
 
             var companyIds = seedUser.Roles.Contains(
                     "Admin",
@@ -4383,7 +4421,8 @@ public static class DevelopmentDataSeeder
         string Email,
         string[] Roles,
         string FirstName,
-        string LastName);
+        string LastName,
+        string? HiddenScreens = null);
 
     private sealed record SeedCompany(
         string Name,

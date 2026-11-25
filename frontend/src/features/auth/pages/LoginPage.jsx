@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useGetSetupStatusQuery } from "../../setup/setupApi";
 import {
   Building2,
   CheckCircle2,
@@ -33,6 +34,7 @@ const getDefaultRoute = (roles = []) => {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { data: setupStatus } = useGetSetupStatusQuery();
 
   const { requiresCompanySelection, isAuthenticated, roles } = useSelector(
     (state) => state.auth,
@@ -43,6 +45,10 @@ export default function LoginPage() {
       navigate(getDefaultRoute(roles), { replace: true });
     }
   }, [isAuthenticated, roles, navigate]);
+
+  if (setupStatus?.requiresSetup) {
+    return <Navigate to="/setup" replace />;
+  }
 
   return (
     <main

@@ -459,6 +459,11 @@ public static class DevelopmentDataSeeder
                 company.Id,
                 cancellationToken);
 
+            await DevelopmentStockDocumentsSeeder.SeedAsync(
+                dbContext,
+                company.Id,
+                cancellationToken);
+
             await SeedCashManagementAsync(
                 dbContext,
                 company,

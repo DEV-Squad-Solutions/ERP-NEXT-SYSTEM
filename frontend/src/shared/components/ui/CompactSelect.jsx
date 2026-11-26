@@ -1,6 +1,7 @@
 // src/shared/components/ui/CompactSelect.jsx
 
 import Select from "react-select";
+import { usePhone } from "../../../utils/viewport";
 
 import { t, getDir } from "../../../i18n";
 // src/shared/components/ui/CompactSelect.jsx
@@ -138,6 +139,14 @@ export default function CompactSelect({
    */
 
   const selectedOption = useMemoSelectedOption(options, value);
+  const phone = usePhone();
+  // على الموبايل: القوائم القصيرة من غير بحث (مفيش كيبورد يزق القايمة لفوق)،
+  // والقايمة بتفتح تحت الحقل دايمًا بدل ما تتقلب لفوق.
+  const optionCount = options.reduce(
+    (n, o) => n + (Array.isArray(o?.options) ? o.options.length : 1),
+    0,
+  );
+  const searchable = !phone || optionCount > 8;
 
   return (
     <Select
@@ -157,6 +166,10 @@ export default function CompactSelect({
       formatGroupLabel={formatGroupLabel}
       menuPortalTarget={typeof document !== "undefined" ? document.body : null}
       menuPosition="fixed"
+      isSearchable={searchable}
+      menuPlacement={phone ? "bottom" : "auto"}
+      maxMenuHeight={phone ? 220 : 300}
+      menuShouldScrollIntoView
       classNamePrefix="compact-select"
     />
   );

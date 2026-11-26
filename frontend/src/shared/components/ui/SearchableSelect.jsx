@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import Select from "react-select";
 
 import { t, getDir } from "../../../i18n";
+import { usePhone } from "../../../utils/viewport";
 /**
  * مكوّن اختيار عام (Searchable Select) مبني على react-select
  * يدعم شكلين من البيانات:
@@ -35,6 +36,7 @@ export default function SearchableSelect({
   const resolveValue = getOptionValue || ((item) => item.value ?? item);
 
   const options = useMemo(() => data, [data]);
+  const phone = usePhone();
 
   const selectedOption = useMemo(() => {
     if (value === undefined || value === null || value === "") return null;
@@ -61,6 +63,11 @@ export default function SearchableSelect({
       isClearable={isClearable}
       isDisabled={isDisabled}
       isRtl={getDir() === "rtl"}
+      isSearchable={!phone || options.length > 8}
+      menuPlacement={phone ? "bottom" : "auto"}
+      maxMenuHeight={phone ? 220 : 300}
+      menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+      menuPosition="fixed"
       classNamePrefix="rs"
       noOptionsMessage={() => t("لا توجد نتائج")}
       styles={{ ...defaultStyles, ...styles }}
@@ -91,6 +98,7 @@ const defaultStyles = {
     color: state.isSelected ? "white" : "#0E1827",
     cursor: "pointer",
   }),
-  menu: (base) => ({ ...base, zIndex: 30 }),
+  menu: (base) => ({ ...base, zIndex: 9999 }),
+  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
   placeholder: (base) => ({ ...base, color: "#9AA6A0" }),
 };

@@ -841,17 +841,15 @@ const AttendanceTakingPage = () => {
               <button
                 type="button"
                 onClick={markSelectedPresent}
-                className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-positive px-3 text-sm font-bold text-white active:opacity-90"
+                className="inline-flex h-12 flex-1 items-center justify-center whitespace-nowrap rounded-xl bg-positive px-2 text-[13px] font-bold text-white active:opacity-90"
               >
-                <UserCheck size={18} />
                 {t("المحدد حاضر")}
               </button>
               <button
                 type="button"
                 onClick={markSelectedAbsent}
-                className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-negative/40 bg-white px-3 text-sm font-bold text-negative active:bg-negative/5"
+                className="inline-flex h-12 flex-1 items-center justify-center whitespace-nowrap rounded-xl border border-negative/40 bg-white px-2 text-[13px] font-bold text-negative active:bg-negative/5"
               >
-                <UserX size={18} />
                 {t("المحدد غائب")}
               </button>
               <button

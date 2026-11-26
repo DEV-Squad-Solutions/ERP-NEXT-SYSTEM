@@ -304,6 +304,11 @@ export default function StockAdjustmentForm({ adjustment, isEditMode }) {
                       onChange={(opt) => f.onChange(opt?.value)}
                       placeholder={t("ابحث عن صنف...")}
                       classNamePrefix="rs"
+          menuPlacement="bottom"
+          maxMenuHeight={220}
+          menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+          menuPosition="fixed"
+          styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                     />
                   )}
                 />

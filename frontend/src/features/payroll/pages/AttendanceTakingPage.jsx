@@ -308,7 +308,7 @@ const AttendanceTakingPage = () => {
   const rowVirtualizer = useVirtualizer({
     count: filteredRows.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => (narrow ? 364 : 118),
+    estimateSize: () => (narrow ? 346 : 118),
     overscan: 10,
   });
 
@@ -761,7 +761,7 @@ const AttendanceTakingPage = () => {
                 type="time"
                 value={defaultCheckIn}
                 onChange={(event) => setDefaultCheckIn(event.target.value)}
-                className="h-10 w-full rounded-xl border border-ink-200 bg-white pe-10 ps-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
+                className="h-10 w-full min-w-0 max-w-full appearance-none rounded-xl border border-ink-200 bg-white pe-10 ps-3 text-start text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
               />
             </div>
           </div>
@@ -781,13 +781,13 @@ const AttendanceTakingPage = () => {
                 type="time"
                 value={defaultCheckOut}
                 onChange={(event) => setDefaultCheckOut(event.target.value)}
-                className="h-10 w-full rounded-xl border border-ink-200 bg-white pe-10 ps-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
+                className="h-10 w-full min-w-0 max-w-full appearance-none rounded-xl border border-ink-200 bg-white pe-10 ps-3 text-start text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
               />
             </div>
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-ink-100 pt-4">
+        <div className="att-actions mt-4 grid grid-cols-2 gap-2 border-t border-ink-100 pt-4 sm:flex sm:flex-wrap sm:items-center">
           <Button
             type="button"
             variant="secondary"
@@ -863,7 +863,7 @@ const AttendanceTakingPage = () => {
             {t("تطبيق الأوقات")}
           </Button>
 
-          <div className="me-auto text-sm text-ink-500">
+          <div className="col-span-2 text-sm text-ink-500 sm:col-span-1 sm:me-auto">
             {t("المحدد:")}{" "}
             <span className="font-semibold text-ink-800">
               {selectedIds.size}

@@ -23,7 +23,7 @@ export default function InvoiceSearchBox({ value, fromDate, toDate, onChange, on
   }, [debounced]);
 
   const { data } = useGetInvoiceProfitabilityQuery(
-    { search: debounced, pageNumber: 1, pageSize: 8, includeReturns: true },
+    { fromDate: `${new Date().getFullYear() - 1}-01-01`, toDate: new Date().toISOString().slice(0, 10), search: debounced, pageNumber: 1, pageSize: 8, includeReturns: true },
     { skip: debounced.length < 1 || !open },
   );
 
@@ -59,7 +59,8 @@ export default function InvoiceSearchBox({ value, fromDate, toDate, onChange, on
           onFocus={() => setOpen(true)}
           onChange={(e) => { onChange(e.target.value); setOpen(true); }}
           onKeyDown={(e) => { if (e.key === "Enter") { onCommit((value ?? "").trim()); setOpen(false); e.currentTarget.blur(); } }}
-          className="min-w-0 flex-1 bg-transparent text-sm text-ink-900 outline-none placeholder:text-ink-400"
+          style={{ border: 0, boxShadow: "none", outline: "none", background: "transparent" }}
+          className="min-w-0 flex-1 text-sm text-ink-900 placeholder:text-ink-400"
         />
         {value ? (
           <button type="button" onClick={() => { onChange(""); onCommit(""); }} aria-label={t("مسح")} className="text-ink-400">

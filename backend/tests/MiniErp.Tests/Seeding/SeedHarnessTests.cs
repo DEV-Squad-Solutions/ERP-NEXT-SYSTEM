@@ -50,14 +50,26 @@ public sealed class SeedHarnessTests(ITestOutputHelper output)
             .AsMatchingInterface()
             .WithScopedLifetime());
         services.RemoveAll<DbContextOptions<ApplicationDbContext>>();
+        services.RemoveAll<DbContextOptions>();
+        services.RemoveAll<ApplicationDbContext>();
+        foreach (var d in services.Where(d => d.ServiceType.IsGenericType && d.ServiceType.Name.StartsWith("IDbContextOptionsConfiguration") && d.ServiceType.GenericTypeArguments[0] == typeof(ApplicationDbContext)).ToList()) services.Remove(d);
         services.AddDbContext<ApplicationDbContext>((sp, o) =>
             o.UseSqlite(connection).AddInterceptors(
-                sp.GetRequiredService<AuditableEntityInterceptor>()));
+                sp.GetRequiredService<AuditableEntityInterceptor>(), new RowVersionEmulator()));
 
         await using var provider = services.BuildServiceProvider();
         await using (var scope = provider.CreateAsyncScope())
-            await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>()
-                .Database.EnsureCreatedAsync();
+        {
+            var ctx = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var script = ctx.Database.GenerateCreateScript();
+            script = System.Text.RegularExpressions.Regex.Replace(
+                script, "(\"RowVersion\" BLOB NOT NULL)", "$1 DEFAULT (randomblob(8))");
+            // SQLite stores decimals as TEXT, which breaks numeric CHECK constraints: drop them in this dry run.
+            script = System.Text.RegularExpressions.Regex.Replace(
+                script, "^\\s*CONSTRAINT \"CK_[^\n]*\n", "", System.Text.RegularExpressions.RegexOptions.Multiline);
+            script = System.Text.RegularExpressions.Regex.Replace(script, ",(\\s*\\))", "$1");
+            await ctx.Database.ExecuteSqlRawAsync(script);
+        }
 
         await DevelopmentDataSeeder.SeedAsync(provider, config);
         var first = await CountsAsync(provider);
@@ -83,5 +95,24 @@ public sealed class SeedHarnessTests(ITestOutputHelper output)
             result[table] = Convert.ToInt64(await cmd.ExecuteScalarAsync());
         }
         return result;
+    }
+}
+
+// SQL Server generates rowversion; SQLite does not, so emulate it.
+internal sealed class RowVersionEmulator : Microsoft.EntityFrameworkCore.Diagnostics.SaveChangesInterceptor
+{
+    public override ValueTask<Microsoft.EntityFrameworkCore.Diagnostics.InterceptionResult<int>> SavingChangesAsync(
+        Microsoft.EntityFrameworkCore.Diagnostics.DbContextEventData eventData,
+        Microsoft.EntityFrameworkCore.Diagnostics.InterceptionResult<int> result,
+        CancellationToken cancellationToken = default)
+    {
+        foreach (var e in eventData.Context!.ChangeTracker.Entries())
+        {
+            if (e.State is not (EntityState.Added or EntityState.Modified)) continue;
+            var prop = e.Metadata.FindProperty("RowVersion");
+            if (prop?.ClrType != typeof(byte[])) continue;
+            e.Property("RowVersion").CurrentValue = System.Security.Cryptography.RandomNumberGenerator.GetBytes(8);
+        }
+        return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 }

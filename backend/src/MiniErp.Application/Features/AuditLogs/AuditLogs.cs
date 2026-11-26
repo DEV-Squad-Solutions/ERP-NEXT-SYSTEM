@@ -49,7 +49,7 @@ public sealed record AuditLogRetentionRequest(int? RetentionDays);
 public static class AuditLogRetentionOptions
 {
     /// <summary>Allowed retention periods in days. Null (off) is always allowed.</summary>
-    public static readonly IReadOnlyList<int> AllowedDays = [30, 90, 180, 365];
+    public static readonly IReadOnlyList<int> AllowedDays = [7, 30, 90];
 }
 
 public static class AuditLogErrors

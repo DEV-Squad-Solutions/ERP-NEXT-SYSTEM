@@ -71,9 +71,11 @@ export default function AuditLogsPage() {
         <label className="w-56 text-[12px] text-ink-500 dark:text-white/60">
           {t("مدة الاحتفاظ بالسجل")}
           <select className={`${selectCls} mt-1`} value={ret?.retentionDays ?? ""} onChange={onRetention} disabled={saving || !ret}>
-            <option value="">{t("بدون حذف تلقائي")}</option>
-            {(ret?.allowedDays ?? [30, 90, 180, 365]).map((d) => (
-              <option key={d} value={d}>{`${d} ${t("يوم")}`}</option>
+            <option value="">{t("بدون حذف (الاحتفاظ دائماً)")}</option>
+            {(ret?.allowedDays ?? [7, 30, 90]).map((d) => (
+              <option key={d} value={d}>
+                {d === 7 ? t("حذف تلقائي كل أسبوع") : d === 30 ? t("حذف تلقائي كل شهر") : d === 90 ? t("حذف تلقائي كل 3 شهور") : `${d} ${t("يوم")}`}
+              </option>
             ))}
           </select>
         </label>

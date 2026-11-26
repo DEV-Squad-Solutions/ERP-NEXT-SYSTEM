@@ -265,7 +265,7 @@ const SidebarSubLink = memo(function SidebarSubLink({
                 "text-white",
               ].join(" ")
             : [
-                "text-white/78",
+                "text-white/80",
                 "hover:bg-white/[0.035]",
                 "hover:text-white",
                 "hover:translate-x-[-1px]",
@@ -391,7 +391,7 @@ const SidebarNestedGroup = memo(function SidebarNestedGroup({
           hasActiveChild
             ? "bg-white/[0.045] font-semibold text-white/95"
             : [
-                "text-white/78",
+                "text-white/80",
                 "hover:bg-white/[0.03]",
                 "hover:text-white",
               ].join(" "),

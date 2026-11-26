@@ -79,8 +79,9 @@ const run = ({ errors, messages }) => {
     let best = null;
     let bestLen = 0;
     els.forEach((el) => {
-      const text = String(labelFor(el)).replace(/[*:\u200f]/g, "").trim();
-      if (text.length >= 3 && msg.includes(text) && text.length > bestLen) {
+      const raw = String(labelFor(el)).replace(/[*:\u200f]/g, "").trim();
+      const text = raw.replace(/\(.*?\)/g, "").replace(/\s+/g, " ").trim();
+      if (text.length >= 3 && (msg.includes(text) || msg.includes(raw)) && text.length > bestLen) {
         best = el;
         bestLen = text.length;
       }

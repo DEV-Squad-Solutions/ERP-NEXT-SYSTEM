@@ -610,6 +610,7 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
   const hiddenScreens = useHiddenScreens();
 
   const [showDetails, setShowDetails] = useState(false);
+  const railMode = !pinned && !hideOnDesktop;
   // Desktop rail state: null (icons only) | "mouse" (hover/keyboard, pushes page) | "touch" (tap, overlay + backdrop)
   const [rail, setRail] = useState(null);
   const lastPointer = useRef("mouse");
@@ -636,7 +637,6 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
   };
   const railClickCapture = (e) => {
     if (pinned || rail || lastPointer.current === "mouse") return;
-    if (window.innerWidth < 1024) return;
     e.preventDefault();
     e.stopPropagation();
     setRail("touch");
@@ -738,8 +738,8 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
         aria-label={t("القائمة الرئيسية")}
         className={[
           "fixed top-0 start-0 z-50",
-          "h-screen w-[260px]",
-          pinned ? "" : "sidebar-rail lg:w-[72px] lg:data-[rail]:w-[260px]",
+          railMode ? "h-screen" : "h-screen w-[260px]",
+          railMode ? "sidebar-rail w-[72px] data-[rail]:w-[260px]" : "",
           "overflow-hidden",
           "flex flex-col",
           "border-e border-white/[0.07]",
@@ -747,7 +747,7 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
           "shadow-2xl shadow-black/30",
           "transition-transform duration-300",
           "ease-[cubic-bezier(0.22,1,0.36,1)]",
-          isOpen ? "translate-x-0" : "max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full",
+          railMode ? "translate-x-0" : isOpen ? "translate-x-0" : "max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full",
           hideOnDesktop ? "lg:hidden" : "lg:translate-x-0",
         ].join(" ")}
       >
@@ -849,7 +849,7 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
                 "outline-none",
                 "focus-visible:ring-2",
                 "focus-visible:ring-gold-500/40",
-                "lg:hidden",
+                railMode ? "hidden" : "lg:hidden",
               ].join(" ")}
             >
               <X size={18} strokeWidth={1.8} />

@@ -447,12 +447,14 @@ html body [data-sonner-toaster] [data-sonner-toast].app-toast [data-icon] { box-
 
 /* Sidebar rail (unpinned): icons only until hovered or focused */
 aside.sidebar-rail { transition: width .22s cubic-bezier(.22,1,.36,1), transform .3s; }
-@media (min-width: 1024px) {
+@media (min-width: 0px) {
   aside.sidebar-rail:not([data-rail]) :is(nav ul ul, nav li > div[class*="grid-rows"], nav [class*="uppercase"], nav button > svg:last-child, nav .truncate, footer > button, header .min-w-0, footer span.min-w-0, footer a > span:last-child, .sidebar-pin) { display: none !important; }
   aside.sidebar-rail:not([data-rail]) :is(nav a, nav button) { justify-content: center; padding-inline: 0; }
   aside.sidebar-rail:not([data-rail]) header > div { justify-content: center; }
   aside.sidebar-rail[data-rail] { box-shadow: 0 0 40px rgb(0 0 0 / .35); }
   /* Mouse hover pushes the page; touch opens as an overlay with a backdrop */
+}
+@media (min-width: 1024px) {
   aside.sidebar-rail[data-rail="mouse"] + div { margin-inline-start: 260px; }
 }
 

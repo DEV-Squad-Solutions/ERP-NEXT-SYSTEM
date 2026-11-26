@@ -462,3 +462,14 @@ aside.sidebar-rail { transition: width .22s cubic-bezier(.22,1,.36,1), transform
 @media (max-width: 640px) {
   .animate-fadeUp > div.flex-wrap > div.flex.items-center { flex-wrap: wrap; max-width: 100%; }
 }
+
+/* iOS Safari zooms the page when a focused field has a font size under 16px.
+   On phones every text field gets 16px, so there is no zoom. */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  select,
+  textarea,
+  [contenteditable="true"] {
+    font-size: 16px !important;
+  }
+}

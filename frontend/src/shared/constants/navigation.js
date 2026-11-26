@@ -465,6 +465,13 @@ export const navigationItems = [
         ],
       },
       {
+        label: t("كل التقارير"),
+        path: "/dashboard/reports",
+        icon: Receipt,
+        end: true,
+        roles: FULL_ACCESS_ROLES,
+      },
+      {
         label: t("تقارير مالية"),
         icon: Receipt,
         roles: FULL_ACCESS_ROLES,

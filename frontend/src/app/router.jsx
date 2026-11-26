@@ -138,6 +138,9 @@ const EmployeeMovementsReportPage = lazy(
 const CashHandoverReportPage = lazy(
   () => import("../features/reports/pages/CashHandoverReportPage"),
 );
+const ReportsHubPage = lazy(
+  () => import("../features/reports/pages/ReportsHubPage"),
+);
 const ExpensesReportPage = lazy(
   () => import("../features/reports/pages/ExpensesReportPage"),
 );
@@ -1028,6 +1031,16 @@ export const router = createBrowserRouter([
           <LazyPage>
             <Role roles={FULL_ACCESS_ROLES}>
               <CashHandoverReportPage />
+            </Role>
+          </LazyPage>
+        ),
+      },
+      {
+        path: "reports",
+        element: (
+          <LazyPage>
+            <Role roles={FULL_ACCESS_ROLES}>
+              <ReportsHubPage />
             </Role>
           </LazyPage>
         ),

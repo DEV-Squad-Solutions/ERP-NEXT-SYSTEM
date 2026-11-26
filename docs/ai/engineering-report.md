@@ -21,8 +21,9 @@ Principle: every number comes from deterministic C# services. The AI only narrat
 - Anomalies are suggestions for a person. Nothing is blocked or changed. Forecasts refuse on short history and say so.
 
 ## Not done yet
-- Stage 3 reporting center beyond KPIs, Stage 5 chat UI, Stage 6 executive dashboard page, Stage 9 frontend AI Center.
-- No provider key yet: needs a free Gemini or Groq key supplied through the vault. Until then Ai/ask returns figures only.
+- Stage 5 chat UI, Stage 6 executive dashboard page, Stage 9 frontend AI Center.
+- Reporting center: now built. A hub page ("كل التقارير") links every report, including inventory stock and cost, partner items, expenses, attendance, employee movements, cash handover, sales/purchases summary and aging (read-only endpoints under InvoiceReports).
+- The analyst is built in and answers from figures the backend computes. It does not need a provider key, and no company data goes to an external AI provider.
 - Per-call logging of assistant questions (access log) is not persisted yet.
 - Cross-company data tests against a real two-company database are not written; isolation is verified by construction and by live use of the test company only.
 

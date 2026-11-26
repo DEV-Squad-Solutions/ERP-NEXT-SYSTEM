@@ -30,7 +30,8 @@ export const statementsApi = baseApi.injectEndpoints({
         params: {
           FromDate: fromDate || undefined,
           ToDate: toDate || undefined,
-          IncludeZeroBalances: includeZeroBalances || undefined,
+          ViewMode: "Summary",
+          IncludeZeroBalances: Boolean(includeZeroBalances),
         },
       }),
       providesTags: ["Statement"],

@@ -145,11 +145,11 @@ export default function TopNav({ onSwitchLayout }) {
         <button
           type="button"
           onClick={onSwitchLayout}
-          title={t("القائمة الجانبية")}
-          aria-label={t("القائمة الجانبية")}
-          className="rounded-lg p-2 text-ink-500 hover:bg-ink-400/10 dark:text-white/70 dark:hover:bg-white/[0.07]"
+          title={t("نقل القائمة إلى الجانب")}
+          aria-label={t("نقل القائمة إلى الجانب")}
+          className="flex items-center gap-1.5 rounded-lg px-2 py-2 text-[12px] font-medium text-ink-500 hover:bg-ink-400/10 dark:text-white/70 dark:hover:bg-white/[0.07]"
         >
-          <PanelLeft size={16} />
+          <PanelLeft size={16} /><span className="hidden xl:inline">{t("جانبي")}</span>
         </button>
       )}
     </nav>

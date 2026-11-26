@@ -13,7 +13,7 @@ import { getDir } from "../../../i18n";
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [layout, setLayout] = useState(() => localStorage.getItem("layout") === "top" ? "top" : "side");
-  const [pinned, setPinned] = useState(() => localStorage.getItem("sidebarPinned") !== "false");
+  const [pinned, setPinned] = useState(() => localStorage.getItem("sidebarPinned") === "true");
   const togglePin = () => {
     localStorage.setItem("sidebarPinned", String(!pinned));
     setPinned(!pinned);

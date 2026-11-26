@@ -73,7 +73,7 @@ internal static class DevelopmentOperationsSeeder
         }
     }
 
-    private static async Task EnsureCashboxesAsync(
+    internal static async Task EnsureCashboxesAsync(
         ApplicationDbContext dbContext,
         int companyId,
         CancellationToken cancellationToken)

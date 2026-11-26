@@ -469,6 +469,14 @@ public static class DevelopmentDataSeeder
                 company,
                 cancellationToken);
 
+            // The operations seeder adds two extra cashboxes. Create them
+            // before the account mappings so they get a mapping on the first
+            // run (transfers/revaluations need it); the call is idempotent.
+            await DevelopmentOperationsSeeder.EnsureCashboxesAsync(
+                dbContext,
+                company.Id,
+                cancellationToken);
+
             await SeedAccountMappingsAsync(
                 dbContext,
                 company,

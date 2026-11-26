@@ -39,7 +39,7 @@ public sealed class SeedHarnessTests(ITestOutputHelper output)
         connection.Open();
 
         var services = new ServiceCollection();
-        services.AddLogging();
+        services.AddLogging(b => b.AddProvider(new OutLoggerProvider(output)).SetMinimumLevel(LogLevel.Warning));
         services.AddSingleton<IConfiguration>(config);
         services.AddInfrastructure(config);
         services.Scan(scan => scan
@@ -73,8 +73,13 @@ public sealed class SeedHarnessTests(ITestOutputHelper output)
 
         await DevelopmentDataSeeder.SeedAsync(provider, config);
         var first = await CountsAsync(provider);
+        output.WriteLine("=== RUN 2");
         await DevelopmentDataSeeder.SeedAsync(provider, config);
         var second = await CountsAsync(provider);
+        output.WriteLine("=== RUN 3");
+        await DevelopmentDataSeeder.SeedAsync(provider, config);
+        var third = await CountsAsync(provider);
+        output.WriteLine("=== 3RD-RUN CHANGES: " + string.Join("; ", second.Where(kv => third[kv.Key] != kv.Value).Select(kv => $"{kv.Key} {kv.Value}->{third[kv.Key]}")));
 
         foreach (var (t, n) in first) output.WriteLine($"{t}: {n} -> {second[t]}");
         var diff = first.Where(kv => second[kv.Key] != kv.Value).Select(kv => $"{kv.Key} {kv.Value}->{second[kv.Key]}").ToList();
@@ -114,5 +119,20 @@ internal sealed class RowVersionEmulator : Microsoft.EntityFrameworkCore.Diagnos
             e.Property("RowVersion").CurrentValue = System.Security.Cryptography.RandomNumberGenerator.GetBytes(8);
         }
         return base.SavingChangesAsync(eventData, result, cancellationToken);
+    }
+}
+
+internal sealed class OutLoggerProvider(ITestOutputHelper o) : ILoggerProvider
+{
+    public ILogger CreateLogger(string c) => new L(o, c);
+    public void Dispose() { }
+    private sealed class L(ITestOutputHelper o, string c) : ILogger
+    {
+        public IDisposable? BeginScope<TState>(TState s) where TState : notnull => null;
+        public bool IsEnabled(LogLevel l) => l >= LogLevel.Warning;
+        public void Log<TState>(LogLevel l, EventId e, TState s, Exception? ex, Func<TState, Exception?, string> f)
+        {
+            try { o.WriteLine($"[{l}] {c}: {f(s, ex)} {ex?.GetType().Name}: {ex?.Message}"); } catch { }
+        }
     }
 }

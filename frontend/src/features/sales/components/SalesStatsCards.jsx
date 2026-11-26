@@ -63,7 +63,7 @@ export default function SalesStatsCards({ summary, isLoading }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
+    <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
       {cards.map((card) => (
         <div
           key={card.label}
@@ -81,7 +81,7 @@ export default function SalesStatsCards({ summary, isLoading }) {
             {isLoading ? (
               <div className="h-5 w-16 rounded bg-ink-400/10 animate-pulse mt-1" />
             ) : (
-              <p className="num font-bold text-ink-900 text-sm truncate">
+              <p className="num font-bold text-ink-900 text-sm break-words sm:truncate">
                 {(Number(card.value) || 0).toLocaleString(getLocale(), {
                   minimumFractionDigits: card.isQuantity ? 0 : 2,
                   maximumFractionDigits: card.isQuantity ? 0 : 2,

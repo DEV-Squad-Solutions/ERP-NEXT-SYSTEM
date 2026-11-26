@@ -9,14 +9,17 @@ import UnauthorizedPage from "../UnauthorizedPage";
 import useHiddenScreens from "../../../features/screenAccess/useHiddenScreens";
 import { isPathHidden } from "../../../features/screenAccess/screenList";
 import { getDir } from "../../../i18n";
+import { usePhone } from "../../../utils/viewport";
 
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [layout, setLayout] = useState(() => localStorage.getItem("layout") === "top" ? "top" : "side");
   const pinned = false;
-  const isTop = layout === "top";
+  const phone = usePhone();
+  // On a phone the 56px side rail eats the screen: use the drawer (menu button) instead.
+  const isTop = layout === "top" || phone;
   const switchLayout = () => {
-    const next = isTop ? "side" : "top";
+    const next = layout === "top" ? "side" : "top";
     localStorage.setItem("layout", next);
     setLayout(next);
   };

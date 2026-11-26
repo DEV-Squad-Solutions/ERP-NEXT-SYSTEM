@@ -1,4 +1,5 @@
 import { useOnFiscalYearChange } from "../../../lib/useOnFiscalYearChange";
+import { isPhone } from "../../../utils/viewport";
 import { clampFilterDates } from "../../../lib/fiscalYearDateRange";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -209,7 +210,7 @@ export default function CashboxDetailPage() {
     },
   });
 
-  const [filtersOpen, setFiltersOpen] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(() => !isPhone());
   const [page, setPage] = useState(1);
 
   // عند تغيير السنة: صفّر الصفحة، وامسح أي تاريخ فلتر برّه حدودها

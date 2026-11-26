@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { isPhone } from "../../../utils/viewport";
 import { Search, RotateCcw, Filter, ChevronDown } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGetPartiesSelectQuery } from "../../partners/partiesApi";
@@ -33,7 +34,7 @@ export default function SalesFiltersCard({
   onSearch,
   onReset,
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(() => !isPhone());
 
   const { data: parties, isLoading: isLoadingParties } =
     useGetPartiesSelectQuery();

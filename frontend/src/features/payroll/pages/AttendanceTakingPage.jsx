@@ -787,89 +787,84 @@ const AttendanceTakingPage = () => {
           </div>
         </div>
 
-        <div className="att-actions mt-4 grid grid-cols-2 gap-2 border-t border-ink-100 pt-4 sm:flex sm:flex-wrap sm:items-center">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={selectAllFiltered}
-            disabled={!filteredRows.length}
-          >
-            <Check size={15} />
-            {t("تحديد الظاهر")}
-          </Button>
+        <div className="mt-4 space-y-3 border-t border-ink-100 pt-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={selectAllFiltered}
+              disabled={!filteredRows.length}
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-ink-200 bg-white px-3 text-sm font-semibold text-ink-700 transition active:bg-ink-50 disabled:opacity-50 sm:h-10 sm:flex-none"
+            >
+              <Check size={16} />
+              {t("تحديد الظاهر")}
+            </button>
+            <button
+              type="button"
+              onClick={markAllPresent}
+              disabled={!filteredRows.length}
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-positive/30 bg-positive/5 px-3 text-sm font-semibold text-positive transition active:bg-positive/10 disabled:opacity-50 sm:h-10 sm:flex-none"
+            >
+              <UserCheck size={16} />
+              {t("الكل حاضر")}
+            </button>
+            <button
+              type="button"
+              onClick={markAllAbsent}
+              disabled={!filteredRows.length}
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-negative/30 bg-negative/5 px-3 text-sm font-semibold text-negative transition active:bg-negative/10 disabled:opacity-50 sm:h-10 sm:flex-none"
+            >
+              <UserX size={16} />
+              {t("الكل غائب")}
+            </button>
+          </div>
 
-          <Button
+          <button
             type="button"
-            variant="secondary"
-            size="sm"
-            onClick={clearSelected}
-            disabled={!selectedIds.size}
-          >
-            <X size={15} />
-            {t("إلغاء التحديد")}
-          </Button>
-
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={markSelectedPresent}
-            disabled={!selectedIds.size}
-          >
-            <UserCheck size={15} />
-            {t("المحدد حاضر")}
-          </Button>
-
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={markSelectedAbsent}
-            disabled={!selectedIds.size}
-          >
-            <UserX size={15} />
-            {t("المحدد غائب")}
-          </Button>
-
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={markAllPresent}
-            disabled={!filteredRows.length}
-          >
-            {t("الكل حاضر")}
-          </Button>
-
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={markAllAbsent}
-            disabled={!filteredRows.length}
-          >
-            {t("الكل غائب")}
-          </Button>
-
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
             onClick={applyDefaultTimes}
             disabled={!filteredRows.length}
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-ink-900 px-4 text-sm font-semibold text-white transition active:opacity-90 disabled:opacity-50 sm:h-10 sm:w-auto"
           >
-            <Clock3 size={15} />
+            <Clock3 size={16} />
             {t("تطبيق الأوقات")}
-          </Button>
-
-          <div className="col-span-2 text-sm text-ink-500 sm:col-span-1 sm:me-auto">
-            {t("المحدد:")}{" "}
-            <span className="font-semibold text-ink-800">
-              {selectedIds.size}
-            </span>
-          </div>
+          </button>
         </div>
+
+        {selectedIds.size > 0 && (
+          <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-200 bg-white/95 px-3 pt-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.12)] backdrop-blur"
+            style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+            <div className="mx-auto flex max-w-3xl items-center gap-2">
+              <div className="min-w-[56px] text-center leading-tight">
+                <div className="num text-lg font-bold text-ink-900">{selectedIds.size}</div>
+                <div className="text-[10px] text-ink-500">{t("المحدد:").replace(":", "")}</div>
+              </div>
+              <button
+                type="button"
+                onClick={markSelectedPresent}
+                className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-positive px-3 text-sm font-bold text-white active:opacity-90"
+              >
+                <UserCheck size={18} />
+                {t("المحدد حاضر")}
+              </button>
+              <button
+                type="button"
+                onClick={markSelectedAbsent}
+                className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-negative/40 bg-white px-3 text-sm font-bold text-negative active:bg-negative/5"
+              >
+                <UserX size={18} />
+                {t("المحدد غائب")}
+              </button>
+              <button
+                type="button"
+                onClick={clearSelected}
+                aria-label={t("إلغاء التحديد")}
+                title={t("إلغاء التحديد")}
+                className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-ink-200 text-ink-500 active:bg-ink-50"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm">

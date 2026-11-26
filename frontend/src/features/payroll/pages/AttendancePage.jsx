@@ -353,7 +353,7 @@ export default function AttendancePage() {
         <ReadOnlyFiscalYearBanner fiscalYear={fiscalYear} />
       )}
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3">
         <SummaryCard label={t("أيام العمل")} value={summary.workDays} />
 
         <SummaryCard
@@ -523,8 +523,59 @@ export default function AttendancePage() {
         </div>
       ) : (
         <>
+          <div className={`space-y-3 sm:hidden ${isFetching ? "opacity-60" : ""}`}>
+            {rows.map((row) => {
+              const st = normalizeRowStatus(row.status);
+              return (
+                <div key={`m-${row.id}`} className="rounded-xl border border-ink-200 bg-white p-3 shadow-sm">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <button
+                        type="button"
+                        onClick={() => openEmployeeDetails(row)}
+                        className="block max-w-full truncate text-start text-sm font-semibold text-primary-600"
+                      >
+                        {row.employeeName || t("موظف #{0}", { 0: row.employeeId })}
+                      </button>
+                      <p className="num text-[11px] text-ink-400">#{row.employeeId} · {row.workDate ? formatDate(row.workDate) : "—"}</p>
+                    </div>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${getStatusBadge(st)}`}>
+                      {getStatusLabel(st)}
+                    </span>
+                  </div>
+                  <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                    <div className="rounded-lg bg-ink-50 px-1 py-2">
+                      <p className="text-[10px] text-ink-400">{t("وقت الحضور")}</p>
+                      <p className="num text-[13px] font-medium text-ink-800">{row.checkIn || "—"}</p>
+                    </div>
+                    <div className="rounded-lg bg-ink-50 px-1 py-2">
+                      <p className="text-[10px] text-ink-400">{t("وقت الانصراف")}</p>
+                      <p className="num text-[13px] font-medium text-ink-800">{row.checkOut || "—"}</p>
+                    </div>
+                    <div className="rounded-lg bg-ink-50 px-1 py-2">
+                      <p className="text-[10px] text-ink-400">{t("عدد الساعات")}</p>
+                      <p className="num text-[13px] font-medium text-ink-800">{row.workHours || "—"}</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between gap-2 text-xs text-ink-600">
+                    <span className="min-w-0 truncate">{row.workLocation || t("غير محدد")}{row.notes ? ` · ${row.notes}` : ""}</span>
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button type="button" onClick={() => openDetails(row)} className="rounded-lg p-2 text-ink-500 hover:bg-primary-50" title={t("تفاصيل السجل")}><Eye size={16} /></button>
+                      {!isFiscalYearReadOnly && (
+                        <>
+                          <button type="button" onClick={() => openEdit(row)} className="rounded-lg p-2 text-ink-500 hover:bg-primary-50" title={t("تعديل")}><Pencil size={16} /></button>
+                          <button type="button" onClick={() => handleDelete(row)} className="rounded-lg p-2 text-ink-500 hover:bg-negative/10 hover:text-negative" title={t("حذف")}><Trash2 size={16} /></button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
           <div
-            className={`overflow-x-auto rounded-2xl border border-ink-400/10 bg-white shadow-card transition-opacity duration-200 ${
+            className={`hidden sm:block overflow-x-auto rounded-2xl border border-ink-400/10 bg-white shadow-card transition-opacity duration-200 ${
               isFetching ? "opacity-60" : ""
             }`}
           >
@@ -741,7 +792,7 @@ export default function AttendancePage() {
 
 function SummaryCard({ label, value, tone }) {
   return (
-    <div className="rounded-2xl border border-ink-400/10 bg-white p-3.5 shadow-card">
+    <div className="rounded-2xl border border-ink-400/10 bg-white p-3 shadow-card sm:p-3.5">
       <p className="mb-1 text-xs text-ink-400">{label}</p>
 
       <p

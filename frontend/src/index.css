@@ -491,4 +491,38 @@ input[type="month"] {
     justify-content: center;
     white-space: nowrap;
   }
+  .att-actions > button:last-of-type {
+    grid-column: span 2;
+  }
+}
+
+/* iOS Safari: native date/time controls ignore the container width unless forced. */
+input[type="time"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+}
+input[type="time"]::-webkit-date-and-time-value,
+input[type="date"]::-webkit-date-and-time-value,
+input[type="datetime-local"]::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: start;
+}
+input[type="time"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-datetime-edit {
+  min-width: 0;
+  padding: 0;
+}
+
+/* Never let the page itself scroll sideways on phones. */
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: clip;
 }

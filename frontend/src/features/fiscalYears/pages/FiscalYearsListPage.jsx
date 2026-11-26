@@ -206,7 +206,7 @@ export default function FiscalYearsListPage() {
                   setPage(1);
                 }}
                 placeholder={t("ابحث باسم السنة المالية...")}
-                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pe-9 ps-3 text-sm outline-none transition-colors focus:border-primary-500"
+                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white ps-9 pe-3 text-sm outline-none transition-colors focus:border-primary-500"
               />
             </div>
           </div>

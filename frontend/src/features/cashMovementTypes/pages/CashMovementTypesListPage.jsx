@@ -200,7 +200,7 @@ export default function CashMovementTypesListPage() {
                       value={searchInput}
                       onChange={(e) => setSearchInput(e.target.value)}
                       placeholder={t("ابحث بالاسم...")}
-                      className="w-full rounded-xl border border-gold/30 bg-white py-2 pe-9 ps-3 text-sm outline-none transition-colors focus:border-emerald-600"
+                      className="w-full rounded-xl border border-gold/30 bg-white py-2 ps-9 pe-3 text-sm outline-none transition-colors focus:border-emerald-600"
                     />
                   </div>
                 </div>

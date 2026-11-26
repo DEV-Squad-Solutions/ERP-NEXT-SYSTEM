@@ -713,7 +713,7 @@ const AttendanceTakingPage = () => {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder={t("اسم الموظف أو الرقم...")}
-                className="h-10 w-full rounded-xl border border-ink-200 bg-white pe-10 ps-3 text-sm text-ink-800 outline-none transition placeholder:text-ink-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
+                className="h-10 w-full rounded-xl border border-ink-200 bg-white ps-10 pe-3 text-sm text-ink-800 outline-none transition placeholder:text-ink-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
               />
             </div>
           </div>

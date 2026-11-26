@@ -129,7 +129,7 @@ export default function CompanySelect() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("ابحث عن شركة...")}
             disabled={isLoading}
-            className="h-10.5 w-full rounded-xl border border-ink-200 bg-ink-400/[0.025] pe-10 ps-10 text-sm text-ink-700 outline-none transition-[border-color,background-color,box-shadow] duration-200 placeholder:text-ink-400/50 hover:border-ink-300 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-10.5 w-full rounded-xl border border-ink-200 bg-ink-400/[0.025] ps-10 pe-10 text-sm text-ink-700 outline-none transition-[border-color,background-color,box-shadow] duration-200 placeholder:text-ink-400/50 hover:border-ink-300 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10 disabled:cursor-not-allowed disabled:opacity-60"
           />
 
           {search && (

@@ -105,7 +105,7 @@ export default function StoreInventoryTab({
               setPageNumber(1);
             }}
             placeholder={t("ابحث بكود أو اسم الصنف...")}
-            className="w-full pe-9 ps-3 py-2 text-sm rounded-xl border border-ink-100 focus:outline-none focus:ring-2 focus:ring-ink-200"
+            className="w-full ps-9 pe-3 py-2 text-sm rounded-xl border border-ink-100 focus:outline-none focus:ring-2 focus:ring-ink-200"
           />
         </div>
 

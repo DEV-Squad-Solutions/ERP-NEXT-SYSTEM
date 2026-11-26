@@ -590,7 +590,7 @@ export default function BulkCreatePayrollEntriesPage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder={t("ابحث باسم الموظف أو الرقم...")}
-                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white pe-9 ps-3 text-sm outline-none focus:border-primary-500 transition-colors"
+                className="w-full h-9 rounded-lg border border-ink-400/15 bg-white ps-9 pe-3 text-sm outline-none focus:border-primary-500 transition-colors"
               />
             </div>
           </div>

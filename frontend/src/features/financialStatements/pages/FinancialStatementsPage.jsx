@@ -690,7 +690,7 @@ export default function FinancialStatementsPage() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder={t("بحث بالكود أو اسم البند...")}
-                    className="w-full h-10 rounded-xl border border-ink-400/20  pe-10 ps-3 text-sm outline-none focus:border-primary-500"
+                    className="w-full h-10 rounded-xl border border-ink-400/20  ps-10 pe-3 text-sm outline-none focus:border-primary-500"
                   />
                 </div>
 

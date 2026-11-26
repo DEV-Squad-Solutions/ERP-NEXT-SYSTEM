@@ -241,7 +241,7 @@ export default function PayrollReportsPage() {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700 max-sm:hidden">
               <ReceiptText size={19} />
             </div>
 
@@ -250,7 +250,7 @@ export default function PayrollReportsPage() {
                 {t("تقارير الأجور والمرتبات")}
               </h1>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 hidden text-sm text-slate-500 sm:block">
                 {t("تقرير تفصيلي للرواتب والموظفين والحضور والاستحقاقات")}
               </p>
             </div>

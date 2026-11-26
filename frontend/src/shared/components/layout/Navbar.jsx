@@ -364,7 +364,7 @@ export default function Navbar({ onMenuClick, showMenuButton = false }) {
               <FiscalYearSwitcher />
             </div>
             <span aria-hidden="true" className="mx-0.5 hidden h-6 w-px bg-ink-200 dark:bg-white/10 sm:block" />
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 max-sm:hidden">
               <LanguageSwitcher />
               <ThemePicker />
             </div>
@@ -747,6 +747,12 @@ export default function Navbar({ onMenuClick, showMenuButton = false }) {
               ].join(" ")}
             />
           </button>
+
+          {/* Phones: language and theme live here to keep the header clean */}
+          <div className="mb-2 flex items-center justify-center gap-3 sm:hidden">
+            <LanguageSwitcher />
+            <ThemePicker />
+          </div>
 
           {/* =================================================
               LOGOUT

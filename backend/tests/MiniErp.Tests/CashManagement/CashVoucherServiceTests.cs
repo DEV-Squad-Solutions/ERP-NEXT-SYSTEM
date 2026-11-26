@@ -156,9 +156,11 @@ public sealed class CashVoucherServiceTests
         Assert.Equal(1075m, cashbox.Value.CurrentBalance);
         Assert.True(rows.IsSuccess, rows.Error.Description);
         Assert.NotEmpty(rows.Value.Items);
-        Assert.All(
-            rows.Value.Items,
-            row => Assert.Equal(1075m, row.CashboxBalance));
+        // The balance on each row is the running balance after that voucher.
+        Assert.Contains(rows.Value.Items, row =>
+            row.Id == receipt.Value.Id && row.CashboxBalance == 1200m);
+        Assert.Contains(rows.Value.Items, row =>
+            row.Id == payment.Value.Id && row.CashboxBalance == 1075m);
     }
 
     [Fact]
@@ -326,7 +328,7 @@ public sealed class CashVoucherServiceTests
         Assert.Equal(revenue.Value.Id, voucher.Id);
         Assert.Equal(CashMovementClassification.Revenue,
             voucher.Classification);
-        Assert.Equal(1030m, voucher.CashboxBalance);
+        Assert.Equal(1020m, voucher.CashboxBalance);
     }
 
     [Fact]

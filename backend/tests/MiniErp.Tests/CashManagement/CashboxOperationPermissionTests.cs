@@ -153,7 +153,7 @@ public sealed class CashboxOperationPermissionTests
         Assert.True(voucherList.IsSuccess);
         var opening = Assert.Single(voucherList.Value.Items);
         Assert.Equal(1, opening.CashboxId);
-        Assert.Equal(900m, opening.CashboxBalance);
+        Assert.Equal(1000m, opening.CashboxBalance);
         Assert.Equal(ErrorType.Forbidden, (await service.AddAsync(Transfer())).Error.Type);
         Assert.Equal(ErrorType.Forbidden, (await service.DeleteAsync(created.Value.Id)).Error.Type);
         var update = created.Value.Adapt<CashboxTransferUpdateRequest>() with { RowVersion = created.Value.RowVersion };

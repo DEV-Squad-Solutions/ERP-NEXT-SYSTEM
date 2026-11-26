@@ -316,7 +316,9 @@ public sealed partial class CashVoucherService
                             .Where(voucher =>
                                 voucher.IsPosted &&
                                 voucher.FiscalYearId ==
-                                    fiscalYear.FiscalYearId)
+                                    fiscalYear.FiscalYearId &&
+                                voucher.VoucherDate <=
+                                    cashbox.OpeningBalanceDate)
                             .Sum(voucher =>
                                 voucher.Direction == CashDirection.Receipt
                                     ? voucher.Amount

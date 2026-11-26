@@ -103,7 +103,12 @@ public sealed class CashVoucherMappingRegister : IRegister
                             .Where(cashboxVoucher =>
                                 cashboxVoucher.IsPosted &&
                                 cashboxVoucher.FiscalYearId ==
-                                    voucher.FiscalYearId)
+                                    voucher.FiscalYearId &&
+                                (cashboxVoucher.VoucherDate <
+                                    voucher.VoucherDate ||
+                                 (cashboxVoucher.VoucherDate ==
+                                    voucher.VoucherDate &&
+                                  cashboxVoucher.Id <= voucher.Id)))
                             .Sum(cashboxVoucher =>
                                 cashboxVoucher.Direction ==
                                     Domain.Enums.CashDirection.Receipt

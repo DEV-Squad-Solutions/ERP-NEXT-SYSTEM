@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useId, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { X, Info, ChevronDown, PanelTop } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -610,6 +610,37 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
   const hiddenScreens = useHiddenScreens();
 
   const [showDetails, setShowDetails] = useState(false);
+  // Desktop rail state: null (icons only) | "mouse" (hover/keyboard, pushes page) | "touch" (tap, overlay + backdrop)
+  const [rail, setRail] = useState(null);
+  const lastPointer = useRef("mouse");
+  const hoverTimer = useRef(null);
+  const { pathname } = useLocation();
+  useEffect(() => setRail(null), [pathname]);
+
+  const railPointerDown = (e) => { lastPointer.current = e.pointerType || "mouse"; };
+  const railEnter = (e) => {
+    if (e.pointerType && e.pointerType !== "mouse") return;
+    clearTimeout(hoverTimer.current);
+    hoverTimer.current = setTimeout(() => setRail("mouse"), 200);
+  };
+  const railLeave = (e) => {
+    if (e.pointerType && e.pointerType !== "mouse") return;
+    clearTimeout(hoverTimer.current);
+    setRail((r) => (r === "mouse" ? null : r));
+  };
+  const railFocus = (e) => {
+    if (e.target.matches?.(":focus-visible")) setRail((r) => r || "mouse");
+  };
+  const railBlur = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) setRail((r) => (r === "mouse" ? null : r));
+  };
+  const railClickCapture = (e) => {
+    if (pinned || rail || lastPointer.current === "mouse") return;
+    if (window.innerWidth < 1024) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setRail("touch");
+  };
 
   const canViewCompany = useMemo(
     () => roles?.includes("Admin") || roles?.includes("CompanyOwner"),
@@ -678,14 +709,15 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
 
       <div
         aria-hidden={!isOpen}
-        onClick={handleClose}
+        onClick={() => { handleClose(); setRail(null); }}
         className={[
-          "fixed inset-0 z-40 lg:hidden",
+          "fixed inset-0 z-40",
+          rail === "touch" ? "" : "lg:hidden",
           "bg-ink-950/70",
           "backdrop-blur-[2px]",
           "transition-[opacity,visibility]",
           "duration-300",
-          isOpen
+          isOpen || rail === "touch"
             ? "visible pointer-events-auto opacity-100"
             : "invisible pointer-events-none opacity-0",
         ].join(" ")}
@@ -696,11 +728,18 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
       =================================================== */}
 
       <aside
+        data-rail={rail || undefined}
+        onPointerDown={railPointerDown}
+        onPointerEnter={pinned ? undefined : railEnter}
+        onPointerLeave={pinned ? undefined : railLeave}
+        onFocus={pinned ? undefined : railFocus}
+        onBlur={pinned ? undefined : railBlur}
+        onClickCapture={pinned ? undefined : railClickCapture}
         aria-label={t("القائمة الرئيسية")}
         className={[
           "fixed top-0 start-0 z-50",
           "h-screen w-[260px]",
-          pinned ? "" : "sidebar-rail lg:w-[72px] lg:hover:w-[260px] lg:has-[:focus-visible]:w-[260px]",
+          pinned ? "" : "sidebar-rail lg:w-[72px] lg:data-[rail]:w-[260px]",
           "overflow-hidden",
           "flex flex-col",
           "border-e border-white/[0.07]",

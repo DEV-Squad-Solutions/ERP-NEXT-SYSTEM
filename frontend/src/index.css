@@ -448,13 +448,12 @@ html body [data-sonner-toaster] [data-sonner-toast].app-toast [data-icon] { box-
 /* Sidebar rail (unpinned): icons only until hovered or focused */
 aside.sidebar-rail { transition: width .22s cubic-bezier(.22,1,.36,1), transform .3s; }
 @media (min-width: 1024px) {
-  aside.sidebar-rail:not(:hover):not(:has(:focus-visible)) :is(nav ul ul, nav li > div[class*="grid-rows"], nav [class*="uppercase"], nav button > svg:last-child, nav .truncate, footer > button, header .min-w-0, footer span.min-w-0, footer a > span:last-child, .sidebar-pin) { display: none !important; }
-  aside.sidebar-rail:not(:hover):not(:has(:focus-visible)) :is(nav a, nav button) { justify-content: center; padding-inline: 0; }
-  aside.sidebar-rail:not(:hover):not(:has(:focus-visible)) header > div { justify-content: center; }
-  aside.sidebar-rail:hover { box-shadow: 0 0 40px rgb(0 0 0 / .35); transition-delay: .2s; }
-  /* Expanding the rail pushes the page instead of covering it */
-  aside.sidebar-rail:hover + div,
-  aside.sidebar-rail:has(:focus-visible) + div { margin-inline-start: 260px; transition-delay: .2s; }
+  aside.sidebar-rail:not([data-rail]) :is(nav ul ul, nav li > div[class*="grid-rows"], nav [class*="uppercase"], nav button > svg:last-child, nav .truncate, footer > button, header .min-w-0, footer span.min-w-0, footer a > span:last-child, .sidebar-pin) { display: none !important; }
+  aside.sidebar-rail:not([data-rail]) :is(nav a, nav button) { justify-content: center; padding-inline: 0; }
+  aside.sidebar-rail:not([data-rail]) header > div { justify-content: center; }
+  aside.sidebar-rail[data-rail] { box-shadow: 0 0 40px rgb(0 0 0 / .35); }
+  /* Mouse hover pushes the page; touch opens as an overlay with a backdrop */
+  aside.sidebar-rail[data-rail="mouse"] + div { margin-inline-start: 260px; }
 }
 
 /* Mobile: page-header action groups wrap instead of overflowing */

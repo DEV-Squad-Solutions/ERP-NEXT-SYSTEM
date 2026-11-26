@@ -66,7 +66,7 @@ const getInitials = (name) => {
    NAVBAR
 ========================================================= */
 
-export default function Navbar({ onMenuClick }) {
+export default function Navbar({ onMenuClick, showMenuButton = false }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -171,7 +171,7 @@ export default function Navbar({ onMenuClick }) {
           className={[
             "flex h-full items-center justify-between",
             "gap-2",
-            "px-3 sm:px-4 lg:px-5",
+            "px-2 sm:px-4 lg:px-5",
           ].join(" ")}
         >
           {/* =================================================
@@ -181,7 +181,7 @@ export default function Navbar({ onMenuClick }) {
           <div className="flex min-w-0 items-center gap-1">
             {/* MOBILE MENU */}
 
-            <button
+            {showMenuButton && <button
               type="button"
               onClick={onMenuClick}
               aria-label={t("فتح القائمة")}
@@ -208,7 +208,7 @@ export default function Navbar({ onMenuClick }) {
                 strokeWidth={1.9}
                 className="transition-transform duration-300 group-hover:scale-110"
               />
-            </button>
+            </button>}
 
             {/* BACK */}
 
@@ -358,11 +358,17 @@ export default function Navbar({ onMenuClick }) {
               USER AREA
           ================================================= */}
 
-          <div className="flex shrink-0 items-center gap-2">
-            <CompanySwitcher />
-            <FiscalYearSwitcher />
-            <LanguageSwitcher />
-            <ThemePicker />
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-1 sm:gap-1.5 [&_button]:h-9 max-sm:[&_button]:px-2 max-sm:[&_button_span]:hidden">
+              <CompanySwitcher />
+              <FiscalYearSwitcher />
+            </div>
+            <span aria-hidden="true" className="mx-0.5 hidden h-6 w-px bg-ink-200 dark:bg-white/10 sm:block" />
+            <div className="flex items-center gap-1">
+              <LanguageSwitcher />
+              <ThemePicker />
+            </div>
+            <span aria-hidden="true" className="mx-0.5 hidden h-6 w-px bg-ink-200 dark:bg-white/10 sm:block" />
 
             <button
               type="button"

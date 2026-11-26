@@ -107,7 +107,7 @@ export default function LoginForm() {
               type="text"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              placeholder="mohamedAlaa"
+              placeholder={t("اسم المستخدم")}
               autoComplete="username"
               dir="ltr"
               disabled={isLoading}

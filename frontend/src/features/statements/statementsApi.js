@@ -30,6 +30,7 @@ export const statementsApi = baseApi.injectEndpoints({
         params: {
           FromDate: fromDate || undefined,
           ToDate: toDate || undefined,
+          AdjustmentView: "AfterAdjustments",
           ViewMode: "Summary",
           IncludeZeroBalances: Boolean(includeZeroBalances),
         },

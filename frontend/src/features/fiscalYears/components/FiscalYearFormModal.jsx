@@ -71,6 +71,7 @@ export default function FiscalYearFormModal({
     register,
     handleSubmit,
     reset,
+    setError,
     watch,
     setValue,
     formState: { errors },
@@ -178,12 +179,33 @@ export default function FiscalYearFormModal({
 
       const rowVersionError = error?.data?.errors?.RowVersion?.[0];
 
-      toast.error(
+      const message =
         rowVersionError ||
-          error?.data?.detail ||
-          error?.data?.title ||
-          t("حدث خطأ أثناء حفظ السنة المالية"),
-      );
+        error?.data?.detail ||
+        error?.data?.title ||
+        t("حدث خطأ أثناء حفظ السنة المالية");
+
+      // علّم الخانة اللي فيها المشكلة بدل رسالة عامة بس.
+      const fieldErrors = error?.data?.errors || {};
+      let marked = false;
+      Object.entries(fieldErrors).forEach(([key, msgs]) => {
+        const field = key.charAt(0).toLowerCase() + key.slice(1);
+        if (["name", "startDate", "endDate"].includes(field)) {
+          setError(field, { type: "server", message: [].concat(msgs)[0] });
+          marked = true;
+        }
+      });
+      if (!marked) {
+        if (/اسم السنة/.test(message)) {
+          setError("name", { type: "server", message });
+        } else if (/تاريخ البداية|تتداخل|تداخل|فترة/.test(message)) {
+          setError("startDate", { type: "server", message });
+        } else if (/تاريخ النهاية/.test(message)) {
+          setError("endDate", { type: "server", message });
+        }
+      }
+
+      toast.error(message);
     }
   };
 

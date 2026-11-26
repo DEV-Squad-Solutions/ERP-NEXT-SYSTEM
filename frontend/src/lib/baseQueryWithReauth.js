@@ -170,7 +170,8 @@ const requestWithReauth = async (argsWithFiscalYear, api, extraOptions) => {
     const refreshToken = api.getState().auth?.refreshToken;
 
     if (!refreshToken) {
-      // جلسة منتهية: التحويل لصفحة الدخول كفاية، من غير رسائل خطأ.
+      showErrors(result.error);
+
       api.dispatch(logout());
 
       return result;
@@ -203,7 +204,8 @@ const requestWithReauth = async (argsWithFiscalYear, api, extraOptions) => {
         showErrors(result.error);
       }
     } else {
-      // تعذّر تجديد الجلسة: نرجّع لصفحة الدخول بهدوء.
+      showErrors(refreshResult.error);
+
       api.dispatch(logout());
     }
 

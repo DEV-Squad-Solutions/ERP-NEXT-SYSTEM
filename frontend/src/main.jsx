@@ -17,6 +17,14 @@ if (import.meta.env.DEV) window.__toast = toast;
 initTheme();
 window.addEventListener("load", warmLazyPages, { once: true });
 applyDocumentLanguage();
+// رسالة الخطأ نفسها ماتظهرش مرتين: نفس النص = نفس الـ id فـ sonner يحدّث الرسالة بدل ما يكررها.
+const originalToastError = toast.error.bind(toast);
+toast.error = (message, options) =>
+  originalToastError(message, {
+    ...(typeof message === "string" ? { id: message } : {}),
+    ...options,
+  });
+
 const savedTheme = localStorage.getItem("theme");
 
 createRoot(document.getElementById("root")).render(

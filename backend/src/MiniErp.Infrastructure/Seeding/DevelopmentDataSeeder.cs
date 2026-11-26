@@ -619,29 +619,9 @@ public static class DevelopmentDataSeeder
             }
             else
             {
-                user.Email = seedUser.Email;
-                user.EmailConfirmed = true;
-                user.FirstName = seedUser.FirstName;
-                user.LastName = seedUser.LastName;
-                user.ProfileImage = string.Empty;
-
-                var updateResult = await userManager.UpdateAsync(user);
-                EnsureSucceeded(
-                    updateResult,
-                    $"updating user '{seedUser.UserName}'");
-
-                if (!await userManager.CheckPasswordAsync(user, password))
-                {
-                    var resetToken = await userManager
-                        .GeneratePasswordResetTokenAsync(user);
-                    var resetResult = await userManager.ResetPasswordAsync(
-                        user,
-                        resetToken,
-                        password);
-                    EnsureSucceeded(
-                        resetResult,
-                        $"resetting the password for '{seedUser.UserName}'");
-                }
+                // Never modify a user that already exists (it may be a real
+                // account): keep its password, name, roles and screens.
+                continue;
             }
 
             await SetRolesAsync(userManager, user, seedUser.Roles);

@@ -980,7 +980,7 @@ export const router = createBrowserRouter([
         element: (
           <LazyPage>
             <Role roles={FULL_ACCESS_ROLES}>
-              <ComingSoon title={t("التقارير")} />
+              <ReportsHubPage />
             </Role>
           </LazyPage>
         ),
@@ -1031,16 +1031,6 @@ export const router = createBrowserRouter([
           <LazyPage>
             <Role roles={FULL_ACCESS_ROLES}>
               <CashHandoverReportPage />
-            </Role>
-          </LazyPage>
-        ),
-      },
-      {
-        path: "reports",
-        element: (
-          <LazyPage>
-            <Role roles={FULL_ACCESS_ROLES}>
-              <ReportsHubPage />
             </Role>
           </LazyPage>
         ),

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using MiniErp.Domain.Entities.Auditing;
 using MiniErp.Domain.Entities.BusinessPartners;
 using MiniErp.Domain.Entities.Accounting;
 using MiniErp.Domain.Entities.CashManagement;
@@ -25,6 +26,8 @@ public sealed partial class ApplicationDbContext
         : base(options)
     {
     }
+
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     public DbSet<Company> Companies => Set<Company>();
 

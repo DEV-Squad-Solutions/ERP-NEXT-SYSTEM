@@ -23,7 +23,7 @@ export default function InvoiceSearchBox({ value, fromDate, toDate, onChange, on
   }, [debounced]);
 
   const { data } = useGetInvoiceProfitabilityQuery(
-    { fromDate, toDate, search: debounced, pageNumber: 1, pageSize: 8, includeReturns: true },
+    { search: debounced, pageNumber: 1, pageSize: 8, includeReturns: true },
     { skip: debounced.length < 1 || !open },
   );
 
@@ -51,7 +51,7 @@ export default function InvoiceSearchBox({ value, fromDate, toDate, onChange, on
       <div className="flex items-center gap-2 rounded-xl border border-ink-400/20 bg-white px-3 py-2.5 focus-within:border-primary-500">
         <Search size={16} className="shrink-0 text-ink-400" />
         <input
-          type="search"
+          type="text"
           enterKeyHint="search"
           autoComplete="off"
           value={value ?? ""}

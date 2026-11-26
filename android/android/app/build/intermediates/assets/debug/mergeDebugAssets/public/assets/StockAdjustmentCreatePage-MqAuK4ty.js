@@ -1,0 +1,1 @@
+import{t as e}from"./StockAdjustmentForm-Cpfts9vU.js";import{A as t,E as n,t as r}from"./jsx-runtime-CwlwA8cZ.js";var i=r();function a(){return(0,i.jsxs)(`div`,{className:`p-6 max-w-5xl mx-auto`,dir:n(),children:[(0,i.jsx)(`h1`,{className:`font-display text-xl font-bold text-ink-900 mb-6`,children:t(`تسوية مخزون جديدة`)}),(0,i.jsx)(e,{isEditMode:!1})]})}export{a as default};

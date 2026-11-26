@@ -1,0 +1,1 @@
+var e=new Set([8,13,18,23]),t=`0123456789abcdef`;function n(){let n=``;for(let r=0;r<36;r+=1)e.has(r)?n+=`-`:n+=r===14?`4`:r===19?t[8+(Math.random()*4|0)]:t[Math.random()*16|0];return n}function r(){let e=typeof crypto>`u`?void 0:crypto;return typeof e?.randomUUID==`function`?e.randomUUID():n()}export{r as t};

@@ -1,0 +1,1 @@
+import{K as e,c as t,s as n}from"./jsx-runtime-CwlwA8cZ.js";function r(){let r=e(n),i=e(t),a=r?.status===`Closed`,o=!r||r.isCurrent&&r.status===`Open`;return{fiscalYearId:i,fiscalYear:r,isClosed:a,canWrite:o,isReadOnly:!o}}export{r as t};

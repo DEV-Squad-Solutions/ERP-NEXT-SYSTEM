@@ -1,0 +1,15 @@
+{
+	"appId": "com.devsquad.erp",
+	"appName": "ERP",
+	"webDir": "../frontend/dist",
+	"backgroundColor": "#ffffff",
+	"server": {
+		"androidScheme": "https"
+	},
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 800,
+			"backgroundColor": "#ffffff"
+		}
+	}
+}

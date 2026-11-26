@@ -1,0 +1,62 @@
+import{a as e}from"./rolldown-runtime-BWaJ3C7D.js";import{A as t,J as n,t as r}from"./jsx-runtime-CwlwA8cZ.js";import{t as i}from"./calendar-days-CaxoOGw8.js";var a=e(n(),1),o=r(),s=()=>new Intl.DateTimeFormat(`en-CA`,{timeZone:`Africa/Cairo`,year:`numeric`,month:`2-digit`,day:`2-digit`}).format(new Date),c=e=>{if(!e)return``;let[t,n,r]=e.split(`-`);return!t||!n||!r?``:`${r}/${n}/${t}`},l=e=>{let t=e.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);if(!t)return``;let[,n,r,i]=t;return`${i}-${r}-${n}`};function u({label:e,labelAddon:n=null,error:r,className:u=``,type:d=`text`,value:f,onChange:p,...m}){let h=d===`number`,g=d===`date`;(0,a.useEffect)(()=>{if(!g||f)return;let e=s();p?.({target:{name:m.name,value:e}})},[g,f]);let _=e=>{if(g)p?.(e);else if(h){let t=e.target.value;if(t===``){p?.({...e,target:{...e.target,value:``}});return}if(!/^\d*\.?\d*$/.test(t))return;p?.({...e,target:{...e.target,value:t}})}else p?.(e)},v=e=>{let t=e.target.value.replace(/\D/g,``);t.length>8&&(t=t.slice(0,8));let n=t;if(t.length>4?n=`${t.slice(0,2)}/${t.slice(2,4)}/${t.slice(4)}`:t.length>2&&(n=`${t.slice(0,2)}/${t.slice(2)}`),t.length<8)return;let r=l(n);r&&p?.({...e,target:{...e.target,value:r}})},y=e=>{p?.(e)},b=e=>{let t=e.currentTarget.parentElement?.querySelector(`input[type="date"]`);t&&(typeof t.showPicker==`function`?t.showPicker():(t.focus(),t.click()))};return(0,o.jsxs)(`div`,{children:[(0,o.jsxs)(`div`,{className:`flex items-stretch rounded-lg overflow-hidden border border-ink-400/10`,children:[(0,o.jsxs)(`div`,{className:`
+            w-36
+            shrink-0
+            bg-ink-900/[0.03]
+            px-3
+            py-2.5
+            text-sm
+            font-medium
+            text-ink-900
+            flex
+            items-center
+            gap-1
+            border-l
+            border-ink-400/10
+          `,children:[e,n&&(0,o.jsx)(`span`,{className:`ms-auto shrink-0`,children:n})]}),g?(0,o.jsxs)(`div`,{className:`relative flex-1 min-w-0`,children:[(0,o.jsx)(`input`,{type:`text`,value:c(f),onChange:v,placeholder:t(`يوم/شهر/سنة`),inputMode:`numeric`,maxLength:10,className:`
+                w-full
+                px-3
+                py-2.5
+                pr-10
+                text-sm
+                bg-white
+                num
+                outline-none
+                transition
+                focus:bg-primary-50/30
+                focus:ring-2
+                focus:ring-primary-500/10
+                ${u}
+              `,...m}),(0,o.jsx)(`button`,{type:`button`,onClick:b,className:`
+                absolute
+                right-0
+                top-0
+                h-full
+                w-10
+                flex
+                items-center
+                justify-center
+                text-ink-500
+                hover:text-primary-600
+                hover:bg-primary-50
+                transition
+              `,"aria-label":t(`اختيار التاريخ`),children:(0,o.jsx)(i,{className:`w-4 h-4`})}),(0,o.jsx)(`input`,{type:`date`,value:f||s(),onChange:y,className:`
+                absolute
+                opacity-0
+                pointer-events-none
+                w-0
+                h-0
+              `,tabIndex:-1,"aria-hidden":`true`})]}):(0,o.jsx)(`input`,{type:h?`text`:d,inputMode:h?`decimal`:void 0,value:f??``,onChange:_,className:`
+              flex-1
+              min-w-0
+              px-3
+              py-2.5
+              text-sm
+              bg-white
+              num
+              outline-none
+              transition
+              focus:bg-primary-50/30
+              focus:ring-2
+              focus:ring-primary-500/10
+              ${u}
+            `,...m})]}),r&&(0,o.jsx)(`p`,{className:`px-3 py-1 text-xs text-negative bg-negative/5`,children:r})]})}export{u as t};

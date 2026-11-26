@@ -41,6 +41,7 @@ public static class DependencyInjection
             .Validate(options => options.TimeoutSeconds is > 0 and <= 120,
                 "Frankfurter:TimeoutSeconds must be between 1 and 120.")
             .ValidateOnStart();
+        services.AddHttpClient();
         services.AddHttpClient<IExchangeRateProvider, FrankfurterExchangeRateProvider>(
             (serviceProvider, client) =>
             {

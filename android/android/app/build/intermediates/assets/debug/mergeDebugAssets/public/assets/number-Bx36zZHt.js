@@ -1,0 +1,1 @@
+function e(e){let t=Number(e);return Number.isFinite(t)?Number(t.toFixed(2)):e}export{e as t};

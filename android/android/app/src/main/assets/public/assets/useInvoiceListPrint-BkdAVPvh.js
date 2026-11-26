@@ -1,0 +1,1 @@
+import{a as e}from"./rolldown-runtime-BWaJ3C7D.js";import{A as t,J as n}from"./jsx-runtime-CwlwA8cZ.js";import{t as r}from"./react-to-print-ChgInJ3f.js";var i=e(n(),1);function a({title:e=t(`تقرير الفواتير`)}={}){let n=(0,i.useRef)(null);return{printList:r({contentRef:n,documentTitle:e}),printRef:n}}export{a as t};

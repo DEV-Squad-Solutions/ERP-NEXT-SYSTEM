@@ -448,6 +448,13 @@ export const navigationItems = [
             end: true,
             roles: FULL_ACCESS_ROLES,
           },
+          {
+            label: t("تكلفة المخزون"),
+            path: "/dashboard/reports/inventory/cost",
+            icon: Boxes,
+            end: true,
+            roles: FULL_ACCESS_ROLES,
+          },
         ],
       },
     ],

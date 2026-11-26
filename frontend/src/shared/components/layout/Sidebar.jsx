@@ -700,7 +700,7 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
         className={[
           "fixed top-0 start-0 z-50",
           "h-screen w-[260px]",
-          pinned ? "" : "sidebar-rail lg:w-[72px] lg:hover:w-[260px] lg:focus-within:w-[260px]",
+          pinned ? "" : "sidebar-rail lg:w-[72px] lg:hover:w-[260px] lg:has-[:focus-visible]:w-[260px]",
           "overflow-hidden",
           "flex flex-col",
           "border-e border-white/[0.07]",

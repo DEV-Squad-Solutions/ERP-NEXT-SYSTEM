@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { toast } from "sonner";
@@ -829,7 +830,7 @@ const AttendanceTakingPage = () => {
           </button>
         </div>
 
-        {selectedIds.size > 0 && (
+        {selectedIds.size > 0 && createPortal(
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-200 bg-white/95 px-3 pt-2.5 shadow-[0_-8px_24px_rgba(15,23,42,0.12)] backdrop-blur"
             style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
             <div className="mx-auto flex max-w-3xl items-center gap-2">
@@ -863,7 +864,8 @@ const AttendanceTakingPage = () => {
                 <X size={18} />
               </button>
             </div>
-          </div>
+          </div>,
+          document.body,
         )}
       </div>
 

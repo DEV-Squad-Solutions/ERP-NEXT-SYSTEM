@@ -30,7 +30,7 @@ export default function InvoiceSearchBox({ value, fromDate, toDate, onChange, on
   const suggestions = useMemo(() => {
     const seen = new Set();
     const out = [];
-    for (const inv of data?.items ?? []) {
+    for (const inv of data?.invoices ?? []) {
       for (const [text, kind] of [[inv.invoiceNumber, t("فاتورة")], [inv.businessPartnerName, t("عميل")]]) {
         if (text && !seen.has(text)) { seen.add(text); out.push({ text, kind }); }
       }

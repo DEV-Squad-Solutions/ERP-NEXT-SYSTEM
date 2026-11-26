@@ -36,30 +36,37 @@ function Leaf({ item, onPick }) {
 }
 
 function Panel({ item, onPick }) {
-  const cols = [];
-  let loose = [];
+  const groups = [];
+  const loose = [];
   item.children.forEach((c) => {
-    if (c.children?.length) cols.push({ title: c.label, leaves: c.children });
+    if (c.children?.length) groups.push({ title: c.label, leaves: c.children });
     else loose.push(c);
   });
-  if (loose.length) cols.unshift({ title: null, leaves: loose });
+  const colCount = Math.max(1, Math.min(groups.length || 1, 3));
   return (
     <div
-      className="absolute top-full z-50 mt-2 start-0 grid items-start gap-x-3 rounded-2xl border border-ink-400/15 bg-white p-3 shadow-xl dark:border-white/10 dark:bg-ink-900"
-      style={{ gridTemplateColumns: `repeat(${Math.min(cols.length, 4)}, minmax(210px, 1fr))`, minWidth: Math.min(cols.length, 4) * 220 }}
+      className="absolute top-full z-50 mt-1.5 start-0 max-h-[70vh] overflow-y-auto rounded-2xl border border-ink-400/15 bg-white p-2 shadow-xl ring-1 ring-black/[0.03] dark:border-white/10 dark:bg-ink-900 dark:ring-white/[0.04]"
+      style={{ width: colCount * 232 + 16 }}
     >
-      {cols.map((c, i) => (
-        <div key={i} className="p-1">
-          {c.title && (
-            <p className="px-3 pb-1.5 pt-1 text-[11px] font-bold uppercase tracking-wide text-primary-500">
-              {c.title}
-            </p>
-          )}
-          {c.leaves.map((l) => (
+      {loose.length > 0 && (
+        <div className={`grid gap-x-2 p-1 ${groups.length ? "mb-1 border-b border-ink-400/10 pb-2 dark:border-white/[0.07]" : ""}`} style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}>
+          {loose.map((l) => (
             <Leaf key={l.path} item={l} onPick={onPick} />
           ))}
         </div>
-      ))}
+      )}
+      {groups.length > 0 && (
+        <div className="grid items-start gap-x-2" style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}>
+          {groups.map((g) => (
+            <div key={g.title} className="p-1">
+              <p className="px-3 pb-1.5 pt-1 text-[11px] font-bold tracking-wide text-primary-500">{g.title}</p>
+              {g.leaves.map((l) => (
+                <Leaf key={l.path} item={l} onPick={onPick} />
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -70,6 +77,9 @@ export default function TopNav({ onSwitchLayout }) {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(null);
   const ref = useRef(null);
+  const closeTimer = useRef(null);
+  const cancelClose = () => closeTimer.current && clearTimeout(closeTimer.current);
+  const scheduleClose = () => { cancelClose(); closeTimer.current = setTimeout(() => setOpen(null), 220); };
 
   const items = useMemo(() => {
     const flat = removeEmptySections(filterNavigationItems(navigationItems, roles, hidden));
@@ -103,6 +113,8 @@ export default function TopNav({ onSwitchLayout }) {
   return (
     <nav
       ref={ref}
+      onMouseEnter={cancelClose}
+      onMouseLeave={scheduleClose}
       aria-label={t("التنقل الرئيسي")}
       className="relative z-30 hidden items-center gap-1 border-b border-ink-400/10 bg-white px-4 py-1.5 dark:border-white/[0.07] dark:bg-ink-900 lg:flex"
     >
@@ -130,6 +142,7 @@ export default function TopNav({ onSwitchLayout }) {
                 type="button"
                 aria-expanded={isOpen}
                 onClick={() => setOpen(isOpen ? null : item.label)}
+                onMouseEnter={() => open && setOpen(item.label)}
                 className={cls}
               >
                 {Icon && <Icon size={15} strokeWidth={1.8} />}

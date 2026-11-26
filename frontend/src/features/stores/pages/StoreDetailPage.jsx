@@ -106,7 +106,7 @@ export default function StoreDetailPage() {
             onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? "bg-ink-900 text-white"
+                ? "bg-primary-500 text-white"
                 : "text-ink-600 hover:bg-ink-50"
             }`}
           >

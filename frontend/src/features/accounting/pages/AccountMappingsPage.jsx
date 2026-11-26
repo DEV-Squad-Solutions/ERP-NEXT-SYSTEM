@@ -218,9 +218,9 @@ export default function AccountMappingsPage() {
           type="button"
           disabled={!isDirty || !canEdit || isSaving}
           onClick={handleSave}
-          className="bg-emerald-800 disabled:bg-emerald-800/40 disabled:cursor-not-allowed
+          className="bg-primary-500 disabled:bg-emerald-800/40 disabled:cursor-not-allowed
                      text-white text-sm font-medium px-5 py-2.5 rounded-lg
-                     hover:bg-emerald-900 transition-colors"
+                     hover:bg-primary-600 transition-colors"
         >
           {isSaving ? t("جارِ الحفظ...") : t("حفظ الربط")}
         </button>

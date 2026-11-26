@@ -79,6 +79,21 @@ public sealed class SeedHarnessTests(ITestOutputHelper output)
         output.WriteLine("=== RUN 3");
         await DevelopmentDataSeeder.SeedAsync(provider, config);
         var third = await CountsAsync(provider);
+        await using (var tscope = provider.CreateAsyncScope())
+        {
+            var db = tscope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            foreach (var et in db.Model.GetEntityTypes().Where(e => e.GetTableName() != null && !e.IsOwned()))
+            {
+                var table = et.GetTableName()!;
+                if (et.FindProperty("CreatedById") == null) { output.WriteLine($"TAG {table}: no CreatedById column (total {third[table]})"); continue; }
+                await using var cmd = db.Database.GetDbConnection().CreateCommand();
+                cmd.CommandText = $"SELECT COUNT(*), SUM(CASE WHEN CreatedById = 'seed' THEN 1 ELSE 0 END) FROM \"{table}\"";
+                await using var rd = await cmd.ExecuteReaderAsync();
+                await rd.ReadAsync();
+                var total = rd.GetInt64(0); var seeded = rd.IsDBNull(1) ? 0 : rd.GetInt64(1);
+                if (total != seeded) output.WriteLine($"TAG {table}: {total - seeded} of {total} rows NOT created_by 'seed'");
+            }
+        }
         output.WriteLine("=== 3RD-RUN CHANGES: " + string.Join("; ", second.Where(kv => third[kv.Key] != kv.Value).Select(kv => $"{kv.Key} {kv.Value}->{third[kv.Key]}")));
 
         foreach (var (t, n) in first) output.WriteLine($"{t}: {n} -> {second[t]}");

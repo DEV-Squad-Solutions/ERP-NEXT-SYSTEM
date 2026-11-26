@@ -136,7 +136,7 @@ export default function StoreInventoryTab({
         <button
           type="button"
           onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-white bg-ink-900 hover:bg-ink-800 transition-colors shrink-0"
+          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 transition-colors shrink-0"
         >
           <Plus className="w-4 h-4" />
           {t("إضافة صنف جديد")}
@@ -631,7 +631,7 @@ function ItemBalanceModal({
                   <button
                     type="button"
                     onClick={handleAddExpense}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-white bg-ink-900 hover:bg-ink-800 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 transition-colors"
                   >
                     {editingId !== null ? (
                       <>
@@ -764,7 +764,7 @@ function ItemBalanceModal({
               )}
             </div>
 
-            <div className="rounded-xl bg-ink-900 text-white p-4 flex items-center justify-between gap-4">
+            <div className="rounded-xl bg-primary-500 text-white p-4 flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs text-white/60">{t("إجمالي مصروفات التسعير")}</p>
 

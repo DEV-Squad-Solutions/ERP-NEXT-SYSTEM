@@ -30,7 +30,7 @@ export function InvoiceDetailsError({ onRetry, onBack }) {
         </button>
         <button
           onClick={onRetry}
-          className="rounded-lg bg-[#0C4A3E] px-4 py-2 text-sm font-medium text-white hover:bg-[#093A31]"
+          className="rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-white hover:bg-primary-600"
         >
           {t("إعادة المحاولة")}
         </button>

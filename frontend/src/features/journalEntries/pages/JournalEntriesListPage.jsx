@@ -244,11 +244,11 @@ function ActionButton({
         ${
           primary
             ? `
-              bg-emerald-800
+              bg-primary-500
               text-white
               shadow-sm
               shadow-emerald-900/10
-              hover:bg-emerald-900
+              hover:bg-primary-600
             `
             : danger
               ? `

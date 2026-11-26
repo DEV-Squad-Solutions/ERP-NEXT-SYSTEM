@@ -60,7 +60,7 @@ export default function AccountsPage() {
         <button
           type="button"
           onClick={openCreateRoot}
-          className="flex items-center gap-1.5 rounded-lg bg-green-900 px-3.5 py-2 text-sm text-white hover:bg-blue-700"
+          className="flex items-center gap-1.5 rounded-lg bg-primary-500 px-3.5 py-2 text-sm text-white hover:bg-blue-700"
         >
           <Plus size={16} />
           {t("حساب رئيسي جديد")}

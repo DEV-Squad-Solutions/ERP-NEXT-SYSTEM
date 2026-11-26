@@ -85,7 +85,7 @@ export const routeTitles = {
     t("تفاصيل ربحية الفاتورة"),
   "/dashboard/reports/profitability/items": t("ربحية الأصناف"),
 
-  "/dashboard/permissions": t("الصلاحيات"),
+  "/dashboard/permissions": t("الشركات والمستخدمون"),
   "/dashboard/profile": t("الملف الشخصي"),
   "/dashboard/profile/edit": t("تعديل الملف الشخصي"),
 };

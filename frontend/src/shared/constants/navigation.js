@@ -445,15 +445,8 @@ export const navigationItems = [
   },
 
   {
-    label: t("الصلاحيات"),
+    label: t("الشركات والمستخدمون"),
     path: "/dashboard/permissions",
-    icon: ShieldCheck,
-    end: true,
-    roles: ["Admin"],
-  },
-  {
-    label: t("إعداد الأدمن والشركات"),
-    path: "/dashboard/setup",
     icon: ShieldCheck,
     end: true,
     roles: ["Admin"],

@@ -982,13 +982,8 @@ export const router = createBrowserRouter([
       },
       {
         path: "setup",
-        element: (
-          <LazyPage>
-            <Role roles={[ROLES.ADMIN]}>
-              <SetupPage mode="admin" />
-            </Role>
-          </LazyPage>
-        ),
+        // Merged into the Companies & Users page (old bookmarks keep working).
+        element: <Navigate to="/dashboard/permissions" replace />,
       },
       {
         path: "permissions",

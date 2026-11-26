@@ -69,7 +69,7 @@ public static class BuiltInAnalyst
         Section(Has(q, "متاخر", "متأخر", "تحصيل", "عميل", "عملاء", "مستحق", "دين", "overdue", "receivable"), () =>
         {
             var s = d.InvoiceStatus;
-            sb.Append($"الفواتير: مدفوعة {s.PaidCount}، مدفوعة جزئيًا {s.PartiallyPaidCount}، غير مدفوعة {s.UnpaidCount}، متأخرة {s.OverdueCount} بقيمة {M(s.OverdueAmount, cur)}.\n");
+            sb.Append($"الفواتير: مدفوعة {s.PaidCount}، مدفوعة جزئيًا {s.PartiallyPaidCount}، غير مدفوعة {s.UnpaidCount}، متأخرة (مبيعات ومشتريات) {s.OverdueCount} بقيمة {M(s.OverdueAmount, cur)}.\n");
         });
 
         Section(Has(q, "شهر", "اتجاه", "تطور", "مقارن", "trend", "month"), () =>
@@ -103,7 +103,7 @@ public static class BuiltInAnalyst
             sb.Append($"المتبقي تحصيله {M(d.Sales.Outstanding, cur)}، قيمة المخزون {M(d.Inventory.CurrentInventoryValue, cur)}، ");
             sb.Append($"عدد الفواتير {d.Counts.InvoiceCount}، العملاء والموردون {d.Counts.BusinessPartnerCount}، الموظفون {d.Counts.EmployeeCount}.\n");
             if (d.InvoiceStatus.OverdueCount > 0)
-                sb.Append($"يستحق الانتباه: {d.InvoiceStatus.OverdueCount} فاتورة متأخرة بقيمة {M(d.InvoiceStatus.OverdueAmount, cur)}.\n");
+                sb.Append($"يستحق الانتباه: {d.InvoiceStatus.OverdueCount} فاتورة متأخرة (مبيعات ومشتريات) بقيمة {M(d.InvoiceStatus.OverdueAmount, cur)}.\n");
             if (!matched)
                 sb.Append("يمكنك السؤال عن: المبيعات، المشتريات، الربحية، النقدية، المخزون، الفواتير المتأخرة، الاتجاه الشهري، التنبيهات.\n");
         }

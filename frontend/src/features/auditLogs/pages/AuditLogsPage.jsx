@@ -106,7 +106,7 @@ export default function AuditLogsPage() {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-ink-400/15 bg-white dark:border-white/10 dark:bg-ink-900">
-        <table className="w-full min-w-[720px] text-[13px]">
+        <table className="cards-on-phone w-full min-w-[720px] text-[13px]">
           <thead className="bg-ink-400/5 text-ink-600 dark:text-white/70">
             <tr>
               <th className="px-3 py-2 text-start">{t("الوقت")}</th>

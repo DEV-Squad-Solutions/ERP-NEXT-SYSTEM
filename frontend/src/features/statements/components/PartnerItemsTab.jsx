@@ -331,7 +331,7 @@ export default function PartnerItemsTab({ partnerId }) {
           ========================= */}
 
           <div className="overflow-x-auto rounded-2xl border border-ink-400/10 bg-white shadow-card">
-            <table className="w-full min-w-[1100px] border-collapse text-start">
+            <table className="cards-on-phone w-full min-w-[1100px] border-collapse text-start">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-xs text-ink-400">
                   <th className="p-2.5 font-medium">{t("رقم الفاتورة")}</th>

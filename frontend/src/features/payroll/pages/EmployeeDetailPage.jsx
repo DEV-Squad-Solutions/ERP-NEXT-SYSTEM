@@ -211,7 +211,7 @@ function AttendanceTab({ employeeId }) {
 
   return (
     <div className="overflow-x-auto custom-scroll rounded-xl border border-ink-400/10">
-      <table className="w-full text-start border-collapse min-w-[600px]">
+      <table className="cards-on-phone w-full text-start border-collapse min-w-[600px]">
         <thead>
           <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
             <th className="p-2.5 font-medium border-e border-ink-400/5">
@@ -263,7 +263,7 @@ function MovementsTab({ employeeId }) {
 
   return (
     <div className="overflow-x-auto custom-scroll rounded-xl border border-ink-400/10">
-      <table className="w-full text-start border-collapse min-w-[720px]">
+      <table className="cards-on-phone w-full text-start border-collapse min-w-[720px]">
         <thead>
           <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
             <th className="p-2.5 font-medium border-e border-ink-400/5">
@@ -341,7 +341,7 @@ function PayrollHistoryTab({ employeeId }) {
 
   return (
     <div className="overflow-x-auto custom-scroll rounded-xl border border-ink-400/10">
-      <table className="w-full text-start border-collapse min-w-[700px]">
+      <table className="cards-on-phone w-full text-start border-collapse min-w-[700px]">
         <thead>
           <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
             <th className="p-2.5 font-medium border-e border-ink-400/5">

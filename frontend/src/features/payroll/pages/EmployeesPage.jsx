@@ -299,7 +299,7 @@ export default function EmployeesPage() {
           <div
             className={`overflow-x-auto custom-scroll rounded-2xl border border-ink-400/10 bg-white shadow-card transition-opacity duration-200 ${isFetching ? "opacity-60" : ""}`}
           >
-            <table className="w-full text-start border-collapse min-w-[1100px]">
+            <table className="cards-on-phone w-full text-start border-collapse min-w-[1100px]">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                   <th className="p-2.5 font-medium border-e border-ink-400/5">

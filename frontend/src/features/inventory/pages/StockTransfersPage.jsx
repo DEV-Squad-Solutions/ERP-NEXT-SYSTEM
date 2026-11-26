@@ -353,7 +353,7 @@ export default function StockTransfersPage() {
               ${isFetching ? "opacity-60" : ""}
             `}
           >
-            <table className="w-full min-w-[1000px] text-start border-collapse">
+            <table className="cards-on-phone w-full min-w-[1000px] text-start border-collapse">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                   <th className="p-2.5 font-medium border-e border-ink-400/5">

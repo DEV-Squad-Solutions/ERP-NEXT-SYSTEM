@@ -543,7 +543,7 @@ export default function SalesInvoicesTable({
           isFetching ? "opacity-60" : ""
         }`}
       >
-        <table className="w-full min-w-[1100px] border-collapse text-start">
+        <table className="cards-on-phone w-full min-w-[1100px] border-collapse text-start">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr

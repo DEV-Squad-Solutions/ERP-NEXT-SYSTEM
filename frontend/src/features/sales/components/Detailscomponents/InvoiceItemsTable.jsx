@@ -33,7 +33,7 @@ export default function InvoiceItemsTable({ items, currency }) {
 
       {/* Table */}
       <div className="overflow-x-auto custom-scroll">
-        <table className="w-full text-start border-collapse text-sm min-w-[750px]">
+        <table className="cards-on-phone w-full text-start border-collapse text-sm min-w-[750px]">
           <thead>
             <tr className="bg-ink-900/[0.03] text-ink-400 text-xs">
               <th className="p-3 font-medium">{t("الكود")}</th>

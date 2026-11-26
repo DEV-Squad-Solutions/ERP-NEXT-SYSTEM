@@ -236,7 +236,7 @@ export default function BeforeAdjustmentTrialBalancePage() {
           }`}
         >
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[700px] text-sm" dir={getDir()}>
+            <table className="cards-on-phone w-full min-w-[700px] text-sm" dir={getDir()}>
               <thead>
                 <tr className="bg-ink-400/5 text-xs text-ink-400">
                   <th className="px-3 py-2.5 text-start font-medium">

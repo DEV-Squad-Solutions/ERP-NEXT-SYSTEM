@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { Toaster, toast } from "sonner";
+import TableCardsLabeler from "./shared/components/TableCardsLabeler";
 import FieldErrorHighlighter from "./shared/components/FieldErrorHighlighter";
 import { store } from "./app/store";
 import App from "./app/App";
@@ -33,6 +34,7 @@ createRoot(document.getElementById("root")).render(
     <Provider store={store}>
       <App />
       <FieldErrorHighlighter />
+      <TableCardsLabeler />
       <Toaster
         closeButton
         visibleToasts={4}

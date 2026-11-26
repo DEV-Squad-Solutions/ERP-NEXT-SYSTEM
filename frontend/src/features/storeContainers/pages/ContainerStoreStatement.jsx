@@ -1081,7 +1081,7 @@ export default function ContainerStoreStatementPage() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[900px] text-sm">
+              <table className="cards-on-phone w-full min-w-[900px] text-sm">
                 <thead>
                   <tr className="bg-ink-400/5 text-ink-400">
                     {[
@@ -1286,7 +1286,7 @@ export default function ContainerStoreStatementPage() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[1250px] text-sm">
+              <table className="cards-on-phone w-full min-w-[1250px] text-sm">
                 <thead>
                   <tr className="bg-ink-400/5 text-ink-400">
                     {[

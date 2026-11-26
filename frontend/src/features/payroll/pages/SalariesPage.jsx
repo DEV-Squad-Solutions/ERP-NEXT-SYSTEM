@@ -405,7 +405,7 @@ export default function SalariesPage() {
               ${isFetching || isDeleting ? "opacity-60" : ""}
             `}
           >
-            <table className="w-full text-start border-collapse min-w-[1200px]">
+            <table className="cards-on-phone w-full text-start border-collapse min-w-[1200px]">
               <thead>
                 <tr className="bg-ink-900/[0.03] text-ink-400 text-[11px]">
                   <th className="p-2.5 border-e border-ink-400/5 w-8">

@@ -55,6 +55,16 @@ const showErrors = (error) => {
   if (messages.length === 0) return;
 
   // One toast per failed request: headline + the field messages as lines.
+  try {
+    window.dispatchEvent(
+      new CustomEvent("api-errors", {
+        detail: { errors: error?.data?.errors, messages },
+      }),
+    );
+  } catch {
+    /* ignore */
+  }
+
   const [headline, ...details] = messages;
   const id = messages.join("|");
   toast.error(headline, {

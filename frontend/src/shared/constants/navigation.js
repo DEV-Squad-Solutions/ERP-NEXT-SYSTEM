@@ -436,6 +436,20 @@ export const navigationItems = [
           },
         ],
       },
+      {
+        label: t("تقارير المخزون"),
+        icon: Boxes,
+        roles: FULL_ACCESS_ROLES,
+        children: [
+          {
+            label: t("أرصدة المخزون"),
+            path: "/dashboard/reports/inventory/stock",
+            icon: Boxes,
+            end: true,
+            roles: FULL_ACCESS_ROLES,
+          },
+        ],
+      },
     ],
   },
 

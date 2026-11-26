@@ -45,6 +45,15 @@ builder.Host.UseDefaultServiceProvider((_, options) =>
 MappingConfiguration.Register(typeof(InfrastructureAssemblyMarker).Assembly);
 ArabicValidationConfiguration.Configure();
 
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+    options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
+    options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+});
+builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProviderOptions>(o => o.Level = System.IO.Compression.CompressionLevel.Fastest);
+builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProviderOptions>(o => o.Level = System.IO.Compression.CompressionLevel.Fastest);
+
 builder.Services
     .AddControllers(options =>
         options.ModelBinderProviders.Insert(
@@ -195,6 +204,7 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 app.UseForwardedHeaders();
+app.UseResponseCompression();
 app.UseMiddleware<SecurityHeadersMiddleware>();
 app.UseExceptionHandler();
 app.UseStatusCodePages(async context =>

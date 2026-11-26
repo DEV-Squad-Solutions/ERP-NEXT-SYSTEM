@@ -28,7 +28,6 @@ import { ATTENDANCE_STATUS_VALUE, dayRatioOptions } from "../payroll.constants";
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import Button from "../../../shared/components/ui/Button";
 import { useFiscalYearGuard } from "../../../lib/useFiscalYearGuard";
-import Modal from "../../../shared/components/ui/Modal";
 import ReadOnlyFiscalYearBanner from "../../../shared/components/ui/ReadOnlyFiscalYearBanner";
 import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
@@ -160,21 +159,17 @@ const createEmptyRow = (employee) => ({
   notes: "",
 });
 
-const summarizeDetails = (row, present) => {
-  const parts = [];
-  const label = (v) => dayRatioOptions.find((o) => String(o.value) === String(v))?.label;
-  if (present && row.workDayRatio && Number(row.workDayRatio) !== 1) parts.push(label(row.workDayRatio));
-  if (row.workOverTimeRatio) parts.push(`${t("إضافي")}: ${label(row.workOverTimeRatio) ?? ""}`);
-  if (row.workDaysDeductionRatio) parts.push(`${t("خصم")}: ${label(row.workDaysDeductionRatio) ?? ""}`);
-  if (row.notes) parts.push(t("ملاحظة"));
-  return parts.length ? <span className="truncate">{parts.join(" · ")}</span> : <span className="text-ink-400">{t("تعديل")}</span>;
-};
-
 const AttendanceTakingPage = () => {
   const { isReadOnly: isFiscalYearReadOnly, fiscalYear } = useFiscalYearGuard();
   const [workDate, setWorkDate] = useState(getToday);
   const [search, setSearch] = useState("");
-  const [detailsFor, setDetailsFor] = useState(null);
+  const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const on = () => setNarrow(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   const [statusFilter, setStatusFilter] = useState("");
   const [localRows, setLocalRows] = useState({});
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -313,7 +308,7 @@ const AttendanceTakingPage = () => {
   const rowVirtualizer = useVirtualizer({
     count: filteredRows.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 60,
+    estimateSize: () => (narrow ? 330 : 118),
     overscan: 10,
   });
 
@@ -878,24 +873,6 @@ const AttendanceTakingPage = () => {
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm">
-        <div className="overflow-x-auto border-b border-ink-100">
-          <div className="min-w-[700px]">
-            <div className="grid grid-cols-[44px_minmax(150px,1.5fr)_130px_105px_105px_minmax(120px,1fr)] items-center gap-0 bg-ink-50 px-3 py-3 text-xs font-semibold text-ink-600">
-              <div />
-
-              <div>{t("الموظف")}</div>
-
-              <div>{t("الحالة")}</div>
-
-              <div>{t("الحضور")}</div>
-
-              <div>{t("الانصراف")}</div>
-
-              <div>{t("تفاصيل")}</div>
-            </div>
-          </div>
-        </div>
-
         <div ref={parentRef} className="min-h-0 flex-1 overflow-auto">
           {isLoading ? (
             <div className="flex h-64 items-center justify-center">
@@ -908,7 +885,7 @@ const AttendanceTakingPage = () => {
             </div>
           ) : (
             <div
-              className="relative min-w-[700px]"
+              className="relative"
               style={{
                 height: `${rowVirtualizer.getTotalSize()}px`,
               }}
@@ -925,91 +902,85 @@ const AttendanceTakingPage = () => {
                 return (
                   <div
                     key={employeeId}
-                    className="absolute start-0 end-0 grid grid-cols-[44px_minmax(150px,1.5fr)_130px_105px_105px_minmax(120px,1fr)] items-center border-b border-ink-100 bg-white px-3 transition hover:bg-ink-50/50"
+                    className="absolute start-0 end-0 border-b border-ink-100 bg-white px-3 py-2 transition hover:bg-ink-50/50"
                     style={{
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
                   >
-                    <div>
-                      <input
-                        type="checkbox"
-                        checked={selected}
-                        onChange={() => toggleSelected(employeeId)}
-                        className="h-4 w-4 rounded border-ink-300 text-primary-600 focus:ring-primary-500"
-                      />
-                    </div>
-
-                    <div className="min-w-0 ps-3">
-                      <div className="truncate font-semibold text-ink-800">
-                        {row.employee.name}
+                    <div className={narrow ? "grid grid-cols-2 gap-x-2 gap-y-1.5" : "grid items-end gap-x-2 gap-y-1.5"} style={narrow ? undefined : { gridTemplateColumns: "44px repeat(4, minmax(0, 1fr))" }}>
+                      <div className={narrow ? "col-span-2 flex items-center gap-2" : "flex h-9 items-center"}>
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => toggleSelected(employeeId)}
+                          className="h-4 w-4 rounded border-ink-300 text-primary-600 focus:ring-primary-500"
+                        />
+                        {narrow && (
+                          <span className="truncate font-semibold text-ink-800">{row.employee.name} <span className="text-xs text-ink-400">#{row.employee.id}</span></span>
+                        )}
                       </div>
-
-                      <div className="mt-0.5 text-xs text-ink-400">
-                        #{row.employee.id}
-                      </div>
-                    </div>
-
-                    <div className="ps-3">
-                      <CompactSelect
-                        value={row.status}
-                        onChange={(value) =>
-                          setEmployeeStatus(employeeId, value)
-                        }
-                        options={[
-                          {
-                            value: STATUS.PRESENT,
-                            label: t("حاضر"),
-                          },
-                          {
-                            value: STATUS.ABSENT,
-                            label: t("غائب"),
-                          },
-                          {
-                            value: STATUS.NOT_RECORDED,
-                            label: t("لم يسجل"),
-                          },
-                        ]}
-                        placeholder={t("الحالة")}
-                      />
-                    </div>
-
-                    <div className="ps-3">
-                      <input
-                        type="time"
-                        value={present ? row.checkIn || "" : ""}
-                        disabled={!present}
-                        onChange={(event) =>
-                          updateRow(employeeId, {
-                            checkIn: event.target.value,
-                          })
-                        }
-                        className="h-9 w-full rounded-lg border border-ink-200 bg-white px-2 text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500"
-                      />
-                    </div>
-
-                    <div className="ps-3">
-                      <input
-                        type="time"
-                        value={present ? row.checkOut || "" : ""}
-                        disabled={!present}
-                        onChange={(event) =>
-                          updateRow(employeeId, {
-                            checkOut: event.target.value,
-                          })
-                        }
-                        className="h-9 w-full rounded-lg border border-ink-200 bg-white px-2 text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500"
-                      />
-                    </div>
-
-                    <div className="ps-3">
-                      <button
-                        type="button"
-                        onClick={() => setDetailsFor(employeeId)}
-                        className="flex h-9 w-full items-center justify-center gap-1 rounded-lg border border-ink-200 bg-white px-2 text-xs text-ink-600 transition hover:border-primary-500 hover:text-primary-600"
-                      >
-                        {summarizeDetails(row, present)}
-                      </button>
+                      {!narrow && (
+                        <div className="min-w-0 pb-1">
+                          <div className="truncate font-semibold text-ink-800">{row.employee.name}</div>
+                          <div className="text-xs text-ink-400">#{row.employee.id}</div>
+                        </div>
+                      )}
+                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الحالة")}
+                        <CompactSelect
+                          value={row.status}
+                          onChange={(value) => setEmployeeStatus(employeeId, value)}
+                          options={[
+                            { value: STATUS.PRESENT, label: t("حاضر") },
+                            { value: STATUS.ABSENT, label: t("غائب") },
+                            { value: STATUS.NOT_RECORDED, label: t("لم يسجل") },
+                          ]}
+                          placeholder={t("الحالة")}
+                        />
+                      </label>
+                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الحضور")}
+                        <input type="time" value={present ? row.checkIn || "" : ""} disabled={!present}
+                          onChange={(event) => updateRow(employeeId, { checkIn: event.target.value })}
+                          className="h-9 w-full rounded-lg border border-ink-200 bg-white px-2 text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500" />
+                      </label>
+                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الانصراف")}
+                        <input type="time" value={present ? row.checkOut || "" : ""} disabled={!present}
+                          onChange={(event) => updateRow(employeeId, { checkOut: event.target.value })}
+                          className="h-9 w-full rounded-lg border border-ink-200 bg-white px-2 text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500" />
+                      </label>
+                      {!narrow && <div />}
+                      <label className="block min-w-0 text-[10px] text-ink-500">{t("نسبة اليوم")}
+                        <CompactSelect
+                          value={present ? (row.workDayRatio ?? 1) : ""}
+                          onChange={(value) => updateRow(employeeId, { workDayRatio: normalizeRatio(value, 1) })}
+                          options={dayRatioOptions}
+                          placeholder={t("نسبة اليوم")}
+                          isDisabled={!present}
+                        />
+                      </label>
+                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الإضافي")}
+                        <CompactSelect
+                          value={row.workOverTimeRatio || ""}
+                          onChange={(value) => updateRow(employeeId, { workOverTimeRatio: value })}
+                          options={[{ value: "", label: t("بدون") }, ...dayRatioOptions]}
+                          placeholder={t("الإضافي")}
+                        />
+                      </label>
+                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الخصم")}
+                        <CompactSelect
+                          value={row.workDaysDeductionRatio || ""}
+                          onChange={(value) => updateRow(employeeId, { workDaysDeductionRatio: value })}
+                          options={[{ value: "", label: t("بدون") }, ...dayRatioOptions]}
+                          placeholder={t("الخصم")}
+                          isDisabled={!present}
+                        />
+                      </label>
+                      <label className="block min-w-0 text-[10px] text-ink-500">{t("ملاحظات")}
+                        <input type="text" value={row.notes || ""}
+                          onChange={(event) => updateRow(employeeId, { notes: event.target.value })}
+                          placeholder={t("ملاحظات...")}
+                          className="h-9 w-full rounded-lg border border-ink-200 bg-white px-3 text-sm outline-none transition placeholder:text-ink-400 focus:border-primary-500" />
+                      </label>
                     </div>
                   </div>
                 );
@@ -1039,35 +1010,6 @@ const AttendanceTakingPage = () => {
           )}
         </div>
       </div>
-
-      {(() => {
-        const row = detailsFor != null ? employeeRows.find((r) => Number(r.employee.id) === detailsFor) : null;
-        if (!row) return null;
-        const id = detailsFor;
-        const present = row.status === STATUS.PRESENT;
-        const withNone = [{ value: "", label: t("بدون") }, ...dayRatioOptions];
-        return (
-          <Modal isOpen onClose={() => setDetailsFor(null)} title={`${t("تفاصيل الحضور")} - ${row.employee.name}`}>
-            <div className="space-y-3">
-              <label className="block text-xs text-ink-500">{t("نسبة اليوم")}
-                <CompactSelect value={present ? (row.workDayRatio ?? 1) : ""} onChange={(v) => updateRow(id, { workDayRatio: normalizeRatio(v, 1) })} options={dayRatioOptions} isDisabled={!present} />
-              </label>
-              <label className="block text-xs text-ink-500">{t("الإضافي")}
-                <CompactSelect value={row.workOverTimeRatio || ""} onChange={(v) => updateRow(id, { workOverTimeRatio: v })} options={withNone} />
-              </label>
-              <label className="block text-xs text-ink-500">{t("الخصم")}
-                <CompactSelect value={row.workDaysDeductionRatio || ""} onChange={(v) => updateRow(id, { workDaysDeductionRatio: v })} options={withNone} isDisabled={!present} />
-              </label>
-              <label className="block text-xs text-ink-500">{t("ملاحظات")}
-                <input type="text" value={row.notes || ""} onChange={(e) => updateRow(id, { notes: e.target.value })} placeholder={t("ملاحظات...")} className="mt-1 h-9 w-full rounded-lg border border-ink-200 bg-white px-3 text-sm outline-none focus:border-primary-500" />
-              </label>
-              <div className="flex justify-end pt-1">
-                <Button type="button" onClick={() => setDetailsFor(null)}>{t("تم")}</Button>
-              </div>
-            </div>
-          </Modal>
-        );
-      })()}
     </div>
   );
 };

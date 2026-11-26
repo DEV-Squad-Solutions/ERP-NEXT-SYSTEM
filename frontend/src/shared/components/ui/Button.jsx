@@ -1,7 +1,7 @@
 import { t } from "../../../i18n";
 const variants = {
   primary:
-    "bg-primary-500 text-white shadow-sm hover:bg-primary-600 hover:shadow-card focus-visible:ring-primary-500/30",
+    "bg-primary-500 text-white shadow-sm hover:bg-primary-600 hover:shadow-card focus-visible:ring-primary-500/30 dark:bg-primary-400 dark:hover:bg-primary-300",
 
   gold: "bg-gold-500 text-white shadow-sm hover:bg-gold-600 hover:shadow-card focus-visible:ring-gold-500/30",
 

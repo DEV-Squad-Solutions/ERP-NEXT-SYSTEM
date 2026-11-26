@@ -331,7 +331,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
   );
 
   const [lines, setLines] = useState(() =>
-    Array.from({ length: 10 }, () => emptyLine()),
+    Array.from({ length: 5 }, () => emptyLine()),
   );
 
   const partySelectRef = useRef(null);
@@ -406,7 +406,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
     } else if (cameFromReturn) {
       setLines((ls) => {
         const kept = ls.filter((l) => l.itemId || l.isTemporaryItem);
-        return kept.length > 0 ? kept : Array.from({ length: 10 }, emptyLine);
+        return kept.length > 0 ? kept : Array.from({ length: 5 }, emptyLine);
       });
       setFullReturnState(null);
     }
@@ -483,7 +483,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
     setShowErrors(false);
 
     if (value === "containers") {
-      setLines(Array.from({ length: 10 }, emptyLine));
+      setLines(Array.from({ length: 5 }, emptyLine));
       setFullReturnState(null);
       setHeader((current) => ({
         ...current,
@@ -1068,7 +1068,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
 
   const handleResetForm = useCallback(() => {
     setHeader(getDefaultHeader());
-    setLines(Array.from({ length: 10 }, () => emptyLine()));
+    setLines(Array.from({ length: 5 }, () => emptyLine()));
     setContainersMovement({ containerStoreId: null, items: [] });
     setIsTemporaryDriver(false);
     setInvoiceNumberLocked(true);
@@ -1910,25 +1910,26 @@ export default function CreateInvoiceForm({ onSuccess }) {
         {/* ===== الملاحظات + الملخص + الأزرار ===== */}
         <aside className="space-y-4">
           {showErrors && !validation.isValid && (
-            <div className="rounded-2xl border border-negative/20 bg-negative/5 p-3">
-              <div className="flex items-center gap-2 text-sm font-semibold text-negative">
+            <div className="review-card" role="alert">
+              <div className="review-card__title">
                 <AlertTriangle size={15} />
                 {t("راجع")} {validation.messages.length} {t("ملاحظة")}
               </div>
-              <ul className="mt-2 space-y-1">
+              <ul className="review-card__list">
                 {validation.messages.slice(0, 6).map((msg, i) => (
                   <li key={i}>
                     <button
                       type="button"
                       onClick={() => jumpToField(msg.field)}
-                      className="text-start text-xs leading-5 text-negative/90 hover:underline"
+                      className="review-card__item"
                     >
-                      • {msg.text}
+                      <span className="review-card__dot" aria-hidden="true" />
+                      {msg.text}
                     </button>
                   </li>
                 ))}
                 {validation.messages.length > 6 && (
-                  <li className="text-xs text-negative/70">
+                  <li className="review-card__more">
                     {t("و")} {validation.messages.length - 6} {t("ملاحظات أخرى…")}
                   </li>
                 )}
@@ -1936,7 +1937,8 @@ export default function CreateInvoiceForm({ onSuccess }) {
             </div>
           )}
 
-          {/* قائمة جاهزية الفاتورة */}
+          {/* قائمة جاهزية الفاتورة (تختفي عند ظهور الملاحظات حتى لا تتكرر) */}
+          {!(showErrors && !validation.isValid) && (
           <div className="rounded-2xl border border-ink-400/15 bg-white p-3 shadow-sm">
             <p className="mb-2 text-xs font-semibold text-ink-600">
               {t("خطوات إنشاء الفاتورة")}
@@ -1978,6 +1980,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
               ))}
             </ul>
           </div>
+          )}
 
           {/* ============ القسم 6: ملخص الفاتورة ============ */}
           <LedgerPanel

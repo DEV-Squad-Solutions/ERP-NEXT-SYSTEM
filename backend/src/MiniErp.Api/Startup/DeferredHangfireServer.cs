@@ -1,4 +1,5 @@
 using Hangfire;
+using MiniErp.Application.Features.AuditLogs;
 
 namespace MiniErp.Api.Startup;
 
@@ -23,6 +24,10 @@ public sealed class DeferredHangfireServer(
             {
                 using var server = new BackgroundJobServer(storage);
                 logger.LogInformation("Hangfire background server started.");
+                new RecurringJobManager(storage).AddOrUpdate<IAuditLogRetentionService>(
+                    "audit-log-retention",
+                    service => service.PurgeExpiredAsync(CancellationToken.None),
+                    Cron.Daily(2));
                 await Task.Delay(Timeout.InfiniteTimeSpan, stoppingToken);
                 return;
             }

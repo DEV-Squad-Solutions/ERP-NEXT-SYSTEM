@@ -15,5 +15,8 @@ public sealed class CompanySettings
 
     public string DefaultThemeMode { get; set; } = "light";
 
+    /// <summary>Days to keep audit log entries. Null means keep forever (default).</summary>
+    public int? AuditLogRetentionDays { get; set; }
+
     public Company Company { get; set; } = null!;
 }

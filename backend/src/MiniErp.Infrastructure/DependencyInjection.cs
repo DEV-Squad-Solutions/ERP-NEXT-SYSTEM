@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.TryAddSingleton(TimeProvider.System);
         services.AddScoped<AuditableEntityInterceptor>();
+        services.AddScoped<AuditLogInterceptor>();
         services.AddOptions<FrankfurterOptions>()
             .Bind(configuration.GetSection(FrankfurterOptions.SectionName))
             .Validate(options =>
@@ -56,7 +57,8 @@ public static class DependencyInjection
             options
                 .UseSqlServer(connectionString)
                 .AddInterceptors(
-                    serviceProvider.GetRequiredService<AuditableEntityInterceptor>()));
+                    serviceProvider.GetRequiredService<AuditableEntityInterceptor>(),
+                    serviceProvider.GetRequiredService<AuditLogInterceptor>()));
 
         services
             .AddIdentityCore<ApplicationUser>()

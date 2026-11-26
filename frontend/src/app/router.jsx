@@ -86,6 +86,9 @@ const StockAdjustmentEditPage = lazy(
 const StockAdjustmentDetailPage = lazy(
   () => import("../features/stock-adjustments/pages/StockAdjustmentDetailPage"),
 );
+const AuditLogsPage = lazy(
+  () => import("../features/auditLogs/pages/AuditLogsPage"),
+);
 const PermissionsPage = lazy(
   () => import("../features/permissions/pages/PermissionsPage"),
 );
@@ -989,6 +992,16 @@ export const router = createBrowserRouter([
         path: "setup",
         // Merged into the Companies & Users page (old bookmarks keep working).
         element: <Navigate to="/dashboard/permissions" replace />,
+      },
+      {
+        path: "audit-log",
+        element: (
+          <LazyPage>
+            <Role roles={[ROLES.ADMIN]}>
+              <AuditLogsPage />
+            </Role>
+          </LazyPage>
+        ),
       },
       {
         path: "permissions",

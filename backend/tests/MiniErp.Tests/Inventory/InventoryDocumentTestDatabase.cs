@@ -218,6 +218,7 @@ internal sealed class InventoryDocumentTestDatabase : IAsyncDisposable
             CREATE TABLE CompanySettings (
                 DefaultColorTheme TEXT NULL,
                 DefaultThemeMode TEXT NULL,
+                AuditLogRetentionDays INTEGER NULL,
                 CompanyId INTEGER NOT NULL PRIMARY KEY,
                 StockBalanceCheckMode INTEGER NOT NULL DEFAULT 1,
                 BaseCurrency INTEGER NOT NULL DEFAULT 0,

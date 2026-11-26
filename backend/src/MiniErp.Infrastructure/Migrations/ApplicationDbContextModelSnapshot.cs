@@ -980,6 +980,74 @@ namespace MiniErp.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MiniErp.Domain.Entities.Auditing.AuditLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("ClientIp")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EntityType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsPermanent")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("OccurredOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "OccurredOn");
+
+                    b.HasIndex("CompanyId", "UserId");
+
+                    b.ToTable("AuditLogs", (string)null);
+                });
+
             modelBuilder.Entity("MiniErp.Domain.Entities.BusinessPartners.BusinessPartner", b =>
                 {
                     b.Property<int>("Id")
@@ -2404,6 +2472,9 @@ namespace MiniErp.Infrastructure.Migrations
             modelBuilder.Entity("MiniErp.Domain.Entities.Companies.CompanySettings", b =>
                 {
                     b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AuditLogRetentionDays")
                         .HasColumnType("int");
 
                     b.Property<int>("BaseCurrency")

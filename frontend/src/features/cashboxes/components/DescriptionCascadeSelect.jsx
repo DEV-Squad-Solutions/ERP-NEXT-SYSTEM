@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown, ChevronLeft, Loader2, Search } from "lucide-react";
 
 import { t } from "../../../i18n";
@@ -28,6 +29,8 @@ export default function DescriptionCascadeSelect({
   const [search, setSearch] = useState("");
   const [expandedKey, setExpandedKey] = useState(null);
   const containerRef = useRef(null);
+  const panelRef = useRef(null);
+  const [rect, setRect] = useState(null);
 
   const selectedOption = useMemo(() => {
     return groups.flatMap((g) => g.options).find((o) => o.value === value);
@@ -43,7 +46,8 @@ export default function DescriptionCascadeSelect({
     function handleClickOutside(event) {
       if (
         containerRef.current &&
-        !containerRef.current.contains(event.target)
+        !containerRef.current.contains(event.target) &&
+        !(panelRef.current && panelRef.current.contains(event.target))
       ) {
         setIsOpen(false);
         setSearch("");
@@ -55,9 +59,26 @@ export default function DescriptionCascadeSelect({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const close = (event) => {
+      if (panelRef.current && event?.target && panelRef.current.contains(event.target)) return;
+      setIsOpen(false);
+      setSearch("");
+      setExpandedKey(null);
+    };
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [isOpen]);
+
   // فتح القائمة يبدأ بفئة السند المختار مفرودة (لو موجود)
   function toggleOpen() {
     if (isDisabled || isLoading) return;
+    if (containerRef.current) setRect(containerRef.current.getBoundingClientRect());
 
     setIsOpen((current) => {
       const next = !current;
@@ -125,8 +146,18 @@ export default function DescriptionCascadeSelect({
         )}
       </button>
 
-      {isOpen && !isDisabled && (
-        <div className="absolute z-50 mt-1 max-h-80 w-full min-w-[240px] overflow-hidden rounded-xl border border-ink-400/10 bg-white shadow-2xl">
+      {isOpen && !isDisabled && rect && createPortal(
+        <div
+          ref={panelRef}
+          dir="rtl"
+          style={{
+            position: "fixed",
+            top: Math.min(rect.bottom + 4, window.innerHeight - 330),
+            left: Math.max(8, Math.min(rect.left, window.innerWidth - Math.max(rect.width, 260) - 8)),
+            width: Math.max(rect.width, 260),
+            zIndex: 1000,
+          }}
+          className="max-h-80 overflow-hidden rounded-xl border border-ink-400/10 bg-white shadow-2xl dark:bg-ink-900">
           <div className="border-b border-ink-400/10 p-1.5">
             <div className="flex items-center gap-1.5 rounded-lg bg-ink-900/[0.03] px-2 py-1.5">
               <Search size={12} className="shrink-0 text-ink-300" />
@@ -208,7 +239,8 @@ export default function DescriptionCascadeSelect({
               );
             })}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

@@ -18,3 +18,16 @@ export const hrReportsApi = baseApi.injectEndpoints({
 });
 
 export const { useGetAttendanceReportQuery, useGetEmployeeMovementsReportQuery } = hrReportsApi;
+
+export const invoiceReportsApi = baseApi.injectEndpoints({
+  endpoints: (builder) => ({
+    getInvoiceSummary: builder.query({
+      query: ({ fromDate, toDate }) => ({ url: "InvoiceReports/summary", params: { fromDate, toDate } }),
+    }),
+    getInvoiceAging: builder.query({
+      query: ({ kind, asOfDate }) => ({ url: "InvoiceReports/aging", params: { kind, asOfDate } }),
+    }),
+  }),
+});
+
+export const { useGetInvoiceSummaryQuery, useGetInvoiceAgingQuery } = invoiceReportsApi;

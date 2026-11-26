@@ -484,6 +484,20 @@ export const navigationItems = [
             roles: FULL_ACCESS_ROLES,
           },
           {
+            label: t("ملخص المبيعات والمشتريات"),
+            path: "/dashboard/reports/invoice-summary",
+            icon: Receipt,
+            end: true,
+            roles: FULL_ACCESS_ROLES,
+          },
+          {
+            label: t("أعمار الديون"),
+            path: "/dashboard/reports/aging",
+            icon: Receipt,
+            end: true,
+            roles: FULL_ACCESS_ROLES,
+          },
+          {
             label: t("تقرير الحضور"),
             path: "/dashboard/reports/attendance",
             icon: Receipt,

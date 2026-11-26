@@ -91,6 +91,8 @@ export const routeTitles = {
   "/dashboard/reports/employee-movements": t("تقرير حركات الموظفين"),
   "/dashboard/reports/cash-handover": t("تقرير تسليم الخزينة"),
   "/dashboard/reports": t("كل التقارير"),
+  "/dashboard/reports/invoice-summary": t("ملخص المبيعات والمشتريات"),
+  "/dashboard/reports/aging": t("أعمار الديون"),
   "/dashboard/reports/expenses": t("تقرير المصروفات"),
 
   "/dashboard/permissions": t("الشركات والمستخدمون"),

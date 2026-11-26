@@ -6,6 +6,7 @@ const GROUPS = [
     ["قائمة الدخل", "/dashboard/income"], ["المركز المالي", "/dashboard/financial-position"],
     ["قائمة التدفقات النقدية", "/dashboard/cash-flow"], ["ميزان المراجعة قبل التسوية", "/dashboard/trial-balance/before-adjustments"],
     ["ميزان المراجعة بعد التسوية", "/dashboard/trial-balance/after-adjustments"], ["تقرير المصروفات", "/dashboard/reports/expenses"],
+    ["ملخص المبيعات والمشتريات", "/dashboard/reports/invoice-summary"], ["أعمار الديون", "/dashboard/reports/aging"],
     ["تقرير تسليم الخزينة", "/dashboard/reports/cash-handover"],
   ]},
   { title: "المبيعات والربحية", items: [

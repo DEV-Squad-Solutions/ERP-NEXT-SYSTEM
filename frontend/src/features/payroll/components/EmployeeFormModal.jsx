@@ -34,7 +34,12 @@ const schema = z.object({
     .or(z.literal("")),
   address: z.string().optional(),
   type: z.string().min(1, t("نوع الأجر مطلوب")),
-  salary: z.coerce.number().min(0, t("لازم تكون قيمة موجبة")),
+  salary: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? 0 : v),
+    z.coerce
+      .number({ invalid_type_error: t("أدخل رقماً صحيحاً") })
+      .gt(0, t("أدخل قيمة أكبر من صفر")),
+  ),
   requiredWorkingDaysPerMonth: z.coerce.number().min(0).optional(),
   workPlaceStatus: z.string().min(1, t("مكان العمل مطلوب")),
   placeName: z.string().optional(),
@@ -48,7 +53,7 @@ const defaultValues = {
   email: "",
   address: "",
   type: "Daily",
-  salary: 0,
+  salary: "",
   requiredWorkingDaysPerMonth: 0,
   workPlaceStatus: "InCompany",
   placeName: "",
@@ -201,9 +206,11 @@ export default function EmployeeFormModal({
           </div>
 
           <Input
-            label={t("الراتب الأساسي")}
+            label={isDaily ? t("الأجر اليومي *") : t("الراتب الشهري *")}
             type="number"
             step="0.01"
+            min="0"
+            inputMode="decimal"
             {...register("salary")}
             error={errors.salary?.message}
           />

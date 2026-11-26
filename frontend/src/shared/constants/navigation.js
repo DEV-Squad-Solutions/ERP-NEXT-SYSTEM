@@ -31,6 +31,7 @@ import {
   ListTree,
   Link2,
   Waves,
+  Sparkles,
 } from "lucide-react";
 
 import { t } from "../../i18n";
@@ -448,6 +449,13 @@ export const navigationItems = [
     label: t("الشركات والمستخدمون"),
     path: "/dashboard/permissions",
     icon: ShieldCheck,
+    end: true,
+    roles: ["Admin"],
+  },
+  {
+    label: t("مركز الذكاء الاصطناعي"),
+    path: "/dashboard/ai-center",
+    icon: Sparkles,
     end: true,
     roles: ["Admin"],
   },

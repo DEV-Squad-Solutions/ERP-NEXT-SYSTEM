@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import Sidebar from "./Sidebar";
@@ -21,6 +21,16 @@ export default function DashboardLayout() {
     setLayout(next);
   };
   const { pathname } = useLocation();
+  const mainRef = useRef(null);
+  // The page area must never drift sideways (focus or wide content can scroll it): pin it back.
+  useEffect(() => {
+    const el = mainRef.current;
+    if (!el) return undefined;
+    el.scrollLeft = 0;
+    const pin = () => { if (el.scrollLeft !== 0) el.scrollLeft = 0; };
+    el.addEventListener("scroll", pin, { passive: true });
+    return () => el.removeEventListener("scroll", pin);
+  }, [pathname]);
   const hiddenScreens = useHiddenScreens();
 
   return (
@@ -69,6 +79,7 @@ export default function DashboardLayout() {
         =================================================== */}
 
         <main
+          ref={mainRef}
           className={[
             "relative",
             "flex-1",

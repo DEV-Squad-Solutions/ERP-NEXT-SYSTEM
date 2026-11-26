@@ -6,7 +6,7 @@ import { store } from "./app/store";
 import App from "./app/App";
 import "./index.css";
 import { initTheme } from "./shared/theme/theme";
-import { reloadOnceForNewVersion } from "./lib/lazyRetry";
+import { reloadOnceForNewVersion, warmLazyPages } from "./lib/lazyRetry";
 import { applyDocumentLanguage, getLang } from "./i18n";
 
 window.addEventListener("vite:preloadError", (event) => {
@@ -15,6 +15,7 @@ window.addEventListener("vite:preloadError", (event) => {
 
 if (import.meta.env.DEV) window.__toast = toast;
 initTheme();
+window.addEventListener("load", warmLazyPages, { once: true });
 applyDocumentLanguage();
 const savedTheme = localStorage.getItem("theme");
 

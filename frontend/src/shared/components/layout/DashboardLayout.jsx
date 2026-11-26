@@ -13,6 +13,11 @@ import { getDir } from "../../../i18n";
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [layout, setLayout] = useState(() => localStorage.getItem("layout") === "top" ? "top" : "side");
+  const [pinned, setPinned] = useState(() => localStorage.getItem("sidebarPinned") !== "false");
+  const togglePin = () => {
+    localStorage.setItem("sidebarPinned", String(!pinned));
+    setPinned(!pinned);
+  };
   const isTop = layout === "top";
   const switchLayout = () => {
     const next = isTop ? "side" : "top";
@@ -40,7 +45,7 @@ export default function DashboardLayout() {
           SIDEBAR
       ===================================================== */}
 
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} hideOnDesktop={isTop} onSwitchLayout={switchLayout} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} hideOnDesktop={isTop} onSwitchLayout={switchLayout} pinned={pinned} onTogglePin={togglePin} />
 
       {/* =====================================================
           MAIN APPLICATION AREA
@@ -53,7 +58,7 @@ export default function DashboardLayout() {
           "transition-[margin]",
           "duration-300",
           "ease-[cubic-bezier(0.22,1,0.36,1)]",
-          isTop ? "" : "lg:ms-[260px]",
+          isTop ? "" : pinned ? "lg:ms-[260px]" : "lg:ms-[72px]",
         ].join(" ")}
       >
         {/* ===================================================

@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useId, useMemo, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { X, Info, ChevronDown } from "lucide-react";
+import { X, Info, ChevronDown, Pin, PinOff } from "lucide-react";
 import { useSelector } from "react-redux";
 
 import { navigationItems } from "../../constants/navigation";
@@ -603,7 +603,7 @@ const SidebarGroup = memo(function SidebarGroup({
    SIDEBAR
 ========================================================= */
 
-function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout }) {
+function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinned = true, onTogglePin }) {
   const company = useSelector((state) => state.auth.selectedCompany);
 
   const roles = useSelector((state) => state.auth.roles);
@@ -700,6 +700,8 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout }) {
         className={[
           "fixed top-0 start-0 z-50",
           "h-screen w-[260px]",
+          pinned ? "" : "sidebar-rail lg:w-[72px] lg:hover:w-[260px] lg:focus-within:w-[260px]",
+          "overflow-hidden",
           "flex flex-col",
           "border-e border-white/[0.07]",
           "bg-ink-900",
@@ -783,6 +785,18 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout }) {
               </div>
             </button>
 
+            {onTogglePin && (
+              <button
+                type="button"
+                onClick={(e) => { onTogglePin(); e.currentTarget.blur(); }}
+                aria-pressed={pinned}
+                title={pinned ? t("إلغاء تثبيت القائمة") : t("تثبيت القائمة")}
+                aria-label={pinned ? t("إلغاء تثبيت القائمة") : t("تثبيت القائمة")}
+                className="sidebar-pin hidden shrink-0 items-center justify-center rounded-lg p-1.5 text-white/70 outline-none transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-gold-500/40 lg:flex"
+              >
+                {pinned ? <PinOff size={16} strokeWidth={1.8} /> : <Pin size={16} strokeWidth={1.8} />}
+              </button>
+            )}
             <button
               type="button"
               onClick={handleClose}

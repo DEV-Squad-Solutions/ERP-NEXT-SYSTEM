@@ -118,18 +118,16 @@ public sealed class AiAssistantService(
             sources.Add(await tools.ExecuteAsync(name, filters, cancellationToken));
         }
 
-        if (!provider.IsConfigured)
+        // الافتراضي: المحلل المدمج داخل السيرفر. لا مفتاح ولا مزود خارجي، وكل الشركات آمنة.
+        var useExternal = provider.IsConfigured && options.Value.AllowedCompanyIds.Contains(company.CompanyId);
+        if (!useExternal)
         {
-            return Result<AiAnswerResponse>.Success(new AiAnswerResponse(
-                question, null, false, null, sources,
-                "الذكاء الاصطناعي غير مفعّل بعد. الأرقام التالية من النظام مباشرة."));
-        }
-
-        if (!options.Value.AllowedCompanyIds.Contains(company.CompanyId))
-        {
-            return Result<AiAnswerResponse>.Success(new AiAnswerResponse(
-                question, null, true, provider.Name, sources,
-                "إرسال بيانات هذه الشركة لمزود الذكاء الاصطناعي غير مسموح بعد. الأرقام من النظام مباشرة."));
+            var overview = sources.Select(x => x.Data).OfType<DashboardResponse>().FirstOrDefault();
+            return Result<AiAnswerResponse>.Success(overview is null
+                ? new AiAnswerResponse(question, null, true, BuiltInAnalyst.ProviderName, sources,
+                    "تعذر تحميل أرقام الشركة الآن.")
+                : new AiAnswerResponse(question, BuiltInAnalyst.Answer(question, overview), true,
+                    BuiltInAnalyst.ProviderName, sources, null));
         }
 
         var data = JsonSerializer.Serialize(sources.Where(s => s.Error is null));

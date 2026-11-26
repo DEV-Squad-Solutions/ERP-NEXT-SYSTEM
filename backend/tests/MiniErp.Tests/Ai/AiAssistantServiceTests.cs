@@ -76,13 +76,12 @@ public sealed class AiAssistantServiceTests
     }
 
     [Fact]
-    public async Task Without_provider_returns_tool_data_and_no_answer()
+    public async Task Without_provider_uses_built_in_analyst_and_sends_nothing_out()
     {
         var p = new FakeProvider(false);
         var r = await Make(p, 2).AskAsync(new AiAskRequest("كم المبيعات؟"));
         Assert.True(r.IsSuccess);
-        Assert.False(r.Value.AiConfigured);
-        Assert.Null(r.Value.Answer);
+        Assert.Equal("built-in", r.Value.Provider);
         Assert.Single(r.Value.Sources);
         Assert.Equal(0, p.Calls);
     }

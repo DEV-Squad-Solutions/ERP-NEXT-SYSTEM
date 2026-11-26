@@ -22,6 +22,7 @@ import {
 import { useReactToPrint } from "react-to-print";
 
 import { useGetInvoiceProfitabilityQuery } from "../profitabilityApi";
+import InvoiceSearchBox from "./InvoiceSearchBox";
 
 import CompactSelect from "../../../shared/components/ui/CompactSelect";
 import Input from "../../../shared/components/ui/Input";
@@ -697,18 +698,16 @@ export default function InvoiceProfitabilityPage() {
                   {/* Search بدون Label */}
 
                   <div className="mt-3">
-                    <Input
-                      placeholder={t("رقم الفاتورة أو اسم العميل...")}
+                    <InvoiceSearchBox
                       value={filters.search}
-                      onChange={(event) =>
-                        updateFilter("search", event.target.value)
-                      }
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                          applyFilters();
-                        }
+                      fromDate={filters.fromDate}
+                      toDate={filters.toDate}
+                      onChange={(v) => updateFilter("search", v)}
+                      onCommit={(v) => {
+                        setPageNumber(1);
+                        setFilters((f) => ({ ...f, search: v }));
+                        setAppliedFilters((f) => ({ ...f, search: v }));
                       }}
-                      icon={<Search size={16} />}
                     />
                   </div>
 

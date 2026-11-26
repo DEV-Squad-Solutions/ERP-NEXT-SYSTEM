@@ -453,3 +453,8 @@ aside.sidebar-rail { transition: width .22s cubic-bezier(.22,1,.36,1), transform
   aside.sidebar-rail:not(:hover):not(:focus-within) header > div { justify-content: center; }
   aside.sidebar-rail:hover { box-shadow: 0 0 40px rgb(0 0 0 / .35); }
 }
+
+/* Mobile: page-header action groups wrap instead of overflowing */
+@media (max-width: 640px) {
+  .animate-fadeUp > div.flex-wrap > div.flex.items-center { flex-wrap: wrap; max-width: 100%; }
+}

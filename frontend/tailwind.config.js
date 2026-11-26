@@ -128,18 +128,18 @@ export default {
 
         /* Destructive / errors (brand anchored) */
         negative: {
-          DEFAULT: "#C0392B",
-          50: "#FDF0EE",
-          100: "#FADCD8",
-          200: "#F4BDB5",
-          300: "#EB9487",
-          400: "#D9685A",
-          500: "#CC4A3B",
-          600: "#C0392B",
-          700: "#A13027",
-          800: "#852820",
-          900: "#6B211B",
-          950: "#4A1712",
+          DEFAULT: "#BE3455",
+          50: "#FFF1F3",
+          100: "#FFE0E5",
+          200: "#FDC4CE",
+          300: "#F89AAB",
+          400: "#EC6A84",
+          500: "#D6405F",
+          600: "#BE3455",
+          700: "#9F2A47",
+          800: "#832440",
+          900: "#6B2038",
+          950: "#3F1021",
         },
 
         /* Dark-mode semantic surfaces (used via dark: variants) */

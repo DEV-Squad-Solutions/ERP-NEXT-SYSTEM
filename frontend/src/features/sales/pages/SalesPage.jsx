@@ -15,7 +15,6 @@ import SalesInvoicesTable from "../components/SalesInvoicesTable";
 import Button from "../../../shared/components/ui/Button";
 import { useInvoiceListPrint } from "../../../shared/hooks/useInvoiceListPrint";
 import InvoiceListPrintTemplate from "../../../shared/components/print/InvoiceListPrintTemplate";
-import { exportInvoicesToExcel } from "../../../shared/hooks/exportInvoicesToExcel";
 
 import { t } from "../../../i18n";
 const emptyFilters = {
@@ -64,7 +63,9 @@ export default function SalesPage() {
           ? t("فواتير-المشتريات")
           : t("فواتير-المبيعات");
 
-      exportInvoicesToExcel(exportData.items, fileName);
+      import("../../../shared/hooks/exportInvoicesToExcel").then((m) =>
+        m.exportInvoicesToExcel(exportData.items, fileName),
+      );
 
       setTriggerExport(false);
 

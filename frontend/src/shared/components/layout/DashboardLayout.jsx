@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import TopNav from "./TopNav";
 import PageLoader from "./PageLoader";
 import UnauthorizedPage from "../UnauthorizedPage";
 import useHiddenScreens from "../../../features/screenAccess/useHiddenScreens";
@@ -11,6 +12,13 @@ import { getDir } from "../../../i18n";
 
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [layout, setLayout] = useState(() => localStorage.getItem("layout") === "top" ? "top" : "side");
+  const isTop = layout === "top";
+  const switchLayout = () => {
+    const next = isTop ? "side" : "top";
+    localStorage.setItem("layout", next);
+    setLayout(next);
+  };
   const { pathname } = useLocation();
   const hiddenScreens = useHiddenScreens();
 
@@ -32,7 +40,7 @@ export default function DashboardLayout() {
           SIDEBAR
       ===================================================== */}
 
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} hideOnDesktop={isTop} onSwitchLayout={switchLayout} />
 
       {/* =====================================================
           MAIN APPLICATION AREA
@@ -45,7 +53,7 @@ export default function DashboardLayout() {
           "transition-[margin]",
           "duration-300",
           "ease-[cubic-bezier(0.22,1,0.36,1)]",
-          "lg:ms-[260px]",
+          isTop ? "" : "lg:ms-[260px]",
         ].join(" ")}
       >
         {/* ===================================================
@@ -53,6 +61,7 @@ export default function DashboardLayout() {
         =================================================== */}
 
         <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+        {isTop && <TopNav onSwitchLayout={switchLayout} />}
 
         {/* ===================================================
             CONTENT

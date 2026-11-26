@@ -24,7 +24,7 @@ function canAccessItem(item, roles) {
    NAVIGATION FILTER
 ========================================================= */
 
-function filterNavigationItems(items, roles, hidden = []) {
+export function filterNavigationItems(items, roles, hidden = []) {
   if (!items?.length) return [];
 
   return items.reduce((result, item) => {
@@ -67,7 +67,7 @@ function filterNavigationItems(items, roles, hidden = []) {
    REMOVE EMPTY SECTIONS
 ========================================================= */
 
-function removeEmptySections(items) {
+export function removeEmptySections(items) {
   const result = [];
 
   items.forEach((item, index) => {
@@ -603,7 +603,7 @@ const SidebarGroup = memo(function SidebarGroup({
    SIDEBAR
 ========================================================= */
 
-function Sidebar({ isOpen, onClose }) {
+function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout }) {
   const company = useSelector((state) => state.auth.selectedCompany);
 
   const roles = useSelector((state) => state.auth.roles);
@@ -707,7 +707,7 @@ function Sidebar({ isOpen, onClose }) {
           "transition-transform duration-300",
           "ease-[cubic-bezier(0.22,1,0.36,1)]",
           isOpen ? "translate-x-0" : "max-lg:ltr:-translate-x-full max-lg:rtl:translate-x-full",
-          "lg:translate-x-0",
+          hideOnDesktop ? "lg:hidden" : "lg:translate-x-0",
         ].join(" ")}
       >
         {/* =================================================
@@ -862,6 +862,11 @@ function Sidebar({ isOpen, onClose }) {
         ================================================= */}
 
         <footer className="shrink-0 border-t border-white/[0.08] bg-ink-900 px-3 py-2.5">
+          {onSwitchLayout && (
+            <button type="button" onClick={onSwitchLayout} className="mb-1 hidden w-full rounded-lg px-2 py-1.5 text-start text-[12px] font-medium text-white/70 hover:bg-white/[0.05] hover:text-white lg:block">
+              {t("القائمة العلوية")}
+            </button>
+          )}
           <a
             href="https://dev-squad-orpin.vercel.app/"
             target="_blank"

@@ -2002,6 +2002,7 @@ public sealed class AutomaticPostingServiceTests
                 CREATE TABLE CompanySettings (
                     DefaultColorTheme TEXT NULL,
                     DefaultThemeMode TEXT NULL,
+                    AuditLogRetentionDays INTEGER NULL,
                     CompanyId INTEGER PRIMARY KEY,
                     BaseCurrency INTEGER NOT NULL DEFAULT 1
                 );

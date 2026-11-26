@@ -14,4 +14,16 @@ public sealed class AiController(IAiAssistantService service) : ApiControllerBas
         [FromBody] AiAskRequest request,
         CancellationToken cancellationToken) =>
         this.ToActionResult(await service.AskAsync(request, cancellationToken));
+
+    [HttpGet("history")]
+    public async Task<IActionResult> History(CancellationToken cancellationToken) =>
+        this.ToActionResult(await service.GetHistoryAsync(cancellationToken));
+
+    [HttpDelete("history/{id:long}")]
+    public async Task<IActionResult> DeleteHistoryItem(long id, CancellationToken cancellationToken) =>
+        this.ToActionResult(await service.DeleteHistoryItemAsync(id, cancellationToken));
+
+    [HttpDelete("history")]
+    public async Task<IActionResult> ClearHistory(CancellationToken cancellationToken) =>
+        this.ToActionResult(await service.ClearHistoryAsync(cancellationToken));
 }

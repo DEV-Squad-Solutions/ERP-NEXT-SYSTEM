@@ -980,6 +980,43 @@ namespace MiniErp.Infrastructure.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MiniErp.Domain.Entities.Ai.AiQuestionLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Answer")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTime>("AskedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Provider")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId", "UserId", "AskedOn");
+
+                    b.ToTable("AiQuestionLogs", (string)null);
+                });
+
             modelBuilder.Entity("MiniErp.Domain.Entities.Auditing.AuditLog", b =>
                 {
                     b.Property<long>("Id")

@@ -4,6 +4,9 @@ using MiniErp.Application.Common.Abstractions;
 using MiniErp.Application.Common.Results;
 using MiniErp.Application.Features.Ai;
 using MiniErp.Application.Features.Dashboard;
+using Microsoft.EntityFrameworkCore;
+using MiniErp.Domain.Entities.Ai;
+using MiniErp.Infrastructure.Persistence;
 
 namespace MiniErp.Infrastructure.Services.Ai;
 
@@ -11,8 +14,14 @@ public sealed class AiAssistantService(
     IAiToolRegistry tools,
     IAIProvider provider,
     ICurrentCompanyContext company,
-    IOptions<AiOptions> options) : IAiAssistantService, IScopedService
+    IOptions<AiOptions> options,
+    ApplicationDbContext dbContext,
+    ICurrentUserService currentUser,
+    TimeProvider timeProvider) : IAiAssistantService, IScopedService
 {
+    private const int HistoryLimit = 50;
+    private const int MaxAnswerLength = 4000;
+
     private const int MaxQuestionLength = 500;
 
     private const string SystemPrompt =
@@ -24,6 +33,74 @@ public sealed class AiAssistantService(
     public async Task<Result<AiAnswerResponse>> AskAsync(
         AiAskRequest request,
         CancellationToken cancellationToken = default)
+    {
+        var result = await AskCoreAsync(request, cancellationToken);
+        if (result.IsSuccess && currentUser.GetUserId() is { IsSuccess: true } user)
+        {
+            var answer = result.Value.Answer;
+            dbContext.AiQuestionLogs.Add(new AiQuestionLog
+            {
+                CompanyId = company.CompanyId,
+                UserId = user.Value,
+                AskedOn = timeProvider.GetUtcNow().UtcDateTime,
+                Question = result.Value.Question,
+                Answer = answer is { Length: > MaxAnswerLength } ? answer[..MaxAnswerLength] : answer,
+                Provider = result.Value.Provider
+            });
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        return result;
+    }
+
+    public async Task<Result<IReadOnlyList<AiHistoryItem>>> GetHistoryAsync(CancellationToken cancellationToken = default)
+    {
+        if (currentUser.GetUserId() is not { IsSuccess: true } user)
+        {
+            return Result<IReadOnlyList<AiHistoryItem>>.Success([]);
+        }
+
+        var companyId = company.CompanyId;
+        var items = await dbContext.AiQuestionLogs.AsNoTracking()
+            .Where(l => l.CompanyId == companyId && l.UserId == user.Value)
+            .OrderByDescending(l => l.AskedOn)
+            .Take(HistoryLimit)
+            .Select(l => new AiHistoryItem(l.Id, l.AskedOn, l.Question, l.Answer, l.Provider))
+            .ToListAsync(cancellationToken);
+        return Result<IReadOnlyList<AiHistoryItem>>.Success(items);
+    }
+
+    public async Task<Result<bool>> DeleteHistoryItemAsync(long id, CancellationToken cancellationToken = default)
+    {
+        if (currentUser.GetUserId() is not { IsSuccess: true } user)
+        {
+            return Result<bool>.Success(false);
+        }
+
+        var companyId = company.CompanyId;
+        var removed = await dbContext.AiQuestionLogs
+            .Where(l => l.Id == id && l.CompanyId == companyId && l.UserId == user.Value)
+            .ExecuteDeleteAsync(cancellationToken);
+        return Result<bool>.Success(removed > 0);
+    }
+
+    public async Task<Result<int>> ClearHistoryAsync(CancellationToken cancellationToken = default)
+    {
+        if (currentUser.GetUserId() is not { IsSuccess: true } user)
+        {
+            return Result<int>.Success(0);
+        }
+
+        var companyId = company.CompanyId;
+        var removed = await dbContext.AiQuestionLogs
+            .Where(l => l.CompanyId == companyId && l.UserId == user.Value)
+            .ExecuteDeleteAsync(cancellationToken);
+        return Result<int>.Success(removed);
+    }
+
+    private async Task<Result<AiAnswerResponse>> AskCoreAsync(
+        AiAskRequest request,
+        CancellationToken cancellationToken)
     {
         var question = request.Question?.Trim() ?? string.Empty;
         if (question.Length == 0 || question.Length > MaxQuestionLength)

@@ -1,8 +1,11 @@
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MiniErp.Application.Common.Abstractions;
 using MiniErp.Application.Common.Results;
 using MiniErp.Application.Features.Ai;
 using MiniErp.Application.Features.Dashboard;
+using MiniErp.Infrastructure.Persistence;
 using MiniErp.Infrastructure.Services.Ai;
 
 namespace MiniErp.Tests.Ai;
@@ -35,8 +38,42 @@ public sealed class AiAssistantServiceTests
         public int CompanyId => id;
     }
 
-    private static AiAssistantService Make(FakeProvider p, int company) =>
-        new(new FakeTools(), p, new FakeCompany(company), Options.Create(new AiOptions()));
+    private sealed class FakeUser(Guid id) : ICurrentUserService
+    {
+        public Result<Guid> GetUserId() => Result<Guid>.Success(id);
+    }
+
+    private static ApplicationDbContext NewDb()
+    {
+        var connection = new SqliteConnection("Data Source=:memory:");
+        connection.Open();
+        var db = new ApplicationDbContext(new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options);
+        db.Database.EnsureCreated();
+        return db;
+    }
+
+    private static AiAssistantService Make(FakeProvider p, int company, ApplicationDbContext? db = null, Guid? user = null) =>
+        new(new FakeTools(), p, new FakeCompany(company), Options.Create(new AiOptions()),
+            db ?? NewDb(), new FakeUser(user ?? Guid.NewGuid()), TimeProvider.System);
+
+    [Fact]
+    public async Task History_is_private_per_user_and_deletable()
+    {
+        var db = NewDb();
+        var a = Guid.NewGuid();
+        var b = Guid.NewGuid();
+        await Make(new FakeProvider(false), 2, db, a).AskAsync(new AiAskRequest("سؤال أ"));
+        await Make(new FakeProvider(false), 2, db, b).AskAsync(new AiAskRequest("سؤال ب"));
+
+        var historyA = (await Make(new FakeProvider(false), 2, db, a).GetHistoryAsync()).Value;
+        Assert.Single(historyA);
+        Assert.Equal("سؤال أ", historyA[0].Question);
+
+        Assert.False((await Make(new FakeProvider(false), 2, db, b).DeleteHistoryItemAsync(historyA[0].Id)).Value);
+        Assert.True((await Make(new FakeProvider(false), 2, db, a).DeleteHistoryItemAsync(historyA[0].Id)).Value);
+        Assert.Empty((await Make(new FakeProvider(false), 2, db, a).GetHistoryAsync()).Value);
+        Assert.Single((await Make(new FakeProvider(false), 2, db, b).GetHistoryAsync()).Value);
+    }
 
     [Fact]
     public async Task Without_provider_returns_tool_data_and_no_answer()

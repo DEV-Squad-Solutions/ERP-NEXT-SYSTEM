@@ -7,6 +7,9 @@ import {
   useGetAnomaliesQuery,
   useGetSalesForecastQuery,
   useAskAiMutation,
+  useGetAiHistoryQuery,
+  useDeleteAiHistoryItemMutation,
+  useClearAiHistoryMutation,
 } from "../aiCenterApi";
 
 const card =
@@ -21,6 +24,9 @@ export default function AiCenterPage() {
   const { data: anomalies } = useGetAnomaliesQuery();
   const { data: forecast } = useGetSalesForecastQuery();
   const [ask, { isLoading: asking }] = useAskAiMutation();
+  const { data: history, refetch: refetchHistory } = useGetAiHistoryQuery();
+  const [delItem] = useDeleteAiHistoryItemMutation();
+  const [clearAll] = useClearAiHistoryMutation();
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState(null);
 
@@ -29,6 +35,7 @@ export default function AiCenterPage() {
     if (!question.trim()) return;
     try {
       setAnswer(await ask({ question }).unwrap());
+      refetchHistory();
     } catch {
       toast.error(t("تعذر تنفيذ السؤال الآن"));
     }
@@ -150,6 +157,43 @@ export default function AiCenterPage() {
             )}
             <p className="text-[11px] text-ink-500">{t("المصدر: أرقام النظام المحسوبة")}</p>
           </div>
+        )}
+      </section>
+
+      <section className={card}>
+        <div className="mb-3 flex items-center justify-between gap-2">
+          <h2 className="text-[15px] font-bold text-ink-900 dark:text-white">{t("أسئلتي السابقة")}</h2>
+          {history?.length > 0 && (
+            <button
+              type="button"
+              onClick={async () => { await clearAll(); refetchHistory(); }}
+              className="text-[12px] font-semibold text-red-600"
+            >
+              {t("مسح الكل")}
+            </button>
+          )}
+        </div>
+        {!history?.length ? (
+          <p className="text-[13px] text-ink-500">{t("لا توجد أسئلة محفوظة. أسئلتك تظهر لك أنت فقط ويمكنك حذفها.")}</p>
+        ) : (
+          <ul className="space-y-2">
+            {history.map((h) => (
+              <li key={h.id} className="rounded-xl border border-ink-400/15 p-3 text-[13px]">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-semibold text-ink-900 dark:text-white">{h.question}</p>
+                  <button
+                    type="button"
+                    onClick={async () => { await delItem(h.id); refetchHistory(); }}
+                    className="shrink-0 text-[12px] text-red-600"
+                  >
+                    {t("حذف")}
+                  </button>
+                </div>
+                {h.answer && <p className="mt-1 whitespace-pre-wrap text-ink-600 dark:text-white/70">{h.answer}</p>}
+                <p className="mt-1 text-[11px] text-ink-500">{new Date(h.askedOn + "Z").toLocaleString("ar-EG")}</p>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
     </div>

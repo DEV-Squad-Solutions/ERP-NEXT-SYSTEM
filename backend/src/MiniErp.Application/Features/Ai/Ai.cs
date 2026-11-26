@@ -44,8 +44,16 @@ public interface IAiToolRegistry : IScopedService
         CancellationToken cancellationToken = default);
 }
 
+public sealed record AiHistoryItem(long Id, DateTime AskedOn, string Question, string? Answer, string? Provider);
+
 public interface IAiAssistantService : IScopedService
 {
+    Task<Result<IReadOnlyList<AiHistoryItem>>> GetHistoryAsync(CancellationToken cancellationToken = default);
+
+    Task<Result<bool>> DeleteHistoryItemAsync(long id, CancellationToken cancellationToken = default);
+
+    Task<Result<int>> ClearHistoryAsync(CancellationToken cancellationToken = default);
+
     Task<Result<AiAnswerResponse>> AskAsync(
         AiAskRequest request,
         CancellationToken cancellationToken = default);

@@ -28,6 +28,7 @@ public sealed partial class ApplicationDbContext
     }
 
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<MiniErp.Domain.Entities.Ai.AiQuestionLog> AiQuestionLogs => Set<MiniErp.Domain.Entities.Ai.AiQuestionLog>();
 
     public DbSet<Company> Companies => Set<Company>();
 

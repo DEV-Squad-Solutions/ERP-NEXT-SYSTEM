@@ -23,7 +23,7 @@ export default function InvoiceSearchBox({ value, fromDate, toDate, onChange, on
   }, [debounced]);
 
   const { data } = useGetInvoiceProfitabilityQuery(
-    { fromDate: `${new Date().getFullYear() - 1}-01-01`, toDate: new Date().toISOString().slice(0, 10), search: debounced, pageNumber: 1, pageSize: 8, includeReturns: true },
+    { fromDate: `${new Date().getFullYear()}-01-01`, toDate: new Date().toISOString().slice(0, 10), search: debounced, pageNumber: 1, pageSize: 8, includeReturns: true },
     { skip: debounced.length < 1 || !open },
   );
 

@@ -129,6 +129,15 @@ const ContainerStoreStatement = lazy(
 const ExpensesPage = lazy(
   () => import("../features/expenses/pages/ExpensesPage"),
 );
+const AttendanceReportPage = lazy(
+  () => import("../features/reports/pages/AttendanceReportPage"),
+);
+const EmployeeMovementsReportPage = lazy(
+  () => import("../features/reports/pages/EmployeeMovementsReportPage"),
+);
+const CashHandoverReportPage = lazy(
+  () => import("../features/reports/pages/CashHandoverReportPage"),
+);
 const ExpensesReportPage = lazy(
   () => import("../features/reports/pages/ExpensesReportPage"),
 );
@@ -989,6 +998,36 @@ export const router = createBrowserRouter([
           <LazyPage>
             <Role roles={FULL_ACCESS_ROLES}>
               <InvoiceProfitabilityDetailsPage />
+            </Role>
+          </LazyPage>
+        ),
+      },
+      {
+        path: "reports/attendance",
+        element: (
+          <LazyPage>
+            <Role roles={FULL_ACCESS_ROLES}>
+              <AttendanceReportPage />
+            </Role>
+          </LazyPage>
+        ),
+      },
+      {
+        path: "reports/employee-movements",
+        element: (
+          <LazyPage>
+            <Role roles={FULL_ACCESS_ROLES}>
+              <EmployeeMovementsReportPage />
+            </Role>
+          </LazyPage>
+        ),
+      },
+      {
+        path: "reports/cash-handover",
+        element: (
+          <LazyPage>
+            <Role roles={FULL_ACCESS_ROLES}>
+              <CashHandoverReportPage />
             </Role>
           </LazyPage>
         ),

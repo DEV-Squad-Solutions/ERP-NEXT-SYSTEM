@@ -14,6 +14,16 @@ import {
 const selectCls =
   "h-[38px] w-full rounded-lg border border-ink-400/25 bg-white px-3 text-[13px] text-ink-800 dark:bg-ink-900 dark:text-white";
 
+const ACTION_AR = { Created: "إضافة", Updated: "تعديل", Deleted: "حذف" };
+const ENTITY_AR = {
+  Employee: "موظف", Invoice: "فاتورة", Item: "صنف", Account: "حساب", JournalEntry: "قيد يومية",
+  BusinessPartner: "عميل/مورد", Cashbox: "خزنة", CashVoucher: "سند", Store: "مخزن", Driver: "سائق",
+  DriverTrip: "رحلة", PayrollEntry: "حركة مرتب", EmployeeAttendance: "حضور", EmployeeMovement: "حركة موظف",
+  FiscalYear: "سنة مالية", Company: "شركة", User: "مستخدم", StockAdjustment: "تسوية مخزون", StockTransfer: "تحويل مخزني",
+};
+const actionLabel = (a) => (ACTION_AR[a] ? t(ACTION_AR[a]) : a);
+const entityLabel = (e) => (ENTITY_AR[e] ? t(ENTITY_AR[e]) : e);
+
 const fmt = (iso) => {
   if (!iso) return "";
   const d = new Date(iso.endsWith("Z") ? iso : iso + "Z");
@@ -76,11 +86,11 @@ export default function AuditLogsPage() {
         </select>
         <select className={selectCls} value={filters.action ?? ""} onChange={set("action")}>
           <option value="">{t("كل العمليات")}</option>
-          {(opts?.actions ?? []).map((a) => <option key={a} value={a}>{a}</option>)}
+          {(opts?.actions ?? []).map((a) => <option key={a} value={a}>{actionLabel(a)}</option>)}
         </select>
         <select className={selectCls} value={filters.entityType ?? ""} onChange={set("entityType")}>
           <option value="">{t("كل الأنواع")}</option>
-          {(opts?.entityTypes ?? []).map((a) => <option key={a} value={a}>{a}</option>)}
+          {(opts?.entityTypes ?? []).map((a) => <option key={a} value={a}>{entityLabel(a)}</option>)}
         </select>
         <select className={selectCls} value={filters.role ?? ""} onChange={set("role")}>
           <option value="">{t("كل الأدوار")}</option>
@@ -108,9 +118,9 @@ export default function AuditLogsPage() {
             {items.map((r) => (
               <tr key={r.id} className="cursor-pointer border-t border-ink-400/10 hover:bg-ink-400/5" onClick={() => setOpen(open === r.id ? null : r.id)}>
                 <td className="whitespace-nowrap px-3 py-2">{fmt(r.occurredOn)}</td>
-                <td className="px-3 py-2">{r.userName}<span className="ms-1 text-[11px] text-ink-400">{r.role}</span></td>
-                <td className="px-3 py-2">{r.action}</td>
-                <td className="px-3 py-2">{r.entityType}</td>
+                <td className="px-3 py-2">{r.userName}</td>
+                <td className="px-3 py-2">{actionLabel(r.action)}</td>
+                <td className="px-3 py-2">{entityLabel(r.entityType)}</td>
                 <td className="px-3 py-2">
                   {r.summary}
                   {open === r.id && r.details && (

@@ -308,7 +308,7 @@ const AttendanceTakingPage = () => {
   const rowVirtualizer = useVirtualizer({
     count: filteredRows.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => (narrow ? 330 : 118),
+    estimateSize: () => (narrow ? 364 : 118),
     overscan: 10,
   });
 
@@ -902,13 +902,13 @@ const AttendanceTakingPage = () => {
                 return (
                   <div
                     key={employeeId}
-                    className="absolute start-0 end-0 border-b border-ink-100 bg-white px-3 py-2 transition hover:bg-ink-50/50"
+                    className={narrow ? "absolute start-0 end-0 px-2.5 py-1.5" : "absolute start-0 end-0 border-b border-ink-100 bg-white px-3 py-2 transition hover:bg-ink-50/50"}
                     style={{
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
                   >
-                    <div className={narrow ? "grid grid-cols-2 gap-x-2 gap-y-1.5" : "grid items-end gap-x-2 gap-y-1.5"} style={narrow ? undefined : { gridTemplateColumns: "44px repeat(4, minmax(0, 1fr))" }}>
+                    <div className={narrow ? "grid h-full grid-cols-2 content-start gap-x-3 gap-y-2.5 overflow-hidden rounded-xl border border-ink-200 bg-white p-3 shadow-sm" : "grid items-end gap-x-2 gap-y-1.5"} style={narrow ? undefined : { gridTemplateColumns: "44px repeat(4, minmax(0, 1fr))" }}>
                       <div className={narrow ? "col-span-2 flex items-center gap-2" : "flex h-9 items-center"}>
                         <input
                           type="checkbox"
@@ -926,7 +926,7 @@ const AttendanceTakingPage = () => {
                           <div className="text-xs text-ink-400">#{row.employee.id}</div>
                         </div>
                       )}
-                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الحالة")}
+                      <label className={"block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1" + (narrow ? " col-span-2" : "")}>{t("الحالة")}
                         <CompactSelect
                           value={row.status}
                           onChange={(value) => setEmployeeStatus(employeeId, value)}
@@ -938,18 +938,18 @@ const AttendanceTakingPage = () => {
                           placeholder={t("الحالة")}
                         />
                       </label>
-                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الحضور")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("الحضور")}
                         <input type="time" value={present ? row.checkIn || "" : ""} disabled={!present}
                           onChange={(event) => updateRow(employeeId, { checkIn: event.target.value })}
-                          className="h-9 w-full rounded-lg border border-ink-200 bg-white px-2 text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500" />
+                          className="h-[38px] w-full min-w-0 max-w-full appearance-none rounded-lg border border-ink-200 bg-white px-2 text-start text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500" />
                       </label>
-                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الانصراف")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("الانصراف")}
                         <input type="time" value={present ? row.checkOut || "" : ""} disabled={!present}
                           onChange={(event) => updateRow(employeeId, { checkOut: event.target.value })}
-                          className="h-9 w-full rounded-lg border border-ink-200 bg-white px-2 text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500" />
+                          className="h-[38px] w-full min-w-0 max-w-full appearance-none rounded-lg border border-ink-200 bg-white px-2 text-start text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500" />
                       </label>
                       {!narrow && <div />}
-                      <label className="block min-w-0 text-[10px] text-ink-500">{t("نسبة اليوم")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("نسبة اليوم")}
                         <CompactSelect
                           value={present ? (row.workDayRatio ?? 1) : ""}
                           onChange={(value) => updateRow(employeeId, { workDayRatio: normalizeRatio(value, 1) })}
@@ -958,7 +958,7 @@ const AttendanceTakingPage = () => {
                           isDisabled={!present}
                         />
                       </label>
-                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الإضافي")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("الإضافي")}
                         <CompactSelect
                           value={row.workOverTimeRatio || ""}
                           onChange={(value) => updateRow(employeeId, { workOverTimeRatio: value })}
@@ -966,7 +966,7 @@ const AttendanceTakingPage = () => {
                           placeholder={t("الإضافي")}
                         />
                       </label>
-                      <label className="block min-w-0 text-[10px] text-ink-500">{t("الخصم")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("الخصم")}
                         <CompactSelect
                           value={row.workDaysDeductionRatio || ""}
                           onChange={(value) => updateRow(employeeId, { workDaysDeductionRatio: value })}
@@ -975,11 +975,11 @@ const AttendanceTakingPage = () => {
                           isDisabled={!present}
                         />
                       </label>
-                      <label className="block min-w-0 text-[10px] text-ink-500">{t("ملاحظات")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("ملاحظات")}
                         <input type="text" value={row.notes || ""}
                           onChange={(event) => updateRow(employeeId, { notes: event.target.value })}
                           placeholder={t("ملاحظات...")}
-                          className="h-9 w-full rounded-lg border border-ink-200 bg-white px-3 text-sm outline-none transition placeholder:text-ink-400 focus:border-primary-500" />
+                          className="h-[38px] w-full min-w-0 rounded-lg border border-ink-200 bg-white px-3 text-sm outline-none transition placeholder:text-ink-400 focus:border-primary-500" />
                       </label>
                     </div>
                   </div>

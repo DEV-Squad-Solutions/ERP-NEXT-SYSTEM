@@ -451,4 +451,11 @@ export const navigationItems = [
     end: true,
     roles: ["Admin"],
   },
+  {
+    label: t("سجل العمليات"),
+    path: "/dashboard/audit-log",
+    icon: ClipboardList,
+    end: true,
+    roles: ["Admin"],
+  },
 ];

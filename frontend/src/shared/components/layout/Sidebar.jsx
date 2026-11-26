@@ -118,7 +118,7 @@ const SidebarSection = memo(function SidebarSection({ label }) {
   return (
     <li className="select-none px-2 pt-5 pb-2">
       <div className="flex items-center gap-2">
-        <span className="whitespace-nowrap text-[10px] font-bold tracking-[0.14em] text-white/40 uppercase">
+        <span className="whitespace-nowrap text-[11px] font-bold tracking-[0.12em] text-white/60 uppercase">
           {label}
         </span>
 
@@ -211,9 +211,9 @@ const SidebarLink = memo(function SidebarLink({
                 "duration-200",
 
                 isActive
-                  ? "bg-gold-500/[0.12] text-gold-400"
+                  ? "bg-primary-500/25 text-white"
                   : [
-                      "text-white/55",
+                      "text-white/75",
                       "group-hover:bg-white/[0.05]",
                       "group-hover:text-white",
                     ].join(" "),
@@ -251,7 +251,7 @@ const SidebarSubLink = memo(function SidebarSubLink({
         [
           "group relative flex min-h-8.5 items-center gap-2.5",
           "rounded-lg py-1.5 ps-3 pe-2",
-          "text-[12px]",
+          "text-[13px]",
           "outline-none",
           "transition-[background-color,color,transform]",
           "duration-200",
@@ -265,7 +265,7 @@ const SidebarSubLink = memo(function SidebarSubLink({
                 "text-white",
               ].join(" ")
             : [
-                "text-white/60",
+                "text-white/78",
                 "hover:bg-white/[0.035]",
                 "hover:text-white",
                 "hover:translate-x-[-1px]",
@@ -329,7 +329,7 @@ const SidebarSubLink = memo(function SidebarSubLink({
                   "group-hover:scale-[1.04]",
                   isActive
                     ? "text-gold-400"
-                    : "text-white/50 group-hover:text-white/80",
+                    : "text-white/70 group-hover:text-white/80",
                 ].join(" ")}
               />
             )}
@@ -382,7 +382,7 @@ const SidebarNestedGroup = memo(function SidebarNestedGroup({
         className={[
           "group flex w-full min-h-8.5 items-center gap-2.5",
           "rounded-lg py-1.5 ps-3 pe-2",
-          "text-[12px]",
+          "text-[13px]",
           "outline-none",
           "transition-[background-color,color]",
           "duration-200",
@@ -391,7 +391,7 @@ const SidebarNestedGroup = memo(function SidebarNestedGroup({
           hasActiveChild
             ? "bg-white/[0.045] font-semibold text-white/95"
             : [
-                "text-white/60",
+                "text-white/78",
                 "hover:bg-white/[0.03]",
                 "hover:text-white",
               ].join(" "),
@@ -406,7 +406,7 @@ const SidebarNestedGroup = memo(function SidebarNestedGroup({
               "transition-colors duration-200",
               hasActiveChild
                 ? "text-gold-400"
-                : "text-white/50 group-hover:text-white/80",
+                : "text-white/70 group-hover:text-white/80",
             ].join(" ")}
           />
         )}
@@ -418,7 +418,7 @@ const SidebarNestedGroup = memo(function SidebarNestedGroup({
           strokeWidth={1.8}
           className={[
             "shrink-0",
-            "text-white/45",
+            "text-white/65",
             "transition-[transform,color]",
             "duration-250",
             isOpen ? "rotate-180 text-white/70" : "",
@@ -533,9 +533,9 @@ const SidebarGroup = memo(function SidebarGroup({
               "duration-200",
 
               hasActiveChild
-                ? "bg-gold-500/[0.11] text-gold-400"
+                ? "bg-primary-500/25 text-white"
                 : [
-                    "text-white/55",
+                    "text-white/75",
                     "group-hover:bg-white/[0.045]",
                     "group-hover:text-white",
                   ].join(" "),
@@ -552,7 +552,7 @@ const SidebarGroup = memo(function SidebarGroup({
           strokeWidth={1.8}
           className={[
             "shrink-0",
-            "text-white/45",
+            "text-white/65",
             "transition-[transform,color]",
             "duration-250",
             isOpen ? "rotate-180 text-white/70" : "group-hover:text-white/65",
@@ -757,7 +757,7 @@ function Sidebar({ isOpen, onClose }) {
                 </span>
 
                 <span className="min-w-0 flex-1">
-                  <span className="mb-0.5 flex items-center gap-1 text-[9px] font-medium text-white/40">
+                  <span className="mb-0.5 flex items-center gap-1 text-[11px] font-medium text-white/60">
                     {t("الشركة الحالية")}
                     {company && canViewCompany && (
                       <Info
@@ -790,7 +790,7 @@ function Sidebar({ isOpen, onClose }) {
               className={[
                 "flex shrink-0 items-center justify-center",
                 "rounded-lg p-1.5",
-                "text-white/50",
+                "text-white/70",
                 "transition-colors duration-200",
                 "hover:bg-white/[0.06]",
                 "hover:text-white",
@@ -885,11 +885,11 @@ function Sidebar({ isOpen, onClose }) {
             </span>
 
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[10px] font-semibold text-white/55 transition-colors group-hover:text-white/75">
+              <span className="block truncate text-[12px] font-semibold text-white/75 transition-colors group-hover:text-white/75">
                 Dev Squad Solutions
               </span>
 
-              <span className="mt-0.5 block text-[8px] text-white/35">
+              <span className="mt-0.5 block text-[10px] text-white/55">
                 © {new Date().getFullYear()} {t("جميع الحقوق محفوظة")}
               </span>
             </span>

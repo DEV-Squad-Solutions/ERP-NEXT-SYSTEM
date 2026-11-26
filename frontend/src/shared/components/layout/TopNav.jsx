@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { ChevronDown, PanelLeft } from "lucide-react";
@@ -36,6 +36,22 @@ function Leaf({ item, onPick }) {
 }
 
 function Panel({ item, onPick }) {
+  const panelRef = useRef(null);
+  const [shift, setShift] = useState(0);
+  useLayoutEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const base = r.left - shift;
+    const w = window.innerWidth;
+    let dx = 0;
+    if (base < 8) dx = 8 - base;
+    else if (base + r.width > w - 8) dx = w - 8 - (base + r.width);
+    if (dx !== shift) setShift(dx);
+  }, [item, shift]);
+  useEffect(() => {
+    panelRef.current?.querySelector("a")?.focus?.({ preventScroll: true });
+  }, []);
   const groups = [];
   const loose = [];
   item.children.forEach((c) => {
@@ -45,8 +61,10 @@ function Panel({ item, onPick }) {
   const colCount = Math.max(1, Math.min(groups.length || 1, 3));
   return (
     <div
+      ref={panelRef}
+      role="menu"
       className="absolute top-full z-50 mt-1.5 start-0 max-h-[70vh] overflow-y-auto rounded-2xl border border-ink-400/15 bg-white p-2 shadow-xl ring-1 ring-black/[0.03] dark:border-white/10 dark:bg-ink-900 dark:ring-white/[0.04]"
-      style={{ width: colCount * 232 + 16 }}
+      style={{ width: colCount * 232 + 16, maxWidth: "calc(100vw - 16px)", transform: shift ? `translateX(${shift}px)` : undefined }}
     >
       {loose.length > 0 && (
         <div className={`grid gap-x-2 p-1 ${groups.length ? "mb-1 border-b border-ink-400/10 pb-2 dark:border-white/[0.07]" : ""}`} style={{ gridTemplateColumns: `repeat(${colCount}, minmax(0, 1fr))` }}>
@@ -95,6 +113,25 @@ export default function TopNav({ onSwitchLayout }) {
         out.push(it);
       }
     });
+    const SPLIT = {
+      "/dashboard/payroll": "الموظفين",
+      "/dashboard/payroll/attendance/records": "الحضور والمرتبات",
+      "/dashboard/accounting-readiness": "الحسابات والقيود",
+      "/dashboard/trial-balance/before-adjustments": "الموازين والقوائم",
+    };
+    out.forEach((g, i) => {
+      g.id = `g${i}`;
+      if (!g.isSection) return;
+      if (g.children.length === 1 && g.children[0].children?.length) g.children = g.children[0].children;
+      if (g.children.every((c) => !c.children?.length) && g.children.some((c) => SPLIT[c.path])) {
+        const cols = [];
+        g.children.forEach((c) => {
+          if (SPLIT[c.path]) cols.push({ label: t(SPLIT[c.path]), children: [] });
+          cols[cols.length - 1].children.push(c);
+        });
+        g.children = cols;
+      }
+    });
     return out;
   }, [roles, hidden]);
 
@@ -135,14 +172,16 @@ export default function TopNav({ onSwitchLayout }) {
               </NavLink>
             );
           }
-          const isOpen = open === item.label;
+          const isOpen = open === item.id;
           return (
-            <div key={item.label} className="relative">
+            <div key={item.id || item.label} className="relative">
               <button
                 type="button"
                 aria-expanded={isOpen}
-                onClick={() => setOpen(isOpen ? null : item.label)}
-                onMouseEnter={() => open && setOpen(item.label)}
+                onClick={() => setOpen(isOpen ? null : item.id)}
+                onMouseEnter={() => open && setOpen(item.id)}
+                onKeyDown={(e) => { if (e.key === "ArrowDown") { e.preventDefault(); setOpen(item.id); } }}
+                aria-haspopup="menu"
                 className={cls}
               >
                 {Icon && <Icon size={15} strokeWidth={1.8} />}

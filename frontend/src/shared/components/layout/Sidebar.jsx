@@ -739,7 +739,7 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
         className={[
           "fixed top-0 start-0 z-50",
           railMode ? "h-screen" : "h-screen w-[260px]",
-          railMode ? "sidebar-rail w-[72px] data-[rail]:w-[260px]" : "",
+          railMode ? "sidebar-rail w-[56px] sm:w-[72px] data-[rail]:w-[260px]" : "",
           "overflow-hidden",
           "flex flex-col",
           "border-e border-white/[0.07]",

@@ -171,7 +171,7 @@ export default function Navbar({ onMenuClick, showMenuButton = false }) {
           className={[
             "flex h-full items-center justify-between",
             "gap-2",
-            "px-3 sm:px-4 lg:px-5",
+            "px-2 sm:px-4 lg:px-5",
           ].join(" ")}
         >
           {/* =================================================
@@ -359,7 +359,7 @@ export default function Navbar({ onMenuClick, showMenuButton = false }) {
           ================================================= */}
 
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-            <div className="flex items-center gap-1.5 [&_button]:h-9 max-sm:[&_button_span]:hidden">
+            <div className="flex items-center gap-1 sm:gap-1.5 [&_button]:h-9 max-sm:[&_button]:px-2 max-sm:[&_button_span]:hidden">
               <CompanySwitcher />
               <FiscalYearSwitcher />
             </div>

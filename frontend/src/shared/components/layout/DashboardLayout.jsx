@@ -54,7 +54,7 @@ export default function DashboardLayout() {
           "transition-[margin]",
           "duration-300",
           "ease-[cubic-bezier(0.22,1,0.36,1)]",
-          isTop ? "" : pinned ? "ms-[260px]" : "ms-[72px]",
+          isTop ? "" : pinned ? "ms-[260px]" : "ms-[56px] sm:ms-[72px]",
         ].join(" ")}
       >
         {/* ===================================================

@@ -24,6 +24,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__DefaultConnection: Server=db,1433;Database=MiniErp;User Id=sa;Password=${SQL_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True
       Jwt__SigningKey: ${JWT_SIGNING_KEY:?set JWT_SIGNING_KEY in .env (32+ random chars)}
+      Database__ApplyMigrationsOnStartup: "true"
       Seed__Enabled: "false"
     depends_on:
       db:

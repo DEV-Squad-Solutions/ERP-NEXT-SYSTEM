@@ -1,0 +1,40 @@
+# One-shot manual Docker smoke test. Throwaway credentials only, no repo secrets.
+name: docker-smoke
+on: workflow_dispatch
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate throwaway env
+        run: |
+          echo "SQL_SA_PASSWORD=Aa1!$(openssl rand -hex 12)" > .env
+          echo "JWT_SIGNING_KEY=$(openssl rand -hex 32)" >> .env
+      - name: Build images
+        run: docker compose build
+      - name: Start stack (fresh volume)
+        run: docker compose up -d
+      - name: Wait for API readiness through web proxy
+        run: |
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/health/ready || true)
+            direct=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8081/health/ready || true)
+            echo "try $i proxy=$code direct=$direct"
+            [ "$code" = "200" ] && [ "$direct" = "200" ] && break
+            sleep 5
+          done
+          [ "$code" = "200" ] || { docker compose logs api | tail -80; exit 1; }
+      - name: Checks
+        run: |
+          set -x
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/)" = "200"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8081/health/live)" = "200"
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8081/health/ready)" = "200"
+          curl -sf http://localhost:8080/api/v1/setup/status
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --no-color | tail -200
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

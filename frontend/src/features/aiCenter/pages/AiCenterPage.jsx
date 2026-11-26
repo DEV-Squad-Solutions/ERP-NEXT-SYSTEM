@@ -83,7 +83,15 @@ export default function AiCenterPage() {
 
       <section className={card}>
         <h2 className="mb-3 text-[15px] font-bold text-ink-900 dark:text-white">{t("حالات تحتاج مراجعتك")}</h2>
-        {anomalies?.note && <p className="mb-2 text-[12px] text-amber-700">{anomalies.note}</p>}
+        {anomalies?.note && (
+          <p className="mb-2 text-[12px] text-amber-700">
+            {t("بيانات غير كافية للحكم (8 فواتير على الأقل لكل نوع) في:")}{" "}
+            {((anomalies.note.match(/for: (.*?)\. Nothing/) || [])[1] || "")
+              .split(", ")
+              .map((k) => t(KIND_AR[k] ?? k))
+              .join("، ") || t("كل الأنواع")}
+          </p>
+        )}
         {(anomalies?.items ?? []).length === 0 ? (
           <p className="text-[13px] text-ink-600 dark:text-white/70">{t("لا توجد حالات غير طبيعية.")}</p>
         ) : (
@@ -128,7 +136,7 @@ export default function AiCenterPage() {
           <button
             type="submit"
             disabled={asking || !question.trim()}
-            className="h-[40px] rounded-lg bg-brand-600 px-5 text-[13px] font-semibold text-white disabled:opacity-50"
+            className="h-[40px] rounded-lg bg-ink-900 px-5 text-[13px] font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-ink-900"
           >
             {asking ? t("جاري...") : t("اسأل")}
           </button>

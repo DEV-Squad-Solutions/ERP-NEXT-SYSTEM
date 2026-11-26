@@ -45,8 +45,8 @@ function Panel({ item, onPick }) {
   if (loose.length) cols.unshift({ title: null, leaves: loose });
   return (
     <div
-      className="absolute top-full z-50 mt-2 start-0 grid gap-x-3 rounded-2xl border border-ink-400/15 bg-white p-3 shadow-xl dark:border-white/10 dark:bg-ink-900"
-      style={{ gridTemplateColumns: `repeat(${Math.min(cols.length, 3)}, minmax(210px, 1fr))`, minWidth: Math.min(cols.length, 3) * 220 }}
+      className="absolute top-full z-50 mt-2 start-0 grid items-start gap-x-3 rounded-2xl border border-ink-400/15 bg-white p-3 shadow-xl dark:border-white/10 dark:bg-ink-900"
+      style={{ gridTemplateColumns: `repeat(${Math.min(cols.length, 4)}, minmax(210px, 1fr))`, minWidth: Math.min(cols.length, 4) * 220 }}
     >
       {cols.map((c, i) => (
         <div key={i} className="p-1">

@@ -13,11 +13,7 @@ import { getDir } from "../../../i18n";
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [layout, setLayout] = useState(() => localStorage.getItem("layout") === "top" ? "top" : "side");
-  const [pinned, setPinned] = useState(() => localStorage.getItem("sidebarPinned") === "true");
-  const togglePin = () => {
-    localStorage.setItem("sidebarPinned", String(!pinned));
-    setPinned(!pinned);
-  };
+  const pinned = false;
   const isTop = layout === "top";
   const switchLayout = () => {
     const next = isTop ? "side" : "top";
@@ -45,7 +41,7 @@ export default function DashboardLayout() {
           SIDEBAR
       ===================================================== */}
 
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} hideOnDesktop={isTop} onSwitchLayout={switchLayout} pinned={pinned} onTogglePin={togglePin} />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} hideOnDesktop={isTop} onSwitchLayout={switchLayout} pinned={pinned} />
 
       {/* =====================================================
           MAIN APPLICATION AREA

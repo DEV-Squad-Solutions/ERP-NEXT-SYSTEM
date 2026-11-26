@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useId, useMemo, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { X, Info, ChevronDown, Pin, PinOff, PanelTop } from "lucide-react";
+import { X, Info, ChevronDown, PanelTop } from "lucide-react";
 import { useSelector } from "react-redux";
 
 import { navigationItems } from "../../constants/navigation";
@@ -794,18 +794,6 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
                 className="hidden shrink-0 items-center justify-center rounded-lg p-1.5 text-white/70 outline-none transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-gold-500/40 lg:flex"
               >
                 <PanelTop size={16} strokeWidth={1.8} />
-              </button>
-            )}
-            {onTogglePin && (
-              <button
-                type="button"
-                onClick={(e) => { onTogglePin(); e.currentTarget.blur(); }}
-                aria-pressed={pinned}
-                title={pinned ? t("إلغاء تثبيت القائمة") : t("تثبيت القائمة")}
-                aria-label={pinned ? t("إلغاء تثبيت القائمة") : t("تثبيت القائمة")}
-                className="sidebar-pin hidden shrink-0 items-center justify-center rounded-lg p-1.5 text-white/70 outline-none transition-colors hover:bg-white/[0.06] hover:text-white focus-visible:ring-2 focus-visible:ring-gold-500/40 lg:flex"
-              >
-                {pinned ? <PinOff size={16} strokeWidth={1.8} /> : <Pin size={16} strokeWidth={1.8} />}
               </button>
             )}
             <button

@@ -13,6 +13,7 @@ const emptyForm = {
 export default function StoreFormModal({ isOpen, onClose, store, onSaved }) {
   const isEdit = Boolean(store);
   const [form, setForm] = useState(emptyForm);
+  const [nameError, setNameError] = useState("");
 
   const [createStore, { isLoading: isCreating }] = useCreateStoreMutation();
   const [updateStore, { isLoading: isUpdating }] = useUpdateStoreMutation();
@@ -38,6 +39,11 @@ export default function StoreFormModal({ isOpen, onClose, store, onSaved }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.name.trim()) {
+      setNameError(t("أدخل اسم المخزن"));
+      return;
+    }
+    setNameError("");
     try {
       const result = isEdit
         ? await updateStore({ id: store.id, ...form }).unwrap()
@@ -55,17 +61,23 @@ export default function StoreFormModal({ isOpen, onClose, store, onSaved }) {
       onClose={onClose}
       title={isEdit ? t("تعديل المخزن") : t("مخزن جديد")}
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div>
           <label className="block text-xs text-ink-400 mb-1.5">
             {t("اسم المخزن")}
           </label>
           <input
-            required
             value={form.name}
-            onChange={handleChange("name")}
+            onChange={(e) => {
+              setNameError("");
+              handleChange("name")(e);
+            }}
+            aria-invalid={Boolean(nameError)}
             className="w-full border border-ink-400/15 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700/50 focus:ring-2 focus:ring-emerald-700/10"
           />
+          {nameError && (
+            <p role="alert" className="field-error">{nameError}</p>
+          )}
         </div>
 
         <div>

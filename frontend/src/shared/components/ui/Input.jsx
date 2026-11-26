@@ -116,31 +116,7 @@ export default function Input({
 
       {/* Error */}
       {error && (
-        <p
-          id={`${inputId}-error`}
-          role="alert"
-          className="
-            mt-1.5
-            flex
-            items-center
-            gap-1
-            text-xs
-            font-medium
-            text-negative
-          "
-        >
-          <span
-            aria-hidden="true"
-            className="
-              inline-flex
-              h-1.5
-              w-1.5
-              shrink-0
-              rounded-full
-              bg-negative
-            "
-          />
-
+        <p id={`${inputId}-error`} role="alert" className="field-error">
           {error}
         </p>
       )}

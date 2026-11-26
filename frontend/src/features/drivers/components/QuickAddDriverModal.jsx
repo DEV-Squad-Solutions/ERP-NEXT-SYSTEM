@@ -35,6 +35,7 @@ export default function QuickAddDriverModal({
   const isEdit = Boolean(driver);
 
   const [form, setForm] = useState(emptyForm);
+  const [nameError, setNameError] = useState("");
 
   const [createDriver, { isLoading: isCreating }] = useCreateDriverMutation();
 
@@ -74,6 +75,12 @@ export default function QuickAddDriverModal({
 
     if (isLoading) return;
 
+    if (!String(form.name ?? "").trim()) {
+      setNameError(t("أدخل اسم السائق"));
+      return;
+    }
+    setNameError("");
+
     try {
       const saved = isEdit
         ? await updateDriver({
@@ -104,7 +111,11 @@ export default function QuickAddDriverModal({
         <Input
           label={t("اسم السائق")}
           value={form.name}
-          onChange={handleChange("name")}
+          onChange={(e) => {
+            setNameError("");
+            handleChange("name")(e);
+          }}
+          error={nameError || undefined}
           disabled={isLoading}
         />
 

@@ -969,6 +969,8 @@ export default {
  "أدخل مبلغاً أكبر من صفر": "Enter an amount greater than zero",
  "أدخل اسم البند": "Enter the item name",
  "أدخل كود البند": "Enter the item code",
+ "أدخل اسم المخزن": "Enter the store name",
+ "أدخل اسم السائق": "Enter the driver name",
  "الأزرق المؤسسي": "Corporate blue",
  "التركواز": "Teal",
  "النيلي": "Indigo",

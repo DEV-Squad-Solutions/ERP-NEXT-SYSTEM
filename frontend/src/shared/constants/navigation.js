@@ -455,6 +455,13 @@ export const navigationItems = [
             end: true,
             roles: FULL_ACCESS_ROLES,
           },
+          {
+            label: t("أصناف العملاء والموردين"),
+            path: "/dashboard/reports/partner-items",
+            icon: Boxes,
+            end: true,
+            roles: FULL_ACCESS_ROLES,
+          },
         ],
       },
     ],

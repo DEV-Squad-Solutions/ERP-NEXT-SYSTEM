@@ -86,6 +86,7 @@ export const routeTitles = {
   "/dashboard/reports/profitability/items": t("ربحية الأصناف"),
   "/dashboard/reports/inventory/stock": t("تقرير أرصدة المخزون"),
   "/dashboard/reports/inventory/cost": t("تقرير تكلفة المخزون"),
+  "/dashboard/reports/partner-items": t("تقرير أصناف العملاء والموردين"),
 
   "/dashboard/permissions": t("الشركات والمستخدمون"),
   "/dashboard/profile": t("الملف الشخصي"),

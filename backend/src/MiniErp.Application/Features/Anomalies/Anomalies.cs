@@ -40,16 +40,18 @@ public static class AnomalyDetector
     public static AnomalyReport Detect(IReadOnlyList<AnomalyPoint> points)
     {
         var items = new List<AnomalyItem>();
-        var enough = true;
+        var skipped = new List<string>();
+        var analysed = 0;
         foreach (var group in points.GroupBy(p => p.Kind))
         {
             var list = group.ToList();
             if (list.Count < MinPoints)
             {
-                enough = false;
+                skipped.Add(group.Key);
                 continue;
             }
 
+            analysed++;
             var median = Median(list.Select(p => p.Amount).ToList());
             var mad = Median(list.Select(p => Math.Abs(p.Amount - median)).ToList());
             foreach (var p in list)
@@ -77,12 +79,12 @@ public static class AnomalyDetector
 
         return new AnomalyReport(
             points.Count,
-            enough && points.Count > 0,
+            analysed > 0,
             MethodName,
             items.OrderByDescending(i => i.Score).ToList(),
-            enough && points.Count > 0
+            skipped.Count == 0 && analysed > 0
                 ? null
-                : "Not enough history (at least 8 documents per kind) to judge. Nothing was flagged.");
+                : $"Not enough history (at least {MinPoints} documents per kind) for: {(skipped.Count == 0 ? "all kinds" : string.Join(", ", skipped))}. Nothing was judged for those kinds.");
     }
 
     private static decimal Median(List<decimal> values)

@@ -47,4 +47,16 @@ public sealed class AnomalyDetectorTests
         Assert.False(r.HasEnoughHistory);
         Assert.Empty(r.Items);
     }
+
+    [Fact]
+    public void Kind_with_history_is_judged_and_short_kind_is_named()
+    {
+        var pts = Series(100, 105, 98, 102, 101, 99, 103, 100, 5000);
+        pts.AddRange(Enumerable.Range(0, 3).Select(i =>
+            new AnomalyPoint($"P-{i}", new DateOnly(2026, 11, 1), 50, "Purchase")));
+        var r = AnomalyDetector.Detect(pts);
+        Assert.True(r.HasEnoughHistory);
+        Assert.Single(r.Items);
+        Assert.Contains("Purchase", r.Note);
+    }
 }

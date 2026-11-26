@@ -69,7 +69,7 @@ export default function InvoiceSearchBox({ value, fromDate, toDate, onChange, on
         ) : null}
       </div>
       {open && suggestions.length > 0 && (
-        <ul className="absolute inset-x-0 top-full z-30 mt-1 max-h-64 overflow-auto rounded-xl border border-ink-400/15 bg-white py-1 shadow-lg">
+        <ul className="mt-1 max-h-64 overflow-auto rounded-xl border border-ink-400/15 bg-white py-1 shadow-lg">
           {suggestions.map((s) => (
             <li key={s.text}>
               <button type="button" onClick={() => pick(s.text)} className="flex w-full items-center justify-between gap-3 px-3 py-2.5 text-start text-sm hover:bg-ink-400/5">

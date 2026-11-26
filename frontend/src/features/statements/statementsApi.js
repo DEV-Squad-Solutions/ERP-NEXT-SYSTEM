@@ -24,6 +24,18 @@ export const statementsApi = baseApi.injectEndpoints({
       providesTags: ["PartnerItemMovements"],
     }),
 
+    getExpensesStatement: builder.query({
+      query: ({ fromDate, toDate, includeZeroBalances } = {}) => ({
+        url: "Statements/expenses",
+        params: {
+          FromDate: fromDate || undefined,
+          ToDate: toDate || undefined,
+          IncludeZeroBalances: includeZeroBalances || undefined,
+        },
+      }),
+      providesTags: ["Statement"],
+    }),
+
     getOperationalTrialBalance: builder.query({
       query: ({
         fromDate,
@@ -120,6 +132,7 @@ export const statementsApi = baseApi.injectEndpoints({
 export const {
   useGetPartnerStatementQuery,
   useGetPartnerItemMovementsQuery,
+  useGetExpensesStatementQuery,
   useGetOperationalTrialBalanceQuery,
   useGetIncomeStatementQuery,
   useGetFinancialPositionQuery,

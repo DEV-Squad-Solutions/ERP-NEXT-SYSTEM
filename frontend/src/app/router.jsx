@@ -129,6 +129,9 @@ const ContainerStoreStatement = lazy(
 const ExpensesPage = lazy(
   () => import("../features/expenses/pages/ExpensesPage"),
 );
+const ExpensesReportPage = lazy(
+  () => import("../features/reports/pages/ExpensesReportPage"),
+);
 const PartnerItemsReportPage = lazy(
   () => import("../features/reports/pages/PartnerItemsReportPage"),
 );
@@ -986,6 +989,16 @@ export const router = createBrowserRouter([
           <LazyPage>
             <Role roles={FULL_ACCESS_ROLES}>
               <InvoiceProfitabilityDetailsPage />
+            </Role>
+          </LazyPage>
+        ),
+      },
+      {
+        path: "reports/expenses",
+        element: (
+          <LazyPage>
+            <Role roles={FULL_ACCESS_ROLES}>
+              <ExpensesReportPage />
             </Role>
           </LazyPage>
         ),

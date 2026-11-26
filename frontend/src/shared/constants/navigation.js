@@ -464,6 +464,20 @@ export const navigationItems = [
           },
         ],
       },
+      {
+        label: t("تقارير مالية"),
+        icon: Receipt,
+        roles: FULL_ACCESS_ROLES,
+        children: [
+          {
+            label: t("المصروفات"),
+            path: "/dashboard/reports/expenses",
+            icon: Receipt,
+            end: true,
+            roles: FULL_ACCESS_ROLES,
+          },
+        ],
+      },
     ],
   },
 

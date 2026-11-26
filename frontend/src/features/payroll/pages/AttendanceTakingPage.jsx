@@ -793,27 +793,27 @@ const AttendanceTakingPage = () => {
               type="button"
               onClick={selectAllFiltered}
               disabled={!filteredRows.length}
-              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-ink-200 bg-white px-3 text-sm font-semibold text-ink-700 transition active:bg-ink-50 disabled:opacity-50 sm:h-10 sm:flex-none"
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-ink-200 bg-white px-2 text-[13px] whitespace-nowrap font-semibold text-ink-700 transition active:bg-ink-50 disabled:opacity-50 sm:h-10 sm:flex-none"
             >
-              <Check size={16} />
+              <Check size={16} className="hidden shrink-0 min-[420px]:block" />
               {t("تحديد الظاهر")}
             </button>
             <button
               type="button"
               onClick={markAllPresent}
               disabled={!filteredRows.length}
-              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-positive/30 bg-positive/5 px-3 text-sm font-semibold text-positive transition active:bg-positive/10 disabled:opacity-50 sm:h-10 sm:flex-none"
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-positive/30 bg-positive/5 px-2 text-[13px] whitespace-nowrap font-semibold text-positive transition active:bg-positive/10 disabled:opacity-50 sm:h-10 sm:flex-none"
             >
-              <UserCheck size={16} />
+              <UserCheck size={16} className="hidden shrink-0 min-[420px]:block" />
               {t("الكل حاضر")}
             </button>
             <button
               type="button"
               onClick={markAllAbsent}
               disabled={!filteredRows.length}
-              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-negative/30 bg-negative/5 px-3 text-sm font-semibold text-negative transition active:bg-negative/10 disabled:opacity-50 sm:h-10 sm:flex-none"
+              className="inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-negative/30 bg-negative/5 px-2 text-[13px] whitespace-nowrap font-semibold text-negative transition active:bg-negative/10 disabled:opacity-50 sm:h-10 sm:flex-none"
             >
-              <UserX size={16} />
+              <UserX size={16} className="hidden shrink-0 min-[420px]:block" />
               {t("الكل غائب")}
             </button>
           </div>

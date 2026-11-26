@@ -967,6 +967,8 @@ export default {
  "التنبيهات": "Alerts",
  "تنبيه": "Alert",
  "أدخل مبلغاً أكبر من صفر": "Enter an amount greater than zero",
+ "أدخل اسم البند": "Enter the item name",
+ "أدخل كود البند": "Enter the item code",
  "الأزرق المؤسسي": "Corporate blue",
  "التركواز": "Teal",
  "النيلي": "Indigo",

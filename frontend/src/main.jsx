@@ -1,13 +1,14 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
-import { Toaster } from "sonner";
+import { Toaster, toast } from "sonner";
 import { store } from "./app/store";
 import App from "./app/App";
 import "./index.css";
 import { initTheme } from "./shared/theme/theme";
 import { applyDocumentLanguage, getLang } from "./i18n";
 
+if (import.meta.env.DEV) window.__toast = toast;
 initTheme();
 applyDocumentLanguage();
 const savedTheme = localStorage.getItem("theme");

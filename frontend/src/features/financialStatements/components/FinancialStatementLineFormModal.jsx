@@ -71,14 +71,23 @@ export default function FinancialStatementLineFormModal({
   }, [isOpen, mode, line]);
 
   const updateField = (field, value) => {
+    setErrors((cur) => (cur[field] ? { ...cur, [field]: undefined } : cur));
     setForm((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
+  const [errors, setErrors] = useState({});
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const nextErrors = {};
+    if (!form.name.trim()) nextErrors.name = t("أدخل اسم البند");
+    if (!form.code.trim()) nextErrors.code = t("أدخل كود البند");
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
 
     await onSubmit({
       fiscalYearId: Number(form.fiscalYearId),
@@ -142,6 +151,9 @@ export default function FinancialStatementLineFormModal({
               className="w-full h-10 rounded-xl border border-ink-400/20 bg-paper px-3 text-sm outline-none focus:border-primary-500"
               placeholder={t("اسم البند")}
             />
+            {errors.name && (
+              <p role="alert" className="field-error">{errors.name}</p>
+            )}
           </div>
 
           <div>
@@ -156,6 +168,9 @@ export default function FinancialStatementLineFormModal({
               className="w-full h-10 rounded-xl border border-ink-400/20 bg-paper px-3 text-sm outline-none focus:border-primary-500"
               placeholder={t("مثال: FP-110")}
             />
+            {errors.code && (
+              <p role="alert" className="field-error">{errors.code}</p>
+            )}
           </div>
 
           <div>

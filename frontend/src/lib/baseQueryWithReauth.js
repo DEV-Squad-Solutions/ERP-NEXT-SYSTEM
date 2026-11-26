@@ -52,9 +52,14 @@ const syncFromErrorCode = (error, api) => {
 
 const showErrors = (error) => {
   const messages = [...new Set(getApiErrors(error))];
+  if (messages.length === 0) return;
 
-  messages.forEach((message) => {
-    toast.error(message, { id: message });
+  // One toast per failed request: headline + the field messages as lines.
+  const [headline, ...details] = messages;
+  const id = messages.join("|");
+  toast.error(headline, {
+    id,
+    description: details.length ? details.join("\n") : undefined,
   });
 };
 

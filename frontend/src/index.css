@@ -526,3 +526,50 @@ body,
   max-width: 100%;
   overflow-x: clip;
 }
+
+/* Cashbox ledger on phones: each row becomes a card with labelled lines. */
+@media (max-width: 639px) {
+  table.ledger-cards {
+    min-width: 0 !important;
+    display: block;
+  }
+  table.ledger-cards colgroup,
+  table.ledger-cards thead { display: none; }
+  table.ledger-cards tbody { display: block; }
+  table.ledger-cards tbody tr {
+    display: flex;
+    flex-direction: column;
+    margin: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    border-radius: 0.75rem;
+    background: #fff;
+  }
+  table.ledger-cards tbody td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.35rem 0 !important;
+    border: 0 !important;
+    min-width: 0;
+  }
+  table.ledger-cards tbody td > * { min-width: 0; max-width: 100%; }
+  table.ledger-cards tbody td[data-label]:not([data-label=""])::before {
+    content: attr(data-label);
+    flex: none;
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
+  }
+  table.ledger-cards td[data-col="date"] { order: 1; }
+  table.ledger-cards td[data-col="voucher"] { order: 2; }
+  table.ledger-cards td[data-col="desc"] { order: 3; }
+  table.ledger-cards td[data-col="class"] { order: 4; }
+  table.ledger-cards td[data-col="credit"] { order: 5; }
+  table.ledger-cards td[data-col="debit"] { order: 6; }
+  table.ledger-cards td[data-col="rate"] { order: 7; }
+  table.ledger-cards td[data-col="balance"] { order: 8; }
+  table.ledger-cards td [class*="min-w-[240px]"] { min-width: 0 !important; }
+}

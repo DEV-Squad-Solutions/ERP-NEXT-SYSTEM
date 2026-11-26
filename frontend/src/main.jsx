@@ -6,7 +6,12 @@ import { store } from "./app/store";
 import App from "./app/App";
 import "./index.css";
 import { initTheme } from "./shared/theme/theme";
+import { reloadOnceForNewVersion } from "./lib/lazyRetry";
 import { applyDocumentLanguage, getLang } from "./i18n";
+
+window.addEventListener("vite:preloadError", (event) => {
+  if (reloadOnceForNewVersion()) event.preventDefault();
+});
 
 if (import.meta.env.DEV) window.__toast = toast;
 initTheme();

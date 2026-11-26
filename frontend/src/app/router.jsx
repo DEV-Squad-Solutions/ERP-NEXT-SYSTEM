@@ -1,4 +1,6 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
+import { lazyRetry as lazy } from "../lib/lazyRetry";
+import RouteError from "../shared/components/RouteError";
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage";
 import SetupPage from "../features/setup/pages/SetupPage";
@@ -274,10 +276,12 @@ function ComingSoon({ title }) {
 export const router = createBrowserRouter([
   {
     path: "/",
+    errorElement: <RouteError />,
     element: <LoginPage />,
   },
   {
     path: "/setup",
+    errorElement: <RouteError />,
     element: <SetupPage mode="first-run" />,
   },
   {
@@ -286,6 +290,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
+    errorElement: <RouteError />,
     element: (
       <ProtectedRoute>
         <DashboardLayout />

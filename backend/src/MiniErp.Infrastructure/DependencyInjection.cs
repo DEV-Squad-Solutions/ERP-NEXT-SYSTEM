@@ -53,6 +53,11 @@ public static class DependencyInjection
                     new MediaTypeWithQualityHeaderValue("application/json"));
             });
 
+        services.Configure<MiniErp.Application.Features.Ai.AiOptions>(
+            configuration.GetSection(MiniErp.Application.Features.Ai.AiOptions.SectionName));
+        services.AddHttpClient<MiniErp.Application.Features.Ai.IAIProvider, Services.Ai.ConfiguredAiProvider>(
+            client => client.Timeout = TimeSpan.FromSeconds(30));
+
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
             options
                 .UseSqlServer(connectionString)

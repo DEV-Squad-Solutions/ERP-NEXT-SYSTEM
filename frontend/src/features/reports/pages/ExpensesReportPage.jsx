@@ -4,13 +4,20 @@ import { useGetExpensesStatementQuery } from "../../statements/statementsApi";
 import Input from "../../../shared/components/ui/Input";
 import { t, getLocale } from "../../../i18n";
 
+const todayISO = () => new Date().toISOString().slice(0, 10);
+const yearStartISO = () => `${new Date().getFullYear()}-01-01`;
+
 export default function ExpensesReportPage() {
   const nf = useMemo(() => new Intl.NumberFormat(getLocale(), { maximumFractionDigits: 2 }), []);
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
+  const [fromDate, setFromDate] = useState(yearStartISO());
+  const [toDate, setToDate] = useState(todayISO());
   const [withZero, setWithZero] = useState(false);
 
-  const { data, isFetching, isError } = useGetExpensesStatementQuery({ fromDate, toDate, includeZeroBalances: withZero });
+  const { data, isFetching, isError } = useGetExpensesStatementQuery({
+    fromDate: fromDate || yearStartISO(),
+    toDate: toDate || todayISO(),
+    includeZeroBalances: withZero,
+  });
   const rows = data?.items ?? [];
   const totals = data?.totals ?? {};
   const net = (r) => (r.periodDebit ?? 0) - (r.periodCredit ?? 0);

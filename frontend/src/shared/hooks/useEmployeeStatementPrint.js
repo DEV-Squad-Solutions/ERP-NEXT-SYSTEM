@@ -13,6 +13,8 @@ export default function useEmployeeStatementPrint({
   const printStatement = useReactToPrint({
     contentRef: printRef,
     documentTitle: title,
+    // 297mm-wide template with its own 12mm padding: A4 landscape, no extra page margin
+    pageStyle: `@page { size: A4 landscape; margin: 0; } @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }`,
   });
 
   return {

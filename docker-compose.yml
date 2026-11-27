@@ -1,3 +1,4 @@
+# للتجربة والتطوير فقط (بيبني من الكود). التشغيل الفعلي على السيرفر: فولدر deploy/ (install-or-update.bat).
 # ERP: SQL Server + API + web (nginx). Not yet run by the author in Docker.
 # Usage: copy .env.example to .env, fill the two values, then:
 #   docker compose up --build

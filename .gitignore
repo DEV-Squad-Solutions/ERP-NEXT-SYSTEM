@@ -1,1 +1,6 @@
 .env
+
+# installer logs
+deploy/erp-install-*.log
+deploy/*.tar
+deploy/.env.bak

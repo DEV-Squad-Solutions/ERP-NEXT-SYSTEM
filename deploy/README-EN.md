@@ -1,0 +1,66 @@
+# ERP server install and update guide (offline Windows server)
+
+**One file does it all:** double-click `install-or-update.bat`. It detects a fresh install or an update and runs steps [1/6] to [6/6].
+At start it asks for a language: `1` English (default after 10 seconds) or `2` Arabic. In Arabic mode the messages (start, success, every error with its fix) appear in popup windows laid out right-to-left. The black console keeps short English progress lines because a console cannot lay out Arabic correctly. Full Arabic guide: `README-AR.md`.
+
+> **Golden rule:** the data lives in the Docker volume `erp_sql_data`. The installer never deletes it. You must never run `docker compose down -v`, `docker volume rm` or `docker system prune --volumes`.
+
+## 1. On the dev PC (internet + Docker + the repo)
+| Step | Command | What it does |
+|---|---|---|
+| 1 | `git pull` | Gets the latest main |
+| 2 | `cd deploy`, then `powershell -ExecutionPolicy Bypass -File .\build-images.ps1 -Version 2.1` | Builds API + web and writes `erp-images-2.1.tar` into deploy (new number each time) |
+| 3 | Copy the whole **deploy** folder to the USB drive | |
+
+Success: `erp-images-2.1.tar` exists in deploy and the script prints DONE.
+
+## 2. On the server (192.168.1.5)
+1. Copy the deploy folder from the USB drive to a fixed place, e.g. `C:\ERP\deploy` (same place every time).
+2. Start Docker Desktop and wait until it is running.
+3. Double-click **install-or-update.bat** and choose a language.
+4. Wait. Loading images the first time can take a few minutes.
+
+| Step | What it does | Success looks like |
+|---|---|---|
+| [1/6] Docker | Checks Docker is running | `OK Docker is running` |
+| [2/6] Install type | Fresh install or update, checks `.env` | `Mode: FRESH INSTALL` or `Mode: UPDATE` |
+| [3/6] Backup | Update only: backup to `C:\ERP_backup` (must succeed or it stops) | `Backup verified: MiniErp_....bak` |
+| [4/6] Load images | Loads the images from the tar file | `Images ready` |
+| [5/6] Start | Starts services (update: API + web only, database untouched) | `Containers started` |
+| [6/6] Health | Waits up to 5 minutes | `System is ready`, then the green SUCCESS box |
+
+The summary shows the version, URLs, backup path and the log file (`erp-install-....log` next to the script). Open `http://localhost` (other PCs: `http://192.168.1.5`).
+
+### The `.env` file (secrets)
+- **Fresh install:** nothing to do. The installer creates `.env` with a strong generated SQL password and JWT key and never prints them. Copy `.env` to a private safe place (not git, not chat).
+- **Update of a running system:** the installer does **not** create new secrets (they would break the database login). If `.env` is missing them it stops and tells you to open `.env` in Notepad and type `SQL_SA_PASSWORD=` and `JWT_SIGNING_KEY=` with the same values as the old `.env`. Type them yourself. Never send them in chat.
+
+## Next update
+Dev PC: `git pull` + `build-images.ps1 -Version 2.2`, copy deploy to the USB drive. Server: copy it over the old one (keep `.env`), double-click `install-or-update.bat`. A backup is taken automatically first.
+
+## Errors
+The installer stops with a red STOPPED box and a "What to do next" line. Nothing is deleted.
+| Message | Fix |
+|---|---|
+| `Docker is not running` | Start Docker Desktop, wait, run again |
+| `No erp-images-*.tar file found` | Copy the tar from the USB drive next to the script |
+| `.env is missing the existing secrets` | Type the two lines into `.env` with the old values |
+| `Backup failed` | Check erp-db is running and the disk has space, run again |
+| `database volume with another name` | Stop. This is an older install under another name. Send the name shown |
+| `The API did not become ready` | Send the log file and the API log lines shown |
+
+## Roll back the code only
+Old images stay on the server. In `.env` set `ERP_VERSION=` to the old number (e.g. 2.0), then from deploy: `docker compose -p erp up -d --no-deps api frontend`. Migrations are additive, so older code still works.
+
+## Restore a backup (emergency only, ask first)
+It replaces current data with an older copy.
+1. `powershell -ExecutionPolicy Bypass -File .\backup.ps1` (take a fresh backup first)
+2. `docker stop erp-api erp-frontend`
+3. `docker cp C:\ERP_backup\MiniErp_XXXX.bak erp-db:/var/opt/mssql/backup/restore.bak`
+4. `docker exec erp-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "<SQL_SA_PASSWORD>" -C -Q "ALTER DATABASE MiniErp SET SINGLE_USER WITH ROLLBACK IMMEDIATE; RESTORE DATABASE MiniErp FROM DISK='/var/opt/mssql/backup/restore.bak' WITH REPLACE; ALTER DATABASE MiniErp SET MULTI_USER;"`
+5. `docker start erp-api erp-frontend`, then check `http://localhost:8080/health/ready`.
+
+## Manual backup any time
+`powershell -ExecutionPolicy Bypass -File .\backup.ps1` (saved to `C:\ERP_backup`, keeps 14 days).
+
+**Honest status:** the scripts are written and reviewed but not yet run on real Docker. Watch the first run on the server and send the log file if anything fails.

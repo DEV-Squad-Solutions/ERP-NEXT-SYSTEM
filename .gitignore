@@ -12,3 +12,9 @@ deploy/.env.bak.*
 deploy/.env.*.bak
 deploy/existing-db-state.json
 deploy/.installer-gate.json*
+
+# desktop app
+desktop/node_modules/
+desktop/dist/
+# build artifacts
+backend/src/MiniErp.Api/tmp/

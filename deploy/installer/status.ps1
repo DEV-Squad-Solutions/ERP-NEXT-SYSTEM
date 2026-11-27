@@ -29,8 +29,9 @@ foreach ($n in "erp-db", "erp-api", "erp-frontend") {
 }
 $img = docker inspect -f "{{.Config.Image}}" erp-api 2>$null
 Row "Running API image" $(if ($img) { $img } else { "-" })
-$vol = docker volume ls -q --filter "name=^erp_sql_data$"
-Row "Data volume" $(if ($vol) { "erp_sql_data (present)" } else { "erp_sql_data NOT found" }) $(if ($vol) { "Green" } else { "Yellow" })
+$sqlVol = "erp_sql_data"; $ef0 = Join-Path $Root ".env"; if (Test-Path $ef0) { $mv = [regex]::Match([IO.File]::ReadAllText($ef0, [Text.Encoding]::UTF8), "(?m)^[ \t]*ERP_SQL_VOLUME[ \t]*=[ \t]*([A-Za-z0-9_.-]+)"); if ($mv.Success) { $sqlVol = $mv.Groups[1].Value } }
+$vol = docker volume ls -q --filter "name=^$sqlVol$"
+Row "Data volume" $(if ($vol) { "$sqlVol (present)" } else { "$sqlVol NOT found" }) $(if ($vol) { "Green" } else { "Yellow" })
 $apiPort = "8080"; $ef = Join-Path $Root ".env"; if (Test-Path $ef) { $m = [regex]::Match([IO.File]::ReadAllText($ef, [Text.Encoding]::UTF8), "(?m)^\s*ERP_API_PORT[ \t]*=[ \t]*(\d+)"); if ($m.Success) { $apiPort = $m.Groups[1].Value } }
 if (Test-ErpApiOnPort $apiPort) {
     try { $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:$apiPort/health/ready" -TimeoutSec 5; Row "Health (ready)" "HTTP $($r.StatusCode)" Green } catch { Row "Health (ready)" "erp-api is running but not ready" Yellow }

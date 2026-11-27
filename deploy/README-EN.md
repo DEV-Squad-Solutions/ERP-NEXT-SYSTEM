@@ -98,3 +98,6 @@ If port 80 or 8080 is used by another container, the window shows two buttons: s
 
 On the dev PC: `git pull`, `build\build-images.ps1 -Version 2.1`, then `powershell -ExecutionPolicy Bypass -File .\build\build-exe.ps1 -Version 2.1`.
 Result: `dist\DevSquad-ERP-Installer-2.1.exe` (Dev Squad icon, compressed, contains the whole package including the images tar). Copy that single file to the USB drive. On the server double-click it: it unpacks to `C:\ERP-Installer\DevSquad-ERP-Installer-2.1` and opens the installer window. Newer versions unpack over the app files only; `.env` and release history are never overwritten. The exe is not code-signed, so Windows SmartScreen may ask: More info, Run anyway. Use `-NoImages` to leave the big tar out and copy it into the `images` folder yourself.
+
+## If the SQL password does not match the database
+Never reset or delete the volume. Double-click `tools\Recover database.bat`: 1 = copy the database files to a folder first, 2 = test old passwords from old .env files, 3 = recover on a COPY (the original volume is never changed). Details are printed on screen.

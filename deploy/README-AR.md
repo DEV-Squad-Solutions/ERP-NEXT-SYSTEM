@@ -99,3 +99,6 @@
 ## ملف واحد (.exe)
 
 على جهازك: `git pull` ثم `build\build-images.ps1 -Version 2.1` ثم `build\build-exe.ps1 -Version 2.1`. هيطلع `dist\DevSquad-ERP-Installer-2.1.exe` بأيقونة Dev Squad ومضغوط وفيه كل حاجة. انسخ الملف ده بس على الفلاشة، وعلى السيرفر دوس عليه مرتين: بيفك في `C:\ERP-Installer\...` وبيفتح المثبّت. الملف مش موقّع فممكن ويندوز يسأل: More info ثم Run anyway.
+
+## لو باسورد الـ SQL مش مطابق للداتابيز
+متمسحش ولا تعمل reset للـ volume. شغّل `tools\Recover database.bat`: 1 = انسخ ملفات الداتابيز لفولدر الأول، 2 = جرّب الباسوردات القديمة من ملفات .env القديمة، 3 = استرجاع على **نسخة** (الـ volume الأصلي مبيتعدّلش أبداً).

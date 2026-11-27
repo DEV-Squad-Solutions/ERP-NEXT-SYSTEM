@@ -95,37 +95,6 @@ function Ask-Choice([string]$text, [string[]]$keys, [string[]]$labels) {
     $a = (Read-Host "      Your choice (anything else cancels)").Trim().ToUpper()
     if ($keys -contains $a) { return $a } else { return "" }
 }
-function Offer-VolumeReset {
-    # Resets ONLY the new volume erp_sql_data. Never any other volume. Refuses if it looks like it holds real data.
-    # Safety: refuses if another container uses it, if MiniErp is big, takes a cold file copy first, needs a typed confirmation.
-    $img = "mcr.microsoft.com/mssql/server:2022-latest"
-    $users = @(docker ps -a --filter "volume=erp_sql_data" --format "{{.Names}}" | Where-Object { $_ -and $_ -ne "erp-db" })
-    if ($users.Count -gt 0) { Info "Reset refused: another container uses erp_sql_data ($($users -join ', '))."; return $false }
-    $ls = docker run --rm --entrypoint sh -v erp_sql_data:/v:ro $img -c "ls -l /v/data 2>/dev/null; echo TOTALKB=`$(du -sk /v | cut -f1)" 2>&1 | Out-String
-    $big = $false; $hasMini = $false
-    foreach ($l in ($ls -split "`n")) { if ($l -match '^\S+\s+\d+\s+\S+\s+\S+\s+(\d+)\s+.*\s(MiniErp[^\s]*\.mdf)\s*$') { $hasMini = $true; if ([int64]$Matches[1] -gt 157286400) { $big = $true } } }
-    $kb = 0; if ($ls -match 'TOTALKB=(\d+)') { $kb = [int64]$Matches[1] }
-    Info ("Volume erp_sql_data: about {0} MB, MiniErp data file in it: {1}" -f [int]($kb / 1024), $(if ($hasMini) { "yes" } else { "no" }))
-    if ($big -or $kb -gt 600000) { Info "Reset refused: the volume is large, it may hold real data. Nothing was changed. Send the log file to your developer."; return $false }
-    Info "This volume belongs only to the NEW erp-db (created by test runs). The old minierp database is a different container and volume and is NOT touched."
-    $ans = Ask "To RESET the new empty erp database (a file copy is saved first), type exactly: RESET NEW DATABASE   (anything else cancels)"
-    if ($ans -cne "RESET NEW DATABASE") { Info "Reset cancelled. Nothing was changed."; return $false }
-    $dest = Join-Path $BackupDir ("erp_sql_data_before_reset_" + (Get-Date -Format "yyyyMMdd_HHmmss"))
-    New-Item -ItemType Directory -Force -Path $dest | Out-Null
-    Info "Stopping erp-db only"
-    docker stop erp-db | Out-Null
-    Info "Copying the volume files to $dest (read-only copy)"
-    docker run --rm --entrypoint sh -v erp_sql_data:/v:ro -v "${dest}:/b" $img -c "cp -a /v/. /b/" 2>&1 | Out-Null
-    $srcKb = [int64](docker run --rm --entrypoint sh -v erp_sql_data:/v:ro $img -c "du -sk /v | cut -f1" 2>$null)
-    $dstKb = [int64](docker run --rm --entrypoint sh -v "${dest}:/b" $img -c "du -sk /b | cut -f1" 2>$null)
-    if ($srcKb -le 0 -or [Math]::Abs($srcKb - $dstKb) -gt [Math]::Max(2048, $srcKb / 50)) { Info "The file copy does not match ($srcKb KB vs $dstKb KB). Reset cancelled, nothing was removed."; docker start erp-db | Out-Null; return $false }
-    Ok "File copy saved and checked: $dest"
-    docker rm erp-db | Out-Null
-    docker volume rm erp_sql_data | Out-Null
-    if ($LASTEXITCODE -ne 0) { Info "The volume could not be removed. Nothing else was changed."; return $false }
-    Ok "New empty volume erp_sql_data reset. The same SQL password from .env will be used for the fresh database."
-    return $true
-}
 function Test-PortFree([int]$port) {
     try { $l = New-Object System.Net.Sockets.TcpListener([System.Net.IPAddress]::Any, $port); $l.Start(); $l.Stop(); return $true } catch { return $false }
 }
@@ -243,10 +212,12 @@ try {
     # ---------- 2. Install type + config ----------
     Step 2 "Detecting install type and checking configuration"
     $dbContainer = docker ps -a --filter "name=^erp-db$" -q
-    $ourVolume = docker volume ls -q --filter "name=^erp_sql_data$"
+    $sqlVol = "erp_sql_data"
+    if (Test-Path (Join-Path $Root ".env")) { $mv = [regex]::Match([IO.File]::ReadAllText((Join-Path $Root ".env"), [Text.Encoding]::UTF8), "(?m)^[ \t]*ERP_SQL_VOLUME[ \t]*=[ \t]*([A-Za-z0-9_.-]+)"); if ($mv.Success) { $sqlVol = $mv.Groups[1].Value } }
+    $ourVolume = docker volume ls -q --filter "name=^$sqlVol$"
     $isUpdate = [bool]$dbContainer -or [bool]$ourVolume
     Info ("Container erp-db : {0}" -f $(if ($dbContainer) { "found" } else { "not found" }))
-    Info ("Volume erp_sql_data: {0}" -f $(if ($ourVolume) { "found" } else { "not found" }))
+    Info ("Volume {0}: {1}" -f $sqlVol, $(if ($ourVolume) { "found" } else { "not found" }))
     if (-not $dbContainer) {
         $foreign = docker ps -a --format "{{.Names}} ({{.Image}}, {{.Status}})" | Where-Object { $_ -match 'mssql|sql' -and $_ -notmatch '^erp-db ' }
         if ($foreign) {
@@ -277,8 +248,8 @@ try {
 
     # a data volume must never be used by two SQL Server containers at once (data corruption risk)
     if ($ourVolume) {
-        $users = docker ps -a --filter "volume=erp_sql_data" --format "{{.Names}}" | Where-Object { $_ -notmatch '^erp-' }
-        if ($users) { Fail "The data volume erp_sql_data is already used by another container: $($users -join ', '). Two SQL Server containers on the same data would corrupt it." "Do not continue. Send this name to your developer. Nothing was changed." "volume" }
+        $users = docker ps -a --filter "volume=$sqlVol" --format "{{.Names}}" | Where-Object { $_ -notmatch '^erp-' }
+        if ($users) { Fail "The data volume $sqlVol is already used by another container: $($users -join ', '). Two SQL Server containers on the same data would corrupt it." "Do not continue. Send this name to your developer. Nothing was changed." "volume" }
     }
 
     $envFile = Join-Path $Root ".env"
@@ -401,13 +372,7 @@ try {
             if ($pwBad) { Info "Diagnosis: SQL Server is running but refuses the password in .env. The password stored inside the data volume is a different one." }
             elseif ($dl -match 'memory|Insufficient|OutOfMemory') { Info "Diagnosis: SQL Server may be short of memory. Give Docker Desktop more RAM (at least 4 GB) and run again." }
             else { Info "Diagnosis: not clear from the log. Send the log file to your developer." }
-            $script:resetDone = $false
-            if ($pwBad -and $true) { $script:resetDone = Offer-VolumeReset }
-            if ($script:resetDone) {
-                Run-Docker compose -p erp up -d db
-                Info "Waiting for the NEW empty database to accept connections"
-                for ($i = 0; $i -lt 36; $i++) { $h = docker inspect -f "{{.State.Health.Status}}" erp-db 2>$null; if ($h -eq "healthy") { $dbReady = $true; break }; Start-Sleep -Seconds 5 }
-            }
+            if ($pwBad) { Info "DO NOT reset or delete anything: the data volume may hold your real data. Use tools\Recover database.bat (copies the files first, then finds or resets the password on a COPY only)." }
             if (-not $dbReady) { Fail "The database container did not become healthy in 3 minutes." "Send the log file to your developer (it now contains the last 40 lines of the database log, no passwords)." "docker2" }
         }
 

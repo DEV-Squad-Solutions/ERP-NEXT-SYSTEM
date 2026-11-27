@@ -34,7 +34,7 @@ $script:recent = New-Object System.Collections.ArrayList
 $T = @{
   en = @{
     title = "ERP System - Installer"; sub = "Install, update, switch version or check status. Data is never deleted."
-    install = "Install / Update"; switchv = "Switch version / Roll back"; status = "Status"; close = "Close"
+    install = "Install / Update"; switchv = "Switch / Roll back"; status = "Status"; close = "Close"
     steps = "Steps"; log = "Live log"; ready = "Ready. Choose an action."; running = "Running... please wait. Do not close this window."
     okTitle = "SUCCESS"; failTitle = "STOPPED - nothing was deleted, your data is safe"; cancelTitle = "Cancelled - nothing was changed"
     next = "What to do next"; busy = "An operation is running. Please wait until it finishes."

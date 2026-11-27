@@ -124,7 +124,7 @@ try {
 
     $envFile = Join-Path $PSScriptRoot ".env"
     $envText = ""
-    if (Test-Path $envFile) { $envText = Get-Content $envFile -Raw }
+    if (Test-Path $envFile) { $envText = [IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8) }
     $sa = Get-EnvValue $envText "SQL_SA_PASSWORD"
     $jwt = Get-EnvValue $envText "JWT_SIGNING_KEY"
 
@@ -138,7 +138,7 @@ try {
     }
     else {
         Ok "Mode: FRESH INSTALL (no existing database)"
-        if (-not $envText) { $envText = Get-Content (Join-Path $PSScriptRoot ".env.example") -Raw }
+        if (-not $envText) { $envText = [IO.File]::ReadAllText((Join-Path $PSScriptRoot ".env.example"), [Text.Encoding]::UTF8) }
         $changed = $false
         if (-not $sa)  { $envText = Set-EnvValue $envText "SQL_SA_PASSWORD" (New-Secret 28); $changed = $true; Ok "Generated a strong SQL password (stored only in .env, not shown)" }
         if (-not $jwt) { $envText = Set-EnvValue $envText "JWT_SIGNING_KEY" (New-Secret 48); $changed = $true; Ok "Generated a JWT signing key (stored only in .env, not shown)" }
@@ -147,7 +147,7 @@ try {
             Info "IMPORTANT: copy the .env file to a safe private place. It is not in git."
         }
     }
-    $envText = Get-Content $envFile -Raw
+    $envText = [IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8)
     if ($envText -match '(?im)^\s*SEED_ENABLED\s*=\s*true') { Fail "SEED_ENABLED is true in .env." "Set SEED_ENABLED=false in .env (this is a real-data server), then run again." "seed" }
     Ok "Seeding is off"
 

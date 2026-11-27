@@ -13,7 +13,7 @@ $envFile = Join-Path $PSScriptRoot ".env"
 if (-not (Test-Path $envFile)) { throw ".env file not found next to the script." }
 
 $saPass = $null
-Get-Content $envFile | ForEach-Object {
+[IO.File]::ReadAllLines($envFile, [Text.Encoding]::UTF8) | ForEach-Object {
     if ($_ -match '^\s*SQL_SA_PASSWORD\s*=\s*(.+?)\s*$') { $saPass = $Matches[1] }
 }
 if (-not $saPass) { throw "SQL_SA_PASSWORD not found in .env" }

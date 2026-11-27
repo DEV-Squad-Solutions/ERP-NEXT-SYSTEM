@@ -43,7 +43,7 @@ $T = @{
     steps = "Steps"; log = "Live log"; ready = "Ready. Choose an action."; running = "Running... please wait. Do not close this window."
     okTitle = "SUCCESS"; failTitle = "STOPPED - nothing was deleted, your data is safe"; cancelTitle = "Cancelled - nothing was changed"
     next = "What to do next"; busy = "An operation is running. Please wait until it finishes."
-    ok = "OK"; gen = "Generate for me"; show = "Show"; hide = "Hide"; weak = "Weak"; fair = "Fair"; good = "Good"; strong = "Strong"; looksOk = "Looks good"; rulesNew = "At least 8 characters, 3 of: capitals, small letters, digits, symbols. Allowed: letters, digits and _ . @ ! * + -"; rulesOld = "Type it exactly as in your old .env. No spaces or quotes. It is checked against the database before anything is saved for good."; rulesJwt = "At least 32 characters. Allowed: letters, digits and _ . @ ! * + / = -"; errMin8 = "At least 8 characters"; errChars = "Allowed characters: letters, digits and _ . @ ! * + -"; errMix = "Use at least 3 kinds: capitals, small letters, digits, symbols"; errJwt = "At least 32 characters, no spaces"; errSpace = "No spaces or quotes"; ctxCap = "Recent log"; secretNote2 = "Typed on this PC and saved only in the .env file. Never shown in the log."; secretNote = "Typed here on this PC, saved only in the .env file. Never shown in the log."; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; oldbak = "Old SQL container backup"; copylog = "Copy log"; copied = "Copied"; tipInstall = "Install a new version or update. A backup is taken first."; tipSwitch = "Go back to an earlier installed version."; tipStatus = "Read-only check of what is running."; tipCopy = "Copy the whole log to the clipboard"; open = "Open"
+    ok = "OK"; gen = "Generate for me"; pwSide = "DB password"; pwTitle = "Change database password"; pwHelp = "Type the OLD password, then the NEW one twice. The password is changed inside the database, your data stays."; pwOld = "Old password (the one the database has now)"; pwNew = "New password"; pwConf = "Confirm new password"; errMatch = "The two new passwords are different"; errSame = "The new password must be different from the old one"; pwNote = "A copy of the database files is saved first (a few minutes). Nothing is deleted. Typed on this PC only, never shown in the log."; pwBtn = "Change password"; pwReady = "Ready"; pwStarted = "Password change started in a separate window. Follow it there (no passwords are shown)."; tipPw = "Change the SQL password of the ERP database without losing data."; show = "Show"; hide = "Hide"; weak = "Weak"; fair = "Fair"; good = "Good"; strong = "Strong"; looksOk = "Looks good"; rulesNew = "At least 8 characters, 3 of: capitals, small letters, digits, symbols. Allowed: letters, digits and _ . @ ! * + -"; rulesOld = "Type it exactly as in your old .env. No spaces or quotes. It is checked against the database before anything is saved for good."; rulesJwt = "At least 32 characters. Allowed: letters, digits and _ . @ ! * + / = -"; errMin8 = "At least 8 characters"; errChars = "Allowed characters: letters, digits and _ . @ ! * + -"; errMix = "Use at least 3 kinds: capitals, small letters, digits, symbols"; errJwt = "At least 32 characters, no spaces"; errSpace = "No spaces or quotes"; ctxCap = "Recent log"; secretNote2 = "Typed on this PC and saved only in the .env file. Never shown in the log."; secretNote = "Typed here on this PC, saved only in the .env file. Never shown in the log."; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; oldbak = "Old SQL container backup"; copylog = "Copy log"; copied = "Copied"; tipInstall = "Install a new version or update. A backup is taken first."; tipSwitch = "Go back to an earlier installed version."; tipStatus = "Read-only check of what is running."; tipCopy = "Copy the whole log to the clipboard"; open = "Open"
     s_install = @("Check Docker", "Install type and config", "Backup", "Load images", "Start services", "Health check")
     s_switch = @("Safety backup", "Restore database (optional)", "Switch code", "Health check")
     s_status = @("Read status")
@@ -55,7 +55,7 @@ $T = @{
     steps = "الخطوات"; log = "السجل المباشر"; ready = "جاهز. اختار إجراء."; running = "جاري التنفيذ... استنى. متقفلش النافذة دي."
     okTitle = "تم بنجاح"; failTitle = "اتوقف - مفيش حاجة اتمسحت والداتا سليمة"; cancelTitle = "اتلغى - مفيش حاجة اتغيّرت"
     next = "الخطوة الجاية"; busy = "فيه عملية شغالة. استنى لحد ما تخلص."
-    ok = "موافق"; gen = "ولّدلي تلقائي"; show = "إظهار"; hide = "إخفاء"; weak = "ضعيف"; fair = "مقبول"; good = "جيد"; strong = "قوي"; looksOk = "تمام"; rulesNew = "8 حروف على الأقل، ومن 3 أنواع: كبيرة وصغيرة وأرقام ورموز. المسموح: حروف وأرقام و _ . @ ! * + -"; rulesOld = "اكتبه زي ما هو في ملف .env القديم. من غير مسافات أو علامات تنصيص. هيتفحص على الداتابيز قبل ما يتحفظ نهائي."; rulesJwt = "32 حرف على الأقل. المسموح: حروف وأرقام و _ . @ ! * + / = -"; errMin8 = "8 حروف على الأقل"; errChars = "المسموح: حروف وأرقام و _ . @ ! * + -"; errMix = "استخدم 3 أنواع على الأقل: كبيرة وصغيرة وأرقام ورموز"; errJwt = "32 حرف على الأقل ومن غير مسافات"; errSpace = "من غير مسافات أو علامات تنصيص"; ctxCap = "آخر السجل"; secretNote2 = "بتكتبه على الجهاز ده وبيتحفظ في ملف .env بس. مش بيظهر في السجل."; secretNote = "بتكتبه هنا على الجهاز ده وبيتحفظ في ملف .env بس. مش بيظهر في السجل."; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; oldbak = "نسخة الـ SQL القديم"; copylog = "نسخ السجل"; copied = "تم النسخ"; tipInstall = "تثبيت أو تحديث. بياخد نسخة احتياطية الأول."; tipSwitch = "الرجوع لإصدار متثبّت قبل كده."; tipStatus = "فحص للقراءة بس للي شغال."; tipCopy = "نسخ السجل كله"; open = "افتح"
+    ok = "موافق"; gen = "ولّدلي تلقائي"; pwSide = "باسورد الداتابيز"; pwTitle = "تغيير باسورد الداتابيز"; pwHelp = "اكتب الباسورد القديم وبعدين الجديد مرتين. التغيير بيتم جوه الداتابيز والداتا بتفضل زي ما هي."; pwOld = "الباسورد القديم (اللي الداتابيز شغالة بيه دلوقتي)"; pwNew = "الباسورد الجديد"; pwConf = "تأكيد الباسورد الجديد"; errMatch = "الباسوردين الجداد مش زي بعض"; errSame = "الباسورد الجديد لازم يختلف عن القديم"; pwNote = "بياخد نسخة من ملفات الداتابيز الأول (كام دقيقة). مفيش حاجة بتتمسح. بتكتبه على الجهاز ده بس ومش بيظهر في السجل."; pwBtn = "غيّر الباسورد"; pwReady = "جاهز"; pwStarted = "بدأ تغيير الباسورد في نافذة منفصلة. تابعه هناك (مفيش باسوردات بتظهر)."; tipPw = "تغيير باسورد SQL للداتابيز من غير ما تضيع الداتا."; show = "إظهار"; hide = "إخفاء"; weak = "ضعيف"; fair = "مقبول"; good = "جيد"; strong = "قوي"; looksOk = "تمام"; rulesNew = "8 حروف على الأقل، ومن 3 أنواع: كبيرة وصغيرة وأرقام ورموز. المسموح: حروف وأرقام و _ . @ ! * + -"; rulesOld = "اكتبه زي ما هو في ملف .env القديم. من غير مسافات أو علامات تنصيص. هيتفحص على الداتابيز قبل ما يتحفظ نهائي."; rulesJwt = "32 حرف على الأقل. المسموح: حروف وأرقام و _ . @ ! * + / = -"; errMin8 = "8 حروف على الأقل"; errChars = "المسموح: حروف وأرقام و _ . @ ! * + -"; errMix = "استخدم 3 أنواع على الأقل: كبيرة وصغيرة وأرقام ورموز"; errJwt = "32 حرف على الأقل ومن غير مسافات"; errSpace = "من غير مسافات أو علامات تنصيص"; ctxCap = "آخر السجل"; secretNote2 = "بتكتبه على الجهاز ده وبيتحفظ في ملف .env بس. مش بيظهر في السجل."; secretNote = "بتكتبه هنا على الجهاز ده وبيتحفظ في ملف .env بس. مش بيظهر في السجل."; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; oldbak = "نسخة الـ SQL القديم"; copylog = "نسخ السجل"; copied = "تم النسخ"; tipInstall = "تثبيت أو تحديث. بياخد نسخة احتياطية الأول."; tipSwitch = "الرجوع لإصدار متثبّت قبل كده."; tipStatus = "فحص للقراءة بس للي شغال."; tipCopy = "نسخ السجل كله"; open = "افتح"
     s_install = @("فحص Docker", "نوع التثبيت والإعدادات", "نسخة احتياطية", "تحميل الصور", "تشغيل الخدمات", "فحص الجاهزية")
     s_switch = @("نسخة أمان", "استرجاع الداتا (اختياري)", "تبديل الكود", "فحص الجاهزية")
     s_status = @("قراءة الحالة")
@@ -147,8 +147,9 @@ $nav.Dock = "Fill"; $nav.FlowDirection = "TopDown"; $nav.WrapContents = $false; 
 $btnInstall = New-Btn $cBlue 192
 $btnSwitch = New-Btn ([System.Drawing.Color]::FromArgb(30, 41, 59)) 192
 $btnStatus = New-Btn ([System.Drawing.Color]::FromArgb(30, 41, 59)) 192
-foreach ($nb in @($btnInstall, $btnSwitch, $btnStatus)) { $nb.TextAlign = "MiddleLeft"; $nb.Padding = New-Object System.Windows.Forms.Padding(16, 0, 10, 0); $nb.Height = 46 }
-$nav.Controls.AddRange(@($btnInstall, $btnSwitch, $btnStatus))
+$btnPw = New-Btn ([System.Drawing.Color]::FromArgb(24, 34, 52)) 192
+foreach ($nb in @($btnInstall, $btnSwitch, $btnStatus, $btnPw)) { $nb.TextAlign = "MiddleLeft"; $nb.Padding = New-Object System.Windows.Forms.Padding(16, 0, 10, 0); $nb.Height = 46 }
+$nav.Controls.AddRange(@($btnInstall, $btnSwitch, $btnStatus, $btnPw))
 $foot = New-Panel $cSide
 $foot.Dock = "Bottom"; $foot.Height = 112; $foot.Padding = New-Object System.Windows.Forms.Padding(14, 8, 14, 14)
 $langRow = New-Object System.Windows.Forms.TableLayoutPanel
@@ -305,7 +306,7 @@ function Set-Rtl([bool]$rtl) {
     # manual right-to-left: text alignment per control and mirrored placement of the main blocks (the whole-form RightToLeft mirror is not used: it can break painting)
     $rt = $(if ($rtl) { "Yes" } else { "No" })
     foreach ($c in @($lblTitle, $lblSub, $lblState, $stepsCap, $logCap, $btnCopy, $resTitle, $resBody)) { $c.RightToLeft = $rt }
-    foreach ($nb in @($btnInstall, $btnSwitch, $btnStatus)) { $nb.RightToLeft = $rt; $nb.TextAlign = $(if ($rtl) { "MiddleRight" } else { "MiddleLeft" }); $nb.Padding = $(if ($rtl) { New-Object System.Windows.Forms.Padding(10, 0, 16, 0) } else { New-Object System.Windows.Forms.Padding(16, 0, 10, 0) }) }
+    foreach ($nb in @($btnInstall, $btnSwitch, $btnStatus, $btnPw)) { $nb.RightToLeft = $rt; $nb.TextAlign = $(if ($rtl) { "MiddleRight" } else { "MiddleLeft" }); $nb.Padding = $(if ($rtl) { New-Object System.Windows.Forms.Padding(10, 0, 16, 0) } else { New-Object System.Windows.Forms.Padding(16, 0, 10, 0) }) }
     $log.RightToLeft = "No"
     $root.SuspendLayout()
     $root.ColumnStyles.Clear()
@@ -328,7 +329,7 @@ function Apply-Lang {
         $rtl = ($script:lang -eq "ar")
         Set-Rtl $rtl
         $form.Text = (L "title"); $lblTitle.Text = (L "title"); $lblSub.Text = (L "sub")
-        $btnInstall.Text = ([string][char]0x2B07 + "   " + (L "install")); $btnSwitch.Text = ([string][char]0x21C4 + "   " + (L "switchv")); $btnStatus.Text = ([string][char]0x25C9 + "   " + (L "status")); $btnClose.Text = (L "close")
+        $btnInstall.Text = ([string][char]0x2B07 + "   " + (L "install")); $btnSwitch.Text = ([string][char]0x21C4 + "   " + (L "switchv")); $btnStatus.Text = ([string][char]0x25C9 + "   " + (L "status")); $btnPw.Text = ([string][char]0x26BF + "   " + (L "pwSide")); $tip.SetToolTip($btnPw, (L "tipPw")); $btnClose.Text = (L "close")
         $stepsCap.Text = (L "steps"); $logCap.Text = (L "log"); $btnCopy.Text = (L "copylog")
         $tip.SetToolTip($btnInstall, (L "tipInstall")); $tip.SetToolTip($btnSwitch, (L "tipSwitch")); $tip.SetToolTip($btnStatus, (L "tipStatus")); $tip.SetToolTip($btnCopy, (L "tipCopy"))
         $btnEn.FlatAppearance.BorderColor = $(if (-not $rtl) { $cCyan } else { $cBorder })
@@ -347,7 +348,7 @@ function Apply-Lang {
 }
 
 function Set-Busy([bool]$b) {
-    $btnInstall.Enabled = -not $b; $btnSwitch.Enabled = -not $b; $btnStatus.Enabled = -not $b
+    $btnInstall.Enabled = -not $b; $btnSwitch.Enabled = -not $b; $btnStatus.Enabled = -not $b; $btnPw.Enabled = -not $b
     $btnEn.Enabled = $true; $btnAr.Enabled = $true
     $script:busy = $b
     if ($b) { if ($script:progTarget -lt 0.05) { Set-Prog 0.05 }; $lblState.Text = (L "running") }
@@ -420,9 +421,8 @@ function New-DlgField([int]$x, [int]$y, [int]$w, [bool]$masked, [bool]$rtl) {
     }
     $outer.Controls.Add($inner)
     Round-Region $outer 11; Round-Region $inner 9
-    $script:D.glow = $outer
-    $tb.Add_Enter({ try { Tween $script:D.glow $cCyan 160 } catch { } })
-    $tb.Add_Leave({ try { Tween $script:D.glow $cBorder 200 } catch { } })
+    $tb.Add_Enter({ param($s, $e) try { Tween $s.Parent.Parent $cCyan 160 } catch { } })
+    $tb.Add_Leave({ param($s, $e) try { Tween $s.Parent.Parent $cBorder 200 } catch { } })
     return @($outer, $tb, $eye)
 }
 function Show-Dlg([string]$prompt, [string]$mode, [bool]$allowGen, $choices) {
@@ -545,6 +545,85 @@ function Show-Dlg([string]$prompt, [string]$mode, [bool]$allowGen, $choices) {
     $r = $dlg.ShowDialog($form)
     $res = $(if ($r -eq "OK") { [string]$script:D.result } else { "" })
     if ($script:D.tb) { $script:D.tb.Text = "" }
+    $script:D = $null
+    $dlg.Dispose()
+    return $res
+}
+function Show-ChangePwDialog {
+    # old + new + confirm, masked. Returns @{ old; new } or $null. Values are never logged.
+    $rtl = ($script:lang -eq "ar")
+    $script:D = @{ form = $null; drag = $false; dx = 0; dy = 0; result = $null }
+    $W = [Math]::Min(600, $wa.Width - 30); $pad = 26; $cw = $W - 2 * $pad
+    $dlg = New-Object System.Windows.Forms.Form
+    $dlg.FormBorderStyle = "None"; $dlg.StartPosition = "CenterParent"; $dlg.ShowInTaskbar = $false; $dlg.BackColor = $cBg; $dlg.ForeColor = $cText; $dlg.Font = $font; $dlg.Text = (L "pwTitle")
+    $script:D.form = $dlg
+    $head = New-Panel $cSide; $head.Location = New-Object System.Drawing.Point(0, 0); $head.Size = New-Object System.Drawing.Size($W, 58)
+    $ic = New-Object System.Windows.Forms.PictureBox; $ic.SizeMode = "Zoom"; $ic.Size = New-Object System.Drawing.Size(34, 34); $ic.BackColor = $cSide
+    try { if ($form.Icon) { $ic.Image = $form.Icon.ToBitmap() } } catch { }
+    $tt = New-Object System.Windows.Forms.Label; $tt.AutoSize = $false; $tt.Text = (L "pwTitle"); $tt.Font = New-Object System.Drawing.Font("Segoe UI Semibold", 12); $tt.ForeColor = $cText; $tt.BackColor = $cSide; $tt.Size = New-Object System.Drawing.Size(($W - 2 * $pad - 48), 58)
+    if ($rtl) { $ic.Location = New-Object System.Drawing.Point(($W - $pad - 34), 12); $tt.Location = New-Object System.Drawing.Point($pad, 0); $tt.TextAlign = "MiddleRight"; $tt.RightToLeft = "Yes" } else { $ic.Location = New-Object System.Drawing.Point($pad, 12); $tt.Location = New-Object System.Drawing.Point(($pad + 46), 0); $tt.TextAlign = "MiddleLeft" }
+    $head.Controls.Add($ic); $head.Controls.Add($tt)
+    $accent = New-Panel $cBlue; $accent.Location = New-Object System.Drawing.Point(0, 58); $accent.Size = New-Object System.Drawing.Size($W, 2)
+    $dlg.Controls.Add($head); $dlg.Controls.Add($accent)
+    foreach ($dc in @($head, $ic, $tt)) {
+        $dc.Add_MouseDown({ param($s, $e) $script:D.drag = $true; $p = [System.Windows.Forms.Cursor]::Position; $script:D.dx = $p.X - $script:D.form.Left; $script:D.dy = $p.Y - $script:D.form.Top })
+        $dc.Add_MouseMove({ param($s, $e) if ($script:D.drag) { $p = [System.Windows.Forms.Cursor]::Position; $script:D.form.Location = New-Object System.Drawing.Point(($p.X - $script:D.dx), ($p.Y - $script:D.dy)) } })
+        $dc.Add_MouseUp({ param($s, $e) $script:D.drag = $false })
+    }
+    $y = 76
+    $lb = New-DlgLabel (L "pwHelp") (New-Object System.Drawing.Font("Segoe UI Semibold", 10)) $cText $pad $y $cw $rtl; $dlg.Controls.Add($lb); $y += $lb.Height + 4
+    $rl = New-DlgLabel (L "rulesNew") (New-Object System.Drawing.Font("Segoe UI", 9)) $cMuted $pad $y $cw $rtl; $dlg.Controls.Add($rl); $y += $rl.Height + 10
+    $tbs = @()
+    foreach ($cap in @("pwOld", "pwNew", "pwConf")) {
+        $cl = New-DlgLabel (L $cap) (New-Object System.Drawing.Font("Segoe UI Semibold", 9.5)) $cText $pad $y $cw $rtl; $dlg.Controls.Add($cl); $y += $cl.Height + 2
+        $parts = New-DlgField $pad $y $cw $true $rtl
+        $dlg.Controls.Add($parts[0]); $tbs += $parts[1]; $parts[2].Tag = $parts[1]
+        $parts[2].Add_Click({ param($s, $e) try { $t = $s.Tag; $t.UseSystemPasswordChar = (-not $t.UseSystemPasswordChar); $s.Text = $(if ($t.UseSystemPasswordChar) { (L "show") } else { (L "hide") }); $t.Focus() } catch { } })
+        $y += 52
+        if ($cap -eq "pwNew") {
+            $segW = [int](($cw - 120 - 3 * 6) / 4); $script:D.segs = @()
+            for ($si = 0; $si -lt 4; $si++) { $sg = New-Panel $cBorder; $sg.Size = New-Object System.Drawing.Size($segW, 6); $sg.Location = New-Object System.Drawing.Point(($pad + $si * ($segW + 6)), ($y + 5)); Round-Region $sg 3; $dlg.Controls.Add($sg); $script:D.segs += $sg }
+            $sl = New-Object System.Windows.Forms.Label; $sl.AutoSize = $false; $sl.Size = New-Object System.Drawing.Size(110, 18); $sl.Location = New-Object System.Drawing.Point(($pad + $cw - 110), $y); $sl.ForeColor = $cMuted; $sl.TextAlign = "MiddleRight"; $sl.Font = New-Object System.Drawing.Font("Segoe UI", 9); $dlg.Controls.Add($sl); $script:D.strLbl = $sl
+            $y += 22
+        }
+    }
+    $script:D.tbs = $tbs
+    $mg = New-Object System.Windows.Forms.Label; $mg.AutoSize = $false; $mg.Size = New-Object System.Drawing.Size($cw, 22); $mg.Location = New-Object System.Drawing.Point($pad, $y); $mg.Font = New-Object System.Drawing.Font("Segoe UI", 9.5); $mg.ForeColor = $cMuted; $mg.BackColor = [System.Drawing.Color]::Transparent
+    if ($rtl) { $mg.RightToLeft = "Yes" }; $dlg.Controls.Add($mg); $script:D.msg = $mg; $y += 26
+    $nt = New-DlgLabel (L "pwNote") (New-Object System.Drawing.Font("Segoe UI", 9)) $cMuted $pad $y $cw $rtl; $dlg.Controls.Add($nt); $y += $nt.Height + 12
+    $ok = New-Btn $cBlue 190; $ok.Height = 42; $ok.Text = (L "pwBtn"); $ok.Margin = New-Object System.Windows.Forms.Padding(0); $ok.Enabled = $false
+    $cn = New-Btn ([System.Drawing.Color]::FromArgb(30, 41, 59)) 120; $cn.Height = 42; $cn.Text = (L "cancel"); $cn.Margin = New-Object System.Windows.Forms.Padding(0)
+    $cn.Location = New-Object System.Drawing.Point(($W - $pad - 190 - 10 - 120), $y); $ok.Location = New-Object System.Drawing.Point(($W - $pad - 190), $y)
+    $dlg.Controls.Add($cn); $dlg.Controls.Add($ok); $script:D.ok = $ok; $y += 56
+    $cn.Add_Click({ $script:D.result = $null; $script:D.form.DialogResult = "Cancel"; $script:D.form.Close() })
+    $ok.Add_Click({ $script:D.result = @{ old = $script:D.tbs[0].Text.Trim(); new = $script:D.tbs[1].Text.Trim() }; $script:D.form.DialogResult = "OK"; $script:D.form.Close() })
+    $check = {
+        try {
+            $o = $script:D.tbs[0].Text.Trim(); $n = $script:D.tbs[1].Text.Trim(); $c = $script:D.tbs[2].Text.Trim()
+            $ek = ""; $okv = $false
+            if (-not $o) { $ek = "" } elseif (Get-DlgError "old" $o) { $ek = "errSpace" }
+            elseif (-not $n) { $ek = "" } elseif (Get-DlgError "new" $n) { $ek = Get-DlgError "new" $n }
+            elseif ($n -ceq $o) { $ek = "errSame" }
+            elseif (-not $c) { $ek = "" } elseif ($c -cne $n) { $ek = "errMatch" } else { $okv = $true }
+            if ($okv) { $script:D.msg.ForeColor = $cGreen; $script:D.msg.Text = [string][char]0x2714 + "  " + (L "pwReady") }
+            elseif ($ek) { $script:D.msg.ForeColor = $cRed; $script:D.msg.Text = [string][char]0x2716 + "  " + (L $ek) }
+            else { $script:D.msg.ForeColor = $cMuted; $script:D.msg.Text = "" }
+            $script:D.ok.Enabled = $okv
+            $sc = $(if ($n) { Get-StrengthScore $n } else { 0 }); if (Get-DlgError "new" $n) { $sc = [Math]::Min(1, $sc) }
+            $cols = @($cRed, [System.Drawing.Color]::FromArgb(255, 170, 70), [System.Drawing.Color]::FromArgb(190, 220, 90), $cGreen); $names = @("", "weak", "fair", "good", "strong")
+            for ($i = 0; $i -lt 4; $i++) { Tween $script:D.segs[$i] $(if ($i -lt $sc) { $cols[[Math]::Max(0, $sc - 1)] } else { $cBorder }) 140 }
+            $script:D.strLbl.Text = $(if ($sc -gt 0) { L $names[$sc] } else { "" })
+        } catch { }
+    }
+    foreach ($t in $tbs) { $t.Add_TextChanged($check) }
+    $dlg.ClientSize = New-Object System.Drawing.Size($W, [Math]::Min($y + 6, $wa.Height - 30))
+    Round-Region $dlg 14
+    $dlg.Add_Paint({ param($s, $e) try { $e.Graphics.SmoothingMode = "AntiAlias"; $pn = New-Object System.Drawing.Pen($cBorder, 2); $gp = New-RoundedPath ($s.Width - 1) ($s.Height - 1) 14; $e.Graphics.DrawPath($pn, $gp); $pn.Dispose(); $gp.Dispose() } catch { } })
+    $dlg.AcceptButton = $ok; $dlg.CancelButton = $cn; $dlg.ActiveControl = $tbs[0]
+    if ($script:animOn) { $dlg.Opacity = 0; [void]$script:fades.Add($dlg) }
+    $r = $dlg.ShowDialog($form)
+    $res = $(if ($r -eq "OK") { $script:D.result } else { $null })
+    foreach ($t in $tbs) { $t.Text = "" }
     $script:D = $null
     $dlg.Dispose()
     return $res
@@ -698,6 +777,21 @@ function Start-Op([string]$op) {
 $btnInstall.Add_Click({ Start-Op "install" })
 $btnSwitch.Add_Click({ Start-Op "switch" })
 $btnStatus.Add_Click({ Start-Op "status" })
+$btnPw.Add_Click({
+    try {
+        if ($script:busy) { return }
+        $r = Show-ChangePwDialog
+        if ($r) {
+            # values travel only through a private temp file that the script deletes as its first action; never in arguments or the log
+            $f = Join-Path $env:TEMP ("erp-pw-" + [guid]::NewGuid().ToString("N") + ".txt")
+            [IO.File]::WriteAllText($f, ($r.old + "`r`n" + $r.new + "`r`n"), (New-Object Text.UTF8Encoding($false)))
+            $r = $null
+            $rs = Join-Path $PSScriptRoot "recover-erp-data.ps1"
+            Start-Process powershell -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ('"' + $rs + '"'), "-Step", "change", "-InputFile", ('"' + $f + '"')) -WorkingDirectory $RootDir
+            Write-Log (L "pwStarted") ([System.Drawing.Color]::LightSkyBlue)
+        }
+    } catch { Log-GuiError $_.Exception "changepw" }
+})
 $btnClose.Add_Click({ $form.Close() })
 $btnEn.Add_Click({ try { $script:lang = "en"; Apply-Lang } catch { Log-GuiError $_.Exception "btnEn" } })
 $btnAr.Add_Click({ try { $script:lang = "ar"; Apply-Lang } catch { Log-GuiError $_.Exception "btnAr" } })

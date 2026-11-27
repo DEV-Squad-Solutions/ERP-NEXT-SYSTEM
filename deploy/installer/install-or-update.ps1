@@ -372,7 +372,7 @@ try {
             if ($pwBad) { Info "Diagnosis: SQL Server is running but refuses the password in .env. The password stored inside the data volume is a different one." }
             elseif ($dl -match 'memory|Insufficient|OutOfMemory') { Info "Diagnosis: SQL Server may be short of memory. Give Docker Desktop more RAM (at least 4 GB) and run again." }
             else { Info "Diagnosis: not clear from the log. Send the log file to your developer." }
-            if ($pwBad) { Info "DO NOT reset or delete anything: the data volume may hold your real data. Use tools\Recover database.bat (copies the files first, then finds or resets the password on a COPY only)." }
+            if ($pwBad) { Info "DO NOT reset or delete anything: the data volume may hold your real data. If you KNOW the old password: use the "DB password" button in the installer (or tools\Recover database.bat, option 4): old + new + confirm, changed inside the database. If you do not: tools\Recover database.bat (copies the files first, then works on a COPY only)." }
             if (-not $dbReady) { Fail "The database container did not become healthy in 3 minutes." "Send the log file to your developer (it now contains the last 40 lines of the database log, no passwords)." "docker2" }
         }
 

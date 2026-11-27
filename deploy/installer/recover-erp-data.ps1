@@ -10,14 +10,14 @@
                      if MiniErp has data) points .env at the recovered volume with the new password.
  Needs Docker Desktop running. Does not touch minierp-db or any minierp volume.
 #>
-param([string]$Step = "menu", [string]$BackupDir = "C:\ERP_backup")
+param([string]$Step = "menu", [string]$BackupDir = "C:\ERP_backup", [string]$InputFile = "")
 $ErrorActionPreference = "Continue"
 $Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })
 $img = "mcr.microsoft.com/mssql/server:2022-latest"
 $SrcVol = "erp_sql_data"; $NewVol = "erp_sql_data_recovered"; $Tmp = "erp-recover-test"
 $envFile = Join-Path $Root ".env"
 function Say($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
-function Stop-Now($m) { Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The original volume $SrcVol was not changed." Yellow; docker rm -f $Tmp *> $null; exit 1 }
+function Stop-Now($m) { Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The original volume $SrcVol was not deleted." Yellow; docker rm -f $Tmp *> $null; if ($InputFile) { [void](Read-Host "Press Enter to close this window") }; exit 1 }
 function New-Secret([int]$len) {
     $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'
     $rng = New-Object System.Security.Cryptography.RNGCryptoServiceProvider
@@ -78,6 +78,85 @@ function Run-Sql([string]$c, [string]$pw, [string]$query) {
 function Test-Pw([string]$pw) {
     $null = Run-Sql "erp-db" $pw "SELECT 1"
     return ($LASTEXITCODE -eq 0)
+}
+function Test-NewSa([string]$v) {
+    if ($v.Length -lt 8) { return "The new password needs at least 8 characters." }
+    if ($v -notmatch '^[A-Za-z0-9_.@!*+-]+$') { return "Use only letters, digits and these characters: _ . @ ! * + -" }
+    $k = 0; foreach ($re in @('[A-Z]', '[a-z]', '[0-9]', '[_.@!*+-]')) { if ($v -cmatch $re) { $k++ } }
+    if ($k -lt 3) { return "Use at least 3 of: capital letters, small letters, digits, symbols." }
+    return ""
+}
+function Read-Masked([string]$prompt) {
+    $ss = Read-Host $prompt -AsSecureString
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($ss)
+    try { return ([Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)).Trim() } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
+}
+function Wait-Login([string]$pw, [int]$tries) {
+    # returns "ok", "denied" (the server answered: wrong password) or "down" (server not answering)
+    for ($i = 0; $i -lt $tries; $i++) {
+        $o = Run-Sql "erp-db" $pw "SELECT 1"
+        if ($LASTEXITCODE -eq 0) { return "ok" }
+        if ($o -match 'Login failed') { return "denied" }
+        Start-Sleep -Seconds 5
+    }
+    return "down"
+}
+function Change-Password {
+    Say "[4] Change the database password (done INSIDE the database: the data stays)" Cyan
+    $old = ""; $new = ""
+    if ($InputFile -and (Test-Path $InputFile)) {
+        $ls = [IO.File]::ReadAllLines($InputFile, [Text.Encoding]::UTF8); Remove-Item $InputFile -Force -ErrorAction SilentlyContinue
+        if ($ls.Count -ge 2) { $old = $ls[0]; $new = $ls[1] }
+    } else {
+        $old = Read-Masked "OLD password (the one the database has now, typed hidden)"
+        for ($t = 1; $t -le 3; $t++) {
+            $n1 = Read-Masked "NEW password (hidden)"; $e = Test-NewSa $n1; if ($e) { Say "  $e" Yellow; continue }
+            $n2 = Read-Masked "CONFIRM new password (hidden)"; if ($n1 -cne $n2) { Say "  The two new passwords are different. Try again." Yellow; continue }
+            $new = $n1; break
+        }
+    }
+    if (-not $old -or -not $new) { Stop-Now "Old or new password missing. Nothing was changed." }
+    $e = Test-NewSa $new; if ($e) { Stop-Now $e }
+    if ($new -ceq $old) { Stop-Now "The new password is the same as the old one." }
+    if (-not (docker ps --filter "name=^erp-db$" --filter "status=running" -q)) { Say "  Starting erp-db (docker start erp-db only)" DarkGray; docker start erp-db | Out-Null }
+    Say "  [1/6] Checking the OLD password against the database (harmless login)" DarkGray
+    $r = Wait-Login $old 24
+    if ($r -eq "denied") { Stop-Now "The old password is NOT accepted by the database. Nothing was changed. Check it and try again (or use option 2 / 3)." }
+    if ($r -eq "down") { Stop-Now "The database did not answer in 2 minutes. Nothing was changed. Send this window to your developer." }
+    Say "  OK  Old password accepted." Green
+    Say "  [2/6] Saving a file copy of the database first" DarkGray
+    $null = Copy-ToFolder
+    $r = Wait-Login $old 24
+    if ($r -ne "ok") { Stop-Now "The database did not come back after the copy. Nothing was changed. Send this window to your developer." }
+    # the new password is kept in a private file until .env is updated, so a crash cannot lose it
+    $pending = Join-Path $Root ".env.pending"
+    [IO.File]::WriteAllText($pending, "SQL_SA_PASSWORD=$new`r`n", (New-Object Text.UTF8Encoding($false)))
+    Say "  [3/6] Changing the sa password inside the database (ALTER LOGIN)" DarkGray
+    $sh = "#!/bin/bash`n/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P `"`$MSSQL_SA_PASSWORD`" -b -Q `"ALTER LOGIN sa WITH PASSWORD = N'`$NEW_SA_PASSWORD'`"`n"
+    $tmp = Join-Path $env:TEMP "erp_alter.sh"
+    [IO.File]::WriteAllText($tmp, $sh, (New-Object Text.UTF8Encoding($false)))
+    docker cp $tmp "erp-db:/tmp/erp_alter.sh" | Out-Null; Remove-Item $tmp -Force -ErrorAction SilentlyContinue
+    $o = docker exec -e "MSSQL_SA_PASSWORD=$old" -e "NEW_SA_PASSWORD=$new" erp-db bash /tmp/erp_alter.sh 2>&1 | Out-String
+    $altered = ($LASTEXITCODE -eq 0)
+    docker exec erp-db rm -f /tmp/erp_alter.sh | Out-Null
+    if (-not $altered) { Remove-Item $pending -Force -ErrorAction SilentlyContinue; Say $o DarkGray; Stop-Now "The database refused the change (message above has no passwords). The old password is still valid. Nothing changed." }
+    Say "  [4/6] Checking the NEW password" DarkGray
+    $r = Wait-Login $new 6
+    if ($r -ne "ok") { Stop-Now "The change was made but the new password test failed. The new password is saved in $pending (do not delete). Send this window to your developer." }
+    Say "  OK  New password works." Green
+    Say "  [5/6] Updating .env" DarkGray
+    $tt = ""; if (Test-Path $envFile) { $tt = [IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8) }
+    $jm = [regex]::Match($tt, '(?m)^[ \t]*JWT_SIGNING_KEY[ \t]*=[ \t]*([^\r\n]*)')
+    $kv = @{ SQL_SA_PASSWORD = $new }
+    if (-not $jm.Success -or -not $jm.Groups[1].Value.Trim()) { $kv["JWT_SIGNING_KEY"] = (New-Secret 48); Say "      JWT_SIGNING_KEY was empty: a new one was generated (users log in again)." DarkGray }
+    Save-Env $kv
+    Remove-Item $pending -Force -ErrorAction SilentlyContinue
+    Say "  [6/6] Recreating the erp-db container so it uses the new password (the data volume is kept)" DarkGray
+    Push-Location $Root; docker compose -p erp up -d db 2>&1 | ForEach-Object { Say "      $_" DarkGray }; Pop-Location
+    $healthy = $false
+    for ($i = 0; $i -lt 36; $i++) { $h = docker inspect -f "{{.State.Health.Status}}" erp-db 2>$null; if ($h -eq "healthy") { $healthy = $true; break }; Start-Sleep -Seconds 5 }
+    if ($healthy) { Say "  OK  erp-db is healthy with the new password." Green } else { Say "  erp-db is not healthy yet. Run ERP Installer.bat, it will show the reason." Yellow }
+    Say ""; Say "  DONE. Next: double-click ERP Installer.bat (it updates the API with the new password). Copy the .env file to a safe private place." Green
 }
 function Find-Password {
     Say "[2] Looking for the old SQL password (candidates are tested, never printed)" Cyan
@@ -169,14 +248,17 @@ if ($Step -eq "menu") {
     Say "  1  Copy the database files to a folder (do this first)"
     Say "  2  Look for the old SQL password in old .env files and test it"
     Say "  3  Recover on a COPY (reset the password on the copy, check MiniErp, make a verified backup)"
+    Say "  4  CHANGE the database password (type old, new and confirm; the data stays)"
     Say "  Q  Quit"
     $a = (Read-Host "Choose").Trim().ToUpper()
-    $Step = switch ($a) { "1" { "copy" } "2" { "find" } "3" { "recover" } default { "quit" } }
+    $Step = switch ($a) { "1" { "copy" } "2" { "find" } "3" { "recover" } "4" { "change" } default { "quit" } }
 }
 switch ($Step) {
     "copy" { $null = Copy-ToFolder }
     "find" { $null = Find-Password }
     "recover" { Recover-OnCopy }
+    "change" { Change-Password }
     default { Say "Nothing done." }
 }
 Say ""; Say "Finished." Green
+if ($InputFile) { [void](Read-Host "Press Enter to close this window") }

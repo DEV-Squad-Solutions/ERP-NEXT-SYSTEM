@@ -7,3 +7,6 @@ deploy/*.tar
 deploy/erp-install-*.log
 deploy/release-history.txt
 dist/
+deploy/.env.pending
+deploy/.env.bak.*
+deploy/.env.*.bak

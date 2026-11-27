@@ -21,7 +21,8 @@ public sealed class AuthenticationService(
     SignInManager<ApplicationUser> signInManager,
     ApplicationDbContext dbContext,
     IOptions<JwtOptions> jwtOptions,
-    TimeProvider timeProvider)
+    TimeProvider timeProvider,
+    IPasswordResetNotifier? passwordResetNotifier = null)
     : IAuthenticationService, IScopedService
 {
     private readonly JwtOptions options = jwtOptions.Value;
@@ -32,7 +33,7 @@ public sealed class AuthenticationService(
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var user = await userManager.FindByNameAsync(request.UserName.Trim());
+        var user = await FindByUserNameOrEmailAsync(request.UserName);
         if (user is null)
         {
             return InvalidCredentials();
@@ -302,6 +303,152 @@ public sealed class AuthenticationService(
         }
 
         return Result.Success();
+    }
+
+    public async Task<Result> ChangePasswordAsync(
+        Guid userId,
+        ChangePasswordRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            return Result.Failure(InvalidUserContext());
+        }
+
+        if (!await userManager.CheckPasswordAsync(
+                user,
+                request.CurrentPassword))
+        {
+            return Result.Failure(CurrentPasswordIncorrect());
+        }
+
+        var changeResult = await userManager.ChangePasswordAsync(
+            user,
+            request.CurrentPassword,
+            request.NewPassword);
+        if (!changeResult.Succeeded)
+        {
+            return Result.Failure(PasswordRejected(
+                changeResult.Errors.Select(error => error.Description)));
+        }
+
+        await RevokeActiveRefreshTokensAsync(user.Id, cancellationToken);
+        return Result.Success();
+    }
+
+    public async Task<Result> ForgotPasswordAsync(
+        ForgotPasswordRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var user = await FindByEmailSafeAsync(request.Email);
+
+        // The answer is always the same so the endpoint cannot be used to
+        // find out which emails have an account.
+        if (user is null ||
+            string.IsNullOrWhiteSpace(user.Email) ||
+            passwordResetNotifier is null ||
+            !await signInManager.CanSignInAsync(user))
+        {
+            return Result.Success();
+        }
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        try
+        {
+            await passwordResetNotifier.SendAsync(
+                user.Email,
+                user.UserName ?? string.Empty,
+                token,
+                cancellationToken);
+        }
+        catch (Exception exception) when (
+            exception is not OperationCanceledException)
+        {
+            // Delivery problems are logged by the notifier. The caller still
+            // gets the same neutral answer.
+        }
+
+        return Result.Success();
+    }
+
+    public async Task<Result> ResetPasswordAsync(
+        ResetPasswordRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var user = await FindByEmailSafeAsync(request.Email);
+        if (user is null)
+        {
+            return Result.Failure(InvalidPasswordResetToken());
+        }
+
+        var resetResult = await userManager.ResetPasswordAsync(
+            user,
+            request.Token,
+            request.NewPassword);
+        if (!resetResult.Succeeded)
+        {
+            var invalidToken = resetResult.Errors.Any(error =>
+                error.Code == nameof(IdentityErrorDescriber.InvalidToken));
+            return invalidToken
+                ? Result.Failure(InvalidPasswordResetToken())
+                : Result.Failure(PasswordRejected(
+                    resetResult.Errors.Select(error => error.Description)));
+        }
+
+        await userManager.ResetAccessFailedCountAsync(user);
+        await userManager.SetLockoutEndDateAsync(user, null);
+        await RevokeActiveRefreshTokensAsync(user.Id, cancellationToken);
+        return Result.Success();
+    }
+
+    private async Task<ApplicationUser?> FindByUserNameOrEmailAsync(
+        string userNameOrEmail)
+    {
+        var value = userNameOrEmail.Trim();
+        var user = await userManager.FindByNameAsync(value);
+        if (user is not null || !value.Contains('@'))
+        {
+            return user;
+        }
+
+        return await FindByEmailSafeAsync(value);
+    }
+
+    private async Task<ApplicationUser?> FindByEmailSafeAsync(string email)
+    {
+        try
+        {
+            return await userManager.FindByEmailAsync(email.Trim());
+        }
+        catch (InvalidOperationException)
+        {
+            // Two accounts share this email. It cannot identify one user.
+            return null;
+        }
+    }
+
+    private async Task RevokeActiveRefreshTokensAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        var now = timeProvider.GetUtcNow();
+        var tokens = await dbContext.RefreshTokens
+            .Where(token => token.UserId == userId &&
+                token.RevokedAtUtc == null)
+            .ToListAsync(cancellationToken);
+        foreach (var token in tokens)
+        {
+            token.RevokedAtUtc = now;
+        }
+
+        if (tokens.Count > 0)
+        {
+            await dbContext.SaveChangesAsync(cancellationToken);
+        }
     }
 
     private async Task<Result<TokenResponse>> CreateTokenPairAsync(

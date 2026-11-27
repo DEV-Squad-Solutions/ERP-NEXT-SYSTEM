@@ -267,6 +267,182 @@ public sealed class AuthenticationServiceTests
         Assert.Empty(await database.Context.RefreshTokens.ToListAsync());
     }
 
+    [Fact]
+    public async Task Login_WithEmailInsteadOfUserName_Succeeds()
+    {
+        await using var database =
+            await AuthenticationServiceTestDatabase.CreateAsync();
+
+        var result = await database.Service.LoginAsync(new LoginRequest(
+            "Refresh-Test-User@Example.com",
+            AuthenticationServiceTestDatabase.Password));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(
+            AuthenticationServiceTestDatabase.UserId,
+            result.Value.UserId);
+    }
+
+    [Fact]
+    public async Task Login_WithUnknownEmail_FailsWithInvalidCredentials()
+    {
+        await using var database =
+            await AuthenticationServiceTestDatabase.CreateAsync();
+
+        var result = await database.Service.LoginAsync(new LoginRequest(
+            "nobody@example.com",
+            AuthenticationServiceTestDatabase.Password));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("Authentication.InvalidCredentials", result.Error.Code);
+    }
+
+    [Fact]
+    public async Task ChangePassword_WrongCurrentPassword_IsRejected()
+    {
+        await using var database =
+            await AuthenticationServiceTestDatabase.CreateAsync();
+
+        var result = await database.Service.ChangePasswordAsync(
+            AuthenticationServiceTestDatabase.UserId,
+            new ChangePasswordRequest("Wrong!12345", "Brand!New123"));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(
+            "Authentication.CurrentPasswordIncorrect",
+            result.Error.Code);
+    }
+
+    [Fact]
+    public async Task ChangePassword_WeakNewPassword_IsRejected()
+    {
+        await using var database =
+            await AuthenticationServiceTestDatabase.CreateAsync();
+
+        var result = await database.Service.ChangePasswordAsync(
+            AuthenticationServiceTestDatabase.UserId,
+            new ChangePasswordRequest(
+                AuthenticationServiceTestDatabase.Password,
+                "short"));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal("Authentication.PasswordRejected", result.Error.Code);
+    }
+
+    [Fact]
+    public async Task ChangePassword_Success_SwitchesPasswordAndRevokesSessions()
+    {
+        await using var database =
+            await AuthenticationServiceTestDatabase.CreateAsync();
+        var login = await database.Service.LoginAsync(new LoginRequest(
+            AuthenticationServiceTestDatabase.UserName,
+            AuthenticationServiceTestDatabase.Password));
+        Assert.True(login.IsSuccess);
+
+        var change = await database.Service.ChangePasswordAsync(
+            AuthenticationServiceTestDatabase.UserId,
+            new ChangePasswordRequest(
+                AuthenticationServiceTestDatabase.Password,
+                "Brand!New123"));
+
+        Assert.True(change.IsSuccess);
+        var oldLogin = await database.Service.LoginAsync(new LoginRequest(
+            AuthenticationServiceTestDatabase.UserName,
+            AuthenticationServiceTestDatabase.Password));
+        Assert.True(oldLogin.IsFailure);
+        var newLogin = await database.Service.LoginAsync(new LoginRequest(
+            AuthenticationServiceTestDatabase.UserName,
+            "Brand!New123"));
+        Assert.True(newLogin.IsSuccess);
+        var refresh = await database.Service.RefreshAsync(
+            new RefreshTokenRequest(login.Value.RefreshToken!));
+        Assert.True(refresh.IsFailure);
+    }
+
+    [Fact]
+    public async Task ForgotPassword_UnknownEmail_AnswersNeutrallyAndSendsNothing()
+    {
+        await using var database =
+            await AuthenticationServiceTestDatabase.CreateAsync();
+        var notifier = new CapturingNotifier();
+        var service = database.CreateServiceWith(notifier);
+
+        var result = await service.ForgotPasswordAsync(
+            new ForgotPasswordRequest("nobody@example.com"));
+
+        Assert.True(result.IsSuccess);
+        Assert.Empty(notifier.Sent);
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithEmailedToken_WorksOnceOnly()
+    {
+        await using var database =
+            await AuthenticationServiceTestDatabase.CreateAsync();
+        var notifier = new CapturingNotifier();
+        var service = database.CreateServiceWith(notifier);
+
+        var forgot = await service.ForgotPasswordAsync(
+            new ForgotPasswordRequest("refresh-test-user@example.com"));
+        Assert.True(forgot.IsSuccess);
+        var sent = Assert.Single(notifier.Sent);
+
+        var weak = await service.ResetPasswordAsync(
+            new ResetPasswordRequest(sent.Email, sent.Token, "weak"));
+        Assert.True(weak.IsFailure);
+        Assert.Equal("Authentication.PasswordRejected", weak.Error.Code);
+
+        var reset = await service.ResetPasswordAsync(
+            new ResetPasswordRequest(sent.Email, sent.Token, "Reset!Pass123"));
+        Assert.True(reset.IsSuccess);
+
+        var login = await service.LoginAsync(new LoginRequest(
+            AuthenticationServiceTestDatabase.UserName,
+            "Reset!Pass123"));
+        Assert.True(login.IsSuccess);
+
+        var reuse = await service.ResetPasswordAsync(
+            new ResetPasswordRequest(sent.Email, sent.Token, "Other!Pass123"));
+        Assert.True(reuse.IsFailure);
+        Assert.Equal(
+            "Authentication.InvalidPasswordResetToken",
+            reuse.Error.Code);
+    }
+
+    [Fact]
+    public async Task ResetPassword_WithGarbageToken_IsRejected()
+    {
+        await using var database =
+            await AuthenticationServiceTestDatabase.CreateAsync();
+
+        var result = await database.Service.ResetPasswordAsync(
+            new ResetPasswordRequest(
+                "refresh-test-user@example.com",
+                "not-a-real-token",
+                "Reset!Pass123"));
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(
+            "Authentication.InvalidPasswordResetToken",
+            result.Error.Code);
+    }
+
+    private sealed class CapturingNotifier
+        : MiniErp.Application.Common.Abstractions.IPasswordResetNotifier
+    {
+        public List<(string Email, string Token)> Sent { get; } = [];
+
+        public Task SendAsync(
+            string email,
+            string userName,
+            string token,
+            CancellationToken cancellationToken = default)
+        {
+            Sent.Add((email, token));
+            return Task.CompletedTask;
+        }
+    }
+
     private sealed class AuthenticationServiceTestDatabase : IAsyncDisposable
     {
         public static readonly Guid UserId =
@@ -302,6 +478,18 @@ public sealed class AuthenticationServiceTests
         public UserManager<ApplicationUser> UserManager { get; }
 
         public AuthenticationService Service { get; }
+
+        public AuthenticationService CreateServiceWith(
+            MiniErp.Application.Common.Abstractions.IPasswordResetNotifier notifier) =>
+            new(
+                UserManager,
+                Scope.ServiceProvider
+                    .GetRequiredService<SignInManager<ApplicationUser>>(),
+                Context,
+                Scope.ServiceProvider
+                    .GetRequiredService<IOptions<JwtOptions>>(),
+                TimeProvider.System,
+                notifier);
 
         public static async Task<AuthenticationServiceTestDatabase>
             CreateAsync()

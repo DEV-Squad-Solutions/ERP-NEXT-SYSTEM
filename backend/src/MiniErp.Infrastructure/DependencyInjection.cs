@@ -76,6 +76,12 @@ public static class DependencyInjection
         services.Configure<IdentityOptions>(
             configuration.GetSection("Identity"));
 
+        services.Configure<EmailOptions>(
+            configuration.GetSection(EmailOptions.SectionName));
+        services.AddScoped<
+            MiniErp.Application.Common.Abstractions.IPasswordResetNotifier,
+            SmtpPasswordResetNotifier>();
+
         var jwtSection = configuration.GetSection(JwtOptions.SectionName);
         var jwtOptions = jwtSection.Get<JwtOptions>()
             ?? throw new InvalidOperationException(

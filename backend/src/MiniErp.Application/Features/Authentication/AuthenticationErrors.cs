@@ -33,4 +33,21 @@ public static class AuthenticationErrors
         Error.Forbidden(
             "Authentication.NoCompanyAccess",
             "المستخدم غير مرتبط بأي شركة نشطة.");
+
+    public static Error CurrentPasswordIncorrect() =>
+        Error.Validation(
+            "Authentication.CurrentPasswordIncorrect",
+            "كلمة المرور الحالية غير صحيحة.",
+            "currentPassword");
+
+    public static Error InvalidPasswordResetToken() =>
+        Error.Validation(
+            "Authentication.InvalidPasswordResetToken",
+            "رابط إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية.");
+
+    public static Error PasswordRejected(IEnumerable<string> descriptions) =>
+        Error.Validation(
+            "Authentication.PasswordRejected",
+            string.Join(" ", descriptions),
+            "newPassword");
 }

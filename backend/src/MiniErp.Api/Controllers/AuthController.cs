@@ -119,6 +119,57 @@ public sealed class AuthController(
         return this.ToActionResult(result);
     }
 
+    [HttpPost("change-password")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> ChangePassword(
+        ChangePasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId))
+        {
+            return this.ToProblem(InvalidUserContext());
+        }
+
+        var result = await authenticationService.ChangePasswordAsync(
+            userId,
+            request,
+            cancellationToken);
+
+        return this.ToActionResult(result);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ForgotPassword(
+        ForgotPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await authenticationService.ForgotPasswordAsync(
+            request,
+            cancellationToken);
+
+        return this.ToActionResult(result);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("reset-password")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ResetPassword(
+        ResetPasswordRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await authenticationService.ResetPasswordAsync(
+            request,
+            cancellationToken);
+
+        return this.ToActionResult(result);
+    }
+
     private bool TryGetUserId(out Guid userId) =>
         Guid.TryParse(User.FindFirst("sub")?.Value, out userId) &&
         userId != Guid.Empty;

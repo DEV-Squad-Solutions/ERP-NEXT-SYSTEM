@@ -110,7 +110,7 @@ function Get-EnvLoginCandidates([string[]]$files) {
         foreach ($m in [regex]::Matches($t, '(?i)(?:Password|Pwd)=([^;\r\n"'']+)')) { [void]$pw.Add($m.Groups[1].Value.Trim()) }
         foreach ($cs in [regex]::Matches($t, '(?i)[^"\r\n]*(?:Password|Pwd)=[^"\r\n]*')) {
             $csu = [regex]::Match($cs.Value, '(?i)(?:User Id|UID|User)\s*=\s*([^;"'']+)'); $csp = [regex]::Match($cs.Value, '(?i)(?:Password|Pwd)=([^;"'']+)')
-            if ($csu.Success -and $csp.Success) { $cu = $csu.Groups[1].Value.Trim(); $cp = $csp.Groups[1].Value.Trim(); if ($cu -and $cp -and $cp.Length -ge 3 -and -not $seen.ContainsKey($cu + "|" + $cp)) { $seen[$cu + "|" + $cp] = $true; [void]$out.Add(@{ user = $cu; pass = $cp; src = $f }) } }
+            if ($csu.Success -and $csp.Success) { $cu = $csu.Groups[1].Value.Trim(); $cp = $csp.Groups[1].Value.Trim(); if ($cu -and $cp -and $cp.Length -ge 3 -and -not $seen.ContainsKey($cu + "|" + $cp)) { $seen[$cu + "|" + $cp] = $true; $cdm = [regex]::Match($cs.Value, '(?i)(?:Database|Initial Catalog)\s*=\s*([^;"'']+)'); $cdb = $(if ($cdm.Success) { $cdm.Groups[1].Value.Trim() } else { "" }); [void]$out.Add(@{ user = $cu; pass = $cp; src = $f; db = $cdb }) } }
         }
         foreach ($p in $pw) {
             if (-not $p -or $p.Length -lt 3 -or $seen.ContainsKey($p)) { continue }
@@ -145,17 +145,47 @@ function Get-ContainerLoginCandidates {
     }
     return @($out)
 }
-function Try-AutoLogin([scriptblock]$test, [string]$root, [int]$max = 14) {
+function Find-AppSettingsFiles([string]$root, [int]$maxSeconds = 75) {
+    # Bounded read-only search for appsettings*.json on the fixed drives: the known dev folders first (D:\erp_build, the delivery folder,
+    # the repo and its parent), then the top-level folders of every fixed drive (depth 6, skipping system and package folders).
+    $sw = [Diagnostics.Stopwatch]::StartNew()
+    $found = New-Object System.Collections.ArrayList
+    $skip = '^(Windows|Program Files|Program Files \(x86\)|ProgramData|\$Recycle\.Bin|System Volume Information|node_modules|\.git|AppData)$'
+    $roots = New-Object System.Collections.ArrayList
+    function Add-Root($d) { if ($d -and (Test-Path $d -PathType Container) -and -not $roots.Contains($d)) { [void]$roots.Add($d) } }
+    foreach ($d in @("D:\erp_build", "D:\erp_build\backend", "H:\Dev_Squad_Projects")) { Add-Root $d }
+    $par = Split-Path $root -Parent; if ($par) { Add-Root $par; $gp = Split-Path $par -Parent; if ($gp) { Add-Root $gp } }
+    try {
+        foreach ($dr in @([IO.DriveInfo]::GetDrives() | Where-Object { $_.DriveType -eq "Fixed" -and $_.IsReady })) {
+            foreach ($sd in @(Get-ChildItem -Path $dr.RootDirectory.FullName -Directory -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch $skip })) { Add-Root $sd.FullName }
+        }
+    } catch { }
+    foreach ($r in $roots) {
+        if ($sw.Elapsed.TotalSeconds -gt $maxSeconds) { break }
+        try {
+            foreach ($f in @(Get-ChildItem -Path $r -Recurse -Depth 6 -File -Filter "appsettings*.json" -ErrorAction SilentlyContinue | Where-Object { $_.FullName -notmatch '\\(node_modules|\.git)\\' -and $_.Length -lt 262144 })) {
+                if (-not $found.Contains($f.FullName)) { [void]$found.Add($f.FullName) }
+            }
+        } catch { }
+    }
+    return @($found)
+}
+function Try-AutoLogin([scriptblock]$test, [string]$root, [int]$max = 20) {
     # Tries the passwords found in old .env files with a REAL login (the $test block gets user and password). Returns @{user;pass;src} or $null.
     # At most $max attempts so the sa login is never locked. Nothing secret is printed or logged; only counts and the folder of the file that worked.
     $files = @(Find-OldEnvFiles $root)
+    $as = @(Find-AppSettingsFiles $root)
+    foreach ($a in $as) { if ($files -notcontains $a) { $files += $a } }
+    Write-Host ("  appsettings files found on the drives: {0}" -f $as.Count) -ForegroundColor DarkGray
     $cands = @(Get-ContainerLoginCandidates) + @(Get-EnvLoginCandidates $files)
     Write-Host ("  Looked automatically in container settings, old .env and appsettings files: {0} file(s) found, {1} candidate login(s) (values are not shown)." -f $files.Count, $cands.Count) -ForegroundColor DarkGray
+    $dbn = @($cands | Where-Object { $_.db } | ForEach-Object { $_.db } | Sort-Object -Unique)
+    if ($dbn.Count -gt 0) { Write-Host ("  Database name(s) named in those settings: {0}" -f ($dbn -join ", ")) -ForegroundColor DarkGray }
     $n = 0
     foreach ($c in $cands) {
         if ($n -ge $max) { break }; $n++
         if (& $test $c.user $c.pass) {
-            $srcLabel = $(if ($c.src -like "container *") { $c.src } else { Split-Path $c.src -Parent })
+            $srcLabel = $(if ($c.src -like "container *") { $c.src } else { $c.src }); if ($c.db) { $srcLabel += (", database " + $c.db) }
             Write-Host ("  OK  A saved login worked (source: {0}). Not shown and not copied anywhere." -f $srcLabel) -ForegroundColor Green
             return $c
         }

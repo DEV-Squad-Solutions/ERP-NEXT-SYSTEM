@@ -178,6 +178,11 @@ function Try-AutoLogin([scriptblock]$test, [string]$root, [int]$max = 20) {
     foreach ($a in $as) { if ($files -notcontains $a) { $files += $a } }
     Write-Host ("  appsettings files found on the drives: {0}" -f $as.Count) -ForegroundColor DarkGray
     $cands = @(Get-ContainerLoginCandidates) + @(Get-EnvLoginCandidates $files)
+    # Production first (the user's default source): appsettings.Production.json, then container settings, appsettings.json, .env files, Development last.
+    $idx = 0
+    $cands = @($cands | ForEach-Object { $idx++; $r = 3; $sn = "$($_.src)"
+        if ($sn -like "*appsettings.Production*.json") { $r = 0 } elseif ($sn -like "container *") { $r = 1 } elseif ($sn -like "*appsettings.Development*.json") { $r = 4 } elseif ($sn -like "*appsettings*.json") { $r = 2 }
+        New-Object psobject -Property @{ user = $_.user; pass = $_.pass; src = $_.src; db = $_.db; rank = $r; ord = $idx } } | Sort-Object rank, ord | ForEach-Object { @{ user = $_.user; pass = $_.pass; src = $_.src; db = $_.db } })
     Write-Host ("  Looked automatically in container settings, old .env and appsettings files: {0} file(s) found, {1} candidate login(s) (values are not shown)." -f $files.Count, $cands.Count) -ForegroundColor DarkGray
     $dbn = @($cands | Where-Object { $_.db } | ForEach-Object { $_.db } | Sort-Object -Unique)
     if ($dbn.Count -gt 0) { Write-Host ("  Database name(s) named in those settings: {0}" -f ($dbn -join ", ")) -ForegroundColor DarkGray }

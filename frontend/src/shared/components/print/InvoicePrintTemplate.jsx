@@ -31,7 +31,7 @@ export default function InvoicePrintTemplate({ invoice }) {
     <div
       dir={getDir()}
       style={{
-        width: "210mm",
+        width: "100%", maxWidth: "210mm",
         minHeight: "297mm",
         padding: "15mm",
         fontFamily: "'Cairo', 'Tajawal', sans-serif",

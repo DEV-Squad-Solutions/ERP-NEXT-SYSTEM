@@ -31,7 +31,7 @@ export default function PayrollDetailPrintTemplate({ entry }) {
     <div
       dir={getDir()}
       style={{
-        width: "210mm",
+        width: "100%", maxWidth: "210mm",
         minHeight: "297mm",
         padding: "16mm",
         fontFamily: "'Cairo', 'Tajawal', sans-serif",

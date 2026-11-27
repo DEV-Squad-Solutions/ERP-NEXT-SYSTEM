@@ -31,7 +31,7 @@ export default function CashHandoverReportPrintTemplate({
     <div
       dir={getDir()}
       className="p-8 font-sans text-ink-900"
-      style={{ width: "210mm", fontFamily: "'Cairo', 'Tajawal', sans-serif" }}
+      style={{ width: "100%", maxWidth: "210mm", fontFamily: "'Cairo', 'Tajawal', sans-serif" }}
     >
       <div className="mb-6 flex items-center justify-between border-b border-ink-200 pb-4">
         <div>

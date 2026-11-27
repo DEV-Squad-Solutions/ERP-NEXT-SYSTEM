@@ -10,7 +10,7 @@ export default function StorePrintTemplate({ store, stats }) {
     <div
       dir={getDir()}
       className="p-8 font-sans text-ink-900"
-      style={{ width: "210mm" }}
+      style={{ width: "100%", maxWidth: "210mm" }}
     >
       <div className="flex items-center justify-between border-b border-ink-200 pb-4 mb-6">
         <div>

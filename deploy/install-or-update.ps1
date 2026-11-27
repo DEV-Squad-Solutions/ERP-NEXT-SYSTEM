@@ -117,6 +117,12 @@ try {
     $dbContainer = docker ps -a --filter "name=^erp-db$" -q
     $ourVolume = docker volume ls -q --filter "name=^erp_sql_data$"
     $isUpdate = [bool]$dbContainer -or [bool]$ourVolume
+    Info ("Container erp-db : {0}" -f $(if ($dbContainer) { "found" } else { "not found" }))
+    Info ("Volume erp_sql_data: {0}" -f $(if ($ourVolume) { "found" } else { "not found" }))
+    if (-not $dbContainer) {
+        $foreign = docker ps -a --format "{{.Names}} ({{.Image}})" | Where-Object { $_ -match 'mssql|sql' -and $_ -notmatch '^erp-db ' }
+        if ($foreign) { Fail "Found a SQL Server container that this installer does not manage: $($foreign -join ', ')." "Do not continue. Send this name to your developer. The installer stops so it never creates a second, empty database next to your data." "volume" }
+    }
     if (-not $isUpdate) {
         $other = docker volume ls -q | Where-Object { $_ -match 'sql_?data|mssql' }
         if ($other) { Fail "Found a database volume with another name ($($other -join ', ')). This looks like an older install." "Do not continue. Send this volume name to your developer (stopped so no empty database is created next to your data)." "volume" }
@@ -165,11 +171,38 @@ try {
     if ($isUpdate) {
         Step 3 "Backing up the database (required before any update)"
         $running = docker ps --filter "name=^erp-db$" --filter "status=running" -q
-        if (-not $running) {
+        if (-not $dbContainer) {
+            Info "Container erp-db is missing but its data volume exists. Starting only the database container on that volume (data is not changed)."
+            docker image inspect mcr.microsoft.com/mssql/server:2022-latest *> $null
+            if ($LASTEXITCODE -ne 0) { Fail "The SQL Server image is not on this PC, so the database container cannot be started." "Load the SQL Server image first (docker load), or send the log file to your developer." "docker2" }
+            Run-Docker compose -p erp up -d db
+        }
+        elseif (-not $running) {
             Info "Starting erp-db for the backup"
             Run-Docker start erp-db
-            Start-Sleep -Seconds 40
         }
+        Info "Waiting for the database to accept connections"
+        $dbReady = $false
+        for ($i = 0; $i -lt 36; $i++) {
+            $h = docker inspect -f "{{.State.Health.Status}}" erp-db 2>$null
+            if ($h -eq "healthy") { $dbReady = $true; break }
+            if (-not $h -or $h -eq "<no value>") { Start-Sleep -Seconds 40; $dbReady = $true; break }
+            Start-Sleep -Seconds 5
+        }
+        if (-not $dbReady) { Fail "The database container did not become healthy in 3 minutes." "Send the log file to your developer." "docker2" }
+
+        # Is there a MiniErp database to back up?
+        $sqlcmd = "/opt/mssql-tools18/bin/sqlcmd"
+        $probe = docker exec erp-db $sqlcmd -S localhost -U sa -P $sa -C -h -1 -W -Q "SET NOCOUNT ON; SELECT CASE WHEN DB_ID('MiniErp') IS NULL THEN 'NO' ELSE 'YES' END" 2>&1 | Out-String
+        if ($probe -cmatch '(?m)^\s*YES\s*$') { $hasDb = $true }
+        elseif ($probe -cmatch '(?m)^\s*NO\s*$') { $hasDb = $false }
+        else { Fail "Could not query the database. SQL_SA_PASSWORD in .env may not match this database." "Check the SQL_SA_PASSWORD line in .env (same value as the old .env). Do not continue until it matches." "envmiss" }
+
+        if (-not $hasDb) {
+            Ok "No MiniErp database in the volume yet: nothing to back up"
+            $bakName = "(none, no database yet)"
+        }
+        else {
         & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "backup.ps1") -BackupDir $BackupDir
         if ($LASTEXITCODE -ne 0) { Fail "Backup failed. The update was cancelled and nothing was changed." "Make sure erp-db is running and the disk has free space, then run again. Send the log file if it repeats." "backup" }
         $bak = Get-ChildItem $BackupDir -Filter "MiniErp_*.bak" -ErrorAction SilentlyContinue |
@@ -179,6 +212,7 @@ try {
         }
         $bakName = Join-Path $BackupDir $bak.Name
         Ok ("Backup verified: {0} ({1} MB)" -f $bak.Name, [math]::Round($bak.Length / 1MB, 1))
+        }
     }
     else { Step 3 "Backup"; Ok "Not needed on a fresh install" }
 

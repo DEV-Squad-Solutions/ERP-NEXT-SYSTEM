@@ -1,6 +1,8 @@
 # ERP server install and update guide (offline Windows server)
 
-**One file does it all:** double-click `install-or-update.bat`. It detects a fresh install or an update and runs steps [1/6] to [6/6].
+**One file does it all:** double-click `install-or-update.bat`. It opens a window (English or Arabic, switch with the buttons at the top) with buttons **Install / Update**, **Switch version / Roll back** and **Status**, a step list, a progress bar, a live log, and a green SUCCESS or red STOPPED box with "what to do next". Typed confirmations (UNRELATED, RESTORE, version number) appear as input boxes. The window only runs the same scripts described below, so every safety rule is unchanged. If the window cannot start, the .bat falls back to the console version; you can also run `install-or-update-console.bat` directly.
+
+The rest of this guide describes what the steps do (same in the window and in the console). It detects a fresh install or an update and runs steps [1/6] to [6/6].
 At start it asks for a language: `1` English (default after 10 seconds) or `2` Arabic. In Arabic mode the messages (start, success, every error with its fix) appear in popup windows laid out right-to-left. The black console keeps short English progress lines because a console cannot lay out Arabic correctly. Full Arabic guide: `README-AR.md`.
 
 > **Golden rule:** the data lives in the Docker volume `erp_sql_data`. The installer never deletes it. You must never run `docker compose down -v`, `docker volume rm` or `docker system prune --volumes`.

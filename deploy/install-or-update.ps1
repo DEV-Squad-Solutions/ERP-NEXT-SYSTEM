@@ -6,7 +6,9 @@
 #>
 param(
     [string]$BackupDir = "C:\ERP_backup",
-    [int]$HealthTimeoutSec = 300
+    [int]$HealthTimeoutSec = 300,
+    [switch]$Gui,          # used by the graphical installer: no menus, prompts go through files in -IoDir
+    [string]$IoDir = ""
 )
 $ErrorActionPreference = "Continue"
 Set-Location $PSScriptRoot
@@ -17,21 +19,8 @@ try { Start-Transcript -Path $logFile -Force | Out-Null } catch { }
 # ---- Language: English (default, safe) or Arabic. A console cannot lay out Arabic right-to-left correctly, so Arabic
 # ---- mode shows the Arabic messages in popup windows (true RTL) while the console keeps short English progress lines.
 $script:Lang = "en"
-$script:AR = @{
-    start   = "تثبيت / تحديث نظام ERP`n`nهيتم تنفيذ 6 خطوات. تابع الشاشة السوداء. مفيش حاجة هتتمسح من الداتا."
-    docker  = "برنامج Docker مش شغال.`n`nالحل: شغّل Docker Desktop، استنى لحد ما يقول إنه شغال، وبعدين اضغط دبل كليك على install-or-update.bat تاني."
-    volume  = "لقيت قاعدة بيانات قديمة باسم مختلف.`n`nالسكربت وقف عشان ميعملش قاعدة فاضية جنبها.`n`nالحل: ابعت الاسم اللي ظهر في الشاشة للمطوّر."
-    envmiss = "ملف .env ناقص الأسرار القديمة.`n`nفي التحديث السكربت مبيعملش أسرار جديدة.`n`nالحل: افتح ملف .env بالنوتباد واكتب بإيدك السطرين SQL_SA_PASSWORD و JWT_SIGNING_KEY بنفس القيم القديمة. ماتبعتهمش في أي شات. وبعدين شغّل السكربت تاني."
-    seed    = "SEED_ENABLED مفعّل في ملف .env.`n`nالحل: خليه false وشغّل تاني (ده سيرفر بداتا حقيقية)."
-    notar   = "مفيش ملف erp-images-*.tar جنب السكربت.`n`nالحل: انسخ الملف من الفلاشة لنفس الفولدر وشغّل تاني."
-    backup  = "النسخة الاحتياطية فشلت، فالتحديث اتلغى ومفيش حاجة اتغيّرت.`n`nالحل: اتأكد إن erp-db شغال وفيه مساحة على القرص وشغّل تاني. لو اتكرر ابعت ملف اللوج."
-    image   = "الصورة مش متحمّلة.`n`nالحل: انسخ ملف erp-images-*.tar الصحيح جنب السكربت وشغّل تاني."
-    docker2 = "أمر Docker فشل.`n`nالحل: ابعت ملف اللوج للمطوّر. مفيش حاجة اتمسحت."
-    health  = "الـ API ماجهزش في الوقت المحدد.`n`nالداتا سليمة ومفيش حاجة اتمسحت.`n`nالحل: ابعت ملف اللوج وآخر سطور الـ API للمطوّر."
-    other   = "حصل خطأ غير متوقع.`n`nالداتا سليمة. ابعت ملف اللوج للمطوّر."
-    okfresh = "تم التثبيت بنجاح.`n`nافتح http://localhost (أو http://192.168.1.5 من باقي الأجهزة).`n`nاحتفظ بنسخة من ملف .env في مكان خاص."
-    okupd   = "تم التحديث بنجاح.`n`nافتح http://localhost (أو http://192.168.1.5 من باقي الأجهزة).`n`nراجع النسخة الاحتياطية في C:\ERP_backup ومكان ملف اللوج في الشاشة."
-}
+. (Join-Path $PSScriptRoot "messages-ar.ps1")
+$script:AR = $AR
 function Show-Ar([string]$key, [string]$kind = "Information") {
     if ($script:Lang -ne "ar") { return }
     try {
@@ -77,6 +66,19 @@ function Choose-Action {
     return $a
 }
 
+$script:askN = 0
+function Ask([string]$text) {
+    if (-not $Gui) { return (Read-Host $text) }
+    $script:askN++
+    $id = "p$($script:askN)"
+    Write-Host "@@PROMPT|$id|$text"
+    $f = Join-Path $IoDir "answer-$id.txt"
+    while (-not (Test-Path $f)) { Start-Sleep -Milliseconds 300 }
+    Start-Sleep -Milliseconds 200
+    $a = [IO.File]::ReadAllText($f).Trim()
+    Remove-Item $f -Force -ErrorAction SilentlyContinue
+    return $a
+}
 function Line($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
 function Step($n, $t) { Write-Host ""; Write-Host ("[{0}/{1}] {2}" -f $n, $total, $t) -ForegroundColor Cyan }
 function Ok($t) { Write-Host "      OK   " -ForegroundColor Green -NoNewline; Write-Host $t }
@@ -91,6 +93,7 @@ function Fail($m, $next, $ar = "other") {
     if ($next) { Line "  What to do next: $next" Yellow }
     Line "  Log file: $logFile" Yellow
     try { Stop-Transcript | Out-Null } catch { }
+    if ($Gui) { Write-Host "@@FAIL|$ar" }
     Show-Ar $ar "Error"
     exit 1
 }
@@ -121,8 +124,7 @@ Line "    ERP SYSTEM  -  Installer / Updater" White
 Line "    Offline server mode (Docker). Data is never deleted." Gray
 Line "  ================================================================" Cyan
 
-Choose-Language
-$action = Choose-Action
+if ($Gui) { [Console]::OutputEncoding = [Text.Encoding]::UTF8; $script:Lang = "en"; $action = "1" } else { Choose-Language; $action = Choose-Action }
 if ($action -ne "1") {
     try { Stop-Transcript | Out-Null } catch { }
     $target = $(if ($action -eq "2") { "rollback.ps1" } else { "status.ps1" })
@@ -153,7 +155,7 @@ try {
             Write-Host ""
             Write-Host "      If it is unrelated to this ERP (for example an old test stack), type UNRELATED and press Enter to continue." -ForegroundColor Yellow
             Write-Host "      If it holds your real data, press Enter only, and send the name to your developer." -ForegroundColor Yellow
-            $ans = Read-Host "      Your answer"
+            $ans = Ask "Another SQL Server container exists. Type UNRELATED to continue (anything else stops)"
             if ($ans -cne "UNRELATED") { Fail "Stopped by you: another SQL Server container exists ($($foreign -join ', '))." "Nothing was changed. Send the container name to your developer." "volume" }
             Ok "Continuing. The other SQL container is left untouched."
         }
@@ -313,6 +315,7 @@ try {
     Line "  Log file  : $logFile" White
     Write-Host ""
     try { Stop-Transcript | Out-Null } catch { }
+    if ($Gui) { Write-Host ("@@DONE|{0}|{1}|{2}|{3}" -f $(if ($isUpdate) { "UPDATE" } else { "INSTALL" }), $version, $bakName, $logFile) }
     Show-Ar $(if ($isUpdate) { "okupd" } else { "okfresh" })
     exit 0
 }

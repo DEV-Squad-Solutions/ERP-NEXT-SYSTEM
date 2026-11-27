@@ -1,7 +1,7 @@
 ﻿<#
  Read-only status of the ERP install. Changes nothing.
 #>
-param([string]$BackupDir = "C:\ERP_backup")
+param([string]$BackupDir = "C:\ERP_backup", [switch]$Gui, [string]$IoDir = "")
 $ErrorActionPreference = "Continue"
 Set-Location $PSScriptRoot
 function Row($k, $v, $c = "White") { Write-Host ("  {0,-22}: " -f $k) -NoNewline; Write-Host $v -ForegroundColor $c }
@@ -10,7 +10,7 @@ Write-Host "  ================================================================" 
 Write-Host "    ERP SYSTEM  -  Status (read-only)" -ForegroundColor White
 Write-Host "  ================================================================" -ForegroundColor Cyan
 docker version --format "{{.Server.Version}}" *> $null
-if ($LASTEXITCODE -ne 0) { Row "Docker" "NOT RUNNING" Red; exit 1 }
+if ($LASTEXITCODE -ne 0) { Row "Docker" "NOT RUNNING" Red; if ($Gui) { Write-Host "@@FAIL|docker" }; exit 1 }
 Row "Docker" "running" Green
 foreach ($n in "erp-db", "erp-api", "erp-frontend") {
     $st = docker inspect -f "{{.State.Status}} / health: {{if .State.Health}}{{.State.Health.Status}}{{else}}n/a{{end}}" $n 2>$null
@@ -27,4 +27,5 @@ $hist = Join-Path $PSScriptRoot "release-history.txt"
 if (Test-Path $hist) { Row "Last update" (Get-Content $hist -Tail 1) } else { Row "Last update" "no history yet" }
 Write-Host "  Local images:"
 docker images --format "      {{.Repository}}:{{.Tag}}   {{.CreatedSince}}" | Select-String "erp-(api|frontend):"
+if ($Gui) { Write-Host "@@DONE|STATUS|||" }
 exit 0

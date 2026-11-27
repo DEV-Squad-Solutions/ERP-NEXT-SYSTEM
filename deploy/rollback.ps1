@@ -6,15 +6,29 @@
  - Code + data switch: restores the backup taken when you left that version. REPLACES current data. Needs a typed confirmation.
  Database migrations are additive and are NOT reversed by a code switch.
 #>
-param([string]$BackupDir = "C:\ERP_backup", [int]$HealthTimeoutSec = 300)
+param([string]$BackupDir = "C:\ERP_backup", [int]$HealthTimeoutSec = 300, [switch]$Gui, [string]$IoDir = "")
 $ErrorActionPreference = "Continue"
 Set-Location $PSScriptRoot
+$script:askN = 0
+function Ask([string]$text) {
+    if (-not $Gui) { return (Read-Host $text) }
+    $script:askN++
+    $id = "p$($script:askN)"
+    Write-Host "@@PROMPT|$id|$text"
+    $f = Join-Path $IoDir "answer-$id.txt"
+    while (-not (Test-Path $f)) { Start-Sleep -Milliseconds 300 }
+    Start-Sleep -Milliseconds 200
+    $a = [IO.File]::ReadAllText($f).Trim()
+    Remove-Item $f -Force -ErrorAction SilentlyContinue
+    return $a
+}
 function Line($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
 function Ok($t) { Write-Host "      OK   " -ForegroundColor Green -NoNewline; Write-Host $t }
 function Info($t) { Write-Host "      ..   " -ForegroundColor DarkGray -NoNewline; Write-Host $t }
 function Stop-Safe($m, $next) {
     Write-Host ""; Write-Host "      FAIL " -ForegroundColor Red -NoNewline; Write-Host $m
     Line "  Nothing was deleted." Yellow
+    if ($Gui) { Write-Host "@@FAIL|other" }
     if ($next) { Line "  What to do next: $next" Yellow }
     exit 1
 }
@@ -22,6 +36,7 @@ function Run-Docker { & docker @args; if ($LASTEXITCODE -ne 0) { Stop-Safe "Comm
 function Get-EnvValue([string]$text, [string]$key) { if ($text -match "(?m)^\s*$key\s*=\s*(\S+)") { return $Matches[1] }; return $null }
 function Step($n, $t) { Write-Host ""; Line "[$n] $t" Cyan }
 
+if ($Gui) { [Console]::OutputEncoding = [Text.Encoding]::UTF8 }
 Write-Host ""
 Line "  ================================================================" Cyan
 Line "    ERP SYSTEM  -  Switch version / Roll back" White
@@ -76,10 +91,10 @@ foreach ($v in $versions) {
     Line ("    [{0}] {1,-10} {2,-45}{3}" -f $i, $v, $bnote, $note)
 }
 Line "    [0] Cancel (default)"
-$pick = Read-Host "  Switch to which version"
-if (-not $menu.ContainsKey($pick)) { Line "  Cancelled. Nothing changed." Yellow; exit 0 }
+$pick = Ask "Switch to which version? Type the number from the list (anything else cancels)"
+if (-not $menu.ContainsKey($pick)) { Line "  Cancelled. Nothing changed." Yellow; if ($Gui) { Write-Host "@@CANCEL" }; exit 0 }
 $target = $menu[$pick]
-if ($target -eq $cur) { Line "  That version is already running. Nothing to do." Yellow; exit 0 }
+if ($target -eq $cur) { Line "  That version is already running. Nothing to do." Yellow; if ($Gui) { Write-Host "@@CANCEL" }; exit 0 }
 $bakFor = Find-Backup $target
 
 Write-Host ""
@@ -91,14 +106,14 @@ Line "    [1] Switch CODE only                (database untouched)"
 if ($bakFor) { Line "    [2] Switch code + RESTORE DATABASE from: $(Split-Path $bakFor -Leaf)   (REPLACES current data)" }
 else { Line "    [2] not available (no backup matches version $target)" DarkGray }
 Line "    [0] Cancel (default)"
-$mode = Read-Host "  Your choice"
-if ($mode -ne "1" -and -not ($mode -eq "2" -and $bakFor)) { Line "  Cancelled. Nothing changed." Yellow; exit 0 }
+$mode = Ask "Your choice: 1 = code only, 2 = code + restore data, anything else cancels"
+if ($mode -ne "1" -and -not ($mode -eq "2" -and $bakFor)) { Line "  Cancelled. Nothing changed." Yellow; if ($Gui) { Write-Host "@@CANCEL" }; exit 0 }
 if ($mode -eq "2") {
     Write-Host ""
     Line "  WARNING: this replaces ALL current data with the backup from when you left $target." Red
     Line "  Everything entered after that backup is lost (a safety backup of the current data is taken first)." Yellow
-    $t = Read-Host "  Type RESTORE (capital letters) to continue, anything else cancels"
-    if ($t -cne "RESTORE") { Line "  Cancelled. Nothing changed." Yellow; exit 0 }
+    $t = Ask "Type RESTORE (capital letters) to replace the current data with the backup. Anything else cancels"
+    if ($t -cne "RESTORE") { Line "  Cancelled. Nothing changed." Yellow; if ($Gui) { Write-Host "@@CANCEL" }; exit 0 }
 }
 
 # --- Safety backup of the current database (always) ---
@@ -165,4 +180,5 @@ Line "  Version       : $target  (was $cur)" White
 Line ("  Data          : {0}" -f $(if ($mode -eq "2") { "restored from $bakFor" } else { "unchanged" })) White
 Line "  Safety backup : $safetyPath" White
 Line "  Open          : http://localhost" White
+if ($Gui) { Write-Host ("@@DONE|SWITCH|{0}|{1}|" -f $target, $safetyPath) }
 exit 0

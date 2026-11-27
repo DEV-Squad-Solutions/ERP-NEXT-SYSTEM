@@ -101,6 +101,49 @@ function Wait-Login([string]$pw, [int]$tries) {
     }
     return "down"
 }
+function Look-Inside {
+    # READ-ONLY: lists the SQL files of the volume (mounted :ro in a throwaway container). Nothing is started, changed or deleted.
+    Say "  Looking inside $SrcVol (read-only) ..." DarkGray
+    $ls = @(docker run --rm --entrypoint sh -v "${SrcVol}:/v:ro" $img -c "ls -l /v/data 2>/dev/null | tail -n +2; echo TOTAL_KB=`$(du -sk /v | cut -f1)" 2>&1)
+    $mdf = 0
+    foreach ($l in $ls) {
+        $t = "$l".Trim(); if (-not $t) { continue }
+        if ($t -match '^TOTAL_KB=(\d+)') { Say ("  Total size of the volume: {0} MB" -f [int]([int64]$Matches[1] / 1024)) White; continue }
+        $p = $t -split '\s+'
+        if ($p.Count -ge 9 -and $p[8] -match '\.(mdf|ndf|ldf|bak)$') {
+            $mb = [Math]::Round([int64]$p[4] / 1MB, 1)
+            Say ("  {0,-28} {1,8} MB" -f $p[8], $mb) Gray
+            if ($p[8] -ieq "MiniErp.mdf") { $mdf = $mb }
+        }
+    }
+    Say ""
+    if ($mdf -eq 0) { Say "  No MiniErp.mdf in this volume: it has no MiniErp database (so nothing of the company is in it)." Green }
+    elseif ($mdf -le 16) { Say "  MiniErp.mdf is small ($mdf MB): probably empty or test data. Not a proof. Option 3 counts the real rows on a copy." Yellow }
+    else { Say "  MiniErp.mdf is $mdf MB: it probably holds real data. Do not delete this volume. Option 3 counts the rows on a copy." Yellow }
+    Say "  Nothing was changed." Green
+}
+function Fresh-Volume {
+    # NEW empty SQL volume + NEW password for ERP 2.0. The old volume is kept as it is (never deleted). Only the erp-db CONTAINER is removed (its data lives in the volume).
+    $stamp = Get-Date -Format "yyyyMMdd"
+    $name = "erp_sql_data_v2"
+    if (docker volume ls -q --filter "name=^$name$") { $name = "erp_sql_data_v2_$stamp" }
+    if (docker volume ls -q --filter "name=^$name$") { Stop-Now "The volume $name already exists. Tell your developer." }
+    Say ""
+    Say "  This makes ERP 2.0 use a NEW empty database volume ($name) with a NEW random password." Cyan
+    Say "  - The old volume $SrcVol is NOT deleted, NOT changed. It stays as a safety copy." Green
+    Say "  - Only the erp-db container is removed (it holds no data; the data is in the volume)." Green
+    Say "  - .env gets the new password and volume name (the old .env is kept as .env.bak.<time>)." Green
+    Say "  - The new database is EMPTY. Your company data comes from the backup of minierp-db (use Existing DB in the installer to upgrade minierp-db in place, or restore the backup)." Yellow
+    $ans = (Read-Host "Type NEW VOLUME to continue (anything else cancels)").Trim()
+    if ($ans -cne "NEW VOLUME") { Say "  Cancelled. Nothing was changed." Yellow; return }
+    $new = New-Secret 20
+    docker stop erp-db *> $null
+    docker rm erp-db *> $null
+    if (-not (docker volume ls -q --filter "name=^$SrcVol$")) { Stop-Now "The old volume is not visible anymore. Stopped before changing .env." }
+    Save-Env @{ SQL_SA_PASSWORD = $new; ERP_SQL_VOLUME = $name }
+    Say ""; Say "  DONE. Next: double-click ERP Installer.bat and run Install / Update. It creates the new database in $name." Green
+    Say "  Copy the .env file to a safe private place (it holds the new password)." Yellow
+}
 function Change-Password {
     Say "[4] Change the database password (done INSIDE the database: the data stays)" Cyan
     $old = ""; $new = ""
@@ -255,15 +298,19 @@ if ($Step -eq "menu") {
     Say "  2  Look for the old SQL password in old .env files and test it"
     Say "  3  Recover on a COPY (reset the password on the copy, check MiniErp, make a verified backup)"
     Say "  4  CHANGE the database password (type old, new and confirm; the data stays)"
+    Say "  5  LOOK inside the volume (read-only: file sizes only)"
+    Say "  6  NEW empty volume + new password for ERP 2.0 (old volume kept, typed confirmation)"
     Say "  Q  Quit"
     $a = (Read-Host "Choose").Trim().ToUpper()
-    $Step = switch ($a) { "1" { "copy" } "2" { "find" } "3" { "recover" } "4" { "change" } default { "quit" } }
+    $Step = switch ($a) { "1" { "copy" } "2" { "find" } "3" { "recover" } "4" { "change" } "5" { "look" } "6" { "fresh" } default { "quit" } }
 }
 switch ($Step) {
     "copy" { $null = Copy-ToFolder }
     "find" { $null = Find-Password }
     "recover" { Recover-OnCopy }
     "change" { Change-Password }
+    "look" { Look-Inside }
+    "fresh" { Fresh-Volume }
     default { Say "Nothing done." }
 }
 Say ""; Say "Finished." Green

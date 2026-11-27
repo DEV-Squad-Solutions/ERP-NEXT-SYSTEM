@@ -43,7 +43,7 @@ $T = @{
     steps = "Steps"; log = "Live log"; ready = "Ready. Choose an action."; running = "Running... please wait. Do not close this window."
     okTitle = "SUCCESS"; failTitle = "STOPPED - nothing was deleted, your data is safe"; cancelTitle = "Cancelled - nothing was changed"
     next = "What to do next"; busy = "An operation is running. Please wait until it finishes."
-    ok = "OK"; gen = "Generate for me"; show = "Show"; secretNote = "Typed here on this PC, saved only in the .env file. Never shown in the log."; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; oldbak = "Old SQL container backup"; copylog = "Copy log"; copied = "Copied"; tipInstall = "Install a new version or update. A backup is taken first."; tipSwitch = "Go back to an earlier installed version."; tipStatus = "Read-only check of what is running."; tipCopy = "Copy the whole log to the clipboard"; open = "Open"
+    ok = "OK"; gen = "Generate for me"; show = "Show"; hide = "Hide"; weak = "Weak"; fair = "Fair"; good = "Good"; strong = "Strong"; looksOk = "Looks good"; rulesNew = "At least 8 characters, 3 of: capitals, small letters, digits, symbols. Allowed: letters, digits and _ . @ ! * + -"; rulesOld = "Type it exactly as in your old .env. No spaces or quotes. It is checked against the database before anything is saved for good."; rulesJwt = "At least 32 characters. Allowed: letters, digits and _ . @ ! * + / = -"; errMin8 = "At least 8 characters"; errChars = "Allowed characters: letters, digits and _ . @ ! * + -"; errMix = "Use at least 3 kinds: capitals, small letters, digits, symbols"; errJwt = "At least 32 characters, no spaces"; errSpace = "No spaces or quotes"; ctxCap = "Recent log"; secretNote2 = "Typed on this PC and saved only in the .env file. Never shown in the log."; secretNote = "Typed here on this PC, saved only in the .env file. Never shown in the log."; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; oldbak = "Old SQL container backup"; copylog = "Copy log"; copied = "Copied"; tipInstall = "Install a new version or update. A backup is taken first."; tipSwitch = "Go back to an earlier installed version."; tipStatus = "Read-only check of what is running."; tipCopy = "Copy the whole log to the clipboard"; open = "Open"
     s_install = @("Check Docker", "Install type and config", "Backup", "Load images", "Start services", "Health check")
     s_switch = @("Safety backup", "Restore database (optional)", "Switch code", "Health check")
     s_status = @("Read status")
@@ -55,7 +55,7 @@ $T = @{
     steps = "الخطوات"; log = "السجل المباشر"; ready = "جاهز. اختار إجراء."; running = "جاري التنفيذ... استنى. متقفلش النافذة دي."
     okTitle = "تم بنجاح"; failTitle = "اتوقف - مفيش حاجة اتمسحت والداتا سليمة"; cancelTitle = "اتلغى - مفيش حاجة اتغيّرت"
     next = "الخطوة الجاية"; busy = "فيه عملية شغالة. استنى لحد ما تخلص."
-    ok = "موافق"; gen = "ولّدلي تلقائي"; show = "إظهار"; secretNote = "بتكتبه هنا على الجهاز ده وبيتحفظ في ملف .env بس. مش بيظهر في السجل."; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; oldbak = "نسخة الـ SQL القديم"; copylog = "نسخ السجل"; copied = "تم النسخ"; tipInstall = "تثبيت أو تحديث. بياخد نسخة احتياطية الأول."; tipSwitch = "الرجوع لإصدار متثبّت قبل كده."; tipStatus = "فحص للقراءة بس للي شغال."; tipCopy = "نسخ السجل كله"; open = "افتح"
+    ok = "موافق"; gen = "ولّدلي تلقائي"; show = "إظهار"; hide = "إخفاء"; weak = "ضعيف"; fair = "مقبول"; good = "جيد"; strong = "قوي"; looksOk = "تمام"; rulesNew = "8 حروف على الأقل، ومن 3 أنواع: كبيرة وصغيرة وأرقام ورموز. المسموح: حروف وأرقام و _ . @ ! * + -"; rulesOld = "اكتبه زي ما هو في ملف .env القديم. من غير مسافات أو علامات تنصيص. هيتفحص على الداتابيز قبل ما يتحفظ نهائي."; rulesJwt = "32 حرف على الأقل. المسموح: حروف وأرقام و _ . @ ! * + / = -"; errMin8 = "8 حروف على الأقل"; errChars = "المسموح: حروف وأرقام و _ . @ ! * + -"; errMix = "استخدم 3 أنواع على الأقل: كبيرة وصغيرة وأرقام ورموز"; errJwt = "32 حرف على الأقل ومن غير مسافات"; errSpace = "من غير مسافات أو علامات تنصيص"; ctxCap = "آخر السجل"; secretNote2 = "بتكتبه على الجهاز ده وبيتحفظ في ملف .env بس. مش بيظهر في السجل."; secretNote = "بتكتبه هنا على الجهاز ده وبيتحفظ في ملف .env بس. مش بيظهر في السجل."; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; oldbak = "نسخة الـ SQL القديم"; copylog = "نسخ السجل"; copied = "تم النسخ"; tipInstall = "تثبيت أو تحديث. بياخد نسخة احتياطية الأول."; tipSwitch = "الرجوع لإصدار متثبّت قبل كده."; tipStatus = "فحص للقراءة بس للي شغال."; tipCopy = "نسخ السجل كله"; open = "افتح"
     s_install = @("فحص Docker", "نوع التثبيت والإعدادات", "نسخة احتياطية", "تحميل الصور", "تشغيل الخدمات", "فحص الجاهزية")
     s_switch = @("نسخة أمان", "استرجاع الداتا (اختياري)", "تبديل الكود", "فحص الجاهزية")
     s_status = @("قراءة الحالة")
@@ -373,92 +373,198 @@ function Show-Result([string]$kind, [string]$text) {   # kind: ok | fail | cance
     if (-not $script:animOn) { $result.Height = $script:resTarget }
 }
 
-function Ask-Secret-Dialog([string]$prompt, [bool]$allowGen) {
-    # masked input. The typed value goes only into the private answer file read by the installer, never into the log.
-    $dlg = New-Object System.Windows.Forms.Form
-    $dlg.Text = (L "promptTitle"); $dlg.ClientSize = New-Object System.Drawing.Size([Math]::Min(640, $wa.Width - 40), 250); $dlg.StartPosition = "CenterParent"; $dlg.Font = $font
-    $dlg.FormBorderStyle = "FixedDialog"; $dlg.MaximizeBox = $false; $dlg.MinimizeBox = $false; $dlg.BackColor = $cBg; $dlg.ForeColor = $cText
-    $lbl = New-Object System.Windows.Forms.Label; $lbl.Dock = "Top"; $lbl.Height = 78; $lbl.Padding = New-Object System.Windows.Forms.Padding(10, 10, 10, 0); $lbl.Text = $prompt
-    $lbl.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
-    $note = New-Object System.Windows.Forms.Label; $note.Dock = "Top"; $note.Height = 36; $note.Padding = New-Object System.Windows.Forms.Padding(10, 4, 10, 0); $note.Text = (L "secretNote"); $note.ForeColor = $cMuted
-    if ($script:lang -eq "ar") { $note.RightToLeft = "Yes" }
-    $tb = New-Object System.Windows.Forms.TextBox; $tb.Dock = "Top"; $tb.UseSystemPasswordChar = $true; $tb.Font = New-Object System.Drawing.Font("Segoe UI", 12)
-    $tb.BackColor = $cCard; $tb.ForeColor = "White"; $tb.BorderStyle = "FixedSingle"
-    $pnl = New-Object System.Windows.Forms.FlowLayoutPanel; $pnl.Dock = "Bottom"; $pnl.Height = 56; $pnl.Padding = New-Object System.Windows.Forms.Padding(8)
-    $ok = New-Object System.Windows.Forms.Button; $ok.Text = (L "ok"); $ok.Width = 110; $ok.Height = 34; $ok.DialogResult = "OK"
-    $cn = New-Object System.Windows.Forms.Button; $cn.Text = (L "cancel"); $cn.Width = 110; $cn.Height = 34; $cn.DialogResult = "Cancel"
-    $sh = New-Object System.Windows.Forms.CheckBox; $sh.Text = (L "show"); $sh.AutoSize = $true; $sh.Margin = New-Object System.Windows.Forms.Padding(10, 8, 6, 0)
-    $sh.Add_CheckedChanged({ $tb.UseSystemPasswordChar = (-not $sh.Checked) })
-    $script:secretAns = $null
-    $btns = @($ok, $cn)
-    if ($allowGen) {
-        $gn = New-Object System.Windows.Forms.Button; $gn.Text = (L "gen"); $gn.Width = 150; $gn.Height = 34
-        $gn.Add_Click({ $script:secretAns = "@@GENERATE"; $f2 = $gn.FindForm(); $f2.DialogResult = "OK"; $f2.Close() })
-        $btns = @($ok, $gn, $cn)
-    }
-    foreach ($bb in $btns) { $bb.FlatStyle = "Flat"; $bb.UseVisualStyleBackColor = $false; $bb.BackColor = [System.Drawing.Color]::FromArgb(30, 41, 59); $bb.ForeColor = "White"; $bb.FlatAppearance.BorderColor = $cBorder }
-    $ok.BackColor = $cBlue
-    $pnl.Controls.AddRange($btns); $pnl.Controls.Add($sh)
-    $dlg.Controls.Add($pnl); $dlg.Controls.Add($tb); $dlg.Controls.Add($note); $dlg.Controls.Add($lbl)
-    $dlg.AcceptButton = $ok; $dlg.CancelButton = $cn; $dlg.ActiveControl = $tb
-    $r = $dlg.ShowDialog($form)
-    $ans = ""
-    if ($r -eq "OK") { if ($script:secretAns) { $ans = $script:secretAns } else { $ans = $tb.Text.Trim() } }
-    $tb.Text = ""; $script:secretAns = $null
-    $dlg.Dispose()
-    return $ans
+function Get-StrengthScore([string]$v) {
+    $k = 0; foreach ($re in @('[A-Z]', '[a-z]', '[0-9]', '[_.@!*+-]')) { if ($v -cmatch $re) { $k++ } }
+    if ($v.Length -lt 8 -or $k -lt 3) { return $(if ($v.Length -eq 0) { 0 } else { 1 }) }
+    $s = 2; if ($v.Length -ge 12) { $s = 3 }; if ($v.Length -ge 16 -and $k -ge 4) { $s = 4 }
+    return $s
 }
-
-function Ask-Input([string]$prompt) {
-    $choices = @()
-    if ($prompt -match '\[\[choices:(.*?)\]\]\s*$') {
-        foreach ($p in ($Matches[1] -split ';')) { $kv = $p -split '=', 2; $choices += , @($kv[0], $kv[1]) }
-        $prompt = ($prompt -replace '\s*\[\[choices:.*?\]\]\s*$', '')
+function Get-DlgError([string]$kind, [string]$v) {   # returns a message key, or "" when the value is acceptable
+    if (-not $v) { return "" }
+    if ($kind -eq "old") { if ($v -match '\s' -or $v -match '["''`]') { return "errSpace" }; return "" }
+    if ($kind -eq "jwt") { if ($v.Length -lt 32 -or $v -notmatch '^[A-Za-z0-9_.@!*+/=-]+$') { return "errJwt" }; return "" }
+    if ($v.Length -lt 8) { return "errMin8" }
+    if ($v -notmatch '^[A-Za-z0-9_.@!*+-]+$') { return "errChars" }
+    $k = 0; foreach ($re in @('[A-Z]', '[a-z]', '[0-9]', '[_.@!*+-]')) { if ($v -cmatch $re) { $k++ } }
+    if ($k -lt 3) { return "errMix" }
+    return ""
+}
+function New-RoundedPath([int]$w, [int]$h, [int]$r) {
+    $gp = New-Object System.Drawing.Drawing2D.GraphicsPath; $d = $r * 2
+    $gp.AddArc(0, 0, $d, $d, 180, 90); $gp.AddArc($w - $d, 0, $d, $d, 270, 90); $gp.AddArc($w - $d, $h - $d, $d, $d, 0, 90); $gp.AddArc(0, $h - $d, $d, $d, 90, 90); $gp.CloseFigure()
+    return $gp
+}
+function Measure-H([string]$text, $fnt, [int]$w) {
+    $sz = [System.Windows.Forms.TextRenderer]::MeasureText($text, $fnt, (New-Object System.Drawing.Size($w, 0)), [System.Windows.Forms.TextFormatFlags]::WordBreak)
+    return ($sz.Height + 4)
+}
+function New-DlgLabel([string]$text, $fnt, $color, [int]$x, [int]$y, [int]$w, [bool]$rtl) {
+    $l = New-Object System.Windows.Forms.Label
+    $l.AutoSize = $false; $l.Font = $fnt; $l.ForeColor = $color; $l.BackColor = [System.Drawing.Color]::Transparent; $l.Text = $text
+    $l.Location = New-Object System.Drawing.Point($x, $y); $l.Width = $w; $l.Height = (Measure-H $text $fnt $w)
+    if ($rtl) { $l.RightToLeft = "Yes" }
+    return $l
+}
+function New-DlgField([int]$x, [int]$y, [int]$w, [bool]$masked, [bool]$rtl) {
+    # outer panel = border/glow colour, inner panel = field surface, both rounded; focus tweens the outer colour
+    $outer = New-Panel $cBorder; $outer.Location = New-Object System.Drawing.Point($x, $y); $outer.Size = New-Object System.Drawing.Size($w, 46)
+    $inner = New-Panel $cCard; $inner.Location = New-Object System.Drawing.Point(2, 2); $inner.Size = New-Object System.Drawing.Size(($w - 4), 42)
+    $tb = New-Object System.Windows.Forms.TextBox; $tb.BorderStyle = "None"; $tb.BackColor = $cCard; $tb.ForeColor = "White"; $tb.Font = New-Object System.Drawing.Font("Segoe UI", 12)
+    $tb.Location = New-Object System.Drawing.Point(12, 9); $tb.Width = ($w - 4 - 24 - $(if ($masked) { 64 } else { 0 })); $tb.UseSystemPasswordChar = $masked; $tb.RightToLeft = "No"
+    $inner.Controls.Add($tb)
+    $eye = $null
+    if ($masked) {
+        $eye = New-Object System.Windows.Forms.Label; $eye.AutoSize = $false; $eye.Size = New-Object System.Drawing.Size(58, 42); $eye.Location = New-Object System.Drawing.Point(($w - 4 - 60), 0)
+        $eye.TextAlign = "MiddleCenter"; $eye.ForeColor = $cCyan; $eye.BackColor = $cCard; $eye.Cursor = [System.Windows.Forms.Cursors]::Hand; $eye.Font = New-Object System.Drawing.Font("Segoe UI Semibold", 9)
+        $eye.Text = (L "show"); $inner.Controls.Add($eye)
     }
-    $secret = $null
-    if ($prompt -match '\[\[secret:(gen|nogen)\]\]\s*$') { $secret = $Matches[1]; $prompt = ($prompt -replace '\s*\[\[secret:(gen|nogen)\]\]\s*$', '') }
-    if ($secret) { return (Ask-Secret-Dialog $prompt ($secret -eq "gen")) }
+    $outer.Controls.Add($inner)
+    Round-Region $outer 11; Round-Region $inner 9
+    $script:D.glow = $outer
+    $tb.Add_Enter({ try { Tween $script:D.glow $cCyan 160 } catch { } })
+    $tb.Add_Leave({ try { Tween $script:D.glow $cBorder 200 } catch { } })
+    return @($outer, $tb, $eye)
+}
+function Show-Dlg([string]$prompt, [string]$mode, [bool]$allowGen, $choices) {
+    # mode: secret | text | choice. One look for every input dialog. Values are never logged or echoed.
+    $rtl = ($script:lang -eq "ar")
+    $script:D = @{ kind = "new"; result = ""; ok = $null; tb = $null; msg = $null; segs = @(); strLbl = $null; glow = $null }
+    $W = [Math]::Min(580, $wa.Width - 30); $pad = 26; $cw = $W - 2 * $pad
+    $kind = "new"
+    if ($mode -eq "secret") { if ($prompt -match 'JWT_SIGNING_KEY') { $kind = "jwt" } elseif (-not $allowGen) { $kind = "old" } }
+    $script:D.kind = $kind
     $dlg = New-Object System.Windows.Forms.Form
-    $dlg.Text = (L "promptTitle"); $dlg.ClientSize = New-Object System.Drawing.Size([Math]::Min(720, $wa.Width - 40), [Math]::Min(470, $wa.Height - 60)); $dlg.StartPosition = "CenterParent"; $dlg.Font = $font
-    $dlg.RightToLeft = $form.RightToLeft; $dlg.RightToLeftLayout = ($script:lang -eq "ar")
-    $dlg.FormBorderStyle = "FixedDialog"; $dlg.MaximizeBox = $false; $dlg.MinimizeBox = $false
-    $ctx = New-Object System.Windows.Forms.TextBox
-    $ctx.Multiline = $true; $ctx.ReadOnly = $true; $ctx.ScrollBars = "Vertical"; $ctx.RightToLeft = "No"; $ctx.Font = New-Object System.Drawing.Font("Consolas", 9.5)
-        $ctx.Text = (($script:recent | Select-Object -Last 22) -join "`r`n")
-    $ctx.SelectionStart = $ctx.TextLength; $ctx.ScrollToCaret()
-    $lbl = New-Object System.Windows.Forms.Label
-    $lbl.Dock = "Top"; $lbl.Height = 70; $lbl.Padding = New-Object System.Windows.Forms.Padding(8, 8, 8, 0); $lbl.RightToLeft = "No"; $lbl.Text = $prompt
-    $lbl.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
-    $tb = New-Object System.Windows.Forms.TextBox; $tb.Dock = "Top"; $tb.RightToLeft = "No"; $tb.Font = New-Object System.Drawing.Font("Segoe UI", 12)
-    $pnl = New-Object System.Windows.Forms.FlowLayoutPanel; $pnl.Dock = "Bottom"; $pnl.Height = 52; $pnl.Padding = New-Object System.Windows.Forms.Padding(8)
-    $ok = New-Object System.Windows.Forms.Button; $ok.Text = (L "ok"); $ok.Width = 110; $ok.Height = 34; $ok.DialogResult = "OK"
-    $cn = New-Object System.Windows.Forms.Button; $cn.Text = (L "cancel"); $cn.Width = 110; $cn.Height = 34; $cn.DialogResult = "Cancel"
-    $script:choiceAns = ""
-    if ($choices.Count -gt 0) {
-        $pnl.Height = 60 * $choices.Count + 50; $pnl.FlowDirection = "TopDown"; $pnl.WrapContents = $false
-        foreach ($c in $choices) {
-            $cb = New-Object System.Windows.Forms.Button; $cb.Text = $c[1]; $cb.Tag = $c[0]; $cb.Width = [Math]::Max(300, $dlg.ClientSize.Width - 40); $cb.Height = 48
-            $cb.FlatStyle = "Flat"; $cb.BackColor = [System.Drawing.Color]::FromArgb(37, 120, 214); $cb.ForeColor = "White"; $cb.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
-            $cb.Add_Click({ param($s, $e) $script:choiceAns = [string]$s.Tag; $fm = $s.FindForm(); $fm.DialogResult = "OK"; $fm.Close() })
-            $pnl.Controls.Add($cb)
+    $dlg.FormBorderStyle = "None"; $dlg.StartPosition = "CenterParent"; $dlg.ShowInTaskbar = $false; $dlg.BackColor = $cBg; $dlg.ForeColor = $cText; $dlg.Font = $font
+    $dlg.Text = (L "promptTitle")
+    # header: icon + title (drag the dialog by it)
+    $head = New-Panel $cSide; $head.Location = New-Object System.Drawing.Point(0, 0); $head.Size = New-Object System.Drawing.Size($W, 58)
+    $ic = New-Object System.Windows.Forms.PictureBox; $ic.SizeMode = "Zoom"; $ic.Size = New-Object System.Drawing.Size(34, 34); $ic.BackColor = $cSide
+    try { if ($form.Icon) { $ic.Image = $form.Icon.ToBitmap() } } catch { }
+    $tt = New-Object System.Windows.Forms.Label; $tt.AutoSize = $false; $tt.Text = $(if ($mode -eq "secret") { (L "promptTitle") + " " + [char]0x2022 + " .env" } else { (L "promptTitle") }); $tt.Font = New-Object System.Drawing.Font("Segoe UI Semibold", 12); $tt.ForeColor = $cText; $tt.BackColor = $cSide
+    $tt.TextAlign = "MiddleLeft"; $tt.Size = New-Object System.Drawing.Size(($W - 2 * $pad - 48), 58)
+    if ($rtl) { $ic.Location = New-Object System.Drawing.Point(($W - $pad - 34), 12); $tt.Location = New-Object System.Drawing.Point($pad, 0); $tt.TextAlign = "MiddleRight"; $tt.RightToLeft = "Yes" } else { $ic.Location = New-Object System.Drawing.Point($pad, 12); $tt.Location = New-Object System.Drawing.Point(($pad + 46), 0) }
+    $head.Controls.Add($ic); $head.Controls.Add($tt)
+    $accent = New-Panel $cBlue; $accent.Location = New-Object System.Drawing.Point(0, 58); $accent.Size = New-Object System.Drawing.Size($W, 2)
+    $dlg.Controls.Add($head); $dlg.Controls.Add($accent)
+    $script:D.drag = $false; $script:D.dx = 0; $script:D.dy = 0; $script:D.form = $dlg
+    foreach ($dc in @($head, $ic, $tt)) {
+        $dc.Add_MouseDown({ param($s, $e) $script:D.drag = $true; $p = [System.Windows.Forms.Cursor]::Position; $script:D.dx = $p.X - $script:D.form.Left; $script:D.dy = $p.Y - $script:D.form.Top })
+        $dc.Add_MouseMove({ param($s, $e) if ($script:D.drag) { $p = [System.Windows.Forms.Cursor]::Position; $script:D.form.Location = New-Object System.Drawing.Point(($p.X - $script:D.dx), ($p.Y - $script:D.dy)) } })
+        $dc.Add_MouseUp({ param($s, $e) $script:D.drag = $false })
+    }
+    $y = 78
+    $lb = New-DlgLabel $prompt (New-Object System.Drawing.Font("Segoe UI Semibold", 10.5)) $cText $pad $y $cw $rtl
+    $dlg.Controls.Add($lb); $y += $lb.Height + 6
+    $cancelText = (L "cancel")
+    if ($mode -eq "secret") {
+        $rk = $(if ($kind -eq "jwt") { "rulesJwt" } elseif ($kind -eq "old") { "rulesOld" } else { "rulesNew" })
+        $rl = New-DlgLabel (L $rk) (New-Object System.Drawing.Font("Segoe UI", 9)) $cMuted $pad $y $cw $rtl
+        $dlg.Controls.Add($rl); $y += $rl.Height + 12
+    } elseif ($mode -eq "choice" -and $script:recent.Count -gt 0) {
+        $ctxText = (($script:recent | Select-Object -Last 6) -join "`r`n")
+        $cb2 = New-Object System.Windows.Forms.TextBox; $cb2.Multiline = $true; $cb2.ReadOnly = $true; $cb2.BorderStyle = "None"; $cb2.RightToLeft = "No"; $cb2.Font = New-Object System.Drawing.Font("Consolas", 9)
+        $cb2.BackColor = [System.Drawing.Color]::FromArgb(5, 8, 13); $cb2.ForeColor = $cMuted; $cb2.Text = $ctxText; $cb2.ScrollBars = "Vertical"
+        $cb2.Location = New-Object System.Drawing.Point($pad, $y); $cb2.Size = New-Object System.Drawing.Size($cw, 96)
+        $dlg.Controls.Add($cb2); $y += 108
+    }
+    if ($mode -eq "secret" -or $mode -eq "text") {
+        $parts = New-DlgField $pad $y $cw ($mode -eq "secret") $rtl
+        $dlg.Controls.Add($parts[0]); $script:D.tb = $parts[1]; $y += 54
+        if ($parts[2]) {
+            $script:D.eye = $parts[2]
+            $parts[2].Add_Click({ try { $t = $script:D.tb; $t.UseSystemPasswordChar = (-not $t.UseSystemPasswordChar); $script:D.eye.Text = $(if ($t.UseSystemPasswordChar) { (L "show") } else { (L "hide") }); $t.Focus() } catch { } })
         }
-        $pnl.Controls.Add($cn)
-        $tb.Visible = $false
-    } else { $pnl.Controls.AddRange(@($ok, $cn)) }
-    $ctx.Dock = "Fill"; $ctx.Height = 100
-    $dlg.Controls.Add($ctx); $dlg.Controls.Add($tb); $dlg.Controls.Add($lbl); $dlg.Controls.Add($pnl)
-    $dlg.BackColor = $cBg; $dlg.ForeColor = $cText
-    $ctx.BackColor = [System.Drawing.Color]::FromArgb(5, 8, 13); $ctx.ForeColor = [System.Drawing.Color]::Gainsboro
-    $tb.BackColor = $cCard; $tb.ForeColor = "White"; $tb.BorderStyle = "FixedSingle"
-    foreach ($bb in @($ok, $cn)) { $bb.FlatStyle = "Flat"; $bb.UseVisualStyleBackColor = $false; $bb.BackColor = [System.Drawing.Color]::FromArgb(30, 41, 59); $bb.ForeColor = "White"; $bb.FlatAppearance.BorderColor = $cBorder }
-    $ok.BackColor = $cBlue
-    $dlg.AcceptButton = $ok; $dlg.CancelButton = $cn
-    $dlg.ActiveControl = $tb
+        if ($mode -eq "secret" -and $kind -ne "old") {
+            $segW = [int](($cw - 120 - 3 * 6) / 4)
+            for ($si = 0; $si -lt 4; $si++) {
+                $sg = New-Panel $cBorder; $sg.Size = New-Object System.Drawing.Size($segW, 6); $sg.Location = New-Object System.Drawing.Point(($pad + $si * ($segW + 6)), ($y + 7)); Round-Region $sg 3
+                $dlg.Controls.Add($sg); $script:D.segs += $sg
+            }
+            $sl = New-Object System.Windows.Forms.Label; $sl.AutoSize = $false; $sl.Size = New-Object System.Drawing.Size(110, 20); $sl.Location = New-Object System.Drawing.Point(($pad + $cw - 110), ($y)); $sl.ForeColor = $cMuted; $sl.BackColor = [System.Drawing.Color]::Transparent
+            $sl.TextAlign = "MiddleRight"; $sl.Font = New-Object System.Drawing.Font("Segoe UI", 9); $dlg.Controls.Add($sl); $script:D.strLbl = $sl
+            $y += 26
+        }
+        $mg = New-Object System.Windows.Forms.Label; $mg.AutoSize = $false; $mg.Size = New-Object System.Drawing.Size($cw, 22); $mg.Location = New-Object System.Drawing.Point($pad, $y); $mg.Font = New-Object System.Drawing.Font("Segoe UI", 9.5); $mg.ForeColor = $cMuted; $mg.BackColor = [System.Drawing.Color]::Transparent
+        if ($rtl) { $mg.RightToLeft = "Yes" }
+        if ($mode -eq "secret") { $mg.Text = (L "secretNote2") }
+        $dlg.Controls.Add($mg); $script:D.msg = $mg; $y += 34
+    }
+    # buttons
+    $ok = New-Btn $cBlue 150; $ok.Height = 42; $ok.Text = (L "ok"); $ok.Margin = New-Object System.Windows.Forms.Padding(0)
+    $cn = New-Btn ([System.Drawing.Color]::FromArgb(30, 41, 59)) 120; $cn.Height = 42; $cn.Text = $cancelText; $cn.Margin = New-Object System.Windows.Forms.Padding(0)
+    $script:D.ok = $ok
+    $cn.Add_Click({ $script:D.result = ""; $script:D.form.DialogResult = "Cancel"; $script:D.form.Close() })
+    if ($mode -eq "choice") {
+        $first = $true
+        foreach ($c in $choices) {
+            $b = New-Btn $(if ($first) { $cBlue } else { [System.Drawing.Color]::FromArgb(30, 41, 59) }) $cw; $b.Height = 46; $b.Text = $c[1]
+            $b.Location = New-Object System.Drawing.Point($pad, $y); $b.Margin = New-Object System.Windows.Forms.Padding(0)
+            $b.Name = [string]$c[0]
+            $b.Add_Click({ param($s, $e) $script:D.result = [string]$s.Name; $script:D.form.DialogResult = "OK"; $script:D.form.Close() })
+            $dlg.Controls.Add($b); $y += 54; $first = $false
+        }
+        $cn.Width = $cw; $cn.Location = New-Object System.Drawing.Point($pad, $y); $dlg.Controls.Add($cn); $y += 56
+    }
+    else {
+        $ok.Add_Click({ $t = $script:D.tb.Text.Trim(); $script:D.result = $t; $script:D.form.DialogResult = "OK"; $script:D.form.Close() })
+        $xs = @(); $btns = @($ok); $gn = $null
+        if ($mode -eq "secret" -and $allowGen) {
+            $gn = New-Btn ([System.Drawing.Color]::FromArgb(22, 58, 96)) 170; $gn.Height = 42; $gn.Text = (L "gen"); $gn.Margin = New-Object System.Windows.Forms.Padding(0)
+            $gn.Add_Click({ $script:D.result = "@@GENERATE"; $script:D.form.DialogResult = "OK"; $script:D.form.Close() })
+            $btns += $gn
+        }
+        $btns += $cn
+        # primary first on the leading side; mirrored for Arabic
+        $total = 0; foreach ($bb in $btns) { $total += $bb.Width + 10 }; $total -= 10
+        $x = $W - $pad - $total   # primary action on the right in both languages (the leading side when reading Arabic)
+        $ordered = @($cn) + @($gn) + @($ok) | Where-Object { $_ }
+        foreach ($bb in $ordered) { $bb.Location = New-Object System.Drawing.Point($x, $y); $dlg.Controls.Add($bb); $x += $bb.Width + 10 }
+        $y += 56
+        $script:D.ok.Enabled = ($mode -eq "text")
+        if ($mode -eq "secret") {
+            $script:D.tb.Add_TextChanged({ try {
+                $v = $script:D.tb.Text; $k = $script:D.kind; $ek = Get-DlgError $k $v
+                if ($v.Length -eq 0) { $script:D.msg.ForeColor = $cMuted; $script:D.msg.Text = (L "secretNote2"); $script:D.ok.Enabled = $false }
+                elseif ($ek) { $script:D.msg.ForeColor = $cRed; $script:D.msg.Text = [string][char]0x2716 + "  " + (L $ek); $script:D.ok.Enabled = $false }
+                else { $script:D.msg.ForeColor = $cGreen; $script:D.msg.Text = [string][char]0x2714 + "  " + (L "looksOk"); $script:D.ok.Enabled = $true }
+                if ($script:D.segs.Count -eq 4) {
+                    $sc = $(if ($ek) { [Math]::Min(1, (Get-StrengthScore $v)) } else { Get-StrengthScore $v })
+                    $cols = @($cRed, [System.Drawing.Color]::FromArgb(255, 170, 70), [System.Drawing.Color]::FromArgb(190, 220, 90), $cGreen); $names = @("", "weak", "fair", "good", "strong")
+                    for ($i = 0; $i -lt 4; $i++) { Tween $script:D.segs[$i] $(if ($i -lt $sc) { $cols[[Math]::Max(0, $sc - 1)] } else { $cBorder }) 140 }
+                    $script:D.strLbl.Text = $(if ($sc -gt 0) { L $names[$sc] } else { "" })
+                }
+            } catch { } })
+        }
+    }
+    $dlg.ClientSize = New-Object System.Drawing.Size($W, [Math]::Min($y + 10, $wa.Height - 40))
+    Round-Region $dlg 14
+    $dlg.Add_Paint({ param($s, $e) try { $e.Graphics.SmoothingMode = "AntiAlias"; $pn = New-Object System.Drawing.Pen($cBorder, 2); $gp = New-RoundedPath ($s.Width - 1) ($s.Height - 1) 14; $e.Graphics.DrawPath($pn, $gp); $pn.Dispose(); $gp.Dispose() } catch { } })
+    if ($mode -ne "choice") { $dlg.AcceptButton = $script:D.ok; $dlg.ActiveControl = $script:D.tb }
+    $dlg.CancelButton = $cn
     if ($script:animOn) { $dlg.Opacity = 0; [void]$script:fades.Add($dlg) }
     $r = $dlg.ShowDialog($form)
-    $ans = $(if ($r -eq "OK") { $(if ($choices.Count -gt 0) { $script:choiceAns } else { $tb.Text.Trim() }) } else { "" })
+    $res = $(if ($r -eq "OK") { [string]$script:D.result } else { "" })
+    if ($script:D.tb) { $script:D.tb.Text = "" }
+    $script:D = $null
     $dlg.Dispose()
-    return $ans
+    return $res
+}
+function Ask-Input([string]$prompt) {
+    # all input dialogs go through Show-Dlg. Any error here falls back to a cancelled answer (the installer then stops safely).
+    try {
+        $choices = @()
+        if ($prompt -match '\[\[choices:(.*?)\]\]\s*$') {
+            foreach ($p in ($Matches[1] -split ';')) { $kv = $p -split '=', 2; $choices += , @($kv[0], $kv[1]) }
+            $prompt = ($prompt -replace '\s*\[\[choices:.*?\]\]\s*$', '')
+            return (Show-Dlg $prompt "choice" $false $choices)
+        }
+        if ($prompt -match '\[\[secret:(gen|nogen)\]\]\s*$') {
+            $gen = ($Matches[1] -eq "gen"); $prompt = ($prompt -replace '\s*\[\[secret:(gen|nogen)\]\]\s*$', '')
+            return (Show-Dlg $prompt "secret" $gen @())
+        }
+        return (Show-Dlg $prompt "text" $false @())
+    }
+    catch { Log-GuiError $_.Exception "dialog"; return "" }
 }
 
 function Handle-Line([string]$line) {

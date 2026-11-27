@@ -114,9 +114,9 @@ export default function FinancialPositionPrintTemplate({
 
               <tr className="border-b-2 border-ink-900/30 font-bold">
                 <td className="py-2 px-2">{t("إجمالي")} {section.title}</td>
-                <td className="py-2 px-2">{fmt(section.sum.opening)}</td>
-                <td className="py-2 px-2">{fmt(section.sum.movement)}</td>
-                <td className="py-2 px-2">{fmt(section.sum.closing)}</td>
+                <td className="py-2 px-2">{fmt(section.sum?.opening)}</td>
+                <td className="py-2 px-2">{fmt(section.sum?.movement)}</td>
+                <td className="py-2 px-2">{fmt(section.sum?.closing)}</td>
               </tr>
             </Fragment>
           ))}

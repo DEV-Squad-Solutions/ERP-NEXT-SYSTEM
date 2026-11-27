@@ -106,9 +106,9 @@ export default function IncomeStatementPrintTemplate({
                 <td className="py-2 px-2" colSpan={isDetailed ? 2 : 1}>
                   {t("إجمالي")} {section.title}
                 </td>
-                <td className="py-2 px-2">{fmt(section.sum.debit)}</td>
-                <td className="py-2 px-2">{fmt(section.sum.credit)}</td>
-                <td className="py-2 px-2">{fmt(section.sum.net)}</td>
+                <td className="py-2 px-2">{fmt(section.sum?.debit)}</td>
+                <td className="py-2 px-2">{fmt(section.sum?.credit)}</td>
+                <td className="py-2 px-2">{fmt(section.sum?.net)}</td>
               </tr>
             </Fragment>
           ))}

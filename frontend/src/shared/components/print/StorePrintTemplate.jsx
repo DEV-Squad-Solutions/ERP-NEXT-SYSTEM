@@ -1,6 +1,6 @@
 import { formatDate, formatDateTime } from "../../../lib/date.js";
 import { t } from "../../../i18n";
-import { getDir } from "../../../i18n";
+import { getDir, getLocale } from "../../../i18n";
 export default function StorePrintTemplate({ store, stats }) {
   if (!store) return null;
 
@@ -51,8 +51,8 @@ export default function StorePrintTemplate({ store, stats }) {
 
       {stats && (
         <div className="grid grid-cols-3 gap-4 border-t border-ink-200 pt-4">
-          <PrintField label={t("عدد الأصناف")} value={stats.itemsCount} />
-          <PrintField label={t("إجمالي قيمة المخزون")} value={stats.totalValue} />
+          <PrintField label={t("عدد الأصناف")} value={Number(stats.itemsCount ?? 0).toLocaleString(getLocale())} />
+          <PrintField label={t("إجمالي قيمة المخزون")} value={Number(stats.totalValue ?? 0).toLocaleString(getLocale(), { maximumFractionDigits: 2 })} />
           <PrintField label={t("آخر تحديث")} value={printedAt} />
         </div>
       )}

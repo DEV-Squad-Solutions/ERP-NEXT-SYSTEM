@@ -54,13 +54,13 @@ if (-not (Test-SqlLogin $sqlUser $saPass)) {
     $got = $false
     $auto = Try-AutoLogin { param($u, $p) Test-SqlLogin $u $p } $Root
     if ($auto) { $sqlUser = $auto.user; $saPass = $auto.pass; $got = $true }
-    for ($t = 1; $t -le 3 -and -not $got; $t++) {
-        $cr = Request-SqlCredential $(if ($t -eq 1) { "The backup cannot sign in to the database (erp-db). Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 3)." }) $Gui.IsPresent $IoDir $Lang
-        if (-not $cr) { throw "Cancelled: no SQL login was entered. Nothing was changed." }
+    for ($t = 1; $t -le 5 -and -not $got; $t++) {
+        $cr = Request-SqlCredential $(if ($t -eq 1) { "The backup cannot sign in to the database (erp-db). Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 5)." }) $Gui.IsPresent $IoDir $Lang
+        if (-not $cr) { Write-Host "  Cancelled: no SQL login was entered. Nothing was changed." -ForegroundColor Yellow; exit 4 }
         if (Test-SqlLogin $cr.user $cr.pass) { $sqlUser = $cr.user; $saPass = $cr.pass; $got = $true; Write-Host "  OK  Login works (not saved anywhere)." -ForegroundColor Green }
-        else { Write-Host "  Login failed (try $t of 3)." -ForegroundColor Yellow }
+        else { Write-Host "  Login failed (try $t of 5)." -ForegroundColor Yellow }
     }
-    if (-not $got) { throw "The SQL login did not work after 3 tries. Nothing was changed." }
+    if (-not $got) { Write-Host "  SQL Server rejected every login that was tried (5 tries). Nothing was changed." -ForegroundColor Yellow; exit 3 }
 }
 Write-Host "=== BACKUP DATABASE (compressed) ===" -ForegroundColor Cyan
 $query = "BACKUP DATABASE [MiniErp] TO DISK = N'$inContainer' WITH FORMAT, COMPRESSION, INIT, STATS=10"

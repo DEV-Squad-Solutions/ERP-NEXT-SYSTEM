@@ -409,6 +409,8 @@ try {
         }
         else {
         & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "backup.ps1") -BackupDir $BackupDir @(if ($Gui) { "-Gui"; "-IoDir"; $IoDir })
+        if ($LASTEXITCODE -eq 3) { Fail "SQL Server rejected the username/password. The update was cancelled and nothing was changed." "The password of erp-db is not the one in .env or the ones typed. Run the installer again and retype it carefully (user is usually sa), or use the DB password button. Your data is untouched." "backup" }
+        if ($LASTEXITCODE -eq 4) { Fail "No SQL login was entered. The update was cancelled and nothing was changed." "Run the installer again and enter the SQL username and password when asked." "backup" }
         if ($LASTEXITCODE -ne 0) { Fail "Backup failed. The update was cancelled and nothing was changed." "Make sure erp-db is running and the disk has free space, then run again. Send the log file if it repeats." "backup" }
         $bak = Get-ChildItem $BackupDir -Filter "*.bak" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^(ERP_DB_backup_|MiniErp_).*\.bak$' } |
             Sort-Object LastWriteTime -Descending | Select-Object -First 1

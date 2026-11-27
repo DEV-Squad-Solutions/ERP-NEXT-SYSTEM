@@ -26,10 +26,10 @@ function Ask([string]$text) {
 function Line($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
 function Ok($t) { Write-Host "      OK   " -ForegroundColor Green -NoNewline; Write-Host $t }
 function Info($t) { Write-Host "      ..   " -ForegroundColor DarkGray -NoNewline; Write-Host $t }
-function Stop-Safe($m, $next) {
+function Stop-Safe($m, $next, $key = "other") {
     Write-Host ""; Write-Host "      FAIL " -ForegroundColor Red -NoNewline; Write-Host $m
     Line "  Nothing was deleted." Yellow
-    if ($Gui) { Write-Host "@@FAIL|other" }
+    if ($Gui) { Write-Host "@@FAIL|$key" }
     if ($next) { Line "  What to do next: $next" Yellow }
     exit 1
 }
@@ -71,7 +71,7 @@ $cur = $(if ($curImg -match ':(.+)$') { $Matches[1] } else { Get-EnvValue $envTe
 $apiTags = @(docker images erp-api --format "{{.Tag}}")
 $webTags = @(docker images erp-frontend --format "{{.Tag}}")
 $versions = @($apiTags | Where-Object { $webTags -contains $_ -and $_ -ne "<none>" } | Sort-Object -Unique)
-if ($versions.Count -eq 0) { Stop-Safe "No installed versions found (no matching erp-api / erp-frontend images)." "Load an erp-images-<version>.tar with install-or-update.bat first." }
+if ($versions.Count -eq 0) { Stop-Safe "There is no ERP 2.0 version on this PC to switch to: the images (erp-api / erp-frontend) are not loaded yet." "Get the images first (the installer offers a Get images step), then Switch / Roll back works. Your data was not touched." "noimages" }
 
 # History: entries that name a backup taken when LEAVING a version
 $hist = Join-Path $Root "release-history.txt"

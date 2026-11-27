@@ -122,6 +122,7 @@ function Test-PortFree([int]$port) { try { $l = New-Object System.Net.Sockets.Tc
 
 function Connect-Existing {
     Say ""; Say "=== Connect ERP 2.0 to the EXISTING database ($Container / $Db) ===" Cyan
+    Need-Images
     Say "[1/8] Checking the old database container (read-only)" Cyan
     Connect-Sql
     $img = docker inspect -f "{{.Config.Image}}" $Container 2>$null
@@ -240,6 +241,18 @@ function Restore-Db {
     $script:summary = "Database restored from $($bf.Name). erp-api and erp-frontend stay stopped on purpose."
     Say ""; Say "  DONE. erp-api and erp-frontend stay stopped on purpose. Run option 1 again when you want to retry the upgrade." Green
 }
+function Need-Images {
+    # Runs BEFORE anything is stopped or changed. Loads a tar if one exists; otherwise tells the GUI to offer "Get images".
+    $v = Get-EnvVal "ERP_VERSION"
+    $tar = @(Get-ChildItem -Path $Root, (Join-Path $Root "images") -Filter "erp-images-*.tar" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending) | Select-Object -First 1
+    if (-not $v -and $tar -and $tar.Name -match '^erp-images-(.+)\.tar$') { $v = $Matches[1] }
+    if (-not $v) { $v = "2.0" }
+    docker image inspect "erp-api:$v" *> $null; $a = ($LASTEXITCODE -eq 0)
+    docker image inspect "erp-frontend:$v" *> $null; $b = ($LASTEXITCODE -eq 0)
+    if ($a -and $b) { $env:ERP_VERSION = $v; return }
+    if ($Gui) { Write-Host "@@FAIL|noimages" }
+    Stop-Now "The ERP 2.0 images (erp-api:$v, erp-frontend:$v) are not on this PC yet. Nothing was changed. Run ERP Installer.bat and click the Get images step (or put erp-images-$v.tar in the deploy\images folder), then run this again."
+}
 function Cleanup-Dry {
     # removes ONLY the throwaway project erp-dryrun (its containers, its network, its own volume). Never anything else.
     Push-Location $Root
@@ -253,6 +266,7 @@ function Cleanup-Dry {
 function Dry-Run {
     Say ""; Say "=== Test the upgrade on a COPY (nothing real is changed) ===" Cyan
     $realContainer = $Container
+    Need-Images
     Say "[1/7] Choosing the backup to test" Cyan
     docker version --format "{{.Server.Version}}" *> $null
     if ($LASTEXITCODE -ne 0) { Stop-Now "Docker is not running. Start Docker Desktop and run this again." }
@@ -272,8 +286,7 @@ function Dry-Run {
     Say ("  Using {0}  ({1} MB, {2:yyyy-MM-dd HH:mm})" -f $bf.FullName, [int]($bf.Length / 1MB), $bf.LastWriteTime) White
     Say "[2/7] Checking images, ports and leftovers" Cyan
     $ver = Get-EnvVal "ERP_VERSION"; if (-not $ver) { $ver = "2.0" }
-    docker image inspect "erp-api:$ver" *> $null
-    if ($LASTEXITCODE -ne 0) { Stop-Now "The image erp-api:$ver is not loaded. Run ERP Installer once to load the images (the test needs the same API image), then run this again." }
+    Need-Images
     docker image inspect "mcr.microsoft.com/mssql/server:2022-latest" *> $null
     if ($LASTEXITCODE -ne 0) { Stop-Now "The SQL Server image mcr.microsoft.com/mssql/server:2022-latest is not on this PC (no internet needed if it is loaded). Nothing was changed." }
     $port = 0; foreach ($p in 18080..18099) { if (Test-PortFree $p) { $port = $p; break } }

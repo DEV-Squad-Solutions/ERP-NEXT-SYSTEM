@@ -50,6 +50,8 @@ $T = @{
     s_exconnect = @("Check old database", "Read tables and migrations", "Old app containers", "Verified backup", "Stop old app", "Write settings", "Images", "Start ERP 2.0")
     s_exrestore = @("Verify backup file", "Pre-restore backup", "Stop ERP 2.0", "Restore", "Check result", "Start old app")
     s_exstatus = @("Read status")
+    s_images = @("Check Docker and images", "Load images file", "Build from the repo", "Save a copy for the server", "Check result")
+    imgAsk = "The ERP 2.0 images are not on this PC yet. One click gets them (loads erp-images-*.tar if present, otherwise builds them from the repo; the build needs internet once and takes 10-20 minutes). Your data is not touched."; imgGo = "Get the images now"
     s_exdry = @("Choose backup", "Check images and ports", "Throwaway SQL Server", "Restore into the copy", "Run migrations on the copy", "Check result", "Remove the copy")
     exDry = "Test the upgrade on a COPY first (recommended, changes nothing real)"
     exTitle = "Existing database (no new database)"; exHelp = "Choose what to do with your existing database."; exConnect = "Connect ERP 2.0 (verified backup first, then upgrade in place)"; exRestore = "Restore from a backup file (rollback)"; exStatus = "Status (read only)"
@@ -68,6 +70,8 @@ $T = @{
     s_exconnect = @("فحص الداتابيز القديمة", "قراءة الجداول والـ migrations", "حاويات التطبيق القديم", "نسخة احتياطية متحقق منها", "إيقاف التطبيق القديم", "كتابة الإعدادات", "الصور", "تشغيل ERP 2.0")
     s_exrestore = @("فحص ملف النسخة", "نسخة قبل الاسترجاع", "إيقاف ERP 2.0", "الاسترجاع", "فحص النتيجة", "تشغيل التطبيق القديم")
     s_exstatus = @("قراءة الحالة")
+    s_images = @("فحص Docker والصور", "تحميل ملف الصور", "بناء من الكود", "حفظ نسخة للسيرفر", "فحص النتيجة")
+    imgAsk = "صور ERP 2.0 مش موجودة على الجهاز لسه. ضغطة واحدة تجيبها (بتحمّل erp-images-*.tar لو موجود، وإلا بتبنيها من الكود؛ البناء محتاج إنترنت مرة واحدة وبياخد 10-20 دقيقة). الداتا متلمسّتش."; imgGo = "هات الصور دلوقتي"
     s_exdry = @("اختيار النسخة", "فحص الصور والبورتات", "SQL مؤقت", "استرجاع في النسخة", "تشغيل الـ migrations على النسخة", "فحص النتيجة", "مسح النسخة")
     exDry = "جرّب الترقية على نسخة الأول (موصى بيه، مش بيغيّر حاجة حقيقية)"
     exTitle = "الداتابيز الحالية (من غير داتابيز جديدة)"; exHelp = "اختار هتعمل إيه في الداتابيز الحالية."; exConnect = "وصّل ERP 2.0 (نسخة احتياطية متحقق منها وبعدين ترقية في نفس المكان)"; exRestore = "استرجاع من ملف نسخة (رجوع)"; exStatus = "الحالة (قراءة فقط)"
@@ -712,6 +716,7 @@ function Finish-Run {
         $mode = $d[1]; $ver = $d[2]; $bak = $d[3]; $lf = $d[4]; $oldBak = $(if ($d.Count -gt 5) { $d[5] } else { "" }); $wp = $(if ($d.Count -gt 6 -and $d[6]) { $d[6] } else { "80" })
         $lblState.Text = (L "okTitle")
         if ($mode -eq "STATUS") { Set-Step 1 "ok"; Show-Result "ok" ((L "okTitle")); return }
+        if ($mode -eq "IMAGES") { Show-Result "ok" ((L "okTitle") + "`r`n" + $d[2]); if ($script:retryOp) { $r = $script:retryOp; $script:retryOp = $null; Start-Op $r }; return }
         if ($mode -eq "EXISTING") { Show-Result "ok" ((L "okTitle") + "`r`n" + $d[2]); return }
         $lines = @((L "okTitle"), ("{0}: {1}" -f (L "version"), $ver), ("{0}: {1}" -f (L "open"), $(if ($wp -eq "80") { "http://localhost   (http://192.168.1.5)" } else { "http://localhost:$wp   (http://192.168.1.5:$wp)" })))
         if ($bak) { $lines += ("{0}: {1}" -f (L "backup"), $bak) }
@@ -732,6 +737,10 @@ function Finish-Run {
     elseif ($script:failMsg) { $msg = $script:failMsg; if ($script:nextMsg) { $msg += "`r`n" + (L "next") + ": " + $script:nextMsg } }
     else { $msg = (L "unexpected") }
     Show-Result "fail" ((L "failTitle") + "`r`n`r`n" + $msg)
+    if (($script:failKey -eq "noimages" -or $script:failKey -eq "notar") -and $script:op -ne "images") {
+        $script:retryOp = $script:op
+        try { $pk = Show-Dlg (L "imgAsk") "choice" $false @(, @("go", (L "imgGo"))); if ($pk -eq "go") { Start-Op "images" } else { $script:retryOp = $null } } catch { Log-GuiError $_.Exception "imgoffer" }
+    }
 }
 
 $timer = New-Object System.Windows.Forms.Timer
@@ -774,7 +783,7 @@ function Start-Op([string]$op) {
     $result.Visible = $false; $log.Clear(); Set-Prog 0; $progFill.BackColor = $cBlue; $script:resTarget = 0
     Build-Steps (L ("s_" + $op))
     $content.RowStyles[2].Height = $(if ($op -eq "status" -or $op -eq "exstatus") { 0 } else { 100 })
-    $engine = switch ($op) { "install" { "install-or-update.ps1" } "switch" { "rollback.ps1" } "exconnect" { "use-existing-db.ps1" } "exrestore" { "use-existing-db.ps1" } "exstatus" { "use-existing-db.ps1" } "exdry" { "use-existing-db.ps1" } default { "status.ps1" } }
+    $engine = switch ($op) { "install" { "install-or-update.ps1" } "switch" { "rollback.ps1" } "exconnect" { "use-existing-db.ps1" } "exrestore" { "use-existing-db.ps1" } "exstatus" { "use-existing-db.ps1" } "exdry" { "use-existing-db.ps1" } "images" { "get-images.ps1" } default { "status.ps1" } }
     $exMode = switch ($op) { "exdry" { "dryrun" } "exconnect" { "connect" } "exrestore" { "restore" } default { "status" } }
     $script:ioDir = Join-Path $env:TEMP ("erp-installer-" + [guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Force -Path $script:ioDir | Out-Null

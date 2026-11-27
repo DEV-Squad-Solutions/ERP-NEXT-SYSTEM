@@ -83,7 +83,7 @@
 ## تجهيز باكدج الفلاشة (على جهازك)
 
 1. `git pull` ثم `build-images.ps1 -Version 2.1` ثم `build-package.ps1 -Version 2.1`.
-2. انسخ فولدر `dist\ERP-Installer-2.1` على الفلاشة. على السيرفر دوس مرتين على `ERP Installer.bat`.
+2. انسخ فولدر `dist\DevSquad-ERP-Installer-2.1` على الفلاشة. على السيرفر دوس مرتين على `ERP Installer.bat`.
 3. اختياري: `Create Desktop Shortcut.bat` بيعمل أيقونة على سطح المكتب.
 
 الباكدج مفيهوش `.env` ولا باسوردات ولا لوجات. البورتات تتغير من `.env` (`ERP_API_PORT` و `ERP_WEB_PORT`).

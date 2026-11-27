@@ -71,21 +71,27 @@ $form.StartPosition = "CenterScreen"
 $iconFile = Join-Path $PSScriptRoot "erp-icon.ico"
 if (Test-Path $iconFile) { try { $form.Icon = New-Object System.Drawing.Icon($iconFile) } catch {} }
 $form.Font = $font
-$form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
+$form.BackColor = [System.Drawing.Color]::FromArgb(10, 13, 20)
+$form.ForeColor = [System.Drawing.Color]::FromArgb(232, 238, 246)
 
 $hdr = New-Object System.Windows.Forms.Panel
-$hdr.Dock = "Top"; $hdr.Height = 70; $hdr.BackColor = [System.Drawing.Color]::FromArgb(15, 61, 62)
+$hdr.Dock = "Top"; $hdr.Height = 84; $hdr.BackColor = [System.Drawing.Color]::FromArgb(4, 6, 10)
 $lblTitle = New-Object System.Windows.Forms.Label
 $lblTitle.ForeColor = "White"; $lblTitle.Font = New-Object System.Drawing.Font("Segoe UI", 16, [System.Drawing.FontStyle]::Bold)
-$lblTitle.AutoSize = $true; $lblTitle.Location = New-Object System.Drawing.Point(20, 8)
+$lblTitle.AutoSize = $true; $lblTitle.Location = New-Object System.Drawing.Point((20 + $script:logoW), 14)
 $lblSub = New-Object System.Windows.Forms.Label
-$lblSub.ForeColor = [System.Drawing.Color]::FromArgb(200, 225, 225); $lblSub.AutoSize = $true; $lblSub.Location = New-Object System.Drawing.Point(22, 42)
-$btnEn = New-Object System.Windows.Forms.Button; $btnEn.Text = "English"; $btnEn.Width = 90; $btnEn.Height = 30; $btnEn.FlatStyle = "Flat"; $btnEn.ForeColor = "White"; $btnEn.BackColor = [System.Drawing.Color]::FromArgb(30, 100, 100)
-$btnAr = New-Object System.Windows.Forms.Button; $btnAr.Text = "العربية"; $btnAr.Width = 90; $btnAr.Height = 30; $btnAr.FlatStyle = "Flat"; $btnAr.ForeColor = "White"; $btnAr.BackColor = [System.Drawing.Color]::FromArgb(30, 100, 100)
-$hdr.Controls.AddRange(@($lblTitle, $lblSub, $btnEn, $btnAr))
+$lblSub.ForeColor = [System.Drawing.Color]::FromArgb(120, 190, 235); $lblSub.AutoSize = $true; $lblSub.Location = New-Object System.Drawing.Point((22 + $script:logoW), 48)
+$btnEn = New-Object System.Windows.Forms.Button; $btnEn.Text = "English"; $btnEn.Width = 90; $btnEn.Height = 30; $btnEn.FlatStyle = "Flat"; $btnEn.ForeColor = "White"; $btnEn.BackColor = [System.Drawing.Color]::FromArgb(24, 44, 72); $btnEn.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(47, 140, 230)
+$btnAr = New-Object System.Windows.Forms.Button; $btnAr.Text = "العربية"; $btnAr.Width = 90; $btnAr.Height = 30; $btnAr.FlatStyle = "Flat"; $btnAr.ForeColor = "White"; $btnAr.BackColor = [System.Drawing.Color]::FromArgb(24, 44, 72); $btnAr.FlatAppearance.BorderColor = [System.Drawing.Color]::FromArgb(47, 140, 230)
+$logoFile = Join-Path $PSScriptRoot "devsquad-header.png"
+$script:logoW = 0
+$pic = New-Object System.Windows.Forms.PictureBox
+$pic.SizeMode = "Zoom"; $pic.BackColor = [System.Drawing.Color]::Transparent
+if (Test-Path $logoFile) { try { $pic.Image = [System.Drawing.Image]::FromFile($logoFile); $pic.Size = New-Object System.Drawing.Size(146, 72); $pic.Location = New-Object System.Drawing.Point(14, 6); $script:logoW = 160 } catch {} }
+$hdr.Controls.AddRange(@($pic, $lblTitle, $lblSub, $btnEn, $btnAr))
 
 $bar = New-Object System.Windows.Forms.FlowLayoutPanel
-$bar.Dock = "Top"; $bar.Height = 60; $bar.Padding = New-Object System.Windows.Forms.Padding(14, 10, 14, 6); $bar.WrapContents = $false; $bar.BackColor = [System.Drawing.Color]::White
+$bar.Dock = "Top"; $bar.Height = 60; $bar.Padding = New-Object System.Windows.Forms.Padding(14, 10, 14, 6); $bar.WrapContents = $false; $bar.BackColor = [System.Drawing.Color]::FromArgb(16, 21, 31)
 function New-Btn($color) {
     $b = New-Object System.Windows.Forms.Button
     $b.Width = 200; $b.Height = 40; $b.Cursor = [System.Windows.Forms.Cursors]::Hand; $b.FlatStyle = "Flat"; $b.BackColor = $color; $b.ForeColor = "White"
@@ -93,10 +99,10 @@ function New-Btn($color) {
     $b.Margin = New-Object System.Windows.Forms.Padding(4, 0, 4, 0)
     return $b
 }
-$btnInstall = New-Btn ([System.Drawing.Color]::FromArgb(22, 121, 99))
-$btnSwitch = New-Btn ([System.Drawing.Color]::FromArgb(180, 110, 20))
-$btnStatus = New-Btn ([System.Drawing.Color]::FromArgb(50, 90, 150))
-$btnClose = New-Btn ([System.Drawing.Color]::FromArgb(110, 110, 110))
+$btnInstall = New-Btn ([System.Drawing.Color]::FromArgb(37, 120, 214))
+$btnSwitch = New-Btn ([System.Drawing.Color]::FromArgb(170, 105, 20))
+$btnStatus = New-Btn ([System.Drawing.Color]::FromArgb(22, 135, 160))
+$btnClose = New-Btn ([System.Drawing.Color]::FromArgb(72, 80, 94))
 $btnClose.Width = 100
 $bar.Controls.AddRange(@($btnInstall, $btnSwitch, $btnStatus, $btnClose))
 
@@ -118,7 +124,7 @@ $result.Font = New-Object System.Drawing.Font("Segoe UI", 10); $result.Visible =
 $logBox = New-Object System.Windows.Forms.GroupBox
 $logBox.Dock = "Fill"; $logBox.Padding = New-Object System.Windows.Forms.Padding(8, 4, 8, 8)
 $log = New-Object System.Windows.Forms.RichTextBox
-$log.Dock = "Fill"; $log.ReadOnly = $true; $log.BackColor = [System.Drawing.Color]::FromArgb(24, 26, 30); $log.ForeColor = [System.Drawing.Color]::Gainsboro
+$log.Dock = "Fill"; $log.ReadOnly = $true; $log.BackColor = [System.Drawing.Color]::FromArgb(5, 8, 13); $log.ForeColor = [System.Drawing.Color]::Gainsboro
 $log.Font = New-Object System.Drawing.Font("Consolas", 10); $log.BorderStyle = "None"; $log.RightToLeft = "No"; $log.WordWrap = $true
 $logBox.Controls.Add($log)
 
@@ -132,8 +138,14 @@ $form.Controls.Add($bar)
 $form.Controls.Add($hdr)
 
 function Layout-Header {
-    $btnAr.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - 110), 24)
-    $btnEn.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - 205), 24)
+    if ($script:lang -eq "ar") {
+        $btnEn.Location = New-Object System.Drawing.Point(14, 27); $btnAr.Location = New-Object System.Drawing.Point(110, 27)
+        $pic.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - 160), 6)
+    } else {
+        $btnAr.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - 110), 27)
+        $btnEn.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - 206), 27)
+        $pic.Location = New-Object System.Drawing.Point(14, 6)
+    }
 }
 $form.Add_Resize({ Layout-Header })
 
@@ -157,7 +169,7 @@ function Build-Steps([string[]]$names) {
         $l = New-Object System.Windows.Forms.Label
         $l.AutoSize = $false; $l.Dock = "Fill"; $l.TextAlign = "MiddleLeft"
         $l.Text = ("   {0}  {1}" -f [char]0x25CB, $names[$i])
-        $l.ForeColor = [System.Drawing.Color]::Gray
+        $l.ForeColor = [System.Drawing.Color]::FromArgb(130, 140, 155)
         $stepsPanel.Controls.Add($l)
         $script:stepLabels += $l
     }
@@ -166,10 +178,10 @@ function Set-Step([int]$i, [string]$state) {   # state: run | ok | fail | skip |
     if ($i -lt 1 -or $i -gt $script:stepLabels.Count) { return }
     $l = $script:stepLabels[$i - 1]; $n = $script:stepNames[$i - 1]
     switch ($state) {
-        "run"  { $l.Text = ("   {0}  {1}" -f [char]0x25B6, $n); $l.ForeColor = [System.Drawing.Color]::FromArgb(30, 100, 200); $l.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold) }
-        "ok"   { $l.Text = ("   {0}  {1}" -f [char]0x2714, $n); $l.ForeColor = [System.Drawing.Color]::FromArgb(20, 140, 70); $l.Font = $font }
-        "fail" { $l.Text = ("   {0}  {1}" -f [char]0x2716, $n); $l.ForeColor = [System.Drawing.Color]::FromArgb(200, 30, 40); $l.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold) }
-        "skip" { $l.Text = ("   -  {0}" -f $n); $l.ForeColor = [System.Drawing.Color]::Gray; $l.Font = $font }
+        "run"  { $l.Text = ("   {0}  {1}" -f [char]0x25B6, $n); $l.ForeColor = [System.Drawing.Color]::FromArgb(90, 200, 255); $l.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold) }
+        "ok"   { $l.Text = ("   {0}  {1}" -f [char]0x2714, $n); $l.ForeColor = [System.Drawing.Color]::FromArgb(80, 215, 130); $l.Font = $font }
+        "fail" { $l.Text = ("   {0}  {1}" -f [char]0x2716, $n); $l.ForeColor = [System.Drawing.Color]::FromArgb(255, 105, 115); $l.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold) }
+        "skip" { $l.Text = ("   -  {0}" -f $n); $l.ForeColor = [System.Drawing.Color]::FromArgb(130, 140, 155); $l.Font = $font }
     }
 }
 
@@ -182,10 +194,11 @@ function Apply-Lang {
     $form.Text = (L "title"); $lblTitle.Text = (L "title"); $lblSub.Text = (L "sub")
     $btnInstall.Text = (L "install"); $btnSwitch.Text = (L "switchv"); $btnStatus.Text = (L "status"); $btnClose.Text = (L "close")
     $stepsBox.Text = (L "steps"); $logBox.Text = (L "log")
-    if ($rtl) { $lblTitle.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - $lblTitle.Width - 20), 10); $lblSub.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - $lblSub.Width - 22), 46) }
-    else { $lblTitle.Location = New-Object System.Drawing.Point(20, 10); $lblSub.Location = New-Object System.Drawing.Point(22, 46) }
+    if ($rtl) { $lblTitle.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - $lblTitle.Width - 20 - $script:logoW), 14); $lblSub.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - $lblSub.Width - 22 - $script:logoW), 48) }
+    else { $lblTitle.Location = New-Object System.Drawing.Point((20 + $script:logoW), 14); $lblSub.Location = New-Object System.Drawing.Point((22 + $script:logoW), 48) }
     if (-not $script:proc) { $lblState.Text = (L "ready") } else { $lblState.Text = (L "running") }
     if ($script:op) { $key = "s_" + $script:op; $cur = $script:curStep; Build-Steps (L $key); for ($i = 1; $i -lt $cur; $i++) { Set-Step $i "ok" }; if ($script:proc -and $cur -gt 0) { Set-Step $cur "run" } }
+        if ($rtl) { $pic.Location = New-Object System.Drawing.Point(($form.ClientSize.Width - 160), 6) } else { $pic.Location = New-Object System.Drawing.Point(14, 6) }
     Layout-Header
 }
 

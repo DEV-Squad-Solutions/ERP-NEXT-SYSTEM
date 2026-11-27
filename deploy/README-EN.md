@@ -78,7 +78,7 @@ The menu ([2] then [2]) does this safely with a safety backup and a typed confir
 
 1. `git pull`, then `powershell -ExecutionPolicy Bypass -File .\build-images.ps1 -Version 2.1` (makes `erp-images-2.1.tar`).
 2. `powershell -ExecutionPolicy Bypass -File .\build-package.ps1 -Version 2.1`
-3. Copy `dist\ERP-Installer-2.1` to the USB drive. On the server double-click `ERP Installer.bat`.
+3. Copy `dist\DevSquad-ERP-Installer-2.1` to the USB drive. On the server double-click `ERP Installer.bat`.
    Optional: `Create Desktop Shortcut.bat` adds a Desktop icon.
 
 The package never contains `.env`, passwords, logs or backups. Layout: `ERP Installer.bat`, `images\`, `tools\`, `app\`.

@@ -1,6 +1,6 @@
 ﻿<#
  Run on the DEV PC. Assembles a clean, self-contained folder you copy to the server by USB:
-   dist\ERP-Installer-<Version>\
+   dist\DevSquad-ERP-Installer-<Version>\
      ERP Installer.bat            <- double-click this (the only thing you need)
      Create Desktop Shortcut.bat  <- optional, adds an icon to the Desktop
      START-HERE.txt, README-EN.md, README-AR.md
@@ -18,13 +18,13 @@ param(
 $ErrorActionPreference = "Stop"
 if ($Version -notmatch '^[A-Za-z0-9._-]+$') { throw "Version may only contain letters, digits, dot, dash, underscore." }
 if (-not $OutRoot) { $OutRoot = Join-Path (Split-Path $PSScriptRoot -Parent) "dist" }
-$pkg = Join-Path $OutRoot "ERP-Installer-$Version"
+$pkg = Join-Path $OutRoot "DevSquad-ERP-Installer-$Version"
 if (Test-Path $pkg) { throw "Folder already exists: $pkg . Delete it yourself or choose another version (nothing is overwritten)." }
 $app = Join-Path $pkg "app"; $tools = Join-Path $pkg "tools"; $img = Join-Path $pkg "images"
 New-Item -ItemType Directory -Force -Path $app, $tools, $img | Out-Null
 
 $appFiles = @("docker-compose.yml", ".env.example", "install-or-update.ps1", "install-or-update.bat", "install-or-update-console.bat",
-    "erp-installer-gui.ps1", "messages-ar.ps1", "rollback.ps1", "status.ps1", "backup.ps1", "minierp-backup.ps1", "create-shortcut.ps1", "erp-icon.ico")
+    "erp-installer-gui.ps1", "messages-ar.ps1", "rollback.ps1", "status.ps1", "backup.ps1", "minierp-backup.ps1", "create-shortcut.ps1", "erp-icon.ico", "devsquad-header.png", "devsquad-logo.jpg")
 foreach ($f in $appFiles) {
     $src = Join-Path $PSScriptRoot $f
     if (-not (Test-Path $src)) { throw "Missing file in deploy folder: $f" }

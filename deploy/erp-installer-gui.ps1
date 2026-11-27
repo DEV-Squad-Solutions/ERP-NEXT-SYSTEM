@@ -75,7 +75,7 @@ $form.BackColor = [System.Drawing.Color]::FromArgb(10, 13, 20)
 $form.ForeColor = [System.Drawing.Color]::FromArgb(232, 238, 246)
 
 $hdr = New-Object System.Windows.Forms.Panel
-$hdr.Dock = "Top"; $hdr.Height = 84; $hdr.BackColor = [System.Drawing.Color]::FromArgb(4, 6, 10)
+$hdr.Dock = "Top"; $hdr.Height = 84; $hdr.BackColor = [System.Drawing.Color]::FromArgb(0, 0, 0)
 $lblTitle = New-Object System.Windows.Forms.Label
 $lblTitle.ForeColor = "White"; $lblTitle.Font = New-Object System.Drawing.Font("Segoe UI", 16, [System.Drawing.FontStyle]::Bold)
 $lblTitle.AutoSize = $true; $lblTitle.Location = New-Object System.Drawing.Point((20 + $script:logoW), 14)

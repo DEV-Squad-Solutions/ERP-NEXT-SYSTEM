@@ -628,9 +628,32 @@ body,
   }
 }
 
+/* Translucent light backgrounds (bg-slate-50/80, bg-white/95 ...) stay light in dark mode otherwise. */
+html.dark :where(
+    [class~="bg-slate-50/50"],
+    [class~="bg-slate-50/60"],
+    [class~="bg-slate-50/70"],
+    [class~="bg-slate-50/80"],
+    [class~="bg-slate-50/95"],
+    [class~="bg-gray-50/60"],
+    [class~="bg-ink-50/30"],
+    [class~="bg-ink-50/50"],
+    [class~="bg-ink-50/60"],
+    [class~="bg-ink-50/70"],
+    [class~="bg-ink-50/80"],
+    [class~="bg-ink-50/95"],
+    [class~="bg-paper/95"],
+    [class~="bg-white/40"],
+    [class~="bg-white/60"],
+    [class~="bg-white/95"]
+  ) {
+  background-color: rgb(var(--c-dk-surface) / 0.9);
+}
+
 /* Extra dark-mode readability for colored text that only had light-mode values. */
 html.dark :where(.text-emerald-900, .text-emerald-800, .text-emerald-700) { color: #6ee7b7; }
 html.dark :where(.text-primary-700, .text-primary-600, .text-primary-500) { color: #8fc7ff; }
 html.dark :where(.text-gold-700, .text-gold-600) { color: #e7c566; }
 html.dark :where(.text-slate-400, .text-ink-400, .text-ink-500) { color: #9fb1c7; }
 html.dark .dark\:text-ink-400, html.dark .dark\:text-ink-500 { color: #9fb1c7; }
+html.dark .recharts-legend-item-text { color: #cbd5e1 !important; }

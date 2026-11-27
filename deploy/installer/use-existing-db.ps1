@@ -83,6 +83,9 @@ function Connect-Sql {
     $envs = docker inspect -f "{{range .Config.Env}}{{println .}}{{end}}" $Container 2>$null | Out-String
     $m = [regex]::Match($envs, '(?m)^(?:MSSQL_SA_PASSWORD|SA_PASSWORD)=(.+)$')
     if ($m.Success) { $script:pw = $m.Groups[1].Value.Trim(); $null = Run-Sql "SELECT 1"; if ($LASTEXITCODE -eq 0) { Say "  OK  Logged in with the container's own SA setting (not shown)." Green; return } }
+    $auto = Try-AutoLogin { param($u, $p) $script:user = $u; $script:pw = $p; $null = Run-Sql "SELECT 1"; return ($LASTEXITCODE -eq 0) } $Root
+    if ($auto) { $script:user = $auto.user; $script:pw = $auto.pass; return }
+    $script:user = "sa"; $script:pw = ""
     Say "  The container's own setting did not work. A dialog asks for the SQL username and password of $Container (typed hidden, not saved)." Yellow
     for ($t = 1; $t -le 3; $t++) {
         $cr = Request-SqlCredential $(if ($t -eq 1) { "Cannot sign in to $Container. Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 3)." }) $Gui.IsPresent $IoDir $Lang

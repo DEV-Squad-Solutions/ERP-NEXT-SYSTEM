@@ -50,8 +50,10 @@ function Test-SqlLogin([string]$u, [string]$p) {
 }
 Write-Host "=== Checking the database login ===" -ForegroundColor Cyan
 if (-not (Test-SqlLogin $sqlUser $saPass)) {
-    Write-Host "  The saved password does not open the database. Asking for the SQL username and password (typed hidden, not saved)." -ForegroundColor Yellow
+    Write-Host "  The password in .env does not open the database. Looking for an old .env, then asking if needed." -ForegroundColor Yellow
     $got = $false
+    $auto = Try-AutoLogin { param($u, $p) Test-SqlLogin $u $p } $Root
+    if ($auto) { $sqlUser = $auto.user; $saPass = $auto.pass; $got = $true }
     for ($t = 1; $t -le 3 -and -not $got; $t++) {
         $cr = Request-SqlCredential $(if ($t -eq 1) { "The backup cannot sign in to the database (erp-db). Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 3)." }) $Gui.IsPresent $IoDir $Lang
         if (-not $cr) { throw "Cancelled: no SQL login was entered. Nothing was changed." }

@@ -51,8 +51,17 @@ Hdr "[1/4] Finding databases"
 $out = docker exec @(Get-SqlEnvArgs) $Container bash /tmp/erp_mb.sh list 2>&1 | Out-String
 $weSet = $false
 if ($out -match 'Login failed|ERR_NO_PASSWORD_ENV') {
-    Write-Host "  The saved login does not work. Asking for the SQL username and password (typed hidden, not saved)." -ForegroundColor Yellow
-    for ($t = 1; $t -le 3; $t++) {
+    Write-Host "  The container's own login does not work. Looking for an old .env, then asking if needed." -ForegroundColor Yellow
+    $rootDir = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })
+    $auto = Try-AutoLogin {
+        param($u, $p)
+        $env:ERP_SQL_USER = $u; $env:MSSQL_SA_PASSWORD = $p
+        $r = docker exec @(Get-SqlEnvArgs) $Container bash /tmp/erp_mb.sh list 2>&1 | Out-String
+        Remove-Item Env:MSSQL_SA_PASSWORD, Env:ERP_SQL_USER -ErrorAction SilentlyContinue
+        return ($r -notmatch 'Login failed|ERR_NO_PASSWORD_ENV|ERR_NO_SQLCMD' -and $r.Trim().Length -gt 0)
+    } $rootDir
+    if ($auto) { $env:ERP_SQL_USER = $auto.user; $env:MSSQL_SA_PASSWORD = $auto.pass; $weSet = $true; $out = docker exec @(Get-SqlEnvArgs) $Container bash /tmp/erp_mb.sh list 2>&1 | Out-String }
+    for ($t = 1; $t -le 3 -and -not $auto; $t++) {
         $cr = Request-SqlCredential $(if ($t -eq 1) { "The backup cannot sign in to $Container. Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 3)." }) $Gui.IsPresent $IoDir $Lang
         if (-not $cr) { Fail "Cancelled: no SQL login was entered." }
         $env:ERP_SQL_USER = $cr.user; $env:MSSQL_SA_PASSWORD = $cr.pass; $weSet = $true

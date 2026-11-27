@@ -170,6 +170,7 @@ function Find-Password {
     if ($pathIn -and (Test-Path $pathIn -PathType Leaf)) { $files += @(Get-Item $pathIn) } elseif ($pathIn) { Say "  That file was not found, skipped." Yellow }
     $typed = Read-Masked "  Optional: type a password you think it is (hidden, Enter to skip)"
     if ($typed) { [void]$cands.Add($typed) }
+    try { . (Join-Path $PSScriptRoot "sql-cred.ps1"); foreach ($ff in @(Find-OldEnvFiles $Root)) { if (-not ($files | Where-Object { $_.FullName -eq $ff })) { $files += @(Get-Item $ff) } } } catch { }
     Say ("  .env-type files found: {0}" -f $files.Count) DarkGray
     foreach ($f in $files) {
         try { $t = [IO.File]::ReadAllText($f.FullName, [Text.Encoding]::UTF8) } catch { continue }

@@ -76,8 +76,16 @@ function Probe([string]$c, [string]$saFromEnv) {
     $out = docker exec @(Get-SqlEnvArgs) $c bash /tmp/erp_cmp.sh 2>&1 | Out-String
     if ($saFromEnv) { Remove-Item Env:MSSQL_SA_PASSWORD -ErrorAction SilentlyContinue }
     if ($out -match 'Login failed|ERR_NO_PASSWORD_ENV') {
-        Write-Host "  The saved login does not work. A dialog asks for the SQL username and password (hidden, not saved; Cancel skips)." -ForegroundColor Yellow
-        for ($t = 1; $t -le 3; $t++) {
+        Write-Host "  The saved login does not work. Looking for an old .env, then a dialog asks if needed (hidden, not saved; Cancel skips)." -ForegroundColor Yellow
+        $auto = Try-AutoLogin {
+            param($u, $p)
+            $env:ERP_SQL_USER = $u; $env:MSSQL_SA_PASSWORD = $p
+            $r = docker exec @(Get-SqlEnvArgs) $c bash /tmp/erp_cmp.sh 2>&1 | Out-String
+            Remove-Item Env:MSSQL_SA_PASSWORD, Env:ERP_SQL_USER -ErrorAction SilentlyContinue
+            return ($r -notmatch 'Login failed|ERR_NO_PASSWORD_ENV|ERR_NO_SQLCMD' -and $r.Trim().Length -gt 0)
+        } $Root
+        if ($auto) { $env:ERP_SQL_USER = $auto.user; $env:MSSQL_SA_PASSWORD = $auto.pass; $out = docker exec @(Get-SqlEnvArgs) $c bash /tmp/erp_cmp.sh 2>&1 | Out-String; Remove-Item Env:MSSQL_SA_PASSWORD, Env:ERP_SQL_USER -ErrorAction SilentlyContinue }
+        for ($t = 1; $t -le 3 -and -not $auto; $t++) {
             $cr = Request-SqlCredential $(if ($t -eq 1) { "Compare cannot sign in to $c. Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 3)." }) $false "" "en"
             if (-not $cr) { break }
             $env:ERP_SQL_USER = $cr.user; $env:MSSQL_SA_PASSWORD = $cr.pass

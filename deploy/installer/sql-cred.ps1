@@ -68,3 +68,68 @@ function Get-SqlEnvArgs {
     if ($env:ERP_SQL_USER) { $a += @("-e", "ERP_SQL_USER") }
     return $a
 }
+
+function Find-OldEnvFiles([string]$root) {
+    # Looks for old .env files (read only): this deploy folder, its parent and sibling folders, backup folders, and the folders the old
+    # Docker Compose projects were started from (compose labels of minierp-* / erp-* containers). Returns full paths. Values are never read here.
+    $dirs = New-Object System.Collections.ArrayList
+    function Add-Dir($d) { if ($d -and (Test-Path $d -PathType Container) -and -not $dirs.Contains($d)) { [void]$dirs.Add($d) } }
+    Add-Dir $root
+    $par = Split-Path $root -Parent
+    if ($par) {
+        Add-Dir $par
+        foreach ($sd in @(Get-ChildItem -Path $par -Directory -ErrorAction SilentlyContinue | Select-Object -First 40)) { Add-Dir $sd.FullName }
+        $gp = Split-Path $par -Parent; if ($gp) { Add-Dir $gp }
+    }
+    foreach ($d in @("C:\ERP_backup", "D:\minierp_backup", "C:\ERP_backup\old-sql-backup")) { Add-Dir $d }
+    try {
+        foreach ($n in @(docker ps -a --format "{{.Names}}" 2>$null | Where-Object { $_ -match '^(minierp|erp)' })) {
+            $wd = docker inspect -f '{{index .Config.Labels "com.docker.compose.project.working_dir"}}' $n 2>$null
+            if ($wd -and $wd -ne "<no value>") { Add-Dir ($wd.Trim()); $pd = Split-Path ($wd.Trim()) -Parent; if ($pd) { Add-Dir $pd } }
+        }
+    } catch { }
+    $files = New-Object System.Collections.ArrayList
+    foreach ($d in $dirs) {
+        foreach ($f in @(Get-ChildItem -Path $d -File -Force -ErrorAction SilentlyContinue | Where-Object { ($_.Name -like ".env*" -or $_.Name -like "*.env") -and $_.Length -lt 65536 })) {
+            if (-not $files.Contains($f.FullName)) { [void]$files.Add($f.FullName) }
+        }
+    }
+    # the current .env first, then the rest
+    return @($files | Sort-Object { if ($_ -ieq (Join-Path $root ".env")) { 0 } else { 1 } })
+}
+function Get-EnvLoginCandidates([string[]]$files) {
+    # returns @{ user; pass; src } for each distinct password found in the files (values kept in memory only)
+    $out = New-Object System.Collections.ArrayList; $seen = @{}
+    foreach ($f in $files) {
+        $t = ""; try { $t = [IO.File]::ReadAllText($f, [Text.Encoding]::UTF8).TrimStart([char]0xFEFF) } catch { continue }
+        $user = "sa"
+        $um = [regex]::Match($t, '(?m)^[ \t]*(?:export[ \t]+)?(?:SQL_USER|SQL_USERNAME|DB_USER|MSSQL_USER)[ \t]*=[ \t]*([^\r\n#]+)')
+        if ($um.Success) { $u2 = $um.Groups[1].Value.Trim().Trim('"').Trim("'"); if ($u2) { $user = $u2 } }
+        $pw = New-Object System.Collections.ArrayList
+        foreach ($m in [regex]::Matches($t, '(?m)^[ \t]*(?:export[ \t]+)?(?:SQL_SA_PASSWORD|MSSQL_SA_PASSWORD|SA_PASSWORD|SQL_PASSWORD|DB_PASSWORD)[ \t]*=[ \t]*([^\r\n]+)')) { [void]$pw.Add($m.Groups[1].Value.Trim().Trim('"').Trim("'")) }
+        foreach ($m in [regex]::Matches($t, '(?i)Password=([^;\r\n"'']+)')) { [void]$pw.Add($m.Groups[1].Value.Trim()) }
+        foreach ($p in $pw) {
+            if (-not $p -or $p.Length -lt 3 -or $seen.ContainsKey($p)) { continue }
+            $seen[$p] = $true; [void]$out.Add(@{ user = $user; pass = $p; src = $f })
+            if ($user -ne "sa") { [void]$out.Add(@{ user = "sa"; pass = $p; src = $f }) }
+        }
+    }
+    return @($out)
+}
+function Try-AutoLogin([scriptblock]$test, [string]$root, [int]$max = 10) {
+    # Tries the passwords found in old .env files with a REAL login (the $test block gets user and password). Returns @{user;pass;src} or $null.
+    # At most $max attempts so the sa login is never locked. Nothing secret is printed or logged; only counts and the folder of the file that worked.
+    $files = @(Find-OldEnvFiles $root)
+    $cands = @(Get-EnvLoginCandidates $files)
+    Write-Host ("  Looked for old .env files automatically: {0} file(s) found, {1} candidate login(s) (values are not shown)." -f $files.Count, $cands.Count) -ForegroundColor DarkGray
+    $n = 0
+    foreach ($c in $cands) {
+        if ($n -ge $max) { break }; $n++
+        if (& $test $c.user $c.pass) {
+            Write-Host ("  OK  A saved login from an old .env worked ({0}). Not shown and not copied anywhere." -f (Split-Path $c.src -Parent)) -ForegroundColor Green
+            return $c
+        }
+    }
+    if ($n -gt 0) { Write-Host "  None of the saved logins worked." -ForegroundColor Yellow }
+    return $null
+}

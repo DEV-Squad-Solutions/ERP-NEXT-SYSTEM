@@ -83,6 +83,16 @@ function Line($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
 function Step($n, $t) { Write-Host ""; Write-Host ("[{0}/{1}] {2}" -f $n, $total, $t) -ForegroundColor Cyan }
 function Ok($t) { Write-Host "      OK   " -ForegroundColor Green -NoNewline; Write-Host $t }
 function Info($t) { Write-Host "      ..   " -ForegroundColor DarkGray -NoNewline; Write-Host $t }
+function Test-ErpApiOnPort([string]$port) {   # true only if OUR erp-api container is running and publishes this host port
+    $run = docker inspect -f "{{.State.Running}}" erp-api 2>$null
+    if ($run -ne "true") { return $false }
+    $p = docker port erp-api 8080 2>$null
+    return [bool]($p -match (":" + [regex]::Escape($port) + "$"))
+}
+function Get-PortOwner([string]$port) {      # name of the container that publishes this host port, or empty
+    $o = docker ps --format "{{.Names}}|{{.Ports}}" 2>$null | Where-Object { $_ -match (":" + [regex]::Escape($port) + "->") } | Select-Object -First 1
+    if ($o) { return ($o -split '\|')[0] } else { return "" }
+}
 function Fail($m, $next, $ar = "other") {
     Write-Host ""
     Write-Host "      FAIL " -ForegroundColor Red -NoNewline; Write-Host $m
@@ -298,8 +308,10 @@ try {
     while ((Get-Date) -lt $deadline) {
         Start-Sleep -Seconds 5
         try {
-            $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:$apiPort/health/ready" -TimeoutSec 5
-            if ($r.StatusCode -eq 200) { $ok = $true; break }
+            if (Test-ErpApiOnPort $apiPort) {
+                $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:$apiPort/health/ready" -TimeoutSec 5
+                if ($r.StatusCode -eq 200) { $ok = $true; break }
+            }
         } catch { }
         Write-Host "." -NoNewline
     }

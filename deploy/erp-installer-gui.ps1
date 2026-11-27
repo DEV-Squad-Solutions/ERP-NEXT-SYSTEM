@@ -222,7 +222,7 @@ function Show-Result([string]$kind, [string]$text) {   # kind: ok | fail | cance
     $result.Text = $text
     $w = [Math]::Max(300, $result.ClientSize.Width - 28)
     $sz = [System.Windows.Forms.TextRenderer]::MeasureText($text, $result.Font, (New-Object System.Drawing.Size($w, 0)), [System.Windows.Forms.TextFormatFlags]::WordBreak)
-    $result.Height = [Math]::Min(150, [Math]::Max(52, $sz.Height + 24))
+    $result.Height = [Math]::Min(150, [Math]::Max(36, $sz.Height + 20))
 }
 
 function Ask-Input([string]$prompt) {
@@ -363,6 +363,7 @@ function Start-Op([string]$op) {
     $script:recent.Clear()
     $result.Visible = $false; $log.Clear(); $prog.Value = 0
     Build-Steps (L ("s_" + $op))
+    $root.RowStyles[4].Height = $(if ($op -eq "status") { 0 } else { 84 })
     $engine = switch ($op) { "install" { "install-or-update.ps1" } "switch" { "rollback.ps1" } default { "status.ps1" } }
     $script:ioDir = Join-Path $env:TEMP ("erp-installer-" + [guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Force -Path $script:ioDir | Out-Null

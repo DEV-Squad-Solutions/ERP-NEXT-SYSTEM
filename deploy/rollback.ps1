@@ -45,6 +45,16 @@ Line "  ================================================================" Cyan
 
 docker version --format "{{.Server.Version}}" *> $null
 if ($LASTEXITCODE -ne 0) { Stop-Safe "Docker is not running." "Start Docker Desktop, wait, run again." }
+function Test-ErpApiOnPort([string]$port) {   # true only if OUR erp-api container is running and publishes this host port
+    $run = docker inspect -f "{{.State.Running}}" erp-api 2>$null
+    if ($run -ne "true") { return $false }
+    $p = docker port erp-api 8080 2>$null
+    return [bool]($p -match (":" + [regex]::Escape($port) + "$"))
+}
+function Get-PortOwner([string]$port) {      # name of the container that publishes this host port, or empty
+    $o = docker ps --format "{{.Names}}|{{.Ports}}" 2>$null | Where-Object { $_ -match (":" + [regex]::Escape($port) + "->") } | Select-Object -First 1
+    if ($o) { return ($o -split '\|')[0] } else { return "" }
+}
 $envFile = Join-Path $PSScriptRoot ".env"
 if (-not (Test-Path $envFile)) { Stop-Safe ".env not found next to this script." "Run this from the deploy folder you installed from." }
 $envText = [IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8)
@@ -165,7 +175,7 @@ Step "4" "Waiting for the system to be ready (up to $HealthTimeoutSec seconds)"
 $ok = $false; $deadline = (Get-Date).AddSeconds($HealthTimeoutSec)
 while ((Get-Date) -lt $deadline) {
     Start-Sleep -Seconds 5
-    try { $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:$apiPort/health/ready" -TimeoutSec 5; if ($r.StatusCode -eq 200) { $ok = $true; break } } catch { }
+    try { if (Test-ErpApiOnPort $apiPort) { $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:$apiPort/health/ready" -TimeoutSec 5; if ($r.StatusCode -eq 200) { $ok = $true; break } } } catch { }
     Write-Host "." -NoNewline
 }
 Write-Host ""

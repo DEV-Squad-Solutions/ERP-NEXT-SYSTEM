@@ -70,6 +70,7 @@ function Choose-Action {
 }
 
 $script:askN = 0
+$script:typedSa = $false
 $script:oldBackups = @()
 function Ask([string]$text) {
     if (-not $Gui) { return (Read-Host $text) }
@@ -136,6 +137,45 @@ function New-Secret([int]$len) {
         $s = -join ($bytes | ForEach-Object { $chars[$_ % $chars.Length] })
     } until ($s -cmatch '[A-Z]' -and $s -cmatch '[a-z]' -and $s -match '[0-9]')
     return $s
+}
+function Ask-Secret([string]$text, [bool]$allowGen) {
+    # typed locally, never echoed, never logged. Returns the typed text, "@@GENERATE" (only if allowed) or "" (cancelled).
+    if ($Gui) { return (Ask ($text + " [[secret:" + $(if ($allowGen) { "gen" } else { "nogen" }) + "]]")) }
+    Write-Host ""; Write-Host "      $text" -ForegroundColor Yellow
+    if ($allowGen) { Write-Host "      Type it (hidden), or just press Enter to generate a strong one automatically." } else { Write-Host "      Type it (hidden). Press Enter with nothing to cancel." }
+    $ss = Read-Host "      Value" -AsSecureString
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($ss)
+    try { $v = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
+    $v = $v.Trim()
+    if (-not $v -and $allowGen) { return "@@GENERATE" }
+    return $v
+}
+function Test-NewSa([string]$v) {   # SQL Server password policy for a NEW password; returns an error text or ""
+    if ($v.Length -lt 8) { return "At least 8 characters." }
+    if ($v -notmatch '^[A-Za-z0-9_.@!*+-]+$') { return "Use only letters, digits and these characters: _ . @ ! * + -" }
+    $k = 0; foreach ($re in @('[A-Z]', '[a-z]', '[0-9]', '[_.@!*+-]')) { if ($v -cmatch $re) { $k++ } }
+    if ($k -lt 3) { return "Use at least 3 of: capital letters, small letters, digits, symbols." }
+    return ""
+}
+function Test-OldSa([string]$v) {   # an EXISTING password is only checked for characters that would break .env; the real check is a login against erp-db
+    if ($v -match '\s' -or $v -match '["''`]') { return "The password must not contain spaces or quotes (they cannot be stored in .env)." }
+    return ""
+}
+function Test-Jwt([string]$v) {
+    if ($v.Length -lt 32) { return "At least 32 characters." }
+    if ($v -notmatch '^[A-Za-z0-9_.@!*+/=-]+$') { return "Use only letters, digits and these characters: _ . @ ! * + / = -" }
+    return ""
+}
+function Read-Secret-Valid([string]$text, [bool]$allowGen, [int]$genLen, [scriptblock]$check) {
+    for ($try = 1; $try -le 3; $try++) {
+        $v = Ask-Secret $text $allowGen
+        if (-not $v) { return "" }
+        if ($v -eq "@@GENERATE") { return (New-Secret $genLen) }
+        $err = & $check $v
+        if (-not $err) { return $v }
+        Info "Not accepted: $err (try $try of 3)"
+    }
+    return ""
 }
 function Set-EnvValue([string]$text, [string]$key, [string]$value) {
     if ($text -match "(?m)^\s*$key\s*=") { return [regex]::Replace($text, "(?m)^\s*$key\s*=.*$", "$key=$value") }
@@ -216,31 +256,38 @@ try {
     $sa = Get-EnvValue $envText "SQL_SA_PASSWORD"
     $jwt = Get-EnvValue $envText "JWT_SIGNING_KEY"
 
-    if ($isUpdate) {
-        Ok "Mode: UPDATE (existing database found)"
-        if (-not $jwt -and $sa) {
-            # the JWT key does not touch the database: safe to create. Only effect: users must log in again.
-            $envText = Set-EnvValue $envText "JWT_SIGNING_KEY" (New-Secret 48)
-            [IO.File]::WriteAllText($envFile, $envText, (New-Object Text.UTF8Encoding($false)))
-            $jwt = "set"; Ok "JWT_SIGNING_KEY was empty: generated a new one (stored only in .env, not shown). Users will have to log in again."
-        }
-        if (-not $sa -or -not $jwt) {
-            if (-not (Test-Path $envFile)) { Copy-Item (Join-Path $Root ".env.example") $envFile }
-            Fail "The .env file has an EMPTY or missing SQL_SA_PASSWORD, but the database volume already exists. A new password cannot be created: it would not match the data and the database would not open (they would break the database login)." ("Open this file in Notepad: $envFile . Put the SAME SQL_SA_PASSWORD= as in your old .env (the one the ERP database was created with). Nothing was changed and no data was touched. Type them yourself in the file. Never send them in chat. Then run install-or-update.bat again.") "envmiss"
-        }
-        Ok "Existing secrets found in .env (both have a value)"
+    if ($isUpdate) { Ok "Mode: UPDATE (existing database found)" } else { Ok "Mode: FRESH INSTALL (no existing database)" }
+    if (-not $envText) {
+        $ex = Join-Path $Root ".env.example"
+        $envText = $(if (Test-Path $ex) { [IO.File]::ReadAllText($ex, [Text.Encoding]::UTF8) } else { "" })
     }
-    else {
-        Ok "Mode: FRESH INSTALL (no existing database)"
-        if (-not $envText) { $envText = [IO.File]::ReadAllText((Join-Path $Root ".env.example"), [Text.Encoding]::UTF8) }
-        $changed = $false
-        if (-not $sa)  { $envText = Set-EnvValue $envText "SQL_SA_PASSWORD" (New-Secret 28); $changed = $true; Ok "Generated a strong SQL password (stored only in .env, not shown)" }
-        if (-not $jwt) { $envText = Set-EnvValue $envText "JWT_SIGNING_KEY" (New-Secret 48); $changed = $true; Ok "Generated a JWT signing key (stored only in .env, not shown)" }
-        if ($changed) {
-            [IO.File]::WriteAllText($envFile, $envText, (New-Object Text.UTF8Encoding($false)))
-            Info "IMPORTANT: copy the .env file to a safe private place. It is not in git."
+    $changed = $false
+    if (-not $sa) {
+        if ($isUpdate) {
+            Info "SQL_SA_PASSWORD is empty in .env, but the database already exists. The password it was created with is needed (a new one would not open it)."
+            $sa = Read-Secret-Valid "Type the existing SQL_SA_PASSWORD (the one from your old .env). It is saved only in .env on this PC." $false 0 { param($v) Test-OldSa $v }
+            if (-not $sa) { Fail "No SQL password was entered. Nothing was changed." "Run again and type the old SQL_SA_PASSWORD, or put it in the .env file yourself." "envmiss" }
+            $script:typedSa = $true
+            Ok "SQL password received (not shown). It will be checked against the database before anything else happens."
         }
+        else {
+            $sa = Read-Secret-Valid "SQL_SA_PASSWORD is empty. Type a new SQL password (min 8, mixed), or generate one." $true 28 { param($v) Test-NewSa $v }
+            if (-not $sa) { Fail "No SQL password was set. Nothing was changed." "Run again and type a password or choose Generate." "envmiss" }
+            Ok "SQL password set (stored only in .env, not shown)"
+        }
+        $envText = Set-EnvValue $envText "SQL_SA_PASSWORD" $sa; $changed = $true
     }
+    if (-not $jwt) {
+        $jwt = Read-Secret-Valid "JWT_SIGNING_KEY is empty. Type a key (min 32 characters), or generate one. (Users must log in again after a new key.)" $true 48 { param($v) Test-Jwt $v }
+        if (-not $jwt) { Fail "No signing key was set. Nothing was changed." "Run again and type a key or choose Generate." "envmiss" }
+        $envText = Set-EnvValue $envText "JWT_SIGNING_KEY" $jwt; $changed = $true
+        Ok "JWT signing key set (stored only in .env, not shown)"
+    }
+    if ($changed) {
+        [IO.File]::WriteAllText($envFile, $envText, (New-Object Text.UTF8Encoding($false)))
+        Info "IMPORTANT: copy the .env file to a safe private place. It is not in git."
+    }
+    Ok "Secrets in .env: both have a value"
     $envText = [IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8)
     if ($envText -match '(?im)^\s*SEED_ENABLED\s*=\s*true') { Fail "SEED_ENABLED is true in .env." "Set SEED_ENABLED=false in .env (this is a real-data server), then run again." "seed" }
     Ok "Seeding is off"
@@ -319,7 +366,14 @@ try {
         $probe = docker exec erp-db $sqlcmd -S localhost -U sa -P $sa -C -h -1 -W -Q "SET NOCOUNT ON; SELECT CASE WHEN DB_ID('MiniErp') IS NULL THEN 'NO' ELSE 'YES' END" 2>&1 | Out-String
         if ($probe -cmatch '(?m)^\s*YES\s*$') { $hasDb = $true }
         elseif ($probe -cmatch '(?m)^\s*NO\s*$') { $hasDb = $false }
-        else { Fail "Could not query the database. SQL_SA_PASSWORD in .env may not match this database." "Check the SQL_SA_PASSWORD line in .env (same value as the old .env). Do not continue until it matches." "envmiss" }
+        else {
+            if ($script:typedSa) {
+                # the password typed just now is wrong: remove it again so the next run asks again (nothing else was changed)
+                try { [IO.File]::WriteAllText($envFile, (Set-EnvValue ([IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8)) "SQL_SA_PASSWORD" ""), (New-Object Text.UTF8Encoding($false))) } catch { }
+                Fail "The SQL password you typed does not open the existing database. It was NOT saved." "Run again and type the correct old SQL_SA_PASSWORD. Nothing was changed or deleted." "envmiss"
+            }
+            Fail "Could not query the database. SQL_SA_PASSWORD in .env may not match this database." "Check the SQL_SA_PASSWORD line in .env (same value as the old .env). Do not continue until it matches." "envmiss"
+        }
 
         if (-not $hasDb) {
             Ok "No MiniErp database in the volume yet: nothing to back up"

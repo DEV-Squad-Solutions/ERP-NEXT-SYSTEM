@@ -43,7 +43,7 @@ $T = @{
     steps = "Steps"; log = "Live log"; ready = "Ready. Choose an action."; running = "Running... please wait. Do not close this window."
     okTitle = "SUCCESS"; failTitle = "STOPPED - nothing was deleted, your data is safe"; cancelTitle = "Cancelled - nothing was changed"
     next = "What to do next"; busy = "An operation is running. Please wait until it finishes."
-    ok = "OK"; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; oldbak = "Old SQL container backup"; copylog = "Copy log"; copied = "Copied"; tipInstall = "Install a new version or update. A backup is taken first."; tipSwitch = "Go back to an earlier installed version."; tipStatus = "Read-only check of what is running."; tipCopy = "Copy the whole log to the clipboard"; open = "Open"
+    ok = "OK"; gen = "Generate for me"; show = "Show"; secretNote = "Typed here on this PC, saved only in the .env file. Never shown in the log."; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; oldbak = "Old SQL container backup"; copylog = "Copy log"; copied = "Copied"; tipInstall = "Install a new version or update. A backup is taken first."; tipSwitch = "Go back to an earlier installed version."; tipStatus = "Read-only check of what is running."; tipCopy = "Copy the whole log to the clipboard"; open = "Open"
     s_install = @("Check Docker", "Install type and config", "Backup", "Load images", "Start services", "Health check")
     s_switch = @("Safety backup", "Restore database (optional)", "Switch code", "Health check")
     s_status = @("Read status")
@@ -55,7 +55,7 @@ $T = @{
     steps = "الخطوات"; log = "السجل المباشر"; ready = "جاهز. اختار إجراء."; running = "جاري التنفيذ... استنى. متقفلش النافذة دي."
     okTitle = "تم بنجاح"; failTitle = "اتوقف - مفيش حاجة اتمسحت والداتا سليمة"; cancelTitle = "اتلغى - مفيش حاجة اتغيّرت"
     next = "الخطوة الجاية"; busy = "فيه عملية شغالة. استنى لحد ما تخلص."
-    ok = "موافق"; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; oldbak = "نسخة الـ SQL القديم"; copylog = "نسخ السجل"; copied = "تم النسخ"; tipInstall = "تثبيت أو تحديث. بياخد نسخة احتياطية الأول."; tipSwitch = "الرجوع لإصدار متثبّت قبل كده."; tipStatus = "فحص للقراءة بس للي شغال."; tipCopy = "نسخ السجل كله"; open = "افتح"
+    ok = "موافق"; gen = "ولّدلي تلقائي"; show = "إظهار"; secretNote = "بتكتبه هنا على الجهاز ده وبيتحفظ في ملف .env بس. مش بيظهر في السجل."; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; oldbak = "نسخة الـ SQL القديم"; copylog = "نسخ السجل"; copied = "تم النسخ"; tipInstall = "تثبيت أو تحديث. بياخد نسخة احتياطية الأول."; tipSwitch = "الرجوع لإصدار متثبّت قبل كده."; tipStatus = "فحص للقراءة بس للي شغال."; tipCopy = "نسخ السجل كله"; open = "افتح"
     s_install = @("فحص Docker", "نوع التثبيت والإعدادات", "نسخة احتياطية", "تحميل الصور", "تشغيل الخدمات", "فحص الجاهزية")
     s_switch = @("نسخة أمان", "استرجاع الداتا (اختياري)", "تبديل الكود", "فحص الجاهزية")
     s_status = @("قراءة الحالة")
@@ -373,12 +373,51 @@ function Show-Result([string]$kind, [string]$text) {   # kind: ok | fail | cance
     if (-not $script:animOn) { $result.Height = $script:resTarget }
 }
 
+function Ask-Secret-Dialog([string]$prompt, [bool]$allowGen) {
+    # masked input. The typed value goes only into the private answer file read by the installer, never into the log.
+    $dlg = New-Object System.Windows.Forms.Form
+    $dlg.Text = (L "promptTitle"); $dlg.ClientSize = New-Object System.Drawing.Size([Math]::Min(640, $wa.Width - 40), 250); $dlg.StartPosition = "CenterParent"; $dlg.Font = $font
+    $dlg.FormBorderStyle = "FixedDialog"; $dlg.MaximizeBox = $false; $dlg.MinimizeBox = $false; $dlg.BackColor = $cBg; $dlg.ForeColor = $cText
+    $lbl = New-Object System.Windows.Forms.Label; $lbl.Dock = "Top"; $lbl.Height = 78; $lbl.Padding = New-Object System.Windows.Forms.Padding(10, 10, 10, 0); $lbl.Text = $prompt
+    $lbl.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
+    $note = New-Object System.Windows.Forms.Label; $note.Dock = "Top"; $note.Height = 36; $note.Padding = New-Object System.Windows.Forms.Padding(10, 4, 10, 0); $note.Text = (L "secretNote"); $note.ForeColor = $cMuted
+    if ($script:lang -eq "ar") { $note.RightToLeft = "Yes" }
+    $tb = New-Object System.Windows.Forms.TextBox; $tb.Dock = "Top"; $tb.UseSystemPasswordChar = $true; $tb.Font = New-Object System.Drawing.Font("Segoe UI", 12)
+    $tb.BackColor = $cCard; $tb.ForeColor = "White"; $tb.BorderStyle = "FixedSingle"
+    $pnl = New-Object System.Windows.Forms.FlowLayoutPanel; $pnl.Dock = "Bottom"; $pnl.Height = 56; $pnl.Padding = New-Object System.Windows.Forms.Padding(8)
+    $ok = New-Object System.Windows.Forms.Button; $ok.Text = (L "ok"); $ok.Width = 110; $ok.Height = 34; $ok.DialogResult = "OK"
+    $cn = New-Object System.Windows.Forms.Button; $cn.Text = (L "cancel"); $cn.Width = 110; $cn.Height = 34; $cn.DialogResult = "Cancel"
+    $sh = New-Object System.Windows.Forms.CheckBox; $sh.Text = (L "show"); $sh.AutoSize = $true; $sh.Margin = New-Object System.Windows.Forms.Padding(10, 8, 6, 0)
+    $sh.Add_CheckedChanged({ $tb.UseSystemPasswordChar = (-not $sh.Checked) })
+    $script:secretAns = $null
+    $btns = @($ok, $cn)
+    if ($allowGen) {
+        $gn = New-Object System.Windows.Forms.Button; $gn.Text = (L "gen"); $gn.Width = 150; $gn.Height = 34
+        $gn.Add_Click({ $script:secretAns = "@@GENERATE"; $f2 = $gn.FindForm(); $f2.DialogResult = "OK"; $f2.Close() })
+        $btns = @($ok, $gn, $cn)
+    }
+    foreach ($bb in $btns) { $bb.FlatStyle = "Flat"; $bb.UseVisualStyleBackColor = $false; $bb.BackColor = [System.Drawing.Color]::FromArgb(30, 41, 59); $bb.ForeColor = "White"; $bb.FlatAppearance.BorderColor = $cBorder }
+    $ok.BackColor = $cBlue
+    $pnl.Controls.AddRange($btns); $pnl.Controls.Add($sh)
+    $dlg.Controls.Add($pnl); $dlg.Controls.Add($tb); $dlg.Controls.Add($note); $dlg.Controls.Add($lbl)
+    $dlg.AcceptButton = $ok; $dlg.CancelButton = $cn; $dlg.ActiveControl = $tb
+    $r = $dlg.ShowDialog($form)
+    $ans = ""
+    if ($r -eq "OK") { if ($script:secretAns) { $ans = $script:secretAns } else { $ans = $tb.Text.Trim() } }
+    $tb.Text = ""; $script:secretAns = $null
+    $dlg.Dispose()
+    return $ans
+}
+
 function Ask-Input([string]$prompt) {
     $choices = @()
     if ($prompt -match '\[\[choices:(.*?)\]\]\s*$') {
         foreach ($p in ($Matches[1] -split ';')) { $kv = $p -split '=', 2; $choices += , @($kv[0], $kv[1]) }
         $prompt = ($prompt -replace '\s*\[\[choices:.*?\]\]\s*$', '')
     }
+    $secret = $null
+    if ($prompt -match '\[\[secret:(gen|nogen)\]\]\s*$') { $secret = $Matches[1]; $prompt = ($prompt -replace '\s*\[\[secret:(gen|nogen)\]\]\s*$', '') }
+    if ($secret) { return (Ask-Secret-Dialog $prompt ($secret -eq "gen")) }
     $dlg = New-Object System.Windows.Forms.Form
     $dlg.Text = (L "promptTitle"); $dlg.ClientSize = New-Object System.Drawing.Size([Math]::Min(720, $wa.Width - 40), [Math]::Min(470, $wa.Height - 60)); $dlg.StartPosition = "CenterParent"; $dlg.Font = $font
     $dlg.RightToLeft = $form.RightToLeft; $dlg.RightToLeftLayout = ($script:lang -eq "ar")
@@ -427,11 +466,12 @@ function Handle-Line([string]$line) {
     if ($line.StartsWith("@@PROMPT|")) {
         $p = $line.Split("|", 3)
         $timer.Stop()
+        $isSecret = ($p[2] -match '\[\[secret:')
         $ans = Ask-Input $p[2]
         $timer.Start()
         $f = Join-Path $script:ioDir ("answer-" + $p[1] + ".txt")
         [IO.File]::WriteAllText($f, $ans, (New-Object Text.UTF8Encoding($false)))
-        Write-Log ("   > " + $(if ($ans) { $ans } else { "(cancelled)" })) ([System.Drawing.Color]::LightSkyBlue)
+        Write-Log ("   > " + $(if (-not $ans) { "(cancelled)" } elseif ($isSecret) { "(hidden, " + $(if ($ans -eq "@@GENERATE") { "generate" } else { "typed" }) + ")" } else { $ans })) ([System.Drawing.Color]::LightSkyBlue)
         return
     }
     if ($line.StartsWith("@@FAIL|")) { $script:failKey = $line.Substring(7); return }

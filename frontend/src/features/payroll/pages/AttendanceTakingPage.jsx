@@ -672,7 +672,7 @@ const AttendanceTakingPage = () => {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4 shadow-sm">
+        <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4 shadow-sm dark:border-amber-400/20 dark:bg-amber-400/10">
           <div className="flex items-center justify-between">
             <span className="text-sm text-ink-500">{t("لم يسجل")}</span>
 
@@ -1003,7 +1003,7 @@ const AttendanceTakingPage = () => {
           )}
         </div>
 
-        <div className="flex items-center justify-between border-t border-ink-100 bg-ink-50/50 px-4 py-3 text-xs text-ink-500">
+        <div className="flex items-center justify-between border-t border-ink-100 bg-ink-50/50 px-4 py-3 text-xs text-ink-500 dark:bg-transparent">
           <div>
             {t("عرض")}{" "}
             <span className="font-semibold text-ink-800">

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import TableLoadingRow from "../../../shared/components/ui/TableLoadingRow";
 import { Receipt, Wallet } from "lucide-react";
 import { useGetExpensesStatementQuery } from "../../statements/statementsApi";
 import Input from "../../../shared/components/ui/Input";
@@ -72,6 +73,7 @@ export default function ExpensesReportPage() {
                 <td className="num px-3 py-2.5 font-semibold">{nf.format(net(r))}</td>
               </tr>
             ))}
+            {isFetching && rows.length === 0 && <TableLoadingRow colSpan={5} />}
             {!isFetching && rows.length === 0 && (
               <tr><td colSpan={5} className="px-3 py-8 text-center text-ink-500">{isError ? t("تعذر تحميل التقرير") : t("لا توجد مصروفات في الفترة")}</td></tr>
             )}

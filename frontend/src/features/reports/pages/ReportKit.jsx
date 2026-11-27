@@ -1,4 +1,5 @@
 import Input from "../../../shared/components/ui/Input";
+import TableLoadingRow from "../../../shared/components/ui/TableLoadingRow";
 import { t } from "../../../i18n";
 
 export const todayISO = () => new Date().toISOString().slice(0, 10);
@@ -50,7 +51,8 @@ export function SimpleTable({ cols, rows, empty, isError, isFetching }) {
               {cols.map((c) => (<td key={c.label} className={`px-3 py-2.5 ${c.num ? "num" : ""}`}>{c.render(r)}</td>))}
             </tr>
           ))}
-          {!isFetching && rows.length === 0 && (
+          {isFetching && rows.length === 0 && <TableLoadingRow colSpan={cols.length} />}
+            {!isFetching && rows.length === 0 && (
             <tr><td colSpan={cols.length} className="px-3 py-8 text-center text-ink-500">{isError ? t("تعذر تحميل التقرير") : empty}</td></tr>
           )}
         </tbody>

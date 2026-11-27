@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import TableLoadingRow from "../../../shared/components/ui/TableLoadingRow";
 import { ArrowDownToLine, ArrowUpFromLine, Wallet } from "lucide-react";
 import { useGetInventoryCostReportQuery, useGetStoresSelectQuery } from "../../stores/storesApi";
 import { useGetItemsSelectQuery } from "../../inventory/inventoryApi";
@@ -89,6 +90,7 @@ export default function InventoryCostReportPage() {
                 <td className="num px-3 py-2.5">{nf.format(r.averageCostAfter ?? 0)}</td>
               </tr>
             ))}
+            {isFetching && rows.length === 0 && <TableLoadingRow colSpan={8} />}
             {!isFetching && rows.length === 0 && (
               <tr><td colSpan={8} className="px-3 py-8 text-center text-ink-500">{isError ? t("تعذر تحميل التقرير") : t("لا توجد حركات")}</td></tr>
             )}

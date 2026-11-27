@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import TableLoadingRow from "../../../shared/components/ui/TableLoadingRow";
 import { ShoppingCart, Truck, Scale } from "lucide-react";
 import { useGetPartnerItemMovementsQuery } from "../../statements/statementsApi";
 import { useGetPartiesSelectQuery } from "../../partners/partiesApi";
@@ -83,6 +84,7 @@ export default function PartnerItemsReportPage() {
                 <td className="num px-3 py-2.5 font-semibold">{nf.format(r.totalAmount ?? 0)}</td>
               </tr>
             ))}
+            {isFetching && rows.length === 0 && <TableLoadingRow colSpan={8} />}
             {!isFetching && rows.length === 0 && (
               <tr><td colSpan={8} className="px-3 py-8 text-center text-ink-500">{isError ? t("تعذر تحميل التقرير") : t("لا توجد حركات لهذا الصنف مع الطرف المختار")}</td></tr>
             )}

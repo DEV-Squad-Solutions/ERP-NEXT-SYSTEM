@@ -34,7 +34,7 @@ function Stop-Safe($m, $next) {
     exit 1
 }
 function Run-Docker { & docker @args; if ($LASTEXITCODE -ne 0) { Stop-Safe "Command failed: docker $($args -join ' ')" "Send the output above to your developer." } }
-function Get-EnvValue([string]$text, [string]$key) { if ($text -match "(?m)^\s*$key\s*=\s*(\S+)") { return $Matches[1] }; return $null }
+function Get-EnvValue([string]$text, [string]$key) { if ($text -match "(?m)^[ \t]*$key[ \t]*=[ \t]*([^\r\n]*)") { $v = $Matches[1].Trim().Trim('"').Trim("'"); if ($v) { return $v } }; return $null }
 function Step($n, $t) { Write-Host ""; Line "[$n] $t" Cyan }
 
 if ($Gui) { [Console]::OutputEncoding = [Text.Encoding]::UTF8 }

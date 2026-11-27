@@ -142,7 +142,8 @@ function Set-EnvValue([string]$text, [string]$key, [string]$value) {
     return $text.TrimEnd() + "`r`n$key=$value`r`n"
 }
 function Get-EnvValue([string]$text, [string]$key) {
-    if ($text -match "(?m)^\s*$key\s*=\s*(\S+)") { return $Matches[1] }
+    # same line only ([ \t]*, never \s*: that would jump over an empty value to the next line); empty or whitespace-only = missing
+    if ($text -match "(?m)^[ \t]*$key[ \t]*=[ \t]*([^\r\n]*)") { $v = $Matches[1].Trim().Trim('"').Trim("'"); if ($v) { return $v } }
     return $null
 }
 
@@ -165,7 +166,7 @@ try {
     # ---------- 1. Docker ----------
     Step 1 "Checking Docker"
     docker version --format "{{.Server.Version}}" *> $null
-    if ($LASTEXITCODE -ne 0) { Fail "Docker is not running." "Start Docker Desktop, wait until it says it is running, then double-click install-or-update.bat again." "docker" }
+    if ($LASTEXITCODE -ne 0) { Fail "Docker is not running." "Start Docker Desktop, wait until it says it is running, then double-click ERP Installer.bat again." "docker" }
     Ok "Docker is running"
 
     # ---------- 2. Install type + config ----------
@@ -217,11 +218,17 @@ try {
 
     if ($isUpdate) {
         Ok "Mode: UPDATE (existing database found)"
+        if (-not $jwt -and $sa) {
+            # the JWT key does not touch the database: safe to create. Only effect: users must log in again.
+            $envText = Set-EnvValue $envText "JWT_SIGNING_KEY" (New-Secret 48)
+            [IO.File]::WriteAllText($envFile, $envText, (New-Object Text.UTF8Encoding($false)))
+            $jwt = "set"; Ok "JWT_SIGNING_KEY was empty: generated a new one (stored only in .env, not shown). Users will have to log in again."
+        }
         if (-not $sa -or -not $jwt) {
             if (-not (Test-Path $envFile)) { Copy-Item (Join-Path $Root ".env.example") $envFile }
-            Fail "The .env file is missing the existing secrets. New secrets are NOT created on an update (they would break the database login)." ("Open this file in Notepad: $envFile . Fill these two lines with the SAME values as your old .env: SQL_SA_PASSWORD= and JWT_SIGNING_KEY= . Type them yourself in the file. Never send them in chat. Then run install-or-update.bat again.") "envmiss"
+            Fail "The .env file has an EMPTY or missing SQL_SA_PASSWORD, but the database volume already exists. A new password cannot be created: it would not match the data and the database would not open (they would break the database login)." ("Open this file in Notepad: $envFile . Put the SAME SQL_SA_PASSWORD= as in your old .env (the one the ERP database was created with). Nothing was changed and no data was touched. Type them yourself in the file. Never send them in chat. Then run install-or-update.bat again.") "envmiss"
         }
-        Ok "Existing secrets found in .env"
+        Ok "Existing secrets found in .env (both have a value)"
     }
     else {
         Ok "Mode: FRESH INSTALL (no existing database)"

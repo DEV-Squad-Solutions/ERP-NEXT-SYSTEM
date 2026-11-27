@@ -35,7 +35,7 @@ function Ask-Phrase([string]$phrase, [string]$en, [string]$ar) {
     return (Read-Host "  Type exactly $phrase to continue (anything else cancels)")
 }
 function Say($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
-function Stop-Now($m) { if ($script:dryActive) { Cleanup-Dry }; Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The database was not changed unless a line above says so." Yellow; if ($script:helped) { docker exec -u 0 $Container rm -f /tmp/erp_rq.sh /tmp/erp_restore.bak 2>$null | Out-Null }; if ($Gui) { Write-Host "  FAIL $m" } else { [void](Read-Host "Press Enter to close") }; exit 1 }
+function Stop-Now($m) { if ($script:dryActive) { Cleanup-Dry }; Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The database was not changed unless a line above says so." Yellow; Show-Summary; if ($script:helped) { docker exec -u 0 $Container rm -f /tmp/erp_rq.sh /tmp/erp_restore.bak 2>$null | Out-Null }; if ($Gui) { Write-Host "  FAIL $m" } else { [void](Read-Host "Press Enter to close") }; exit 1 }
 function Read-Masked([string]$prompt) {
     if ($Gui) { return (Ask ($prompt + " [[secret:nogen]]")) }
     $ss = Read-Host $prompt -AsSecureString
@@ -130,6 +130,71 @@ function Run-Backup([string]$dir) {
 }
 function Test-PortFree([int]$port) { try { $l = New-Object System.Net.Sockets.TcpListener([System.Net.IPAddress]::Any, $port); $l.Start(); $l.Stop(); return $true } catch { return $false } }
 
+function Show-Summary {
+    # Plain "what happened" card, printed at the end of every run (also when it stopped). No secrets, only names, states and paths.
+    if ($script:sumShown) { return }; $script:sumShown = $true
+    function St([string]$n) { $x = docker inspect -f "{{.State.Status}}" $n 2>$null; if ($x) { return "$x" } else { return "not found" } }
+    Say ""; Say "=== WHAT HAPPENED (plain summary) ===" Cyan
+    $old = @(docker ps -a --format "{{.Names}}" 2>$null | Where-Object { $_ -match '^minierp' })
+    Say "  Old stack (minierp, holds the company data):" White
+    foreach ($n in $old) { Say ("    {0,-18} {1}" -f $n, (St $n)) }
+    if ($old.Count -eq 0) { Say "    none found" DarkGray }
+    Say "  ERP 2.0 stack:" White
+    foreach ($n in @("erp-api", "erp-frontend")) { Say ("    {0,-18} {1}" -f $n, (St $n)) }
+    Say ("    erp-db (separate new SQL container, not used here): {0}. It was not started, read or changed." -f (St "erp-db")) DarkGray
+    $st = $null; if (Test-Path $stateFile) { try { $st = Get-Content $stateFile -Raw | ConvertFrom-Json } catch { } }
+    if ($st) {
+        Say ("  Database in use by ERP 2.0: {0} on {1}" -f $st.db, $st.container) White
+        if ($st.copy) { Say ("    It is a COPY of {0}. The original {0} was not changed." -f $st.sourceDb) Green }
+        else { Say ("    The original database was upgraded in place.") Yellow }
+        if ($st.backup) { Say ("  Verified backup of the original: {0}" -f $st.backup) White }
+        if ($st.copy) { Say ("  To go back: Existing DB > Restore (switches back to {0}, the copy is kept)." -f $st.sourceDb) Gray }
+        else { Say "  To go back: Existing DB > Restore (restores the backup above)." Gray }
+    } else { Say "  ERP 2.0 is not connected to an existing database yet (nothing was upgraded)." Yellow }
+}
+function Get-VersionTag {
+    $tar = @(Get-ChildItem -Path $Root, (Join-Path $Root "images") -Filter "erp-images-*.tar" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending) | Select-Object -First 1
+    $v = ""; if ($tar -and $tar.Name -match 'erp-images-(.+)\.tar$') { $v = $Matches[1] }
+    if (-not $v) { $v = Get-EnvVal "ERP_VERSION" }
+    if (-not $v) { $v = "2.0" }
+    return ($v -replace '[^A-Za-z0-9]', '_')
+}
+function Create-VersionedCopy($bak, [string]$name) {
+    # Restores the verified backup into a NEW database on the same container. An existing database is never replaced or overwritten.
+    if ($name -notmatch '^[A-Za-z0-9_]+$') { Stop-Now "Unsafe database name." }
+    $final = $name; $i = 1
+    while ($true) {
+        $e = Run-Sql "SET NOCOUNT ON; SELECT CASE WHEN DB_ID('$final') IS NULL THEN 'FREE' ELSE 'TAKEN' END"
+        if ($e -match 'FREE') { break }
+        if ($e -notmatch 'TAKEN') { Say $e DarkGray; Stop-Now "Could not check whether the database name $final is free. Nothing was changed." }
+        $i++; $final = "${name}_$i"
+        if ($i -gt 30) { Stop-Now "Too many databases named like $name. Tell your developer." }
+    }
+    if ($final -ne $name) { Say "  The name $name already exists, so the copy is named $final (an existing database is never replaced)." Yellow }
+    docker cp $bak.FullName "${Container}:/tmp/erp_restore.bak" | Out-Null
+    $v = Run-Sql "RESTORE VERIFYONLY FROM DISK = N'/tmp/erp_restore.bak' WITH CHECKSUM"
+    if ($LASTEXITCODE -ne 0 -or $v -notmatch 'valid') { Say $v DarkGray; Stop-Now "The backup file did not verify. Nothing was changed." }
+    $fl = Run-Sql "RESTORE FILELISTONLY FROM DISK = N'/tmp/erp_restore.bak'"
+    $moves = @(); $n = 0
+    foreach ($l in ($fl -split "`n")) {
+        $t = @($l.Trim() -split '\s+')
+        if ($t.Count -ge 3 -and $t[1] -like "/*" -and ($t[2] -eq "D" -or $t[2] -eq "L")) { $n++; $ext = [IO.Path]::GetExtension($t[1]); $moves += ("MOVE N'{0}' TO N'/var/opt/mssql/data/{1}_{2}{3}'" -f $t[0], $final, $n, $ext) }
+    }
+    if ($moves.Count -lt 2) { Say $fl DarkGray; Stop-Now "Could not read the file list of the backup. Nothing was changed." }
+    $r = Run-Sql ("RESTORE DATABASE [$final] FROM DISK = N'/tmp/erp_restore.bak' WITH " + ($moves -join ", ") + ", RECOVERY, CHECKSUM, STATS = 20")
+    if ($LASTEXITCODE -ne 0) { Say $r DarkGray; Stop-Now "Creating the copy $final failed. The original database was not touched. Send this window to your developer." }
+    docker exec -u 0 $Container rm -f /tmp/erp_restore.bak | Out-Null
+    return $final
+}
+function Ask-Mode([string]$copyName) {
+    $c = "copy"
+    if ($Gui) {
+        $pairs = @("copy=" + (T "COPY (recommended): create $copyName next to the original and upgrade the copy. The original stays untouched." "نسخة (الأفضل): نعمل $copyName جنب الأصلية ونرقّي النسخة. الأصلية متتلمسش."), "inplace=" + (T "IN PLACE: upgrade the original database itself (Restore is the way back)." "في مكانها: نرقّي الداتابيز الأصلية نفسها (الرجوع بالاسترجاع)."))
+        $pick = (Ask ((T "How should ERP 2.0 use the old database?" "ERP 2.0 هيستخدم الداتابيز القديمة إزاي؟") + " [[choices:" + ($pairs -join ";") + "]]")).Trim()
+    } else { $pick = (Read-Host "  1 = COPY named $copyName (recommended, original untouched), 2 = upgrade IN PLACE (anything else = 1)").Trim(); if ($pick -eq "2") { $pick = "inplace" } }
+    if ($pick -eq "inplace") { $c = "inplace" }
+    return $c
+}
 function Connect-Existing {
     Say ""; Say "=== Connect ERP 2.0 to the EXISTING database ($Container / $Db) ===" Cyan
     Need-Images
@@ -162,16 +227,35 @@ function Connect-Existing {
     Say ("  Backup file: {0}  ({1} MB)" -f $bak.FullName, [int]($bak.Length / 1MB)) Green
     Say "  Copy this file to a second disk or USB too." Yellow
     Say ""
+    $srcDb = $Db
+    $copyName = "erp_version_" + (Get-VersionTag)
+    $how = Ask-Mode $copyName
     Say "  WHAT WILL HAPPEN:" White
-    Say "   - $Container and its data are kept. ERP 2.0 (erp-api) connects to it and UPGRADES the $Db database in place (forward only)."
-    Say "   - The old app containers above are stopped (not deleted). The old app may not work on the upgraded database."
-    Say "   - To go back: run this tool, option 2 (Restore) with the backup file above."
-    $c = Ask-Phrase "UPGRADE EXISTING DATABASE" "The database will be upgraded IN PLACE after the verified backup. The old app containers will be stopped (not deleted). To go back, use Restore." "الداتابيز هتتـرقّى في مكانها بعد النسخة الاحتياطية المتحقق منها. حاويات التطبيق القديم هتتوقف (مش هتتمسح). للرجوع استخدم الاسترجاع."
-    if ($c -cne "UPGRADE EXISTING DATABASE") { Stop-Now "Cancelled by you. Nothing was changed." }
+    if ($how -eq "copy") {
+        Say "   - $Container and its data are kept. A COPY of $srcDb named $copyName is created on $Container from the verified backup."
+        Say "   - ERP 2.0 (erp-api) connects to the COPY and upgrades only the copy (forward only). $srcDb is NOT changed."
+        Say "   - The old app containers above are stopped (not deleted) so two apps do not write different data."
+        Say "   - To go back: Existing DB > Restore switches back to $srcDb and starts the old app again. The copy is kept."
+        $c = Ask-Phrase "UPGRADE COPY" "A copy of the database will be created and ERP 2.0 will use the copy. The original is not changed. The old app containers will be stopped (not deleted). To go back, use Restore." "هنعمل نسخة من الداتابيز وERP 2.0 هيستخدم النسخة. الأصلية متتغيرش. حاويات التطبيق القديم هتتوقف (مش هتتمسح). للرجوع استخدم الاسترجاع."
+        if ($c -cne "UPGRADE COPY") { Stop-Now "Cancelled by you. Nothing was changed." }
+        Say "[4b/8] Creating the copy from the verified backup" Cyan
+        $newDb = Create-VersionedCopy $bak $copyName
+        $script:Db = $newDb
+        $f3 = Get-Facts
+        if ($f3.nodb -or $f3.nohist -or $f3.tables -ne $f.tables) { Stop-Now ("The copy $newDb does not match the original (tables {0} vs {1}). ERP 2.0 was NOT started." -f $f3.tables, $f.tables) }
+        Say ("  OK  Copy {0} created: {1} tables, {2} rows (original {3}: {4} tables, {5} rows)." -f $newDb, $f3.tables, $f3.rows, $srcDb, $f.tables, $f.rows) Green
+        $f = $f3
+    } else {
+        Say "   - $Container and its data are kept. ERP 2.0 (erp-api) connects to it and UPGRADES the $Db database in place (forward only)."
+        Say "   - The old app containers above are stopped (not deleted). The old app may not work on the upgraded database."
+        Say "   - To go back: run this tool, option 2 (Restore) with the backup file above."
+        $c = Ask-Phrase "UPGRADE EXISTING DATABASE" "The database will be upgraded IN PLACE after the verified backup. The old app containers will be stopped (not deleted). To go back, use Restore." "الداتابيز هتتـرقّى في مكانها بعد النسخة الاحتياطية المتحقق منها. حاويات التطبيق القديم هتتوقف (مش هتتمسح). للرجوع استخدم الاسترجاع."
+        if ($c -cne "UPGRADE EXISTING DATABASE") { Stop-Now "Cancelled by you. Nothing was changed." }
+    }
     Say "[5/8] Stopping the old app containers" Cyan
     $stopped = @()
     foreach ($a in $apps) { $n = ($a -split '\|')[0]; docker stop $n | Out-Null; if ($LASTEXITCODE -eq 0) { $stopped += $n; Say "  stopped $n" DarkGray } }
-    $state = @{ container = $Container; db = $Db; network = $net; backup = $bak.FullName; backupDir = $OutDir; started = (Get-Date -Format s); stopped = $stopped }
+    $state = @{ container = $Container; db = $Db; sourceDb = $srcDb; copy = ($how -eq "copy"); network = $net; backup = $bak.FullName; backupDir = $OutDir; started = (Get-Date -Format s); stopped = $stopped }
     [IO.File]::WriteAllText($stateFile, ($state | ConvertTo-Json), (New-Object Text.UTF8Encoding($false)))
     Say "[6/8] Writing .env (EXISTING_DB_* values; the erp-db settings are not touched)" Cyan
     $kv = @{ EXISTING_DB_HOST = $Container; EXISTING_DB_NAME = $Db; EXISTING_DB_NETWORK = $net; EXISTING_DB_PASSWORD = $script:pw }
@@ -207,9 +291,26 @@ function Connect-Existing {
         if ($Gui) { Write-Host "  FAIL erp-api did not become healthy. See the log above. Your backup: $($bak.FullName). You can restore it from Existing DB > Restore."; exit 1 }
     }
 }
+function Switch-Back($st) {
+    $src = [string]$st.sourceDb
+    Say ""; Say "=== Go back to the original database ===" Cyan
+    Say "  ERP 2.0 currently uses the COPY $($st.db). Going back will:" White
+    Say "   - stop erp-api and erp-frontend (docker stop only)"
+    Say "   - start the old app containers again (they use $src)"
+    Say "   - point .env at $src. The copy $($st.db) is kept, nothing is deleted, $src is not changed."
+    $c = Ask-Phrase "GO BACK" "ERP 2.0 will be stopped and the old app will be started again on the original database. The copy is kept." "ERP 2.0 هيتوقف والتطبيق القديم هيشتغل تاني على الداتابيز الأصلية. النسخة هتفضل موجودة."
+    if ($c -cne "GO BACK") { Stop-Now "Cancelled by you. Nothing was changed." }
+    foreach ($n in @("erp-frontend", "erp-api")) { if (docker ps --filter "name=^$n$" --filter "status=running" -q) { docker stop $n | Out-Null; Say "  stopped $n" DarkGray } }
+    if ($st.stopped) { foreach ($n in @($st.stopped)) { docker start ([string]$n) | Out-Null; Say "  started $n" DarkGray } } else { Say "  (no list of stopped containers saved: start the old app from Docker Desktop)" Yellow }
+    Save-Env @{ EXISTING_DB_NAME = $src }
+    Move-Item $stateFile ($stateFile + ".reverted-" + (Get-Date -Format "yyyyMMdd_HHmmss")) -Force -ErrorAction SilentlyContinue
+    $script:summary = "Went back to $src. The old app is running again. The copy $($st.db) is kept."
+    Say ""; Say "  DONE. Back on $src. The copy $($st.db) is still there if you need it." Green
+}
 function Restore-Db {
     Say ""; Say "=== Restore the database from a backup file (rollback) ===" Cyan
     $st = $null; if (Test-Path $stateFile) { try { $st = Get-Content $stateFile -Raw | ConvertFrom-Json } catch { } }
+    if ($st -and $st.copy) { Switch-Back $st; return }
     if ($st) { $script:Container = [string]$st.container; $script:Db = [string]$st.db; if ($st.backupDir) { $script:OutDir = [string]$st.backupDir } }
     Connect-Sql
     $files = @(Get-ChildItem -Path $OutDir -Filter "*.bak" -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match ('^(ERP_DB_backup_old-' + $Db + '_|' + $Db + '_).*\.bak$') } | Sort-Object LastWriteTime -Descending | Select-Object -First 6)
@@ -382,7 +483,7 @@ function Show-Status {
 }
 if ($Mode -eq "menu") {
     Say ""; Say "=== Use the EXISTING database with ERP 2.0 (nothing new is created) ===" Cyan
-    Say "  1  Connect ERP 2.0 to the existing database (verified backup first, then upgrade in place)"
+    Say "  1  Connect ERP 2.0 to the existing database (verified backup first, then a named COPY erp_version_<version>, or in place)"
     Say "  2  Restore the database from a backup file (rollback)"
     Say "  3  Status (read-only)"
     Say "  T  Test the upgrade on a COPY first (dry run, recommended)"
@@ -392,5 +493,6 @@ if ($Mode -eq "menu") {
 }
 switch ($Mode) { "dryrun" { Dry-Run } "connect" { Connect-Existing } "restore" { Restore-Db } "status" { Show-Status } default { Say "Nothing done." } }
 if ($script:helped) { docker exec -u 0 $Container rm -f /tmp/erp_rq.sh 2>$null | Out-Null }
+Show-Summary
 Say ""; Say "Finished." Green
 if ($Gui) { Write-Host ("@@DONE|" + $(if ($Mode -eq "status") { "STATUS" } else { "EXISTING" }) + "|" + ($script:summary -replace '\|', '/')) } else { [void](Read-Host "Press Enter to close") }

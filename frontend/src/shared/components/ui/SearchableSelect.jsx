@@ -80,9 +80,9 @@ const defaultStyles = {
     ...base,
     minHeight: "38px",
     borderRadius: "0.5rem",
-    borderColor: state.isFocused ? "#1A7A5E" : "#E2E7E4",
-    boxShadow: state.isFocused ? "0 0 0 1px #1A7A5E" : "none",
-    "&:hover": { borderColor: "#1A7A5E" },
+    borderColor: state.isFocused ? "rgb(var(--c-primary-500))" : "#E2E7E4",
+    boxShadow: state.isFocused ? "0 0 0 1px rgb(var(--c-primary-500))" : "none",
+    "&:hover": { borderColor: "rgb(var(--c-primary-500))" },
     fontFamily: "'Segoe UI', Tahoma, Arial, sans-serif",
     fontSize: "0.875rem",
   }),
@@ -91,7 +91,7 @@ const defaultStyles = {
     ...base,
     fontSize: "0.875rem",
     backgroundColor: state.isSelected
-      ? "#1A7A5E"
+      ? "rgb(var(--c-primary-500))"
       : state.isFocused
         ? "#EFF2F0"
         : "white",

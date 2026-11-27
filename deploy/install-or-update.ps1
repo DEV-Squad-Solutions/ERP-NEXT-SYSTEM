@@ -146,13 +146,26 @@ try {
     Info ("Container erp-db : {0}" -f $(if ($dbContainer) { "found" } else { "not found" }))
     Info ("Volume erp_sql_data: {0}" -f $(if ($ourVolume) { "found" } else { "not found" }))
     if (-not $dbContainer) {
-        $foreign = docker ps -a --format "{{.Names}} ({{.Image}})" | Where-Object { $_ -match 'mssql|sql' -and $_ -notmatch '^erp-db ' }
-        if ($foreign) { Fail "Found a SQL Server container that this installer does not manage: $($foreign -join ', ')." "Do not continue. Send this name to your developer. The installer stops so it never creates a second, empty database next to your data." "volume" }
+        $foreign = docker ps -a --format "{{.Names}} ({{.Image}}, {{.Status}})" | Where-Object { $_ -match 'mssql|sql' -and $_ -notmatch '^erp-db ' }
+        if ($foreign) {
+            Info "Another SQL Server container exists (running or stopped): $($foreign -join ', ')"
+            Info "It is not managed by this installer and will NOT be touched."
+            Write-Host ""
+            Write-Host "      If it is unrelated to this ERP (for example an old test stack), type UNRELATED and press Enter to continue." -ForegroundColor Yellow
+            Write-Host "      If it holds your real data, press Enter only, and send the name to your developer." -ForegroundColor Yellow
+            $ans = Read-Host "      Your answer"
+            if ($ans -cne "UNRELATED") { Fail "Stopped by you: another SQL Server container exists ($($foreign -join ', '))." "Nothing was changed. Send the container name to your developer." "volume" }
+            Ok "Continuing. The other SQL container is left untouched."
+        }
     }
     if (-not $isUpdate) {
         $other = docker volume ls -q | Where-Object { $_ -match 'sql_?data|mssql' }
         if ($other) { Fail "Found a database volume with another name ($($other -join ', ')). This looks like an older install." "Do not continue. Send this volume name to your developer (stopped so no empty database is created next to your data)." "volume" }
     }
+
+    # ports 80 and 8080 must be free (or used by our own erp-* containers)
+    $busy = docker ps --format "{{.Names}}|{{.Ports}}" | Where-Object { $_ -notmatch '^erp-' -and $_ -match '(:|^|, )(80|8080)->' }
+    if ($busy) { Fail "Port 80 or 8080 is already used by another container: $(($busy | ForEach-Object { ($_ -split '\|')[0] }) -join ', ')." "Stop that container (docker stop <name>) if it is not needed, then run this again. It is not deleted by stopping." "docker2" }
 
     $envFile = Join-Path $PSScriptRoot ".env"
     $envText = ""

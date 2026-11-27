@@ -165,7 +165,7 @@
 }
 
 .page-enter {
-  animation: page-enter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: page-enter 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -195,7 +195,7 @@
   }
 
   tbody tr {
-    animation: row-enter 0.3s ease both;
+    animation: row-enter 0.2s ease both;
   }
 
   tbody tr:nth-child(n + 2) { animation-delay: 0.02s; }

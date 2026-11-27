@@ -112,30 +112,33 @@ $lblState = New-Object System.Windows.Forms.Label
 $lblState.Dock = "Top"; $lblState.Height = 28; $lblState.Padding = New-Object System.Windows.Forms.Padding(14, 5, 14, 0)
 
 $stepsBox = New-Object System.Windows.Forms.GroupBox
-$stepsBox.Dock = "Top"; $stepsBox.Height = 96; $stepsBox.Padding = New-Object System.Windows.Forms.Padding(8, 4, 8, 4)
+$stepsBox.Dock = "Top"; $stepsBox.Height = 84; $stepsBox.Padding = New-Object System.Windows.Forms.Padding(8, 4, 8, 4)
 $stepsPanel = New-Object System.Windows.Forms.TableLayoutPanel
 $stepsPanel.Dock = "Fill"; $stepsPanel.ColumnCount = 3; $stepsPanel.RowCount = 2
 $stepsBox.Controls.Add($stepsPanel)
 
 $result = New-Object System.Windows.Forms.Label
-$result.Dock = "Bottom"; $result.Height = 118; $result.AutoEllipsis = $true; $result.Padding = New-Object System.Windows.Forms.Padding(14, 8, 14, 8)
+$result.Dock = "Bottom"; $result.Height = 80; $result.Padding = New-Object System.Windows.Forms.Padding(14, 8, 14, 8)
 $result.Font = New-Object System.Drawing.Font("Segoe UI", 10); $result.Visible = $false
 
 $logBox = New-Object System.Windows.Forms.GroupBox
 $logBox.Dock = "Fill"; $logBox.Padding = New-Object System.Windows.Forms.Padding(8, 4, 8, 8)
 $log = New-Object System.Windows.Forms.RichTextBox
-$log.Dock = "Fill"; $log.ReadOnly = $true; $log.BackColor = [System.Drawing.Color]::FromArgb(5, 8, 13); $log.ForeColor = [System.Drawing.Color]::Gainsboro
+$log.Dock = "Fill"; $log.ReadOnly = $true; $log.HideSelection = $false; $log.BackColor = [System.Drawing.Color]::FromArgb(5, 8, 13); $log.ForeColor = [System.Drawing.Color]::Gainsboro
 $log.Font = New-Object System.Drawing.Font("Consolas", 10); $log.BorderStyle = "None"; $log.RightToLeft = "No"; $log.WordWrap = $true
 $logBox.Controls.Add($log)
 
-# dock order: last added docks first
-$form.Controls.Add($logBox)
-$form.Controls.Add($result)
-$form.Controls.Add($stepsBox)
-$form.Controls.Add($lblState)
-$form.Controls.Add($prog)
-$form.Controls.Add($bar)
-$form.Controls.Add($hdr)
+# one table = fixed rows on top, the log takes ALL remaining space, the result box only takes the space it needs
+$root = New-Object System.Windows.Forms.TableLayoutPanel
+$root.Dock = "Fill"; $root.ColumnCount = 1; $root.RowCount = 7; $root.Margin = New-Object System.Windows.Forms.Padding(0); $root.Padding = New-Object System.Windows.Forms.Padding(0)
+[void]$root.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle("Percent", 100)))
+foreach ($h in @(84, 60, 10, 30, 84)) { [void]$root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle("Absolute", $h))) }
+[void]$root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle("Percent", 100)))
+[void]$root.RowStyles.Add((New-Object System.Windows.Forms.RowStyle("AutoSize")))
+foreach ($c in @($hdr, $bar, $prog, $lblState, $stepsBox, $logBox, $result)) { $c.Margin = New-Object System.Windows.Forms.Padding(0); $c.Dock = "Fill" }
+$i = 0
+foreach ($c in @($hdr, $bar, $prog, $lblState, $stepsBox, $logBox, $result)) { $root.Controls.Add($c, 0, $i); $i++ }
+$form.Controls.Add($root)
 
 function Layout-Header {
     if ($script:lang -eq "ar") {
@@ -217,6 +220,9 @@ function Show-Result([string]$kind, [string]$text) {   # kind: ok | fail | cance
         default  { $result.BackColor = [System.Drawing.Color]::FromArgb(255, 240, 205); $result.ForeColor = [System.Drawing.Color]::FromArgb(120, 80, 0) }
     }
     $result.Text = $text
+    $w = [Math]::Max(300, $result.ClientSize.Width - 28)
+    $sz = [System.Windows.Forms.TextRenderer]::MeasureText($text, $result.Font, (New-Object System.Drawing.Size($w, 0)), [System.Windows.Forms.TextFormatFlags]::WordBreak)
+    $result.Height = [Math]::Min(150, [Math]::Max(52, $sz.Height + 24))
 }
 
 function Ask-Input([string]$prompt) {

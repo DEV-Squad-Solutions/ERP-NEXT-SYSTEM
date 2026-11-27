@@ -304,6 +304,8 @@ if ($Step -eq "menu") {
     $a = (Read-Host "Choose").Trim().ToUpper()
     $Step = switch ($a) { "1" { "copy" } "2" { "find" } "3" { "recover" } "4" { "change" } "5" { "look" } "6" { "fresh" } default { "quit" } }
 }
+. (Join-Path $PSScriptRoot "gate.ps1")
+if ($Step -in @("copy", "find", "recover", "change", "fresh")) { Require-Gate $Root $false "" }
 switch ($Step) {
     "copy" { $null = Copy-ToFolder }
     "find" { $null = Find-Password }

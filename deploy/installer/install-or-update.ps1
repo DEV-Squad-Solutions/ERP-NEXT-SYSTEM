@@ -203,6 +203,8 @@ if ($action -ne "1") {
 Show-Ar "start"
 
 try {
+    . (Join-Path $PSScriptRoot "gate.ps1")
+    Require-Gate $Root $Gui.IsPresent $IoDir
     # ---------- 1. Docker ----------
     Step 1 "Checking Docker"
     docker version --format "{{.Server.Version}}" *> $null

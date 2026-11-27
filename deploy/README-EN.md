@@ -104,3 +104,15 @@ Never reset or delete the volume. Double-click `tools\Recover database.bat`: 1 =
 
 ## Use your EXISTING database (no new database)
 Click **Existing DB** in the installer (or `tools\Use existing database.bat`). 1 = verified backup, then ERP 2.0 connects to your old SQL container and upgrades the MiniErp database in place (you type UPGRADE EXISTING DATABASE; the old app containers are stopped, not deleted). 2 = Restore from the backup file (type RESTORE DATABASE; a pre-restore backup is made first). The old SQL container and its data are never deleted.
+
+
+## Installer password
+
+The installer asks for a password before anything that changes the system (install, update, switch version, restore, new volume, DB password, get images). Read-only tools (Status, Compare, Look inside volume) and the plain backup tools do not ask.
+
+- First run: you choose the password (typed twice, hidden, at least 8 characters). Only a salted PBKDF2 hash is stored in `.installer-gate.json`. The password itself is never saved, logged or put in `.env`.
+- Wrong password: from the 3rd wrong try in a row the installer locks for 15 s, then 30 s, 60 s, and so on up to 15 minutes.
+- After a correct password, the scripts started by that run do not ask again (up to 2 hours).
+- Forgot it: run `tools\Reset installer password.bat` as Administrator on this PC and type `RESET INSTALLER PASSWORD`. The old gate file is kept as `.installer-gate.json.reset-<time>`. Nothing else is touched.
+- `.env`, its backups, the state file and the logs folder are restricted to your Windows user, Administrators and SYSTEM each time the installer starts a protected action. `.env` and its backups do contain the database password and the JWT key: copy them only to a private place.
+- Honest limit: this gate stops casual or accidental use. Someone who is Administrator on this PC, can edit these scripts or can run `docker` directly is not stopped by it. Keep the PC itself physically and account-wise private.

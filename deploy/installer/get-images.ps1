@@ -12,6 +12,8 @@ param([switch]$Gui, [string]$IoDir = "", [string]$BackupDir = "", [string]$Lang 
 $ErrorActionPreference = "Continue"
 if ($Gui) { [Console]::OutputEncoding = [Text.Encoding]::UTF8 }
 $Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })
+. (Join-Path $PSScriptRoot "gate.ps1")
+Require-Gate $Root $Gui.IsPresent $IoDir
 function Say($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
 function Fail-Now($m) { if ($Gui) { Write-Host "  FAIL $m" } else { Say "  FAIL $m" Red; [void](Read-Host "Press Enter to close") }; exit 1 }
 function Get-EnvVal([string]$key) {

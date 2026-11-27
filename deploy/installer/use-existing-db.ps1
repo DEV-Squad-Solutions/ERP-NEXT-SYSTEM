@@ -491,6 +491,8 @@ if ($Mode -eq "menu") {
     $a = (Read-Host "Choose").Trim().ToUpper()
     $Mode = switch ($a) { "1" { "connect" } "2" { "restore" } "3" { "status" } "T" { "dryrun" } default { "quit" } }
 }
+. (Join-Path $PSScriptRoot "gate.ps1")
+if ($Mode -in @("connect", "restore", "dryrun")) { Require-Gate $Root $Gui.IsPresent $IoDir }
 switch ($Mode) { "dryrun" { Dry-Run } "connect" { Connect-Existing } "restore" { Restore-Db } "status" { Show-Status } default { Say "Nothing done." } }
 if ($script:helped) { docker exec -u 0 $Container rm -f /tmp/erp_rq.sh 2>$null | Out-Null }
 Show-Summary

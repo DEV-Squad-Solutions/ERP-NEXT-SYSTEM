@@ -10,6 +10,8 @@ param([string]$BackupDir = "C:\ERP_backup", [int]$HealthTimeoutSec = 300, [switc
 $ErrorActionPreference = "Continue"
 $Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })   # folder with .env, docker-compose.yml, images, logs
 Set-Location $Root
+. (Join-Path $PSScriptRoot "gate.ps1")
+Require-Gate $Root $Gui.IsPresent $IoDir
 $script:askN = 0
 function Ask([string]$text) {
     if (-not $Gui) { return (Read-Host $text) }

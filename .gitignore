@@ -11,3 +11,4 @@ deploy/.env.pending
 deploy/.env.bak.*
 deploy/.env.*.bak
 deploy/existing-db-state.json
+deploy/.installer-gate.json*

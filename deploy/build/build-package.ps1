@@ -26,7 +26,7 @@ New-Item -ItemType Directory -Force -Path $inst, $tools, $img | Out-Null
 $crlf = "`r`n"
 
 # same layout as the deploy folder of the repo: root = entry bat + compose + .env.example + docs; installer\ = scripts and assets; tools\ = helper bats
-foreach ($f in @("ERP Installer.bat", "Create Desktop Shortcut.bat", "docker-compose.yml", "docker-compose.existing.yml", "docker-compose.dryrun.yml", ".env.example", "README-EN.md", "README-AR.md")) {
+foreach ($f in @("ERP Installer.bat", "Create Desktop Shortcut.bat", "docker-compose.yml", "docker-compose.existing.yml", "docker-compose.dryrun.yml", ".env.example", "README-EN.md", "README-AR.md", "CLIENT-GUIDE-AR.md")) {
     $src = Join-Path $deploy $f
     if (-not (Test-Path $src)) { throw "Missing file in deploy folder: $f" }
     Copy-Item $src (Join-Path $pkg $f)
@@ -59,7 +59,7 @@ if ($tar) { Copy-Item $tar.FullName (Join-Path $img $tar.Name); Write-Host "Incl
 else { Write-Host "WARNING: erp-images-$Version.tar not found. Run build\build-images.ps1 -Version $Version first, then copy the .tar into $img" -ForegroundColor Yellow }
 
 # safety check: nothing private may be in the package
-$bad = Get-ChildItem $pkg -Recurse -Force -File | Where-Object { $_.Name -in @(".env", ".env.bak", "release-history.txt") -or $_.Name -like "erp-install-*.log" -or $_.Extension -in @(".bak", ".key", ".pfx") }
+$bad = Get-ChildItem $pkg -Recurse -Force -File | Where-Object { $_.Name -in @(".env", ".env.bak", ".env.pending", "release-history.txt", "existing-db-state.json") -or $_.Name -like ".installer-gate.json*" -or $_.Name -like ".env.bak.*" -or $_.Name -like "erp-install-*.log" -or $_.Extension -in @(".bak", ".key", ".pfx") }
 if ($bad) { Remove-Item $pkg -Recurse -Force; throw "Private file found, package deleted: $($bad.Name -join ', ')" }
 $size = [math]::Round(((Get-ChildItem $pkg -Recurse -File | Measure-Object Length -Sum).Sum / 1MB), 1)
 Write-Host "DONE: $pkg ($size MB). Copy this folder to the USB drive. Entry point: ERP Installer.bat" -ForegroundColor Green

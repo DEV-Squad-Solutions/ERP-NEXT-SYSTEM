@@ -187,5 +187,10 @@ finally { Remove-Item $work -Recurse -Force -ErrorAction SilentlyContinue }
 
 $mb = [math]::Round((Get-Item $exe).Length / 1MB, 1)
 Write-Host "DONE: $exe ($mb MB)" -ForegroundColor Green
+$sha = (Get-FileHash -Algorithm SHA256 -Path $exe).Hash.ToLower()
+$shaFile = $exe + ".sha256.txt"
+[IO.File]::WriteAllText($shaFile, ("{0}  {1}`r`n" -f $sha, (Split-Path $exe -Leaf)), (New-Object Text.UTF8Encoding($false)))
+Write-Host ("SHA256: {0}" -f $sha) -ForegroundColor Green
+Write-Host "Checksum file: $shaFile . Send it to the client by a DIFFERENT channel than the exe (for example a message), so a swapped exe is noticed." -ForegroundColor Green
 Write-Host "Copy this ONE file to the USB drive. On the server double-click it. It unpacks to C:\ERP-Installer\DevSquad-ERP-Installer-$Version and opens the installer." -ForegroundColor Green
 Write-Host "Windows may show a blue 'unknown publisher' (SmartScreen) message because the file is not code-signed: click More info, then Run anyway." -ForegroundColor Yellow

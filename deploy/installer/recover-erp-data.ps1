@@ -165,6 +165,11 @@ function Find-Password {
     $cands = New-Object System.Collections.ArrayList
     $files = @()
     foreach ($d in @($Root, (Split-Path $Root -Parent), $BackupDir)) { if ($d -and (Test-Path $d)) { $files += @(Get-ChildItem -Path $d -File -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -like ".env*" -or $_.Name -like "*.env" -or $_.Name -like "*.env.*" }) } }
+    # optional: a file path or a typed candidate, entered locally (hidden). Nothing is printed, stored or sent anywhere.
+    $pathIn = (Read-Host "  Optional: full path of an old .env file to try (Enter to skip)").Trim().Trim('"')
+    if ($pathIn -and (Test-Path $pathIn -PathType Leaf)) { $files += @(Get-Item $pathIn) } elseif ($pathIn) { Say "  That file was not found, skipped." Yellow }
+    $typed = Read-Masked "  Optional: type a password you think it is (hidden, Enter to skip)"
+    if ($typed) { [void]$cands.Add($typed) }
     Say ("  .env-type files found: {0}" -f $files.Count) DarkGray
     foreach ($f in $files) {
         try { $t = [IO.File]::ReadAllText($f.FullName, [Text.Encoding]::UTF8) } catch { continue }

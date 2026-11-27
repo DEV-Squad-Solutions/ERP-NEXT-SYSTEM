@@ -932,6 +932,8 @@ public sealed class InventoryMasterDeletionTests
 
                 CREATE TABLE ContainerMovements (
                     Id INTEGER PRIMARY KEY,
+                    SourceType INTEGER NOT NULL DEFAULT 1,
+                    RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
                     CompanyId INTEGER NOT NULL,
                     ContainerStoreId INTEGER NOT NULL,
                     IsDeleted INTEGER NOT NULL

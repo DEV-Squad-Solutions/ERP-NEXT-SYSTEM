@@ -317,6 +317,8 @@ public sealed class BusinessPartnerIntegrityServiceTests
 
                 CREATE TABLE ContainerMovements (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    SourceType INTEGER NOT NULL DEFAULT 1,
+                    RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
                     CompanyId INTEGER NOT NULL,
                     BusinessPartnerId INTEGER NOT NULL,
                     IsDeleted INTEGER NOT NULL

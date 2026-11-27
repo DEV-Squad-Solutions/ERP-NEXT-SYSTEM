@@ -756,6 +756,8 @@ internal sealed class CashManagementTestDatabase : IAsyncDisposable
 
             CREATE TABLE ContainerMovements (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                SourceType INTEGER NOT NULL DEFAULT 1,
+                RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
                 CompanyId INTEGER NOT NULL,
                 BusinessPartnerId INTEGER NOT NULL,
                 ContainerStoreId INTEGER NOT NULL,

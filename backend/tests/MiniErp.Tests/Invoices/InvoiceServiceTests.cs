@@ -8140,6 +8140,8 @@ public sealed class InvoiceServiceTests
 
                 CREATE TABLE ContainerMovements (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    SourceType INTEGER NOT NULL DEFAULT 1,
+                    RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
                     CompanyId INTEGER NOT NULL,
                     FiscalYearId INTEGER NOT NULL DEFAULT 1,
                     BusinessPartnerId INTEGER NOT NULL,

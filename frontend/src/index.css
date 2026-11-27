@@ -685,3 +685,8 @@ html.dark :where(.text-gold-700, .text-gold-600) { color: #e7c566; }
 html.dark :where(.text-slate-400, .text-ink-400, .text-ink-500) { color: #9fb1c7; }
 html.dark .dark\:text-ink-400, html.dark .dark\:text-ink-500 { color: #9fb1c7; }
 html.dark .recharts-legend-item-text { color: #cbd5e1 !important; }
+
+/* Light mode: slate/gray-400 text (#9AA6A0) is only ~2.5:1 on white. Darken it to ~5:1 (dark mode keeps its own colours). */
+html:not(.dark) :where(.text-slate-400, .text-gray-400) {
+  color: #66736c;
+}

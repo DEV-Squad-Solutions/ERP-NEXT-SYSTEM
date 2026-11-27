@@ -37,7 +37,7 @@ const compactStyles = {
 
   placeholder: (base) => ({
     ...base,
-    color: "#9AA6A0",
+    color: "#66736C",
     fontSize: "13px",
   }),
 

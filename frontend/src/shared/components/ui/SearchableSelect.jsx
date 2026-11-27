@@ -100,5 +100,5 @@ const defaultStyles = {
   }),
   menu: (base) => ({ ...base, zIndex: 9999 }),
   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-  placeholder: (base) => ({ ...base, color: "#9AA6A0" }),
+  placeholder: (base) => ({ ...base, color: "#66736C" }),
 };

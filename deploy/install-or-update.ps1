@@ -67,6 +67,7 @@ function Choose-Action {
 }
 
 $script:askN = 0
+$script:oldBackups = @()
 function Ask([string]$text) {
     if (-not $Gui) { return (Read-Host $text) }
     $script:askN++
@@ -78,6 +79,20 @@ function Ask([string]$text) {
     $a = [IO.File]::ReadAllText($f).Trim()
     Remove-Item $f -Force -ErrorAction SilentlyContinue
     return $a
+}
+function Ask-Choice([string]$text, [string[]]$keys, [string[]]$labels) {
+    # GUI: shows one button per choice. Console: asks to type the key. Returns the chosen key, or "" if cancelled.
+    if ($Gui) {
+        $pairs = for ($i = 0; $i -lt $keys.Count; $i++) { "{0}={1}" -f $keys[$i], $labels[$i] }
+        return (Ask ($text + " [[choices:" + ($pairs -join ";") + "]]"))
+    }
+    Write-Host ""; Write-Host "      $text" -ForegroundColor Yellow
+    for ($i = 0; $i -lt $keys.Count; $i++) { Write-Host ("        type {0} = {1}" -f $keys[$i], $labels[$i]) }
+    $a = (Read-Host "      Your choice (anything else cancels)").Trim().ToUpper()
+    if ($keys -contains $a) { return $a } else { return "" }
+}
+function Test-PortFree([int]$port) {
+    try { $l = New-Object System.Net.Sockets.TcpListener([System.Net.IPAddress]::Any, $port); $l.Start(); $l.Stop(); return $true } catch { return $false }
 }
 function Line($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
 function Step($n, $t) { Write-Host ""; Write-Host ("[{0}/{1}] {2}" -f $n, $total, $t) -ForegroundColor Cyan }
@@ -161,13 +176,23 @@ try {
         $foreign = docker ps -a --format "{{.Names}} ({{.Image}}, {{.Status}})" | Where-Object { $_ -match 'mssql|sql' -and $_ -notmatch '^erp-db ' }
         if ($foreign) {
             Info "Another SQL Server container exists (running or stopped): $($foreign -join ', ')"
-            Info "It is not managed by this installer and will NOT be touched."
-            Write-Host ""
-            Write-Host "      If it is unrelated to this ERP (for example an old test stack), type UNRELATED and press Enter to continue." -ForegroundColor Yellow
-            Write-Host "      If it holds your real data, press Enter only, and send the name to your developer." -ForegroundColor Yellow
-            $ans = Ask "Another SQL Server container exists. Type UNRELATED to continue (anything else stops)"
-            if ($ans -cne "UNRELATED") { Fail "Stopped by you: another SQL Server container exists ($($foreign -join ', '))." "Nothing was changed. Send the container name to your developer." "volume" }
-            Ok "Continuing. The other SQL container is left untouched."
+            Info "It will NOT be touched, stopped or deleted. A verified read-only backup is taken first."
+            $bakRoot = $(if (Test-Path "D:\") { "D:\minierp_backup" } else { Join-Path $BackupDir "old-sql-backup" })
+            $runningNow = @(docker ps --format "{{.Names}}")
+            foreach ($f in $foreign) {
+                $n = ($f -split ' ')[0]
+                if ($runningNow -notcontains $n) { Info "$n is stopped, so it cannot be read or backed up. It is left untouched."; continue }
+                Info "Backing up $n (read-only, verified). This can take a few minutes."
+                $dest = Join-Path $bakRoot $n
+                & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "minierp-backup.ps1") -Container $n -OutDir $dest -Embedded
+                if ($LASTEXITCODE -ne 0) { Fail "The safety backup of container $n failed or could not be verified." "Nothing was changed and the container was not touched. Send the log file to your developer." "volume" }
+                $rep = Get-ChildItem $dest -Filter "backup-report_*.txt" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+                $script:oldBackups += $dest
+                Ok "Verified backup of $n saved in: $dest"
+                if ($rep) { Info "Report (sizes and SHA256): $($rep.FullName)" }
+            }
+            Info "Please also copy that backup folder to a second disk or USB."
+            Ok "Continuing. The other SQL container was left untouched."
         }
     }
     if (-not $isUpdate) {
@@ -212,8 +237,37 @@ try {
 
     $apiPort = $(if (Get-EnvValue $envText "ERP_API_PORT") { Get-EnvValue $envText "ERP_API_PORT" } else { "8080" })
     $webPort = $(if (Get-EnvValue $envText "ERP_WEB_PORT") { Get-EnvValue $envText "ERP_WEB_PORT" } else { "80" })
-    $busy = docker ps --format "{{.Names}}|{{.Ports}}" | Where-Object { $_ -notmatch '^erp-' -and ($_ -match ":$apiPort->" -or $_ -match ":$webPort->") }
-    if ($busy) { Fail "Port $apiPort or $webPort is already used by another container: $(($busy | ForEach-Object { ($_ -split '\|')[0] }) -join ', ')." "Stop that container (docker stop <name>, nothing is deleted) or set ERP_API_PORT / ERP_WEB_PORT in .env to free ports, then run again." "docker2" }
+    $owners = @()
+    foreach ($p in @($apiPort, $webPort)) { $o = Get-PortOwner $p; if ($o -and $o -notmatch '^erp-' -and $owners -notcontains $o) { $owners += $o } }
+    $busyPorts = @($apiPort, $webPort) | Where-Object { (-not (Get-PortOwner $_ | Where-Object { $_ -match '^erp-' })) -and (-not (Test-PortFree ([int]$_))) }
+    if ($busyPorts) {
+        $who = $(if ($owners) { "container(s): " + ($owners -join ", ") } else { "another program on this PC" })
+        Info "Port(s) $($busyPorts -join ', ') are in use by $who."
+        $keys = @(); $labels = @()
+        if ($owners) { $keys += "STOP"; $labels += "Stop " + ($owners -join ", ") + " (stop only, nothing deleted)" }
+        $keys += "PORTS"; $labels += "Use other ports for ERP (set in .env)"
+        $c = Ask-Choice "Ports $($busyPorts -join ' and ') are in use by $who. Nothing is deleted either way. What do you want to do?" $keys $labels
+        if ($c -eq "STOP" -and $owners) {
+            foreach ($o in $owners) {
+                Info "Stopping $o (docker stop only; it is NOT removed and its data stays; start it again later with: docker start $o)"
+                docker stop $o | Out-Null
+                if ($LASTEXITCODE -ne 0) { Fail "Could not stop $o." "Nothing was deleted. Send the log file to your developer." "docker2" }
+            }
+            Start-Sleep -Seconds 2
+            $still = @($apiPort, $webPort) | Where-Object { -not (Test-PortFree ([int]$_)) }
+            if ($still) { Fail "Port(s) $($still -join ', ') are still in use after stopping the container(s)." "Another program uses them. Run again and choose other ports." "docker2" }
+            Ok "Stopped: $($owners -join ', '). Not deleted."
+        }
+        elseif ($c -eq "PORTS") {
+            $newApi = 18080; while (-not (Test-PortFree $newApi)) { $newApi++ }
+            $newWeb = 8081; while (($newWeb -eq $newApi) -or -not (Test-PortFree $newWeb)) { $newWeb++ }
+            $envText = Set-EnvValue (Set-EnvValue $envText "ERP_API_PORT" "$newApi") "ERP_WEB_PORT" "$newWeb"
+            [IO.File]::WriteAllText($envFile, $envText, (New-Object Text.UTF8Encoding($false)))
+            $apiPort = "$newApi"; $webPort = "$newWeb"
+            Ok "ERP will use port $webPort (web) and $apiPort (api). Saved in .env."
+        }
+        else { Fail "Ports $($busyPorts -join ', ') are in use and no choice was made." "Nothing was changed. Run again and choose Stop or Other ports." "docker2" }
+    }
     Ok "Ports $webPort (web) and $apiPort (api) are free"
 
     $tar = Get-ChildItem @($PSScriptRoot, (Join-Path $PSScriptRoot "..\images")) -Filter "erp-images-*.tar" -ErrorAction SilentlyContinue |
@@ -331,11 +385,12 @@ try {
     Line "  Version   : $version" White
     Line ("  Open      : http://localhost{0}   (other PCs: http://192.168.1.5{0})" -f $(if ($webPort -ne "80") { ":$webPort" } else { "" })) White
     Line "  Health    : http://localhost:$apiPort/health/ready" White
+    foreach ($ob in $script:oldBackups) { Line "  Old SQL backup : $ob" White }
     Line "  Backup    : $bakName" White
     Line "  Log file  : $logFile" White
     Write-Host ""
     try { Stop-Transcript | Out-Null } catch { }
-    if ($Gui) { Write-Host ("@@DONE|{0}|{1}|{2}|{3}" -f $(if ($isUpdate) { "UPDATE" } else { "INSTALL" }), $version, $bakName, $logFile) }
+    if ($Gui) { Write-Host ("@@DONE|{0}|{1}|{2}|{3}|{4}|{5}" -f $(if ($isUpdate) { "UPDATE" } else { "INSTALL" }), $version, $bakName, $logFile, ($script:oldBackups -join "; "), $webPort) }
     Show-Ar $(if ($isUpdate) { "okupd" } else { "okfresh" })
     exit 0
 }

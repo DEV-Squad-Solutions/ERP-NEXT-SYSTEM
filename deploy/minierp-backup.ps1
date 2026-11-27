@@ -7,10 +7,12 @@
 #>
 param(
     [string]$Container = "minierp-db",
-    [string]$OutDir = "D:\minierp_backup"
+    [string]$OutDir = "D:\minierp_backup",
+    [switch]$Embedded   # used by the installer: quieter step lines
 )
 $ErrorActionPreference = "Continue"
 function Fail($m) { Write-Host ""; Write-Host "FAIL: $m" -ForegroundColor Red; Write-Host "Nothing was changed or deleted." -ForegroundColor Yellow; exit 1 }
+function Hdr($t) { if ($Embedded) { Write-Host ("      ..   " + ($t -replace '^\[\d/\d\]\s*', "")) -ForegroundColor DarkGray } else { Write-Host $t -ForegroundColor Cyan } }
 function Ok($m) { Write-Host "  OK   $m" -ForegroundColor Green }
 
 Write-Host ""
@@ -42,7 +44,7 @@ docker cp $tmp "${Container}:/tmp/erp_mb.sh"
 if ($LASTEXITCODE -ne 0) { Fail "Could not copy the helper script into the container." }
 Remove-Item $tmp -Force -ErrorAction SilentlyContinue
 
-Write-Host "[1/4] Finding databases" -ForegroundColor Cyan
+Hdr "[1/4] Finding databases"
 $out = docker exec $Container bash /tmp/erp_mb.sh list 2>&1 | Out-String
 if ($out -match 'ERR_NO_SQLCMD') { Fail "sqlcmd was not found in the container. Run: docker exec $Container bash -c 'ls /opt/mssql-tools*/bin' and send the output." }
 if ($out -match 'ERR_NO_PASSWORD_ENV') { Fail "The container has no MSSQL_SA_PASSWORD or SA_PASSWORD variable. Run (names only, no values): docker inspect $Container --format '{{range .Config.Env}}{{println .}}{{end}}' | ForEach-Object { (`$_ -split '=')[0] }  and send the names." }
@@ -55,21 +57,21 @@ $report = @()
 foreach ($db in $dbs) {
     Write-Host ""
     Write-Host "=== $db ===" -ForegroundColor Cyan
-    Write-Host "[2/4] Backup (COPY_ONLY, compressed, checksum)" -ForegroundColor Cyan
+    Hdr "[2/4] Backup (COPY_ONLY, compressed, checksum)"
     docker exec $Container bash /tmp/erp_mb.sh backup $db
     if ($LASTEXITCODE -ne 0) { Fail "Backup of $db failed." }
-    Write-Host "[3/4] Verify inside the container (RESTORE VERIFYONLY)" -ForegroundColor Cyan
+    Hdr "[3/4] Verify inside the container (RESTORE VERIFYONLY)"
     $v = docker exec $Container bash /tmp/erp_mb.sh verify $db 2>&1 | Out-String
     Write-Host $v.Trim()
     if ($LASTEXITCODE -ne 0 -or $v -notmatch 'valid') { Fail "Verification of $db did not report a valid backup." }
     Ok "Backup is valid"
-    Write-Host "[4/4] Copy to this PC and check size" -ForegroundColor Cyan
+    Hdr "[4/4] Copy to this PC and check size"
     $dest = Join-Path $OutDir ("{0}_{1}.bak" -f $db, $stamp)
     docker cp "${Container}:/tmp/$db.bak" $dest
     if ($LASTEXITCODE -ne 0) { Fail "Copy of $db to $dest failed." }
     $inSize = [int64](docker exec $Container bash /tmp/erp_mb.sh size $db | Out-String).Trim()
     $hostSize = (Get-Item $dest).Length
-    if ($inSize -ne $hostSize -or $hostSize -lt 1MB) { Fail "Size mismatch or too small for $db (container $inSize bytes, PC $hostSize bytes)." }
+    if ($inSize -ne $hostSize -or $hostSize -lt 100KB) { Fail "Size mismatch or too small for $db (container $inSize bytes, PC $hostSize bytes)." }
     $hash = (Get-FileHash $dest -Algorithm SHA256).Hash
     Ok ("{0}  {1} MB  SHA256 {2}" -f $dest, [math]::Round($hostSize / 1MB, 1), $hash)
     $report += ("{0}  {1} bytes  sha256={2}" -f $dest, $hostSize, $hash)

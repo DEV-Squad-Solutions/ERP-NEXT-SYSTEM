@@ -88,3 +88,8 @@ Ports can be changed in `.env` with `ERP_API_PORT` / `ERP_WEB_PORT` (defaults 80
 
 `powershell -ExecutionPolicy Bypass -File .\minierp-backup.ps1` (or `tools\Backup old MiniErp container.bat`).
 It makes a verified COPY_ONLY backup of every database in `minierp-db` into `D:\minierp_backup`. It changes nothing in the container.
+
+## Other SQL Server container / busy ports (automatic)
+
+If the installer finds another SQL Server container (for example an old MiniErp), it first takes a verified read-only backup of it (COPY_ONLY, RESTORE VERIFYONLY, size and SHA256 check) into `D:\minierp_backup\<container>` (or `C:\ERP_backup\old-sql-backup\<container>` if there is no D: drive), shows the path in the window and the summary, then continues. The other container is never stopped or changed by the backup. If the backup or the check fails, the installer stops. A stopped container cannot be read, so it is only reported and left untouched.
+If port 80 or 8080 is used by another container, the window shows two buttons: stop that container (stop only, never deleted; start it again with `docker start <name>`) or let ERP use other ports (saved in `.env`). Copy the backup folder to a second disk or USB.

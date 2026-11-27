@@ -38,7 +38,7 @@ $T = @{
     steps = "Steps"; log = "Live log"; ready = "Ready. Choose an action."; running = "Running... please wait. Do not close this window."
     okTitle = "SUCCESS"; failTitle = "STOPPED - nothing was deleted, your data is safe"; cancelTitle = "Cancelled - nothing was changed"
     next = "What to do next"; busy = "An operation is running. Please wait until it finishes."
-    ok = "OK"; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; open = "Open"
+    ok = "OK"; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; oldbak = "Old SQL container backup"; open = "Open"
     s_install = @("Check Docker", "Install type and config", "Backup", "Load images", "Start services", "Health check")
     s_switch = @("Safety backup", "Restore database (optional)", "Switch code", "Health check")
     s_status = @("Read status")
@@ -50,7 +50,7 @@ $T = @{
     steps = "الخطوات"; log = "السجل المباشر"; ready = "جاهز. اختار إجراء."; running = "جاري التنفيذ... استنى. متقفلش النافذة دي."
     okTitle = "تم بنجاح"; failTitle = "اتوقف - مفيش حاجة اتمسحت والداتا سليمة"; cancelTitle = "اتلغى - مفيش حاجة اتغيّرت"
     next = "الخطوة الجاية"; busy = "فيه عملية شغالة. استنى لحد ما تخلص."
-    ok = "موافق"; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; open = "افتح"
+    ok = "موافق"; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; oldbak = "نسخة الـ SQL القديم"; open = "افتح"
     s_install = @("فحص Docker", "نوع التثبيت والإعدادات", "نسخة احتياطية", "تحميل الصور", "تشغيل الخدمات", "فحص الجاهزية")
     s_switch = @("نسخة أمان", "استرجاع الداتا (اختياري)", "تبديل الكود", "فحص الجاهزية")
     s_status = @("قراءة الحالة")
@@ -226,6 +226,11 @@ function Show-Result([string]$kind, [string]$text) {   # kind: ok | fail | cance
 }
 
 function Ask-Input([string]$prompt) {
+    $choices = @()
+    if ($prompt -match '\[\[choices:(.*?)\]\]\s*$') {
+        foreach ($p in ($Matches[1] -split ';')) { $kv = $p -split '=', 2; $choices += , @($kv[0], $kv[1]) }
+        $prompt = ($prompt -replace '\s*\[\[choices:.*?\]\]\s*$', '')
+    }
     $dlg = New-Object System.Windows.Forms.Form
     $dlg.Text = (L "promptTitle"); $dlg.ClientSize = New-Object System.Drawing.Size([Math]::Min(720, $wa.Width - 40), [Math]::Min(470, $wa.Height - 60)); $dlg.StartPosition = "CenterParent"; $dlg.Font = $font
     $dlg.RightToLeft = $form.RightToLeft; $dlg.RightToLeftLayout = ($script:lang -eq "ar")
@@ -241,13 +246,24 @@ function Ask-Input([string]$prompt) {
     $pnl = New-Object System.Windows.Forms.FlowLayoutPanel; $pnl.Dock = "Bottom"; $pnl.Height = 52; $pnl.Padding = New-Object System.Windows.Forms.Padding(8)
     $ok = New-Object System.Windows.Forms.Button; $ok.Text = (L "ok"); $ok.Width = 110; $ok.Height = 34; $ok.DialogResult = "OK"
     $cn = New-Object System.Windows.Forms.Button; $cn.Text = (L "cancel"); $cn.Width = 110; $cn.Height = 34; $cn.DialogResult = "Cancel"
-    $pnl.Controls.AddRange(@($ok, $cn))
+    $script:choiceAns = ""
+    if ($choices.Count -gt 0) {
+        $pnl.Height = 60 * $choices.Count + 50; $pnl.FlowDirection = "TopDown"; $pnl.WrapContents = $false
+        foreach ($c in $choices) {
+            $cb = New-Object System.Windows.Forms.Button; $cb.Text = $c[1]; $cb.Tag = $c[0]; $cb.Width = [Math]::Max(300, $dlg.ClientSize.Width - 40); $cb.Height = 48
+            $cb.FlatStyle = "Flat"; $cb.BackColor = [System.Drawing.Color]::FromArgb(37, 120, 214); $cb.ForeColor = "White"; $cb.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
+            $cb.Add_Click({ param($s, $e) $script:choiceAns = [string]$s.Tag; $fm = $s.FindForm(); $fm.DialogResult = "OK"; $fm.Close() })
+            $pnl.Controls.Add($cb)
+        }
+        $pnl.Controls.Add($cn)
+        $tb.Visible = $false
+    } else { $pnl.Controls.AddRange(@($ok, $cn)) }
     $ctx.Dock = "Fill"; $ctx.Height = 100
     $dlg.Controls.Add($ctx); $dlg.Controls.Add($tb); $dlg.Controls.Add($lbl); $dlg.Controls.Add($pnl)
     $dlg.AcceptButton = $ok; $dlg.CancelButton = $cn
     $dlg.ActiveControl = $tb
     $r = $dlg.ShowDialog($form)
-    $ans = $(if ($r -eq "OK") { $tb.Text.Trim() } else { "" })
+    $ans = $(if ($r -eq "OK") { $(if ($choices.Count -gt 0) { $script:choiceAns } else { $tb.Text.Trim() }) } else { "" })
     $dlg.Dispose()
     return $ans
 }
@@ -301,11 +317,12 @@ function Finish-Run {
         for ($k = 1; $k -le $script:stepLabels.Count; $k++) { if ($script:stepLabels[$k - 1].Text -match [char]0x25B6) { Set-Step $k "ok" } }
         $prog.Value = 100
         $d = $script:done
-        $mode = $d[1]; $ver = $d[2]; $bak = $d[3]; $lf = $d[4]
+        $mode = $d[1]; $ver = $d[2]; $bak = $d[3]; $lf = $d[4]; $oldBak = $(if ($d.Count -gt 5) { $d[5] } else { "" }); $wp = $(if ($d.Count -gt 6 -and $d[6]) { $d[6] } else { "80" })
         $lblState.Text = (L "okTitle")
         if ($mode -eq "STATUS") { Set-Step 1 "ok"; Show-Result "ok" ((L "okTitle")); return }
-        $lines = @((L "okTitle"), ("{0}: {1}" -f (L "version"), $ver), ("{0}: {1}" -f (L "open"), "http://localhost   (http://192.168.1.5)"))
+        $lines = @((L "okTitle"), ("{0}: {1}" -f (L "version"), $ver), ("{0}: {1}" -f (L "open"), $(if ($wp -eq "80") { "http://localhost   (http://192.168.1.5)" } else { "http://localhost:$wp   (http://192.168.1.5:$wp)" })))
         if ($bak) { $lines += ("{0}: {1}" -f (L "backup"), $bak) }
+        if ($oldBak) { $lines += ("{0}: {1}" -f (L "oldbak"), $oldBak) }
         if ($lf) { $lines += ("{0}: {1}" -f (L "logfile"), $lf) }
         if ($script:lang -eq "ar") {
             $key = $(if ($mode -eq "UPDATE") { "okupd" } elseif ($mode -eq "INSTALL") { "okfresh" } else { "" })

@@ -248,6 +248,17 @@ html.dark
   ) {
   border-color: rgba(255, 255, 255, 0.1);
 }
+/* Plain text-ink (and its opacity variants) are navy: unreadable on dark
+   surfaces. Exact class-token matches, so hover:/focus: variants are untouched. */
+html.dark :where(.text-ink) {
+  color: #e5eaf1;
+}
+html.dark :where(
+    [class~="text-ink/30"], [class~="text-ink/40"], [class~="text-ink/50"], [class~="text-ink/60"],
+    [class~="text-ink/70"], [class~="text-ink/80"], [class~="text-ink/90"]
+  ) {
+  color: #b4c2d3;
+}
 html.dark :where(input, select, textarea) {
   background-color: rgb(var(--c-dk-field));
   color: #e5eaf1;
@@ -602,3 +613,24 @@ body,
   table.cards-on-phone td > * { min-width: 0; max-width: 100%; }
   table.cards-on-phone td[data-wide] { justify-content: center; }
 }
+
+@media (max-width: 639px) {
+  html.dark table.ledger-cards tbody tr {
+    background: rgb(var(--c-dk-surface));
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  html.dark table.cards-on-phone tr {
+    background: rgb(var(--c-dk-surface));
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+  html.dark table.cards-on-phone td[data-label]:not([data-label=""])::before {
+    color: #9fb1c7;
+  }
+}
+
+/* Extra dark-mode readability for colored text that only had light-mode values. */
+html.dark :where(.text-emerald-900, .text-emerald-800, .text-emerald-700) { color: #6ee7b7; }
+html.dark :where(.text-primary-700, .text-primary-600, .text-primary-500) { color: #8fc7ff; }
+html.dark :where(.text-gold-700, .text-gold-600) { color: #e7c566; }
+html.dark :where(.text-slate-400, .text-ink-400, .text-ink-500) { color: #9fb1c7; }
+html.dark .dark\:text-ink-400, html.dark .dark\:text-ink-500 { color: #9fb1c7; }

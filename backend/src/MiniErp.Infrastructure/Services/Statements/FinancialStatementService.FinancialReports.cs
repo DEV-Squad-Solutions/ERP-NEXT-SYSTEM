@@ -517,7 +517,13 @@ public sealed partial class FinancialStatementService
                 AccountId: null,
                 AccountCode: null,
                 AccountName: null,
-                AccountType: null,
+                // نوع الحساب المشترك لبنود المجموعة (إيراد/مصروف) حتى تصنّف الواجهة البند؛ null لو مختلط.
+                AccountType: group
+                    .Select(item => item.AccountType)
+                    .Distinct()
+                    .Count() == 1
+                    ? group.First().AccountType
+                    : null,
                 OpeningDebit: group.Sum(item => item.OpeningDebit),
                 OpeningCredit: group.Sum(item => item.OpeningCredit),
                 PeriodDebit: group.Sum(item => item.PeriodDebit),

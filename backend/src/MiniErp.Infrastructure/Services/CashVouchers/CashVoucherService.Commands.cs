@@ -551,8 +551,12 @@ public sealed partial class CashVoucherService
         if (id <= 0)
             return Result.Failure(InvalidId());
 
-        await using var transaction = await dbContext.Database
-            .BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+        // When called from a bulk batch the caller already owns the transaction
+        // (and rolls it back on failure); join it instead of opening a nested one.
+        await using var transaction = dbContext.Database.CurrentTransaction is null
+            ? await dbContext.Database.BeginTransactionAsync(
+                IsolationLevel.Serializable, cancellationToken)
+            : null;
 
         var voucher = await dbContext.CashVouchers.FirstOrDefaultAsync(
             entity => entity.Id == id && entity.CompanyId == companyId,
@@ -585,7 +589,7 @@ public sealed partial class CashVoucherService
                     cancellationToken);
             if (fiscalYearResult.IsFailure)
             {
-                await transaction.RollbackAsync(cancellationToken);
+                if (transaction is not null) await transaction.RollbackAsync(cancellationToken);
                 return Result.Failure(fiscalYearResult.Errors);
             }
         }
@@ -614,18 +618,18 @@ public sealed partial class CashVoucherService
                     .DeleteAsync(voucher.Id, cancellationToken);
                 if (postingResult.IsFailure)
                 {
-                    await transaction.RollbackAsync(cancellationToken);
+                    if (transaction is not null) await transaction.RollbackAsync(cancellationToken);
                     dbContext.ChangeTracker.Clear();
                     return postingResult;
                 }
             }
 
             await dbContext.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
+            if (transaction is not null) await transaction.CommitAsync(cancellationToken);
         }
         catch (DbUpdateConcurrencyException)
         {
-            await transaction.RollbackAsync(cancellationToken);
+            if (transaction is not null) await transaction.RollbackAsync(cancellationToken);
             dbContext.ChangeTracker.Clear();
             return Result.Failure(Concurrency());
         }

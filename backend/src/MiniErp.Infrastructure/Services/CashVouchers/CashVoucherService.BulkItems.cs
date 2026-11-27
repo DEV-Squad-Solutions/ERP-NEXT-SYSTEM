@@ -262,6 +262,14 @@ public sealed partial class CashVoucherService
         CancellationToken cancellationToken)
     {
         var result = await DeleteAsync(item.Id, cancellationToken);
-        return Result<CashVoucherBulkItemResponse>.Failure(result.Errors);
+        if (result.IsFailure)
+            return Result<CashVoucherBulkItemResponse>.Failure(result.Errors);
+
+        return Result<CashVoucherBulkItemResponse>.Success(
+            new CashVoucherBulkItemResponse(
+                Action: CashVoucherBulkAction.Delete,
+                Status: "Deleted",
+                Id: item.Id,
+                Voucher: null));
     }
 }

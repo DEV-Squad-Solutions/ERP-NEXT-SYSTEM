@@ -504,6 +504,60 @@ public sealed class BusinessPartnerContainerStoreServiceTests
                     DeletedByPc TEXT NULL,
                     IsDeleted INTEGER NOT NULL
                 );
+
+                CREATE TABLE JournalEntries (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CompanyId INTEGER NOT NULL,
+                    FiscalYearId INTEGER NOT NULL,
+                    EntryNumber TEXT NOT NULL,
+                    EntryDate TEXT NOT NULL,
+                    Description TEXT NOT NULL,
+                    EntryType INTEGER NOT NULL,
+                    SourceType INTEGER NULL,
+                    SourceId INTEGER NULL,
+                    SourceNumber TEXT NULL,
+                    Status INTEGER NOT NULL,
+                    PostedOn TEXT NOT NULL,
+                    ReversedOn TEXT NULL,
+                    ReversalOfEntryId INTEGER NULL,
+                    RowVersion BLOB NOT NULL DEFAULT (randomblob(8)),
+                    CreatedById TEXT NOT NULL DEFAULT '',
+                    CreatedOn TEXT NOT NULL DEFAULT '0001-01-01',
+                    CreatedByPc TEXT NOT NULL DEFAULT '',
+                    UpdatedById TEXT NULL,
+                    UpdatedOn TEXT NULL,
+                    UpdatedByPc TEXT NULL,
+                    DeletedById TEXT NULL,
+                    DeletedOn TEXT NULL,
+                    DeletedByPc TEXT NULL,
+                    IsDeleted INTEGER NOT NULL DEFAULT 0
+                );
+
+                CREATE TABLE JournalEntryLines (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    CompanyId INTEGER NOT NULL,
+                    JournalEntryId INTEGER NOT NULL,
+                    AccountId INTEGER NOT NULL,
+                    PartyType INTEGER NULL,
+                    PartyId INTEGER NULL,
+                    Description TEXT NULL,
+                    Debit TEXT NOT NULL,
+                    Credit TEXT NOT NULL,
+                    Currency INTEGER NOT NULL DEFAULT 1,
+                    ExchangeRate TEXT NOT NULL DEFAULT 1,
+                    TransactionDebit TEXT NOT NULL DEFAULT 0,
+                    TransactionCredit TEXT NOT NULL DEFAULT 0,
+                    CreatedById TEXT NOT NULL DEFAULT '',
+                    CreatedOn TEXT NOT NULL DEFAULT '0001-01-01',
+                    CreatedByPc TEXT NOT NULL DEFAULT '',
+                    UpdatedById TEXT NULL,
+                    UpdatedOn TEXT NULL,
+                    UpdatedByPc TEXT NULL,
+                    DeletedById TEXT NULL,
+                    DeletedOn TEXT NULL,
+                    DeletedByPc TEXT NULL,
+                    IsDeleted INTEGER NOT NULL DEFAULT 0
+                );
                 """);
         }
 

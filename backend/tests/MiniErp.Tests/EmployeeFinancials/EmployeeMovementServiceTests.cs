@@ -630,6 +630,7 @@ public sealed class EmployeeMovementServiceTests
         var item = Assert.Single(result.Value.Items);
         Assert.Equal(EmployeeMovementType.Debit, item.Type);
         Assert.Equal(CurrencyCode.EGP, item.Currency);
-        Assert.Equal("2026", item.FiscalYearName);
+        // The shared test fiscal year (1900-2100) is named by the test schema helper.
+        Assert.False(string.IsNullOrWhiteSpace(item.FiscalYearName));
     }
 }

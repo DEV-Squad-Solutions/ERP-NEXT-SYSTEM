@@ -15,6 +15,11 @@ try {
 }
 catch { exit 100 }
 
+$RootDir = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })   # folder with .env, docker-compose.yml, images, logs
+try {
+    [System.Windows.Forms.Application]::SetUnhandledExceptionMode([System.Windows.Forms.UnhandledExceptionMode]::CatchException)
+    [System.Windows.Forms.Application]::add_ThreadException({ param($s, $e) Log-GuiError $e.Exception "ui" })
+} catch { }
 $script:lang = "en"
 $script:proc = $null
 $script:outFile = $null
@@ -79,8 +84,10 @@ $wa = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
 $fw = [Math]::Min(1000, $wa.Width - 20); $fh = [Math]::Min(700, $wa.Height - 10)
 $form.Size = New-Object System.Drawing.Size($fw, $fh)
 $form.MinimumSize = New-Object System.Drawing.Size([Math]::Min(780, $fw), [Math]::Min(560, $fh))
-$form.StartPosition = "CenterScreen"
-$iconFile = Join-Path $PSScriptRoot "erp-icon.ico"
+$form.StartPosition = "Manual"; $form.AutoScaleMode = "None"
+$form.Location = New-Object System.Drawing.Point([Math]::Max($wa.Left, $wa.Left + [int](($wa.Width - $fw) / 2)), [Math]::Max($wa.Top, $wa.Top + [int](($wa.Height - $fh) / 2)))
+$form.Add_Shown({ try { $w2 = [System.Windows.Forms.Screen]::FromControl($form).WorkingArea; if ($form.Height -gt $w2.Height) { $form.Height = $w2.Height }; if ($form.Width -gt $w2.Width) { $form.Width = $w2.Width }; $x = [Math]::Min([Math]::Max($form.Left, $w2.Left), $w2.Right - $form.Width); $y = [Math]::Min([Math]::Max($form.Top, $w2.Top), $w2.Bottom - $form.Height); $form.Location = New-Object System.Drawing.Point($x, $y) } catch { } })
+$iconFile = Join-Path $PSScriptRoot "assets\erp-icon.ico"
 if (Test-Path $iconFile) { try { $form.Icon = New-Object System.Drawing.Icon($iconFile) } catch {} }
 $form.Font = $font
 $form.BackColor = $cBg
@@ -133,7 +140,7 @@ $side = New-Panel $cSide
 $side.Dock = "Fill"
 $pic = New-Object System.Windows.Forms.PictureBox
 $pic.SizeMode = "Zoom"; $pic.Dock = "Top"; $pic.Height = 170; $pic.BackColor = $cSide
-$logoFile = Join-Path $PSScriptRoot "devsquad-logo.jpg"
+$logoFile = Join-Path $PSScriptRoot "assets\devsquad-logo.jpg"
 if (Test-Path $logoFile) { try { $pic.Image = [System.Drawing.Image]::FromFile($logoFile) } catch {} }
 $nav = New-Object System.Windows.Forms.FlowLayoutPanel
 $nav.Dock = "Fill"; $nav.FlowDirection = "TopDown"; $nav.WrapContents = $false; $nav.Padding = New-Object System.Windows.Forms.Padding(14, 18, 14, 0); $nav.BackColor = $cSide
@@ -172,7 +179,7 @@ $lblTitle.Dock = "Top"; $lblTitle.Height = 36; $lblTitle.ForeColor = "White"; $l
 $lblSub = New-Object System.Windows.Forms.Label
 $lblSub.Dock = "Fill"; $lblSub.ForeColor = $cMuted; $lblSub.Font = $font
 $verTxt = ""
-$tarFound = Get-ChildItem @($PSScriptRoot, (Join-Path $PSScriptRoot "..\images")) -Filter "erp-images-*.tar" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+$tarFound = Get-ChildItem @($RootDir, (Join-Path $RootDir "images")) -Filter "erp-images-*.tar" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if ($tarFound) { $verTxt = "v" + ($tarFound.BaseName -replace '^erp-images-', '') }
 $chip = New-Object System.Windows.Forms.Label
 $chip.Dock = "Right"; $chip.Width = 84; $chip.Text = $(if ($verTxt) { $verTxt } else { "ERP" }); $chip.TextAlign = "MiddleCenter"
@@ -243,6 +250,13 @@ $form.Controls.Add($root)
 
 function Layout-Header { }
 
+function Log-GuiError($ex, [string]$where) {
+    try {
+        $d = Join-Path $RootDir "logs"; New-Item -ItemType Directory -Force -Path $d | Out-Null
+        Add-Content -Path (Join-Path $d "gui-error.log") -Value ("{0} [{1}] {2}`r`n{3}`r`n" -f (Get-Date -Format s), $where, $ex.Message, $ex.ToString()) -Encoding UTF8
+    } catch { }
+    try { Write-Log ("GUI error ({0}): {1}   (details: logs\gui-error.log)" -f $where, $ex.Message) ([System.Drawing.Color]::OrangeRed) } catch { }
+}
 function Write-Log([string]$text, $color) {
     $log.SelectionStart = $log.TextLength
     $log.SelectionColor = $color
@@ -271,7 +285,7 @@ function Build-Steps([string[]]$names) {
         $card.Controls.Add($l); $card.Controls.Add($strip)
         Make-Round $card 8
         Tween $card $cCard 450; Tween $strip $cBorder 450
-        $stepsPanel.Controls.Add($card)
+        if ($script:lang -eq "ar") { $stepsPanel.Controls.Add($card, ($cols - 1 - $i), 0) } else { $stepsPanel.Controls.Add($card, $i, 0) }
         $script:stepLabels += $l; $script:stepStrips += $strip
     }
 }
@@ -287,18 +301,49 @@ function Set-Step([int]$i, [string]$state) {   # state: run | ok | fail | skip |
     }
 }
 
-function Apply-Lang {
-    $rtl = ($script:lang -eq "ar")
-    $form.RightToLeft = $(if ($rtl) { "Yes" } else { "No" })
+function Set-Rtl([bool]$rtl) {
+    # manual right-to-left: text alignment per control and mirrored placement of the main blocks (the whole-form RightToLeft mirror is not used: it can break painting)
+    $rt = $(if ($rtl) { "Yes" } else { "No" })
+    foreach ($c in @($lblTitle, $lblSub, $lblState, $stepsCap, $logCap, $btnCopy, $resTitle, $resBody)) { $c.RightToLeft = $rt }
+    foreach ($nb in @($btnInstall, $btnSwitch, $btnStatus)) { $nb.RightToLeft = $rt; $nb.TextAlign = $(if ($rtl) { "MiddleRight" } else { "MiddleLeft" }); $nb.Padding = $(if ($rtl) { New-Object System.Windows.Forms.Padding(10, 0, 16, 0) } else { New-Object System.Windows.Forms.Padding(16, 0, 10, 0) }) }
     $log.RightToLeft = "No"
-    $form.Text = (L "title"); $lblTitle.Text = (L "title"); $lblSub.Text = (L "sub")
-    $btnInstall.Text = ([string][char]0x2B07 + "   " + (L "install")); $btnSwitch.Text = ([string][char]0x21C4 + "   " + (L "switchv")); $btnStatus.Text = ([string][char]0x25C9 + "   " + (L "status")); $btnClose.Text = (L "close")
-    $stepsCap.Text = (L "steps"); $logCap.Text = (L "log"); $btnCopy.Text = (L "copylog")
-    $tip.SetToolTip($btnInstall, (L "tipInstall")); $tip.SetToolTip($btnSwitch, (L "tipSwitch")); $tip.SetToolTip($btnStatus, (L "tipStatus")); $tip.SetToolTip($btnCopy, (L "tipCopy"))
-    $btnEn.FlatAppearance.BorderColor = $(if (-not $rtl) { $cCyan } else { $cBorder })
-    $btnAr.FlatAppearance.BorderColor = $(if ($rtl) { $cCyan } else { $cBorder })
-    if (-not $script:proc) { $lblState.Text = (L "ready") } else { $lblState.Text = (L "running") }
-    if ($script:op) { $key = "s_" + $script:op; $cur = $script:curStep; Build-Steps (L $key); for ($i = 1; $i -lt $cur; $i++) { Set-Step $i "ok" }; if ($script:proc -and $cur -gt 0) { Set-Step $cur "run" } }
+    $root.SuspendLayout()
+    $root.ColumnStyles.Clear()
+    if ($rtl) {
+        [void]$root.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle("Percent", 100)))
+        [void]$root.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle("Absolute", 224)))
+        $root.SetColumn($content, 0); $root.SetColumn($side, 1)
+        $chipHolder.Dock = "Left"; $btnCopy.Dock = "Left"
+    } else {
+        [void]$root.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle("Absolute", 224)))
+        [void]$root.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle("Percent", 100)))
+        $root.SetColumn($side, 0); $root.SetColumn($content, 1)
+        $chipHolder.Dock = "Right"; $btnCopy.Dock = "Right"
+    }
+    $root.ResumeLayout($true)
+}
+
+function Apply-Lang {
+    try {
+        $rtl = ($script:lang -eq "ar")
+        Set-Rtl $rtl
+        $form.Text = (L "title"); $lblTitle.Text = (L "title"); $lblSub.Text = (L "sub")
+        $btnInstall.Text = ([string][char]0x2B07 + "   " + (L "install")); $btnSwitch.Text = ([string][char]0x21C4 + "   " + (L "switchv")); $btnStatus.Text = ([string][char]0x25C9 + "   " + (L "status")); $btnClose.Text = (L "close")
+        $stepsCap.Text = (L "steps"); $logCap.Text = (L "log"); $btnCopy.Text = (L "copylog")
+        $tip.SetToolTip($btnInstall, (L "tipInstall")); $tip.SetToolTip($btnSwitch, (L "tipSwitch")); $tip.SetToolTip($btnStatus, (L "tipStatus")); $tip.SetToolTip($btnCopy, (L "tipCopy"))
+        $btnEn.FlatAppearance.BorderColor = $(if (-not $rtl) { $cCyan } else { $cBorder })
+        $btnAr.FlatAppearance.BorderColor = $(if ($rtl) { $cCyan } else { $cBorder })
+        if (-not $script:proc) { $lblState.Text = (L "ready") } else { $lblState.Text = (L "running") }
+        if ($script:op) { $key = "s_" + $script:op; $cur = $script:curStep; Build-Steps (L $key); for ($i = 1; $i -lt $cur; $i++) { Set-Step $i "ok" }; if ($script:proc -and $cur -gt 0) { Set-Step $cur "run" } }
+        else { Build-Steps (L "s_install") }
+    }
+    catch {
+        Log-GuiError $_.Exception "language"
+        if ($script:lang -eq "ar") {
+            $script:lang = "en"
+            try { Set-Rtl $false; $form.Text = (L "title"); $lblTitle.Text = (L "title"); $lblSub.Text = (L "sub"); $btnInstall.Text = (L "install"); $btnSwitch.Text = (L "switchv"); $btnStatus.Text = (L "status"); $btnClose.Text = (L "close") } catch { }
+        }
+    }
 }
 
 function Set-Busy([bool]$b) {
@@ -508,8 +553,8 @@ $btnInstall.Add_Click({ Start-Op "install" })
 $btnSwitch.Add_Click({ Start-Op "switch" })
 $btnStatus.Add_Click({ Start-Op "status" })
 $btnClose.Add_Click({ $form.Close() })
-$btnEn.Add_Click({ $script:lang = "en"; Apply-Lang })
-$btnAr.Add_Click({ $script:lang = "ar"; Apply-Lang })
+$btnEn.Add_Click({ try { $script:lang = "en"; Apply-Lang } catch { Log-GuiError $_.Exception "btnEn" } })
+$btnAr.Add_Click({ try { $script:lang = "ar"; Apply-Lang } catch { Log-GuiError $_.Exception "btnAr" } })
 $form.Add_FormClosing({
     if ($script:proc -and -not $script:proc.HasExited) {
         [void][System.Windows.Forms.MessageBox]::Show((L "busy"))

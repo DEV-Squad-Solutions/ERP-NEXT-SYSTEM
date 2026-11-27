@@ -9,7 +9,8 @@ param(
     [int]$RetainDays = 14
 )
 $ErrorActionPreference = "Stop"
-$envFile = Join-Path $PSScriptRoot ".env"
+$Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })   # folder with .env, docker-compose.yml, images, logs
+$envFile = Join-Path $Root ".env"
 if (-not (Test-Path $envFile)) { throw ".env file not found next to the script." }
 
 $saPass = $null
@@ -48,7 +49,7 @@ docker exec -u 0 erp-db rm -f $inContainer
 $cutoff = (Get-Date).AddDays(-$RetainDays)
 # Never delete a backup that release-history.txt points to (it is the data of a specific version).
 $keep = @()
-$hist = Join-Path $PSScriptRoot "release-history.txt"
+$hist = Join-Path $Root "release-history.txt"
 if (Test-Path $hist) { $keep = Get-Content $hist | ForEach-Object { if ($_ -match 'backup=(.*)$') { $Matches[1].Trim() } } }
 Get-ChildItem $BackupDir -Filter "MiniErp_*.bak" |
     Where-Object { $_.LastWriteTime -lt $cutoff -and ($keep -notcontains $_.FullName) } |

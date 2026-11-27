@@ -11,9 +11,12 @@ param(
     [string]$IoDir = ""
 )
 $ErrorActionPreference = "Continue"
-Set-Location $PSScriptRoot
+$Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })   # folder with .env, docker-compose.yml, images, logs
+Set-Location $Root
 $total = 6
-$logFile = Join-Path $PSScriptRoot ("erp-install-{0}.log" -f (Get-Date -Format "yyyyMMdd_HHmmss"))
+New-Item -ItemType Directory -Force -Path (Join-Path $Root "logs") | Out-Null
+Get-ChildItem $Root -Filter "erp-install-*.log" -File -ErrorAction SilentlyContinue | ForEach-Object { Move-Item $_.FullName (Join-Path $Root "logs") -Force -ErrorAction SilentlyContinue }
+$logFile = Join-Path (Join-Path $Root "logs") ("erp-install-{0}.log" -f (Get-Date -Format "yyyyMMdd_HHmmss"))
 try { Start-Transcript -Path $logFile -Force | Out-Null } catch { }
 
 # ---- Language: English (default, safe) or Arabic. A console cannot lay out Arabic right-to-left correctly, so Arabic
@@ -206,7 +209,7 @@ try {
         if ($users) { Fail "The data volume erp_sql_data is already used by another container: $($users -join ', '). Two SQL Server containers on the same data would corrupt it." "Do not continue. Send this name to your developer. Nothing was changed." "volume" }
     }
 
-    $envFile = Join-Path $PSScriptRoot ".env"
+    $envFile = Join-Path $Root ".env"
     $envText = ""
     if (Test-Path $envFile) { $envText = [IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8) }
     $sa = Get-EnvValue $envText "SQL_SA_PASSWORD"
@@ -215,14 +218,14 @@ try {
     if ($isUpdate) {
         Ok "Mode: UPDATE (existing database found)"
         if (-not $sa -or -not $jwt) {
-            if (-not (Test-Path $envFile)) { Copy-Item (Join-Path $PSScriptRoot ".env.example") $envFile }
+            if (-not (Test-Path $envFile)) { Copy-Item (Join-Path $Root ".env.example") $envFile }
             Fail "The .env file is missing the existing secrets. New secrets are NOT created on an update (they would break the database login)." ("Open this file in Notepad: $envFile . Fill these two lines with the SAME values as your old .env: SQL_SA_PASSWORD= and JWT_SIGNING_KEY= . Type them yourself in the file. Never send them in chat. Then run install-or-update.bat again.") "envmiss"
         }
         Ok "Existing secrets found in .env"
     }
     else {
         Ok "Mode: FRESH INSTALL (no existing database)"
-        if (-not $envText) { $envText = [IO.File]::ReadAllText((Join-Path $PSScriptRoot ".env.example"), [Text.Encoding]::UTF8) }
+        if (-not $envText) { $envText = [IO.File]::ReadAllText((Join-Path $Root ".env.example"), [Text.Encoding]::UTF8) }
         $changed = $false
         if (-not $sa)  { $envText = Set-EnvValue $envText "SQL_SA_PASSWORD" (New-Secret 28); $changed = $true; Ok "Generated a strong SQL password (stored only in .env, not shown)" }
         if (-not $jwt) { $envText = Set-EnvValue $envText "JWT_SIGNING_KEY" (New-Secret 48); $changed = $true; Ok "Generated a JWT signing key (stored only in .env, not shown)" }
@@ -270,7 +273,7 @@ try {
     }
     Ok "Ports $webPort (web) and $apiPort (api) are free"
 
-    $tar = Get-ChildItem @($PSScriptRoot, (Join-Path $PSScriptRoot "..\images")) -Filter "erp-images-*.tar" -ErrorAction SilentlyContinue |
+    $tar = Get-ChildItem @($Root, (Join-Path $Root "images")) -Filter "erp-images-*.tar" -ErrorAction SilentlyContinue |
         Sort-Object LastWriteTime -Descending | Select-Object -First 1
     $version = $null
     if ($tar) { $version = ($tar.BaseName -replace '^erp-images-', '') }
@@ -347,7 +350,7 @@ try {
     # remember what we are moving from, so a rollback is possible (images are never deleted)
     $prevImg = docker inspect -f "{{.Config.Image}}" erp-api 2>$null
     $prevVer = $(if ($prevImg -and $prevImg -match ':(.+)$') { $Matches[1] } else { "none" })
-    Add-Content -Path (Join-Path $PSScriptRoot "release-history.txt") -Value ("{0}|from={1}|to={2}|backup={3}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $prevVer, $version, $bakName) -Encoding UTF8
+    Add-Content -Path (Join-Path $Root "release-history.txt") -Value ("{0}|from={1}|to={2}|backup={3}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $prevVer, $version, $bakName) -Encoding UTF8
 
     # ---------- 5. Start ----------
     Step 5 "Starting services"

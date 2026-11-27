@@ -1,6 +1,6 @@
 # ERP server install and update guide (offline Windows server)
 
-**One file does it all:** double-click `install-or-update.bat`. It opens a window (English or Arabic, switch with the buttons at the top) with buttons **Install / Update**, **Switch version / Roll back** and **Status**, a step list, a progress bar, a live log, and a green SUCCESS or red STOPPED box with "what to do next". Typed confirmations (UNRELATED, RESTORE, version number) appear as input boxes. The window only runs the same scripts described below, so every safety rule is unchanged. If the window cannot start, the .bat falls back to the console version; you can also run `install-or-update-console.bat` directly.
+**One file does it all:** double-click `ERP Installer.bat`. It opens a window (English or Arabic, switch with the buttons at the top) with buttons **Install / Update**, **Switch version / Roll back** and **Status**, a step list, a progress bar, a live log, and a green SUCCESS or red STOPPED box with "what to do next". Typed confirmations (UNRELATED, RESTORE, version number) appear as input boxes. The window only runs the same scripts described below, so every safety rule is unchanged. If the window cannot start, the .bat falls back to the console version; you can also run `install-or-update-console.bat` directly.
 
 The rest of this guide describes what the steps do (same in the window and in the console). It detects a fresh install or an update and runs steps [1/6] to [6/6].
 At start it asks for a language: `1` English (default after 10 seconds) or `2` Arabic. In Arabic mode the messages (start, success, every error with its fix) appear in popup windows laid out right-to-left. The black console keeps short English progress lines because a console cannot lay out Arabic correctly. Full Arabic guide: `README-AR.md`.
@@ -11,7 +11,7 @@ At start it asks for a language: `1` English (default after 10 seconds) or `2` A
 | Step | Command | What it does |
 |---|---|---|
 | 1 | `git pull` | Gets the latest main |
-| 2 | `cd deploy`, then `powershell -ExecutionPolicy Bypass -File .\build-images.ps1 -Version 2.1` | Builds API + web and writes `erp-images-2.1.tar` into deploy (new number each time) |
+| 2 | `cd deploy`, then `powershell -ExecutionPolicy Bypass -File .\build\build-images.ps1 -Version 2.1` | Builds API + web and writes `erp-images-2.1.tar` into deploy (new number each time) |
 | 3 | Copy the whole **deploy** folder to the USB drive | |
 
 Success: `erp-images-2.1.tar` exists in deploy and the script prints DONE.
@@ -19,7 +19,7 @@ Success: `erp-images-2.1.tar` exists in deploy and the script prints DONE.
 ## 2. On the server (192.168.1.5)
 1. Copy the deploy folder from the USB drive to a fixed place, e.g. `C:\ERP\deploy` (same place every time).
 2. Start Docker Desktop and wait until it is running.
-3. Double-click **install-or-update.bat** and choose a language.
+3. Double-click **ERP Installer.bat** and choose a language.
 4. Wait. Loading images the first time can take a few minutes.
 
 | Step | What it does | Success looks like |
@@ -38,7 +38,7 @@ The summary shows the version, URLs, backup path and the log file (`erp-install-
 - **Update of a running system:** the installer does **not** create new secrets (they would break the database login). If `.env` is missing them it stops and tells you to open `.env` in Notepad and type `SQL_SA_PASSWORD=` and `JWT_SIGNING_KEY=` with the same values as the old `.env`. Type them yourself. Never send them in chat.
 
 ## Next update
-Dev PC: `git pull` + `build-images.ps1 -Version 2.2`, copy deploy to the USB drive. Server: copy it over the old one (keep `.env`), double-click `install-or-update.bat`. A backup is taken automatically first.
+Dev PC: `git pull` + `build\build-images.ps1 -Version 2.2`, copy deploy to the USB drive. Server: copy it over the old one (keep `.env`), double-click `ERP Installer.bat`. A backup is taken automatically first.
 
 ## Errors
 The installer stops with a red STOPPED box and a "What to do next" line. Nothing is deleted.
@@ -52,41 +52,41 @@ The installer stops with a red STOPPED box and a "What to do next" line. Nothing
 | `The API did not become ready` | Send the log file and the API log lines shown |
 
 ## Switch version / roll back (menu)
-Double-click `install-or-update.bat`, choose **[2] Switch version / roll back** (or run `rollback.ps1`). Nothing runs automatically.
+Double-click `ERP Installer.bat`, choose **[2] Switch version / roll back** (or run `installer\rollback.ps1`). Nothing runs automatically.
 - It lists **every installed version** (their images stay on the server and are never deleted) and you pick any one, older or newer.
 - It **always** takes a safety backup of the current database first.
 - **[1] Code only:** database untouched (safest). Migrations are additive and are NOT reversed. Older code usually runs on a newer database but this is not guaranteed. Test after switching.
 - **[2] Code + restore data:** restores the backup taken when you left that version. It **replaces all current data**; anything entered after that backup is lost (the safety backup protects you). You must type `RESTORE`.
 - If the version you want is not installed: put its `erp-images-<version>.tar` next to the script and run `docker load -i` on it.
 - Backups listed in `release-history.txt` are never removed by the 14-day cleanup.
-- **Status (read-only):** choose **[3]** or run `status.ps1`: running version, containers, latest backup, last update.
+- **Status (read-only):** choose **[3]** or run `installer\status.ps1`: running version, containers, latest backup, last update.
 
 ## Manual restore (emergency only, ask first)
 The menu ([2] then [2]) does this safely with a safety backup and a typed confirmation. By hand:
-1. `powershell -ExecutionPolicy Bypass -File .\backup.ps1`
+1. `powershell -ExecutionPolicy Bypass -File .\installer\backup.ps1`
 2. `docker stop erp-api erp-frontend`
 3. `docker cp C:\ERP_backup\MiniErp_XXXX.bak erp-db:/var/opt/mssql/backup/restore.bak`
 4. `docker exec erp-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "<SQL_SA_PASSWORD>" -C -Q "ALTER DATABASE MiniErp SET SINGLE_USER WITH ROLLBACK IMMEDIATE; RESTORE DATABASE MiniErp FROM DISK='/var/opt/mssql/backup/restore.bak' WITH REPLACE; ALTER DATABASE MiniErp SET MULTI_USER;"`
 5. `docker start erp-api erp-frontend`, then check `http://localhost:8080/health/ready`.
 
 ## Manual backup any time
-`powershell -ExecutionPolicy Bypass -File .\backup.ps1` (saved to `C:\ERP_backup`, keeps 14 days).
+`powershell -ExecutionPolicy Bypass -File .\installer\backup.ps1` (saved to `C:\ERP_backup`, keeps 14 days).
 
 **Honest status:** the scripts are written and reviewed but not yet run on real Docker. Watch the first run on the server and send the log file if anything fails.
 
 ## Building the USB package (dev PC)
 
-1. `git pull`, then `powershell -ExecutionPolicy Bypass -File .\build-images.ps1 -Version 2.1` (makes `erp-images-2.1.tar`).
-2. `powershell -ExecutionPolicy Bypass -File .\build-package.ps1 -Version 2.1`
+1. `git pull`, then `powershell -ExecutionPolicy Bypass -File .\build\build-images.ps1 -Version 2.1` (makes `erp-images-2.1.tar`).
+2. `powershell -ExecutionPolicy Bypass -File .\build\build-package.ps1 -Version 2.1`
 3. Copy `dist\DevSquad-ERP-Installer-2.1` to the USB drive. On the server double-click `ERP Installer.bat`.
    Optional: `Create Desktop Shortcut.bat` adds a Desktop icon.
 
-The package never contains `.env`, passwords, logs or backups. Layout: `ERP Installer.bat`, `images\`, `tools\`, `app\`.
+The package never contains `.env`, passwords, logs or backups. Layout: `ERP Installer.bat`, `installer\`, `images\`, `tools\`, `docker-compose.yml`, `.env.example`.
 Ports can be changed in `.env` with `ERP_API_PORT` / `ERP_WEB_PORT` (defaults 8080 / 80).
 
 ## Backing up an old MiniErp container (read-only)
 
-`powershell -ExecutionPolicy Bypass -File .\minierp-backup.ps1` (or `tools\Backup old MiniErp container.bat`).
+`powershell -ExecutionPolicy Bypass -File .\installer\minierp-backup.ps1` (or `tools\Backup old MiniErp container.bat`).
 It makes a verified COPY_ONLY backup of every database in `minierp-db` into `D:\minierp_backup`. It changes nothing in the container.
 
 ## Other SQL Server container / busy ports (automatic)
@@ -96,5 +96,5 @@ If port 80 or 8080 is used by another container, the window shows two buttons: s
 
 ## One-file installer (.exe)
 
-On the dev PC: `git pull`, `build-images.ps1 -Version 2.1`, then `powershell -ExecutionPolicy Bypass -File .\build-exe.ps1 -Version 2.1`.
+On the dev PC: `git pull`, `build\build-images.ps1 -Version 2.1`, then `powershell -ExecutionPolicy Bypass -File .\build\build-exe.ps1 -Version 2.1`.
 Result: `dist\DevSquad-ERP-Installer-2.1.exe` (Dev Squad icon, compressed, contains the whole package including the images tar). Copy that single file to the USB drive. On the server double-click it: it unpacks to `C:\ERP-Installer\DevSquad-ERP-Installer-2.1` and opens the installer window. Newer versions unpack over the app files only; `.env` and release history are never overwritten. The exe is not code-signed, so Windows SmartScreen may ask: More info, Run anyway. Use `-NoImages` to leave the big tar out and copy it into the `images` folder yourself.

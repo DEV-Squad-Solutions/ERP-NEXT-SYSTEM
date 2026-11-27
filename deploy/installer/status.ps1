@@ -3,7 +3,8 @@
 #>
 param([string]$BackupDir = "C:\ERP_backup", [switch]$Gui, [string]$IoDir = "")
 $ErrorActionPreference = "Continue"
-Set-Location $PSScriptRoot
+$Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })   # folder with .env, docker-compose.yml, images, logs
+Set-Location $Root
 function Test-ErpApiOnPort([string]$port) {   # true only if OUR erp-api container is running and publishes this host port
     $run = docker inspect -f "{{.State.Running}}" erp-api 2>$null
     if ($run -ne "true") { return $false }
@@ -30,7 +31,7 @@ $img = docker inspect -f "{{.Config.Image}}" erp-api 2>$null
 Row "Running API image" $(if ($img) { $img } else { "-" })
 $vol = docker volume ls -q --filter "name=^erp_sql_data$"
 Row "Data volume" $(if ($vol) { "erp_sql_data (present)" } else { "erp_sql_data NOT found" }) $(if ($vol) { "Green" } else { "Yellow" })
-$apiPort = "8080"; $ef = Join-Path $PSScriptRoot ".env"; if (Test-Path $ef) { $m = [regex]::Match([IO.File]::ReadAllText($ef, [Text.Encoding]::UTF8), "(?m)^\s*ERP_API_PORT\s*=\s*(\S+)"); if ($m.Success) { $apiPort = $m.Groups[1].Value } }
+$apiPort = "8080"; $ef = Join-Path $Root ".env"; if (Test-Path $ef) { $m = [regex]::Match([IO.File]::ReadAllText($ef, [Text.Encoding]::UTF8), "(?m)^\s*ERP_API_PORT\s*=\s*(\S+)"); if ($m.Success) { $apiPort = $m.Groups[1].Value } }
 if (Test-ErpApiOnPort $apiPort) {
     try { $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:$apiPort/health/ready" -TimeoutSec 5; Row "Health (ready)" "HTTP $($r.StatusCode)" Green } catch { Row "Health (ready)" "erp-api is running but not ready" Yellow }
 } else {
@@ -40,7 +41,7 @@ if (Test-ErpApiOnPort $apiPort) {
 }
 $bak = Get-ChildItem $BackupDir -Filter "MiniErp_*.bak" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if ($bak) { Row "Latest backup" ("{0} ({1} MB, {2})" -f $bak.Name, [math]::Round($bak.Length/1MB,1), $bak.LastWriteTime.ToString("yyyy-MM-dd HH:mm")) } else { Row "Latest backup" "none in $BackupDir" Yellow }
-$hist = Join-Path $PSScriptRoot "release-history.txt"
+$hist = Join-Path $Root "release-history.txt"
 if (Test-Path $hist) { Row "Last update" (Get-Content $hist -Tail 1) } else { Row "Last update" "no history yet" }
 Write-Host "  Local images:"
 docker images --format "      {{.Repository}}:{{.Tag}}   {{.CreatedSince}}" | Where-Object { $_ -match "^\s+erp-(api|frontend):" }

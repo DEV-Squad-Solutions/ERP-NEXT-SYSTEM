@@ -5,9 +5,9 @@
 #>
 $ErrorActionPreference = "Stop"
 try {
-    $pkgBat = Join-Path (Split-Path $PSScriptRoot -Parent) "ERP Installer.bat"
-    $target = $(if (Test-Path $pkgBat) { $pkgBat } else { Join-Path $PSScriptRoot "install-or-update.bat" })
-    $icon = Join-Path $PSScriptRoot "erp-icon.ico"
+    $target = Join-Path (Split-Path $PSScriptRoot -Parent) "ERP Installer.bat"
+    if (-not (Test-Path $target)) { throw "ERP Installer.bat not found next to the installer folder." }
+    $icon = Join-Path $PSScriptRoot "assets\erp-icon.ico"
     $desktop = [Environment]::GetFolderPath("Desktop")
     $lnk = Join-Path $desktop "ERP Installer.lnk"
     $sh = New-Object -ComObject WScript.Shell

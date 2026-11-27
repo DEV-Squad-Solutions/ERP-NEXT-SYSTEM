@@ -5,7 +5,7 @@
  - it never contains .env, passwords, logs or backups. Updating: new versions unpack over the app files only
    (.env and release-history.txt of the customer are never overwritten).
  - uses only what Windows already has: PowerShell, .NET Framework 4 (csc.exe) and the zip classes. No installs, no internet.
- Steps on the dev PC:  git pull ; build-images.ps1 -Version 2.1 ; build-exe.ps1 -Version 2.1
+ Steps on the dev PC:  git pull ; deploy\build\build-images.ps1 -Version 2.1 ; deploy\build\build-exe.ps1 -Version 2.1
  If the erp-images-<Version>.tar is bigger than what you want inside the exe, use -NoImages and copy the tar next to the
  unpacked folder's "images" directory yourself.
 #>
@@ -15,7 +15,8 @@ param(
 )
 $ErrorActionPreference = "Stop"
 if ($Version -notmatch '^[A-Za-z0-9._-]+$') { throw "Version may only contain letters, digits, dot, dash, underscore." }
-$dist = Join-Path (Split-Path $PSScriptRoot -Parent) "dist"
+$deploy = Split-Path $PSScriptRoot -Parent
+$dist = Join-Path (Split-Path $deploy -Parent) "dist"
 $pkg = Join-Path $dist "DevSquad-ERP-Installer-$Version"
 $exe = Join-Path $dist "DevSquad-ERP-Installer-$Version.exe"
 if (Test-Path $exe) { throw "File already exists: $exe . Delete it yourself or choose another version (nothing is overwritten)." }
@@ -158,7 +159,7 @@ static class Program
     $csFile = Join-Path $work "stub.cs"
     [IO.File]::WriteAllText($csFile, $cs, (New-Object Text.UTF8Encoding($false)))
     $stub = Join-Path $work "stub.exe"
-    $icon = Join-Path $PSScriptRoot "erp-icon.ico"
+    $icon = Join-Path $deploy "installer\assets\erp-icon.ico"
     Write-Host "=== Compiling the launcher ===" -ForegroundColor Cyan
     & $csc /nologo /target:winexe /optimize+ "/out:$stub" "/win32icon:$icon" /r:System.dll /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll $csFile
     if ($LASTEXITCODE -ne 0 -or -not (Test-Path $stub)) { throw "Compiling the launcher failed (see the messages above)." }

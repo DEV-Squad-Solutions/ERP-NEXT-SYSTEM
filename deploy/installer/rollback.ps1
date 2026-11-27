@@ -8,7 +8,8 @@
 #>
 param([string]$BackupDir = "C:\ERP_backup", [int]$HealthTimeoutSec = 300, [switch]$Gui, [string]$IoDir = "")
 $ErrorActionPreference = "Continue"
-Set-Location $PSScriptRoot
+$Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })   # folder with .env, docker-compose.yml, images, logs
+Set-Location $Root
 $script:askN = 0
 function Ask([string]$text) {
     if (-not $Gui) { return (Read-Host $text) }
@@ -55,7 +56,7 @@ function Get-PortOwner([string]$port) {      # name of the container that publis
     $o = docker ps --format "{{.Names}}|{{.Ports}}" 2>$null | Where-Object { $_ -match (":" + [regex]::Escape($port) + "->") } | Select-Object -First 1
     if ($o) { return ($o -split '\|')[0] } else { return "" }
 }
-$envFile = Join-Path $PSScriptRoot ".env"
+$envFile = Join-Path $Root ".env"
 if (-not (Test-Path $envFile)) { Stop-Safe ".env not found next to this script." "Run this from the deploy folder you installed from." }
 $envText = [IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8)
 $sa = Get-EnvValue $envText "SQL_SA_PASSWORD"
@@ -73,7 +74,7 @@ $versions = @($apiTags | Where-Object { $webTags -contains $_ -and $_ -ne "<none
 if ($versions.Count -eq 0) { Stop-Safe "No installed versions found (no matching erp-api / erp-frontend images)." "Load an erp-images-<version>.tar with install-or-update.bat first." }
 
 # History: entries that name a backup taken when LEAVING a version
-$hist = Join-Path $PSScriptRoot "release-history.txt"
+$hist = Join-Path $Root "release-history.txt"
 $entries = @()
 if (Test-Path $hist) {
     foreach ($l in (Get-Content $hist)) {

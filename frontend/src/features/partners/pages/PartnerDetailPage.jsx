@@ -311,10 +311,10 @@ export default function PartnerDetailPage() {
 
 function Field({ label, value }) {
   return (
-    <div>
+    <div className="min-w-0">
       <p className="text-xs text-ink-400 mb-1">{label}</p>
 
-      <p className="text-sm text-ink-900">{value || "—"}</p>
+      <p className="text-sm text-ink-900 [overflow-wrap:anywhere]">{value || "—"}</p>
     </div>
   );
 }

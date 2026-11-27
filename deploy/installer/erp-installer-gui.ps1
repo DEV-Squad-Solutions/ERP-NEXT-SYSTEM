@@ -5,7 +5,7 @@
  Typed confirmations (UNRELATED, RESTORE, version number) appear as input boxes.
  Exit code 100 = the window could not start (the .bat then falls back to the console installer).
 #>
-param([string]$BackupDir = "C:\ERP_backup")
+param([string]$BackupDir = "C:\ERP_backup", [string]$Open = "")
 $ErrorActionPreference = "Stop"
 try {
     Add-Type -AssemblyName System.Windows.Forms
@@ -47,6 +47,10 @@ $T = @{
     s_install = @("Check Docker", "Install type and config", "Backup", "Load images", "Start services", "Health check")
     s_switch = @("Safety backup", "Restore database (optional)", "Switch code", "Health check")
     s_status = @("Read status")
+    s_exconnect = @("Check old database", "Read tables and migrations", "Old app containers", "Verified backup", "Stop old app", "Write settings", "Images", "Start ERP 2.0")
+    s_exrestore = @("Verify backup file", "Pre-restore backup", "Stop ERP 2.0", "Restore", "Check result", "Start old app")
+    s_exstatus = @("Read status")
+    exTitle = "Existing database (no new database)"; exHelp = "Choose what to do with your existing database."; exConnect = "Connect ERP 2.0 (verified backup first, then upgrade in place)"; exRestore = "Restore from a backup file (rollback)"; exStatus = "Status (read only)"
     unexpected = "The operation ended unexpectedly. Send the log file to your developer."
   }
   ar = @{
@@ -59,6 +63,10 @@ $T = @{
     s_install = @("فحص Docker", "نوع التثبيت والإعدادات", "نسخة احتياطية", "تحميل الصور", "تشغيل الخدمات", "فحص الجاهزية")
     s_switch = @("نسخة أمان", "استرجاع الداتا (اختياري)", "تبديل الكود", "فحص الجاهزية")
     s_status = @("قراءة الحالة")
+    s_exconnect = @("فحص الداتابيز القديمة", "قراءة الجداول والـ migrations", "حاويات التطبيق القديم", "نسخة احتياطية متحقق منها", "إيقاف التطبيق القديم", "كتابة الإعدادات", "الصور", "تشغيل ERP 2.0")
+    s_exrestore = @("فحص ملف النسخة", "نسخة قبل الاسترجاع", "إيقاف ERP 2.0", "الاسترجاع", "فحص النتيجة", "تشغيل التطبيق القديم")
+    s_exstatus = @("قراءة الحالة")
+    exTitle = "الداتابيز الحالية (من غير داتابيز جديدة)"; exHelp = "اختار هتعمل إيه في الداتابيز الحالية."; exConnect = "وصّل ERP 2.0 (نسخة احتياطية متحقق منها وبعدين ترقية في نفس المكان)"; exRestore = "استرجاع من ملف نسخة (رجوع)"; exStatus = "الحالة (قراءة فقط)"
     unexpected = "العملية وقفت بشكل غير متوقع. ابعت ملف السجل للمطوّر."
   }
 }
@@ -700,6 +708,7 @@ function Finish-Run {
         $mode = $d[1]; $ver = $d[2]; $bak = $d[3]; $lf = $d[4]; $oldBak = $(if ($d.Count -gt 5) { $d[5] } else { "" }); $wp = $(if ($d.Count -gt 6 -and $d[6]) { $d[6] } else { "80" })
         $lblState.Text = (L "okTitle")
         if ($mode -eq "STATUS") { Set-Step 1 "ok"; Show-Result "ok" ((L "okTitle")); return }
+        if ($mode -eq "EXISTING") { Show-Result "ok" ((L "okTitle") + "`r`n" + $d[2]); return }
         $lines = @((L "okTitle"), ("{0}: {1}" -f (L "version"), $ver), ("{0}: {1}" -f (L "open"), $(if ($wp -eq "80") { "http://localhost   (http://192.168.1.5)" } else { "http://localhost:$wp   (http://192.168.1.5:$wp)" })))
         if ($bak) { $lines += ("{0}: {1}" -f (L "backup"), $bak) }
         if ($oldBak) { $lines += ("{0}: {1}" -f (L "oldbak"), $oldBak) }
@@ -760,12 +769,14 @@ function Start-Op([string]$op) {
     $script:recent.Clear()
     $result.Visible = $false; $log.Clear(); Set-Prog 0; $progFill.BackColor = $cBlue; $script:resTarget = 0
     Build-Steps (L ("s_" + $op))
-    $content.RowStyles[2].Height = $(if ($op -eq "status") { 0 } else { 100 })
-    $engine = switch ($op) { "install" { "install-or-update.ps1" } "switch" { "rollback.ps1" } default { "status.ps1" } }
+    $content.RowStyles[2].Height = $(if ($op -eq "status" -or $op -eq "exstatus") { 0 } else { 100 })
+    $engine = switch ($op) { "install" { "install-or-update.ps1" } "switch" { "rollback.ps1" } "exconnect" { "use-existing-db.ps1" } "exrestore" { "use-existing-db.ps1" } "exstatus" { "use-existing-db.ps1" } default { "status.ps1" } }
+    $exMode = switch ($op) { "exconnect" { "connect" } "exrestore" { "restore" } default { "status" } }
     $script:ioDir = Join-Path $env:TEMP ("erp-installer-" + [guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Force -Path $script:ioDir | Out-Null
     $script:outFile = Join-Path $script:ioDir "out.txt"
     $inner = ('powershell.exe -NoProfile -ExecutionPolicy Bypass -File "{0}" -Gui -IoDir "{1}" -BackupDir "{2}" > "{3}" 2>&1' -f (Join-Path $PSScriptRoot $engine), $script:ioDir, $BackupDir, $script:outFile)
+    if ($op -like "ex*") { $inner = $inner.Replace(' > "' + $script:outFile + '"', (' -Mode {0} -Lang {1} > "{2}"' -f $exMode, $script:lang, $script:outFile)) }
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = "cmd.exe"; $psi.Arguments = '/s /c "' + $inner + '"'
     $psi.UseShellExecute = $false; $psi.CreateNoWindow = $true; $psi.WorkingDirectory = $PSScriptRoot
@@ -778,13 +789,15 @@ function Start-Op([string]$op) {
 $btnInstall.Add_Click({ Start-Op "install" })
 $btnSwitch.Add_Click({ Start-Op "switch" })
 $btnStatus.Add_Click({ Start-Op "status" })
-$btnEx.Add_Click({
+function Start-Existing {
     try {
         if ($script:busy) { return }
-        $rs = Join-Path $PSScriptRoot "use-existing-db.ps1"
-        Start-Process powershell -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", ('"' + $rs + '"')) -WorkingDirectory $RootDir
+        $ch = @(@("exconnect", (L "exConnect")), @("exrestore", (L "exRestore")), @("exstatus", (L "exStatus")))
+        $pick = Show-Dlg ((L "exTitle") + "`n" + (L "exHelp")) "choice" $false $ch
+        if ($pick -in @("exconnect", "exrestore", "exstatus")) { Start-Op $pick }
     } catch { Log-GuiError $_.Exception "existingdb" }
-})
+}
+$btnEx.Add_Click({ Start-Existing })
 $btnPw.Add_Click({
     try {
         if ($script:busy) { return }
@@ -813,6 +826,7 @@ $form.Add_FormClosing({
 Build-Steps (L "s_install")
 Apply-Lang
 Layout-Header
+if ($Open -eq "existing") { $form.Add_Shown({ Start-Existing }) }
 Write-Log "ERP installer ready. Choose an action above." ([System.Drawing.Color]::Silver)
 
 $anim = New-Object System.Windows.Forms.Timer

@@ -10,15 +10,33 @@
  The old SQL container and its volume are never stopped, removed or deleted. The erp-db / erp_sql_data data is not used or touched.
  Passwords are never printed. The SA password is read from the old container's own settings; if that does not work you type it (hidden).
 #>
-param([string]$Mode = "menu", [string]$Container = "minierp-db", [string]$Db = "MiniErp", [string]$OutDir = "")
+param([string]$Mode = "menu", [string]$Container = "minierp-db", [string]$Db = "MiniErp", [string]$OutDir = "", [switch]$Gui, [string]$IoDir = "", [string]$BackupDir = "", [string]$Lang = "en")
 $ErrorActionPreference = "Continue"
 $Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })
 $envFile = Join-Path $Root ".env"; $stateFile = Join-Path $Root "existing-db-state.json"
 if (-not $OutDir) { $OutDir = $(if (Test-Path "D:\") { "D:\minierp_backup" } else { "C:\ERP_backup\old-sql-backup" }) }
-$script:pw = ""; $script:helped = $false
+$script:pw = ""; $script:helped = $false; $script:summary = ""; $script:askN = 0
+if ($Gui) { [Console]::OutputEncoding = [Text.Encoding]::UTF8 }
+function T([string]$en, [string]$ar) { if ($Lang -eq "ar") { return $ar } else { return $en } }
+function Ask([string]$text) {
+    # GUI: the installer window shows the dialog (same protocol as install-or-update.ps1). Console: Read-Host.
+    if (-not $Gui) { return (Read-Host $text) }
+    $script:askN++; $id = "p$($script:askN)"
+    Write-Host "@@PROMPT|$id|$text"
+    $f = Join-Path $IoDir "answer-$id.txt"
+    while (-not (Test-Path $f)) { Start-Sleep -Milliseconds 300 }
+    Start-Sleep -Milliseconds 200
+    $a = [IO.File]::ReadAllText($f).Trim(); Remove-Item $f -Force -ErrorAction SilentlyContinue
+    return $a
+}
+function Ask-Phrase([string]$phrase, [string]$en, [string]$ar) {
+    if ($Gui) { return (Ask ((T $en $ar) + "  " + (T "Type exactly: " "اكتب بالظبط: ") + $phrase)) }
+    return (Read-Host "  Type exactly $phrase to continue (anything else cancels)")
+}
 function Say($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
-function Stop-Now($m) { Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The database was not changed unless a line above says so." Yellow; if ($script:helped) { docker exec $Container rm -f /tmp/erp_rq.sh /tmp/erp_restore.bak 2>$null | Out-Null }; [void](Read-Host "Press Enter to close"); exit 1 }
+function Stop-Now($m) { Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The database was not changed unless a line above says so." Yellow; if ($script:helped) { docker exec $Container rm -f /tmp/erp_rq.sh /tmp/erp_restore.bak 2>$null | Out-Null }; if ($Gui) { Write-Host "  FAIL $m" } else { [void](Read-Host "Press Enter to close") }; exit 1 }
 function Read-Masked([string]$prompt) {
+    if ($Gui) { return (Ask ($prompt + " [[secret:nogen]]")) }
     $ss = Read-Host $prompt -AsSecureString
     $b = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($ss)
     try { return ([Runtime.InteropServices.Marshal]::PtrToStringBSTR($b)).Trim() } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($b) }
@@ -137,7 +155,7 @@ function Connect-Existing {
     Say "   - $Container and its data are kept. ERP 2.0 (erp-api) connects to it and UPGRADES the $Db database in place (forward only)."
     Say "   - The old app containers above are stopped (not deleted). The old app may not work on the upgraded database."
     Say "   - To go back: run this tool, option 2 (Restore) with the backup file above."
-    $c = Read-Host "  Type exactly UPGRADE EXISTING DATABASE to continue (anything else cancels)"
+    $c = Ask-Phrase "UPGRADE EXISTING DATABASE" "The database will be upgraded IN PLACE after the verified backup. The old app containers will be stopped (not deleted). To go back, use Restore." "الداتابيز هتتـرقّى في مكانها بعد النسخة الاحتياطية المتحقق منها. حاويات التطبيق القديم هتتوقف (مش هتتمسح). للرجوع استخدم الاسترجاع."
     if ($c -cne "UPGRADE EXISTING DATABASE") { Stop-Now "Cancelled by you. Nothing was changed." }
     Say "[5/8] Stopping the old app containers" Cyan
     $stopped = @()
@@ -169,11 +187,13 @@ function Connect-Existing {
         Say ("  OK  erp-api is healthy. {0}: migrations applied {1} (was {2}), rows {3}." -f $Db, $f2.mig.Count, $f.mig.Count, $f2.rows) Green
         $web = Get-EnvVal "ERP_WEB_PORT"; if (-not $web) { $web = "80" }
         Say ("  DONE. Open http://localhost{0}" -f $(if ($web -ne "80") { ":$web" } else { "" })) Green
-        Say "  To go back to the state before the upgrade: run this tool, option 2." Green
+        Say "  To go back to the state before the upgrade: use Restore." Green
+        $script:summary = ("erp-api healthy. Open http://localhost{0}. To go back: Existing DB > Restore. Backup: {1}" -f $(if ($web -ne "80") { ":$web" } else { "" }), $bak.FullName)
     } else {
         Say "  erp-api is not healthy yet. Last 40 lines of its log (no passwords):" Yellow
         docker logs --tail 40 erp-api 2>&1 | ForEach-Object { Say "  | $_" DarkGray }
         Say "  You can go back with option 2 (Restore) using $($bak.FullName)." Yellow
+        if ($Gui) { Write-Host "  FAIL erp-api did not become healthy. See the log above. Your backup: $($bak.FullName). You can restore it from Existing DB > Restore."; exit 1 }
     }
 }
 function Restore-Db {
@@ -185,7 +205,10 @@ function Restore-Db {
     if ($st -and $st.backup -and (Test-Path ([string]$st.backup))) { $files = @(Get-Item ([string]$st.backup)) + @($files | Where-Object { $_.FullName -ne [string]$st.backup }) }
     if ($files.Count -eq 0) { Stop-Now "No $Db backup file found in $OutDir." }
     for ($i = 0; $i -lt $files.Count; $i++) { Say ("  {0}  {1}   {2} MB   {3}" -f ($i + 1), $files[$i].Name, [int]($files[$i].Length / 1MB), $files[$i].LastWriteTime) }
-    $pick = (Read-Host "  Number of the backup to restore (1 = the one made before the upgrade, anything else cancels)").Trim()
+    if ($Gui) {
+        $pairs = for ($i = 0; $i -lt $files.Count; $i++) { "{0}={1}  ({2} MB, {3:yyyy-MM-dd HH:mm})" -f ($i + 1), $files[$i].Name, [int]($files[$i].Length / 1MB), $files[$i].LastWriteTime }
+        $pick = (Ask ((T "Choose the backup to restore (the first one is the one made before the upgrade)." "اختار النسخة اللي هترجّعها (الأولى هي اللي اتاخدت قبل الترقية).") + " [[choices:" + ($pairs -join ";") + "]]")).Trim()
+    } else { $pick = (Read-Host "  Number of the backup to restore (1 = the one made before the upgrade, anything else cancels)").Trim() }
     if ($pick -notmatch '^\d+$' -or [int]$pick -lt 1 -or [int]$pick -gt $files.Count) { Stop-Now "Cancelled. Nothing was changed." }
     $bf = $files[[int]$pick - 1]
     Say "[1/6] Checking the backup file (RESTORE VERIFYONLY with checksum)" Cyan
@@ -195,7 +218,7 @@ function Restore-Db {
     Say "  OK  The backup file is valid." Green
     Say ""; Say "  This REPLACES the current $Db database in $Container with the contents of $($bf.Name)." White
     Say "  Everything entered after that backup is lost from the live database (a pre-restore backup is made first)." White
-    $c = Read-Host "  Type exactly RESTORE DATABASE to continue (anything else cancels)"
+    $c = Ask-Phrase "RESTORE DATABASE" "This REPLACES the current database with the chosen backup. Anything entered after that backup is lost (a pre-restore backup is made first)." "ده هيستبدل الداتابيز الحالية بالنسخة اللي اخترتها. أي حاجة اتسجلت بعدها هتضيع (بياخد نسخة قبل الاسترجاع الأول)."
     if ($c -cne "RESTORE DATABASE") { Stop-Now "Cancelled by you. Nothing was changed." }
     Say "[2/6] Pre-restore backup of the CURRENT database" Cyan
     $pre = Run-Backup (Join-Path $OutDir ("pre-restore_" + (Get-Date -Format "yyyyMMdd_HHmmss")))
@@ -214,6 +237,7 @@ function Restore-Db {
     docker exec $Container rm -f /tmp/erp_restore.bak | Out-Null
     Say "[6/6] Starting the old app containers again" Cyan
     if ($st -and $st.stopped) { foreach ($n in @($st.stopped)) { docker start ([string]$n) | Out-Null; Say "  started $n" DarkGray } } else { Say "  (no list of stopped containers saved: start them from Docker Desktop if needed)" Yellow }
+    $script:summary = "Database restored from $($bf.Name). erp-api and erp-frontend stay stopped on purpose."
     Say ""; Say "  DONE. erp-api and erp-frontend stay stopped on purpose. Run option 1 again when you want to retry the upgrade." Green
 }
 function Show-Status {
@@ -233,4 +257,4 @@ if ($Mode -eq "menu") {
 switch ($Mode) { "connect" { Connect-Existing } "restore" { Restore-Db } "status" { Show-Status } default { Say "Nothing done." } }
 if ($script:helped) { docker exec $Container rm -f /tmp/erp_rq.sh 2>$null | Out-Null }
 Say ""; Say "Finished." Green
-[void](Read-Host "Press Enter to close")
+if ($Gui) { Write-Host ("@@DONE|" + $(if ($Mode -eq "status") { "STATUS" } else { "EXISTING" }) + "|" + ($script:summary -replace '\|', '/')) } else { [void](Read-Host "Press Enter to close") }

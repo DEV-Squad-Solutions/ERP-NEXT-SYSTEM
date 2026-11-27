@@ -135,7 +135,7 @@ if (-not $running) { Stop-Safe "erp-db is not running." "Start it with: docker s
 $probe = docker exec erp-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $sa -C -h -1 -W -Q "SET NOCOUNT ON; SELECT CASE WHEN DB_ID('MiniErp') IS NULL THEN 'NO' ELSE 'YES' END" 2>&1 | Out-String
 $safetyPath = "(none, no database)"
 if ($probe -cmatch '(?m)^\s*YES\s*$') {
-    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "backup.ps1") -BackupDir $BackupDir
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "backup.ps1") -BackupDir $BackupDir @(if ($Gui) { "-Gui"; "-IoDir"; $IoDir })
     if ($LASTEXITCODE -ne 0) { Stop-Safe "Safety backup failed. Nothing was changed." "Fix the backup problem first, then run again." }
     $sb = Get-ChildItem $BackupDir -Filter "*.bak" | Where-Object { $_.Name -match '^(ERP_DB_backup_|MiniErp_).*\.bak$' } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if (-not $sb -or $sb.Length -lt 1MB -or $sb.LastWriteTime -lt (Get-Date).AddMinutes(-30)) { Stop-Safe "No fresh valid safety backup found. Nothing was changed." "Run backup.ps1 and check $BackupDir." }

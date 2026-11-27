@@ -230,7 +230,7 @@ try {
                 if ($runningNow -notcontains $n) { Info "$n is stopped, so it cannot be read or backed up. It is left untouched."; continue }
                 Info "Backing up $n (read-only, verified). This can take a few minutes."
                 $dest = Join-Path $bakRoot $n
-                & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "minierp-backup.ps1") -Container $n -OutDir $dest -Embedded
+                & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "minierp-backup.ps1") -Container $n -OutDir $dest -Embedded @(if ($Gui) { "-Gui"; "-IoDir"; $IoDir })
                 if ($LASTEXITCODE -ne 0) { Fail "The safety backup of container $n failed or could not be verified." "Nothing was changed and the container was not touched. Send the log file to your developer." "volume" }
                 $rep = Get-ChildItem $dest -Filter "backup-report_*.txt" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
                 $script:oldBackups += $dest
@@ -395,7 +395,7 @@ try {
             $bakName = "(none, no database yet)"
         }
         else {
-        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "backup.ps1") -BackupDir $BackupDir
+        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "backup.ps1") -BackupDir $BackupDir @(if ($Gui) { "-Gui"; "-IoDir"; $IoDir })
         if ($LASTEXITCODE -ne 0) { Fail "Backup failed. The update was cancelled and nothing was changed." "Make sure erp-db is running and the disk has free space, then run again. Send the log file if it repeats." "backup" }
         $bak = Get-ChildItem $BackupDir -Filter "*.bak" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^(ERP_DB_backup_|MiniErp_).*\.bak$' } |
             Sort-Object LastWriteTime -Descending | Select-Object -First 1

@@ -1,16 +1,18 @@
 ﻿<#
  SAFE, READ-ONLY backup of an OLD MiniErp SQL Server container (default: minierp-db) to a folder on this PC.
  - Does not stop, restart, change or delete anything. Creates COPY_ONLY compressed backups (they do not affect the database or its backup chain).
- - The SA password is taken from the container's own environment inside the container. It is never typed, shown or logged.
+ - The SA password is taken from the container's own environment inside the container. If that login fails, a masked dialog asks for a username and password (never shown, logged or saved).
  - For every user database: BACKUP -> RESTORE VERIFYONLY (checksum) -> docker cp to this PC -> size check -> SHA256.
  Example: powershell -ExecutionPolicy Bypass -File .\minierp-backup.ps1
 #>
 param(
     [string]$Container = "minierp-db",
     [string]$OutDir = "D:\minierp_backup",
-    [switch]$Embedded   # used by the installer: quieter step lines
+    [switch]$Embedded,   # used by the installer: quieter step lines
+    [switch]$Gui, [string]$IoDir = "", [string]$Lang = "en"
 )
 $ErrorActionPreference = "Continue"
+. (Join-Path $PSScriptRoot "sql-cred.ps1")
 function Fail($m) { Write-Host ""; Write-Host "FAIL: $m" -ForegroundColor Red; Write-Host "Nothing was changed or deleted." -ForegroundColor Yellow; exit 1 }
 function Hdr($t) { if ($Embedded) { Write-Host ("      ..   " + ($t -replace '^\[\d/\d\]\s*', "")) -ForegroundColor DarkGray } else { Write-Host $t -ForegroundColor Cyan } }
 function Ok($m) { Write-Host "  OK   $m" -ForegroundColor Green }
@@ -28,12 +30,13 @@ $sh = @'
 #!/bin/bash
 S=$(ls /opt/mssql-tools18/bin/sqlcmd /opt/mssql-tools/bin/sqlcmd 2>/dev/null | head -1)
 P="${MSSQL_SA_PASSWORD:-$SA_PASSWORD}"
+U="${ERP_SQL_USER:-sa}"
 if [ -z "$S" ]; then echo "ERR_NO_SQLCMD"; exit 2; fi
 if [ -z "$P" ]; then echo "ERR_NO_PASSWORD_ENV"; exit 3; fi
 case "$1" in
-  list)   "$S" -S localhost -U sa -P "$P" -C -b -h -1 -W -Q "SET NOCOUNT ON; SELECT name FROM sys.databases WHERE database_id > 4 AND state_desc = 'ONLINE'" ;;
-  backup) "$S" -S localhost -U sa -P "$P" -C -b -Q "BACKUP DATABASE [$2] TO DISK = N'/tmp/$2.bak' WITH COPY_ONLY, COMPRESSION, CHECKSUM, INIT, STATS = 25" ;;
-  verify) "$S" -S localhost -U sa -P "$P" -C -b -Q "RESTORE VERIFYONLY FROM DISK = N'/tmp/$2.bak' WITH CHECKSUM" ;;
+  list)   "$S" -S localhost -U "$U" -P "$P" -C -b -h -1 -W -Q "SET NOCOUNT ON; SELECT name FROM sys.databases WHERE database_id > 4 AND state_desc = 'ONLINE'" ;;
+  backup) "$S" -S localhost -U "$U" -P "$P" -C -b -Q "BACKUP DATABASE [$2] TO DISK = N'/tmp/$2.bak' WITH COPY_ONLY, COMPRESSION, CHECKSUM, INIT, STATS = 25" ;;
+  verify) "$S" -S localhost -U "$U" -P "$P" -C -b -Q "RESTORE VERIFYONLY FROM DISK = N'/tmp/$2.bak' WITH CHECKSUM" ;;
   size)   stat -c %s "/tmp/$2.bak" ;;
   clean)  rm -f "/tmp/$2.bak" ;;
 esac
@@ -45,7 +48,19 @@ if ($LASTEXITCODE -ne 0) { Fail "Could not copy the helper script into the conta
 Remove-Item $tmp -Force -ErrorAction SilentlyContinue
 
 Hdr "[1/4] Finding databases"
-$out = docker exec $Container bash /tmp/erp_mb.sh list 2>&1 | Out-String
+$out = docker exec @(Get-SqlEnvArgs) $Container bash /tmp/erp_mb.sh list 2>&1 | Out-String
+$weSet = $false
+if ($out -match 'Login failed|ERR_NO_PASSWORD_ENV') {
+    Write-Host "  The saved login does not work. Asking for the SQL username and password (typed hidden, not saved)." -ForegroundColor Yellow
+    for ($t = 1; $t -le 3; $t++) {
+        $cr = Request-SqlCredential $(if ($t -eq 1) { "The backup cannot sign in to $Container. Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 3)." }) $Gui.IsPresent $IoDir $Lang
+        if (-not $cr) { Fail "Cancelled: no SQL login was entered." }
+        $env:ERP_SQL_USER = $cr.user; $env:MSSQL_SA_PASSWORD = $cr.pass; $weSet = $true
+        $out = docker exec @(Get-SqlEnvArgs) $Container bash /tmp/erp_mb.sh list 2>&1 | Out-String
+        if ($out -notmatch 'Login failed|ERR_NO_PASSWORD_ENV') { Write-Host "  OK  Login works (not saved anywhere)." -ForegroundColor Green; break }
+        Write-Host "  Login failed (try $t of 3)." -ForegroundColor Yellow
+    }
+}
 if ($out -match 'ERR_NO_SQLCMD') { Fail "sqlcmd was not found in the container. Run: docker exec $Container bash -c 'ls /opt/mssql-tools*/bin' and send the output." }
 if ($out -match 'ERR_NO_PASSWORD_ENV') { Fail "The container has no MSSQL_SA_PASSWORD or SA_PASSWORD variable. Run (names only, no values): docker inspect $Container --format '{{range .Config.Env}}{{println .}}{{end}}' | ForEach-Object { (`$_ -split '=')[0] }  and send the names." }
 $dbs = @($out -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -match '^[A-Za-z0-9_\-\. ]+$' -and $_ -ne "" })
@@ -58,10 +73,10 @@ foreach ($db in $dbs) {
     Write-Host ""
     Write-Host "=== $db ===" -ForegroundColor Cyan
     Hdr "[2/4] Backup (COPY_ONLY, compressed, checksum)"
-    docker exec $Container bash /tmp/erp_mb.sh backup $db
+    docker exec @(Get-SqlEnvArgs) $Container bash /tmp/erp_mb.sh backup $db
     if ($LASTEXITCODE -ne 0) { Fail "Backup of $db failed." }
     Hdr "[3/4] Verify inside the container (RESTORE VERIFYONLY)"
-    $v = docker exec $Container bash /tmp/erp_mb.sh verify $db 2>&1 | Out-String
+    $v = docker exec @(Get-SqlEnvArgs) $Container bash /tmp/erp_mb.sh verify $db 2>&1 | Out-String
     Write-Host $v.Trim()
     if ($LASTEXITCODE -ne 0 -or $v -notmatch 'valid') { Fail "Verification of $db did not report a valid backup." }
     Ok "Backup is valid"
@@ -69,14 +84,15 @@ foreach ($db in $dbs) {
     $dest = Join-Path $OutDir ("ERP_DB_backup_old-{0}_{1}.bak" -f $db, $stamp)
     docker cp "${Container}:/tmp/$db.bak" $dest
     if ($LASTEXITCODE -ne 0) { Fail "Copy of $db to $dest failed." }
-    $inSize = [int64](docker exec $Container bash /tmp/erp_mb.sh size $db | Out-String).Trim()
+    $inSize = [int64](docker exec @(Get-SqlEnvArgs) $Container bash /tmp/erp_mb.sh size $db | Out-String).Trim()
     $hostSize = (Get-Item $dest).Length
     if ($inSize -ne $hostSize -or $hostSize -lt 100KB) { Fail "Size mismatch or too small for $db (container $inSize bytes, PC $hostSize bytes)." }
     $hash = (Get-FileHash $dest -Algorithm SHA256).Hash
     Ok ("{0}  {1} MB  SHA256 {2}" -f $dest, [math]::Round($hostSize / 1MB, 1), $hash)
     $report += ("{0}  {1} bytes  sha256={2}" -f $dest, $hostSize, $hash)
-    docker exec $Container bash /tmp/erp_mb.sh clean $db
+    docker exec @(Get-SqlEnvArgs) $Container bash /tmp/erp_mb.sh clean $db
 }
+if ($weSet) { Remove-Item Env:MSSQL_SA_PASSWORD, Env:ERP_SQL_USER -ErrorAction SilentlyContinue }
 docker exec -u 0 $Container rm -f /tmp/erp_mb.sh
 $rf = Join-Path $OutDir ("backup-report_{0}.txt" -f $stamp)
 $report | Set-Content -Path $rf -Encoding UTF8

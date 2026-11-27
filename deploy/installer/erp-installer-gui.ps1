@@ -12,6 +12,7 @@ try {
     Add-Type -AssemblyName System.Drawing
     [System.Windows.Forms.Application]::EnableVisualStyles()
     . (Join-Path $PSScriptRoot "messages-ar.ps1")
+    . (Join-Path $PSScriptRoot "sql-cred.ps1")
 }
 catch { exit 100 }
 
@@ -654,6 +655,11 @@ function Ask-Input([string]$prompt) {
             $prompt = ($prompt -replace '\s*\[\[choices:.*?\]\]\s*$', '')
             return (Show-Dlg $prompt "choice" $false $choices)
         }
+        if ($prompt -match '\[\[cred\]\]\s*$') {
+            $prompt = ($prompt -replace '\s*\[\[cred\]\]\s*$', '')
+            $cr = Show-SqlCredDialog $prompt "sa" $script:lang
+            if ($cr) { return ($cr.user + "`t" + $cr.pass) } else { return "" }
+        }
         if ($prompt -match '\[\[secret:(gen|nogen)\]\]\s*$') {
             $gen = ($Matches[1] -eq "gen"); $prompt = ($prompt -replace '\s*\[\[secret:(gen|nogen)\]\]\s*$', '')
             return (Show-Dlg $prompt "secret" $gen @())
@@ -668,7 +674,7 @@ function Handle-Line([string]$line) {
     if ($line.StartsWith("@@PROMPT|")) {
         $p = $line.Split("|", 3)
         $timer.Stop()
-        $isSecret = ($p[2] -match '\[\[secret:')
+        $isSecret = ($p[2] -match '\[\[secret:' -or $p[2] -match '\[\[cred\]\]')
         $ans = Ask-Input $p[2]
         $timer.Start()
         $f = Join-Path $script:ioDir ("answer-" + $p[1] + ".txt")

@@ -6,7 +6,8 @@
 [CmdletBinding()]
 param(
     [string]$BackupDir = "C:\ERP_backup",
-    [int]$RetainDays = 14
+    [int]$RetainDays = 14,
+    [switch]$Gui, [string]$IoDir = "", [string]$Lang = "en"
 )
 $ErrorActionPreference = "Stop"
 $Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })   # folder with .env, docker-compose.yml, images, logs
@@ -17,7 +18,8 @@ $saPass = $null
 [IO.File]::ReadAllLines($envFile, [Text.Encoding]::UTF8) | ForEach-Object {
     if ($_ -match '^\s*SQL_SA_PASSWORD\s*=\s*(.+?)\s*$') { $saPass = $Matches[1] }
 }
-if (-not $saPass) { throw "SQL_SA_PASSWORD not found in .env" }
+. (Join-Path $PSScriptRoot "sql-cred.ps1")
+$sqlUser = "sa"   # replaced by a typed login only if the .env password does not work (asked in a masked dialog, never saved)
 
 New-Item -ItemType Directory -Force -Path $BackupDir | Out-Null
 $stamp = Get-Date -Format "yyyyMMdd_HHmm"
@@ -38,10 +40,32 @@ $sqlcmd = "sqlcmd"
 docker exec erp-db bash -lc "test -x /opt/mssql-tools18/bin/sqlcmd && echo tools18" 2>$null | Out-Null
 if ($LASTEXITCODE -eq 0) { $sqlcmd = "/opt/mssql-tools18/bin/sqlcmd" }
 
+function Test-SqlLogin([string]$u, [string]$p) {
+    if (-not $p) { return $false }
+    $env:SQLCMDPASSWORD = $p
+    $prevEap = $ErrorActionPreference; $ErrorActionPreference = "Continue"
+    docker exec -e SQLCMDPASSWORD erp-db $sqlcmd -S localhost -U $u -C -b -Q "SELECT 1" 2>&1 | Out-Null
+    $okL = ($LASTEXITCODE -eq 0); $ErrorActionPreference = $prevEap; Remove-Item Env:SQLCMDPASSWORD -ErrorAction SilentlyContinue
+    return $okL
+}
+Write-Host "=== Checking the database login ===" -ForegroundColor Cyan
+if (-not (Test-SqlLogin $sqlUser $saPass)) {
+    Write-Host "  The saved password does not open the database. Asking for the SQL username and password (typed hidden, not saved)." -ForegroundColor Yellow
+    $got = $false
+    for ($t = 1; $t -le 3 -and -not $got; $t++) {
+        $cr = Request-SqlCredential $(if ($t -eq 1) { "The backup cannot sign in to the database (erp-db). Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 3)." }) $Gui.IsPresent $IoDir $Lang
+        if (-not $cr) { throw "Cancelled: no SQL login was entered. Nothing was changed." }
+        if (Test-SqlLogin $cr.user $cr.pass) { $sqlUser = $cr.user; $saPass = $cr.pass; $got = $true; Write-Host "  OK  Login works (not saved anywhere)." -ForegroundColor Green }
+        else { Write-Host "  Login failed (try $t of 3)." -ForegroundColor Yellow }
+    }
+    if (-not $got) { throw "The SQL login did not work after 3 tries. Nothing was changed." }
+}
 Write-Host "=== BACKUP DATABASE (compressed) ===" -ForegroundColor Cyan
 $query = "BACKUP DATABASE [MiniErp] TO DISK = N'$inContainer' WITH FORMAT, COMPRESSION, INIT, STATS=10"
-docker exec erp-db $sqlcmd -S localhost -U sa -P $saPass -C -b -Q $query
-if ($LASTEXITCODE -ne 0) { throw "BACKUP failed. Check the password in .env" }
+$env:SQLCMDPASSWORD = $saPass
+docker exec -e SQLCMDPASSWORD erp-db $sqlcmd -S localhost -U $sqlUser -C -b -Q $query
+$bkRc = $LASTEXITCODE; Remove-Item Env:SQLCMDPASSWORD -ErrorAction SilentlyContinue
+if ($bkRc -ne 0) { throw "BACKUP failed. Check the SQL login and its permissions." }
 
 Write-Host "=== Copying backup to $BackupDir ===" -ForegroundColor Cyan
 docker cp "erp-db:$inContainer" (Join-Path $BackupDir $bakName)

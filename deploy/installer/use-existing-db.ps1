@@ -12,10 +12,11 @@
 #>
 param([string]$Mode = "menu", [string]$Container = "minierp-db", [string]$Db = "MiniErp", [string]$OutDir = "", [switch]$Gui, [string]$IoDir = "", [string]$BackupDir = "", [string]$Lang = "en")
 $ErrorActionPreference = "Continue"
+. (Join-Path $PSScriptRoot "sql-cred.ps1")
 $Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })
 $envFile = Join-Path $Root ".env"; $stateFile = Join-Path $Root "existing-db-state.json"
 if (-not $OutDir) { $OutDir = $(if (Test-Path "D:\") { "D:\minierp_backup" } else { "C:\ERP_backup\old-sql-backup" }) }
-$script:pw = ""; $script:helped = $false; $script:summary = ""; $script:askN = 0; $script:dryActive = $false
+$script:pw = ""; $script:user = "sa"; $script:helped = $false; $script:summary = ""; $script:askN = 0; $script:dryActive = $false
 if ($Gui) { [Console]::OutputEncoding = [Text.Encoding]::UTF8 }
 function T([string]$en, [string]$ar) { if ($Lang -eq "ar") { return $ar } else { return $en } }
 function Ask([string]$text) {
@@ -65,13 +66,13 @@ function Save-Env([hashtable]$kv) {
     Say "  .env updated (previous one kept as .env.bak.$stamp). Values are not shown." Green
 }
 function Put-Helper {
-    $sh = "#!/bin/bash`n/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P `"`$MSSQL_SA_PASSWORD`" -h -1 -W -b -Q `"`$1`"`n"
+    $sh = "#!/bin/bash`n/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U `"`${ERP_SQL_USER:-sa}`" -P `"`$MSSQL_SA_PASSWORD`" -h -1 -W -b -Q `"`$1`"`n"
     $tmp = Join-Path $env:TEMP "erp_rq.sh"
     [IO.File]::WriteAllText($tmp, $sh, (New-Object Text.UTF8Encoding($false)))
     docker cp $tmp "${Container}:/tmp/erp_rq.sh" | Out-Null; Remove-Item $tmp -Force -ErrorAction SilentlyContinue
     $script:helped = $true
 }
-function Run-Sql([string]$query) { return (docker exec -e "MSSQL_SA_PASSWORD=$($script:pw)" $Container bash /tmp/erp_rq.sh $query 2>&1 | Out-String) }
+function Run-Sql([string]$query) { return (docker exec -e "MSSQL_SA_PASSWORD=$($script:pw)" -e "ERP_SQL_USER=$($script:user)" $Container bash /tmp/erp_rq.sh $query 2>&1 | Out-String) }
 function Connect-Sql {
     docker version --format "{{.Server.Version}}" *> $null
     if ($LASTEXITCODE -ne 0) { Stop-Now "Docker is not running. Start Docker Desktop and run this again." }
@@ -82,11 +83,12 @@ function Connect-Sql {
     $envs = docker inspect -f "{{range .Config.Env}}{{println .}}{{end}}" $Container 2>$null | Out-String
     $m = [regex]::Match($envs, '(?m)^(?:MSSQL_SA_PASSWORD|SA_PASSWORD)=(.+)$')
     if ($m.Success) { $script:pw = $m.Groups[1].Value.Trim(); $null = Run-Sql "SELECT 1"; if ($LASTEXITCODE -eq 0) { Say "  OK  Logged in with the container's own SA setting (not shown)." Green; return } }
-    Say "  The container's own setting did not work. Type the SA password of $Container (hidden)." Yellow
+    Say "  The container's own setting did not work. A dialog asks for the SQL username and password of $Container (typed hidden, not saved)." Yellow
     for ($t = 1; $t -le 3; $t++) {
-        $script:pw = Read-Masked "  SA password of $Container"
-        if (-not $script:pw) { continue }
-        $null = Run-Sql "SELECT 1"; if ($LASTEXITCODE -eq 0) { Say "  OK  Login works." Green; return }
+        $cr = Request-SqlCredential $(if ($t -eq 1) { "Cannot sign in to $Container. Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 3)." }) $Gui.IsPresent $IoDir $Lang
+        if (-not $cr) { Stop-Now "Cancelled: no SQL login was entered. Nothing was changed." }
+        $script:user = $cr.user; $script:pw = $cr.pass
+        $null = Run-Sql "SELECT 1"; if ($LASTEXITCODE -eq 0) { Say "  OK  Login works (not saved anywhere)." Green; return }
         Say "  Login failed (try $t of 3)." Yellow
     }
     Stop-Now "Could not log in to $Container. Nothing was changed."
@@ -113,7 +115,12 @@ function Find-Newest-Bak([datetime]$since) {
 }
 function Run-Backup([string]$dir) {
     $since = (Get-Date).AddSeconds(-5)
-    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "minierp-backup.ps1") -Container $Container -OutDir $dir
+    $env:MSSQL_SA_PASSWORD = $script:pw; $env:ERP_SQL_USER = $script:user   # forwarded to the backup script by name only, removed right after
+    $ga = @(); if ($Gui) { $ga = @("-Gui", "-IoDir", $IoDir, "-Lang", $Lang) }
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "minierp-backup.ps1") -Container $Container -OutDir $dir @ga
+    $brc = $LASTEXITCODE
+    Remove-Item Env:MSSQL_SA_PASSWORD, Env:ERP_SQL_USER -ErrorAction SilentlyContinue
+    $global:LASTEXITCODE = $brc
     if ($LASTEXITCODE -ne 0) { return $null }
     $c = Get-ChildItem -Path $dir -Filter "*.bak" -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match ('^(ERP_DB_backup_old-' + $Db + '_|' + $Db + '_).*\.bak$') } | Where-Object { $_.LastWriteTime -ge $since } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     return $c
@@ -301,6 +308,7 @@ function Dry-Run {
     Push-Location $Root
     docker compose -p erp-dryrun -f docker-compose.dryrun.yml up -d db 2>&1 | ForEach-Object { Say "  $_" DarkGray }
     Pop-Location
+    $realUser = $script:user; $script:user = "sa"
     $script:Container = "erp-dryrun-db"; $script:pw = $sa; Put-Helper
     $up = $false
     for ($i = 0; $i -lt 60; $i++) { $null = Run-Sql "SELECT 1"; if ($LASTEXITCODE -eq 0) { $up = $true; break }; Start-Sleep -Seconds 3 }
@@ -356,7 +364,7 @@ function Dry-Run {
     Say "  OK  All migrations applied, no rows lost." Green
     Say "[7/7] Removing the test copy" Cyan
     Cleanup-Dry
-    $script:Container = $realContainer; $script:pw = ""
+    $script:Container = $realContainer; $script:pw = ""; $script:user = $realUser
     $script:summary = ("TEST PASSED on a copy of {0}: {1} migrations applied ({2} -> {3}), rows {4} -> {5}, erp-api healthy. Your real database was not touched. Next: Existing DB > Connect." -f $bf.Name, $todo.Count, $before.mig.Count, $after.mig.Count, $before.rows, $after.rows)
     Say ("  RESULT: " + $script:summary) Green
 }

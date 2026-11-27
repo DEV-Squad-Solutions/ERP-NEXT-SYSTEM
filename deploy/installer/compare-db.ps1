@@ -6,6 +6,7 @@
 #>
 param([string]$Old = "minierp-db", [string]$New = "erp-db")
 $ErrorActionPreference = "Continue"
+. (Join-Path $PSScriptRoot "sql-cred.ps1")
 $Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })
 $known = @(
     "20260826065406_createdatabase",
@@ -52,9 +53,10 @@ $sh = @'
 #!/bin/bash
 S=$(ls /opt/mssql-tools18/bin/sqlcmd /opt/mssql-tools/bin/sqlcmd 2>/dev/null | head -1)
 P="${MSSQL_SA_PASSWORD:-$SA_PASSWORD}"
+U="${ERP_SQL_USER:-sa}"
 [ -z "$S" ] && { echo "ERR_NO_SQLCMD"; exit 2; }
 [ -z "$P" ] && { echo "ERR_NO_PASSWORD_ENV"; exit 3; }
-Q() { "$S" -S localhost -U sa -P "$P" -C -b -h -1 -W -s "|" -Q "SET NOCOUNT ON; $1" 2>&1; }
+Q() { "$S" -S localhost -U "$U" -P "$P" -C -b -h -1 -W -s "|" -Q "SET NOCOUNT ON; $1" 2>&1; }
 echo "DBS"; Q "SELECT name FROM sys.databases WHERE database_id > 4 AND state_desc = 'ONLINE'"
 for D in $(Q "SELECT name FROM sys.databases WHERE database_id > 4 AND state_desc = 'ONLINE'" | tr -d '\r'); do
   echo "DB|$D"
@@ -70,7 +72,21 @@ function Probe([string]$c, [string]$saFromEnv) {
     $tmp = Join-Path $env:TEMP "erp_cmp.sh"
     [IO.File]::WriteAllText($tmp, ($sh -replace "`r", ""), (New-Object Text.UTF8Encoding($false)))
     docker cp $tmp "${c}:/tmp/erp_cmp.sh" | Out-Null; Remove-Item $tmp -Force -ErrorAction SilentlyContinue
-    if ($saFromEnv) { $out = docker exec -e "MSSQL_SA_PASSWORD=$saFromEnv" $c bash /tmp/erp_cmp.sh 2>&1 | Out-String } else { $out = docker exec $c bash /tmp/erp_cmp.sh 2>&1 | Out-String }
+    if ($saFromEnv) { $env:MSSQL_SA_PASSWORD = $saFromEnv }
+    $out = docker exec @(Get-SqlEnvArgs) $c bash /tmp/erp_cmp.sh 2>&1 | Out-String
+    if ($saFromEnv) { Remove-Item Env:MSSQL_SA_PASSWORD -ErrorAction SilentlyContinue }
+    if ($out -match 'Login failed|ERR_NO_PASSWORD_ENV') {
+        Write-Host "  The saved login does not work. A dialog asks for the SQL username and password (hidden, not saved; Cancel skips)." -ForegroundColor Yellow
+        for ($t = 1; $t -le 3; $t++) {
+            $cr = Request-SqlCredential $(if ($t -eq 1) { "Compare cannot sign in to $c. Enter the SQL username and password." } else { "Sign-in failed. Try again (try $t of 3)." }) $false "" "en"
+            if (-not $cr) { break }
+            $env:ERP_SQL_USER = $cr.user; $env:MSSQL_SA_PASSWORD = $cr.pass
+            $out = docker exec @(Get-SqlEnvArgs) $c bash /tmp/erp_cmp.sh 2>&1 | Out-String
+            Remove-Item Env:MSSQL_SA_PASSWORD, Env:ERP_SQL_USER -ErrorAction SilentlyContinue
+            if ($out -notmatch 'Login failed|ERR_NO_PASSWORD_ENV') { break }
+            Write-Host "  Login failed (try $t of 3)." -ForegroundColor Yellow
+        }
+    }
     docker exec -u 0 $c rm -f /tmp/erp_cmp.sh | Out-Null
     if ($out -match 'ERR_NO_PASSWORD_ENV') { Write-Host "  no SA password variable in this container." -ForegroundColor Yellow; return }
     if ($out -match 'Login failed') { Write-Host "  login failed: the SQL password does not match this database." -ForegroundColor Red; return }

@@ -650,6 +650,16 @@ html.dark :where(
   background-color: rgb(var(--c-dk-surface) / 0.9);
 }
 
+/* Translucent tinted panels (bg-primary-50/50 ...) turned mid-grey in dark mode. */
+html.dark :where(
+    [class~="bg-primary-50/40"], [class~="bg-primary-50/50"], [class~="bg-primary-50/60"]
+  ) {
+  background-color: rgb(var(--c-primary-500) / 0.12);
+}
+html.dark :where([class~="bg-gold-50/40"]) {
+  background-color: rgba(212, 175, 55, 0.1);
+}
+
 /* Extra dark-mode readability for colored text that only had light-mode values. */
 html.dark :where(.text-emerald-900, .text-emerald-800, .text-emerald-700) { color: #6ee7b7; }
 html.dark :where(.text-primary-700, .text-primary-600, .text-primary-500) { color: #8fc7ff; }

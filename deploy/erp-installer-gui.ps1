@@ -38,7 +38,7 @@ $T = @{
     steps = "Steps"; log = "Live log"; ready = "Ready. Choose an action."; running = "Running... please wait. Do not close this window."
     okTitle = "SUCCESS"; failTitle = "STOPPED - nothing was deleted, your data is safe"; cancelTitle = "Cancelled - nothing was changed"
     next = "What to do next"; busy = "An operation is running. Please wait until it finishes."
-    ok = "OK"; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; oldbak = "Old SQL container backup"; open = "Open"
+    ok = "OK"; cancel = "Cancel"; promptTitle = "Your input is needed"; version = "Version"; backup = "Backup"; logfile = "Log file"; oldbak = "Old SQL container backup"; copylog = "Copy log"; copied = "Copied"; tipInstall = "Install a new version or update. A backup is taken first."; tipSwitch = "Go back to an earlier installed version."; tipStatus = "Read-only check of what is running."; tipCopy = "Copy the whole log to the clipboard"; open = "Open"
     s_install = @("Check Docker", "Install type and config", "Backup", "Load images", "Start services", "Health check")
     s_switch = @("Safety backup", "Restore database (optional)", "Switch code", "Health check")
     s_status = @("Read status")
@@ -50,7 +50,7 @@ $T = @{
     steps = "الخطوات"; log = "السجل المباشر"; ready = "جاهز. اختار إجراء."; running = "جاري التنفيذ... استنى. متقفلش النافذة دي."
     okTitle = "تم بنجاح"; failTitle = "اتوقف - مفيش حاجة اتمسحت والداتا سليمة"; cancelTitle = "اتلغى - مفيش حاجة اتغيّرت"
     next = "الخطوة الجاية"; busy = "فيه عملية شغالة. استنى لحد ما تخلص."
-    ok = "موافق"; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; oldbak = "نسخة الـ SQL القديم"; open = "افتح"
+    ok = "موافق"; cancel = "إلغاء"; promptTitle = "محتاج إدخال منك"; version = "الإصدار"; backup = "النسخة الاحتياطية"; logfile = "ملف السجل"; oldbak = "نسخة الـ SQL القديم"; copylog = "نسخ السجل"; copied = "تم النسخ"; tipInstall = "تثبيت أو تحديث. بياخد نسخة احتياطية الأول."; tipSwitch = "الرجوع لإصدار متثبّت قبل كده."; tipStatus = "فحص للقراءة بس للي شغال."; tipCopy = "نسخ السجل كله"; open = "افتح"
     s_install = @("فحص Docker", "نوع التثبيت والإعدادات", "نسخة احتياطية", "تحميل الصور", "تشغيل الخدمات", "فحص الجاهزية")
     s_switch = @("نسخة أمان", "استرجاع الداتا (اختياري)", "تبديل الكود", "فحص الجاهزية")
     s_status = @("قراءة الحالة")
@@ -86,6 +86,24 @@ $form.Font = $font
 $form.BackColor = $cBg
 $form.ForeColor = $cText
 
+# ---------------- animation engine: one 30 ms timer; any error turns animations off and snaps to the final values ----------------
+$cCyanDark = [System.Drawing.Color]::FromArgb(30, 110, 160)
+$script:animOn = $true
+$script:tw = New-Object System.Collections.ArrayList
+$script:fades = New-Object System.Collections.ArrayList
+$script:clock = [System.Diagnostics.Stopwatch]::StartNew()
+$script:progCur = 0.0; $script:progTarget = 0.0; $script:busy = $false; $script:pulseIdx = 0
+$script:resTarget = 0; $script:copiedUntil = 0
+function Mix($a, $b, [double]$t) {
+    return [System.Drawing.Color]::FromArgb([int]($a.R + ($b.R - $a.R) * $t), [int]($a.G + ($b.G - $a.G) * $t), [int]($a.B + ($b.B - $a.B) * $t))
+}
+function Tween($c, $to, [int]$ms = 180) {
+    if (-not $script:animOn) { $c.BackColor = $to; return }
+    for ($i = $script:tw.Count - 1; $i -ge 0; $i--) { if ([object]::ReferenceEquals($script:tw[$i].c, $c)) { $script:tw.RemoveAt($i) } }
+    [void]$script:tw.Add(@{ c = $c; from = $c.BackColor; to = $to; t0 = $script:clock.ElapsedMilliseconds; ms = $ms })
+}
+function Set-Prog([double]$f) { $script:progTarget = $f; if ($f -le 0) { $script:progCur = 0.0 } }
+
 function New-Panel($color) { $p = New-Object System.Windows.Forms.Panel; $p.BackColor = $color; $p.Margin = New-Object System.Windows.Forms.Padding(0); return $p }
 function Round-Region($c, [int]$r) {
     if ($c.Width -lt 4 -or $c.Height -lt 4) { return }
@@ -99,9 +117,14 @@ function New-Btn($color, $w = 200) {
     $b = New-Object System.Windows.Forms.Button
     $b.Width = $w; $b.Height = 44; $b.FlatStyle = "Flat"; $b.BackColor = $color; $b.ForeColor = "White"; $b.UseVisualStyleBackColor = $false
     $b.Font = $fontB; $b.FlatAppearance.BorderSize = 0; $b.Cursor = [System.Windows.Forms.Cursors]::Hand
-    $b.FlatAppearance.MouseOverBackColor = [System.Windows.Forms.ControlPaint]::Light($color, 0.25)
     $b.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 10); $b.TextAlign = "MiddleCenter"
     Make-Round $b 9
+    $b.Tag = $color
+    $b.FlatAppearance.MouseOverBackColor = $color; $b.FlatAppearance.MouseDownBackColor = $color
+    $b.Add_MouseEnter({ param($s, $e) if ($s.Enabled) { Tween $s ([System.Windows.Forms.ControlPaint]::Light($s.Tag, 0.22)) 140 } })
+    $b.Add_MouseLeave({ param($s, $e) Tween $s $s.Tag 220 })
+    $b.Add_MouseDown({ param($s, $e) Tween $s ([System.Windows.Forms.ControlPaint]::Dark($s.Tag, 0.08)) 60 })
+    $b.Add_MouseUp({ param($s, $e) if ($s.Enabled) { Tween $s ([System.Windows.Forms.ControlPaint]::Light($s.Tag, 0.22)) 100 } })
     return $b
 }
 
@@ -161,8 +184,11 @@ $hdr.Controls.Add($lblSub); $hdr.Controls.Add($lblTitle); $hdr.Controls.Add($chi
 $stateP = New-Panel $cBg
 $lblState = New-Object System.Windows.Forms.Label
 $lblState.Dock = "Fill"; $lblState.ForeColor = $cCyan; $lblState.Font = $fontB; $lblState.TextAlign = "MiddleLeft"
-$prog = New-Object System.Windows.Forms.ProgressBar
-$prog.Dock = "Bottom"; $prog.Height = 6; $prog.Style = "Continuous"
+$prog = New-Panel ([System.Drawing.Color]::FromArgb(30, 40, 58))
+$prog.Dock = "Bottom"; $prog.Height = 6
+$progFill = New-Panel $cBlue; $progFill.Left = 0; $progFill.Top = 0; $progFill.Height = 6; $progFill.Width = 0
+$shim = New-Panel ([System.Drawing.Color]::FromArgb(140, 205, 255)); $shim.Top = 0; $shim.Height = 6; $shim.Width = 70; $shim.Visible = $false
+$progFill.Controls.Add($shim); $prog.Controls.Add($progFill)
 $stateP.Controls.Add($lblState); $stateP.Controls.Add($prog)
 
 $stepsBox = New-Panel $cBg
@@ -182,7 +208,17 @@ $log = New-Object System.Windows.Forms.RichTextBox
 $log.Dock = "Fill"; $log.ReadOnly = $true; $log.HideSelection = $false; $log.BorderStyle = "None"
 $log.BackColor = [System.Drawing.Color]::FromArgb(5, 8, 13); $log.ForeColor = [System.Drawing.Color]::Gainsboro
 $log.Font = New-Object System.Drawing.Font("Consolas", 10); $log.RightToLeft = "No"; $log.WordWrap = $true
-$logInner.Controls.Add($log); $logInner.Controls.Add($logCap)
+$logHead = New-Panel ([System.Drawing.Color]::FromArgb(5, 8, 13)); $logHead.Dock = "Top"; $logHead.Height = 22
+$logCap.Dock = "Fill"
+$btnCopy = New-Object System.Windows.Forms.Label
+$btnCopy.Dock = "Right"; $btnCopy.Width = 110; $btnCopy.TextAlign = "MiddleRight"; $btnCopy.ForeColor = $cCyan; $btnCopy.Cursor = [System.Windows.Forms.Cursors]::Hand
+$btnCopy.Font = New-Object System.Drawing.Font("Segoe UI Semibold", 9); $btnCopy.BackColor = [System.Drawing.Color]::FromArgb(5, 8, 13)
+$btnCopy.Add_MouseEnter({ param($s, $e) $s.ForeColor = [System.Drawing.Color]::White })
+$btnCopy.Add_MouseLeave({ param($s, $e) $s.ForeColor = $cCyan })
+$btnCopy.Add_Click({ try { if ($log.TextLength -gt 0) { [System.Windows.Forms.Clipboard]::SetText($log.Text); $btnCopy.Text = (L "copied"); $script:copiedUntil = $script:clock.ElapsedMilliseconds + 1600 } } catch { } })
+$logHead.Controls.Add($logCap); $logHead.Controls.Add($btnCopy)
+$logInner.Controls.Add($log); $logInner.Controls.Add($logHead)
+$tip = New-Object System.Windows.Forms.ToolTip; $tip.InitialDelay = 300
 $logBox.Controls.Add($logInner)
 
 $result = New-Panel $cCard
@@ -222,11 +258,11 @@ function Build-Steps([string[]]$names) {
     $cols = [Math]::Max(1, $names.Count)
     $stepsPanel.ColumnCount = $cols
     for ($c = 0; $c -lt $cols; $c++) { [void]$stepsPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle("Percent", (100.0 / $cols)))) }
-    $script:stepLabels = @(); $script:stepStrips = @()
+    $script:stepLabels = @(); $script:stepStrips = @(); $script:pulseIdx = 0
     for ($i = 0; $i -lt $names.Count; $i++) {
-        $card = New-Panel $cCard
+        $card = New-Panel $cBg
         $card.Dock = "Fill"; $card.Margin = New-Object System.Windows.Forms.Padding(0, 0, 8, 0)
-        $strip = New-Panel $cBorder; $strip.Dock = "Top"; $strip.Height = 4
+        $strip = New-Panel $cBg; $strip.Dock = "Top"; $strip.Height = 4
         $l = New-Object System.Windows.Forms.Label
         $l.AutoSize = $false; $l.Dock = "Fill"; $l.TextAlign = "MiddleCenter"
         $l.Font = New-Object System.Drawing.Font("Segoe UI", 9)
@@ -234,6 +270,7 @@ function Build-Steps([string[]]$names) {
         $l.Text = ("{0}`r`n{1}" -f [char]0x25CB, $names[$i])
         $card.Controls.Add($l); $card.Controls.Add($strip)
         Make-Round $card 8
+        Tween $card $cCard 450; Tween $strip $cBorder 450
         $stepsPanel.Controls.Add($card)
         $script:stepLabels += $l; $script:stepStrips += $strip
     }
@@ -243,10 +280,10 @@ function Set-Step([int]$i, [string]$state) {   # state: run | ok | fail | skip |
     $l = $script:stepLabels[$i - 1]; $n = $script:stepNames[$i - 1]; $st = $script:stepStrips[$i - 1]; $card = $l.Parent
     $bold = New-Object System.Drawing.Font("Segoe UI Semibold", 9)
     switch ($state) {
-        "run"  { $l.Text = ("{0}`r`n{1}" -f [char]0x25B6, $n); $l.ForeColor = $cCyan; $card.BackColor = [System.Drawing.Color]::FromArgb(14, 40, 68); $st.BackColor = $cCyan; $l.Font = $bold }
-        "ok"   { $l.Text = ("{0}`r`n{1}" -f [char]0x2714, $n); $l.ForeColor = $cGreen; $card.BackColor = [System.Drawing.Color]::FromArgb(14, 40, 30); $st.BackColor = $cGreen; $l.Font = $bold }
-        "fail" { $l.Text = ("{0}`r`n{1}" -f [char]0x2716, $n); $l.ForeColor = $cRed; $card.BackColor = [System.Drawing.Color]::FromArgb(58, 20, 26); $st.BackColor = $cRed; $l.Font = $bold }
-        "skip" { $l.Text = ("-`r`n{0}" -f $n); $l.ForeColor = $cMuted; $card.BackColor = $cCard; $st.BackColor = $cBorder }
+        "run"  { $script:pulseIdx = $i; $l.Text = ("{0}`r`n{1}" -f [char]0x25B6, $n); $l.ForeColor = $cCyan; Tween $card ([System.Drawing.Color]::FromArgb(14, 40, 68)) 300; Tween $st $cCyan 300; $l.Font = $bold }
+        "ok"   { if ($script:pulseIdx -eq $i) { $script:pulseIdx = 0 }; $l.Text = ("{0}`r`n{1}" -f [char]0x2714, $n); $l.ForeColor = $cGreen; Tween $card ([System.Drawing.Color]::FromArgb(14, 40, 30)) 300; Tween $st $cGreen 300; $l.Font = $bold }
+        "fail" { if ($script:pulseIdx -eq $i) { $script:pulseIdx = 0 }; $l.Text = ("{0}`r`n{1}" -f [char]0x2716, $n); $l.ForeColor = $cRed; Tween $card ([System.Drawing.Color]::FromArgb(58, 20, 26)) 300; Tween $st $cRed 300; $l.Font = $bold }
+        "skip" { if ($script:pulseIdx -eq $i) { $script:pulseIdx = 0 }; $l.Text = ("-`r`n{0}" -f $n); $l.ForeColor = $cMuted; Tween $card $cCard 300; Tween $st $cBorder 300 }
     }
 }
 
@@ -256,7 +293,8 @@ function Apply-Lang {
     $log.RightToLeft = "No"
     $form.Text = (L "title"); $lblTitle.Text = (L "title"); $lblSub.Text = (L "sub")
     $btnInstall.Text = ([string][char]0x2B07 + "   " + (L "install")); $btnSwitch.Text = ([string][char]0x21C4 + "   " + (L "switchv")); $btnStatus.Text = ([string][char]0x25C9 + "   " + (L "status")); $btnClose.Text = (L "close")
-    $stepsCap.Text = (L "steps"); $logCap.Text = (L "log")
+    $stepsCap.Text = (L "steps"); $logCap.Text = (L "log"); $btnCopy.Text = (L "copylog")
+    $tip.SetToolTip($btnInstall, (L "tipInstall")); $tip.SetToolTip($btnSwitch, (L "tipSwitch")); $tip.SetToolTip($btnStatus, (L "tipStatus")); $tip.SetToolTip($btnCopy, (L "tipCopy"))
     $btnEn.FlatAppearance.BorderColor = $(if (-not $rtl) { $cCyan } else { $cBorder })
     $btnAr.FlatAppearance.BorderColor = $(if ($rtl) { $cCyan } else { $cBorder })
     if (-not $script:proc) { $lblState.Text = (L "ready") } else { $lblState.Text = (L "running") }
@@ -266,16 +304,17 @@ function Apply-Lang {
 function Set-Busy([bool]$b) {
     $btnInstall.Enabled = -not $b; $btnSwitch.Enabled = -not $b; $btnStatus.Enabled = -not $b
     $btnEn.Enabled = $true; $btnAr.Enabled = $true
-    if ($b) { $prog.Style = "Marquee"; $prog.MarqueeAnimationSpeed = 30; $lblState.Text = (L "running") }
-    else { $prog.Style = "Continuous"; $prog.MarqueeAnimationSpeed = 0 }
+    $script:busy = $b
+    if ($b) { if ($script:progTarget -lt 0.05) { Set-Prog 0.05 }; $lblState.Text = (L "running") }
 }
 
 function Show-Result([string]$kind, [string]$text) {   # kind: ok | fail | cancel
+    if (-not $result.Visible) { $result.Height = 6; $result.BackColor = $cCard }
     $result.Visible = $true
     switch ($kind) {
-        "ok"     { $result.BackColor = [System.Drawing.Color]::FromArgb(14, 46, 34); $col = [System.Drawing.Color]::FromArgb(150, 240, 185); $bar = $cGreen; $ico = [char]0x2714 }
-        "fail"   { $result.BackColor = [System.Drawing.Color]::FromArgb(58, 20, 28); $col = [System.Drawing.Color]::FromArgb(255, 170, 178); $bar = $cRed; $ico = [char]0x2716 }
-        default  { $result.BackColor = [System.Drawing.Color]::FromArgb(58, 44, 14); $col = [System.Drawing.Color]::FromArgb(255, 220, 140); $bar = [System.Drawing.Color]::Gold; $ico = [char]0x26A0 }
+        "ok"     { $tcol = [System.Drawing.Color]::FromArgb(14, 46, 34); $col = [System.Drawing.Color]::FromArgb(150, 240, 185); $bar = $cGreen; $ico = [char]0x2714 }
+        "fail"   { $tcol = [System.Drawing.Color]::FromArgb(58, 20, 28); $col = [System.Drawing.Color]::FromArgb(255, 170, 178); $bar = $cRed; $ico = [char]0x2716 }
+        default  { $tcol = [System.Drawing.Color]::FromArgb(58, 44, 14); $col = [System.Drawing.Color]::FromArgb(255, 220, 140); $bar = [System.Drawing.Color]::Gold; $ico = [char]0x26A0 }
     }
     $parts = $text -split "`r?`n", 2
     $body = $(if ($parts.Count -gt 1) { $parts[1].Trim() } else { "" })
@@ -284,7 +323,9 @@ function Show-Result([string]$kind, [string]$text) {   # kind: ok | fail | cance
     $w = [Math]::Max(300, $content.ClientSize.Width - 48 - 40)
     $bh = 0
     if ($body) { $sz = [System.Windows.Forms.TextRenderer]::MeasureText($body, $resBody.Font, (New-Object System.Drawing.Size($w, 0)), [System.Windows.Forms.TextFormatFlags]::WordBreak); $bh = $sz.Height + 12 }
-    $result.Height = [Math]::Min(190, 36 + $bh + 6)
+    $script:resTarget = [Math]::Min(190, 36 + $bh + 6)
+    Tween $result $tcol 450
+    if (-not $script:animOn) { $result.Height = $script:resTarget }
 }
 
 function Ask-Input([string]$prompt) {
@@ -329,6 +370,7 @@ function Ask-Input([string]$prompt) {
     $ok.BackColor = $cBlue
     $dlg.AcceptButton = $ok; $dlg.CancelButton = $cn
     $dlg.ActiveControl = $tb
+    if ($script:animOn) { $dlg.Opacity = 0; [void]$script:fades.Add($dlg) }
     $r = $dlg.ShowDialog($form)
     $ans = $(if ($r -eq "OK") { $(if ($choices.Count -gt 0) { $script:choiceAns } else { $tb.Text.Trim() }) } else { "" })
     $dlg.Dispose()
@@ -360,6 +402,7 @@ function Handle-Line([string]$line) {
         $n = [int]$Matches[1]
         if ($script:curStep -gt 0 -and $script:curStep -lt $n) { for ($k = $script:curStep; $k -lt $n; $k++) { Set-Step $k "ok" } }
         $script:curStep = $n
+        Set-Prog (($n - 0.5) / [Math]::Max(1, $script:stepNames.Count))
         Set-Step $n "run"
         $color = [System.Drawing.Color]::FromArgb(110, 200, 255)
         $lblState.Text = ("{0}  [{1}/{2}]" -f (L "running"), $n, $script:stepNames.Count)
@@ -379,10 +422,9 @@ function Finish-Run {
     try { $code = $script:proc.ExitCode } catch { }
     $script:proc = $null
     Set-Busy $false
-    $prog.Value = 0
     if ($script:done) {
         for ($k = 1; $k -le $script:stepLabels.Count; $k++) { if ($script:stepLabels[$k - 1].Text -match [char]0x25B6) { Set-Step $k "ok" } }
-        $prog.Value = 100
+        Set-Prog 1; Tween $progFill $cGreen 400
         $d = $script:done
         $mode = $d[1]; $ver = $d[2]; $bak = $d[3]; $lf = $d[4]; $oldBak = $(if ($d.Count -gt 5) { $d[5] } else { "" }); $wp = $(if ($d.Count -gt 6 -and $d[6]) { $d[6] } else { "80" })
         $lblState.Text = (L "okTitle")
@@ -400,7 +442,7 @@ function Finish-Run {
     }
     if ($script:cancelled) { $lblState.Text = (L "cancelTitle"); Show-Result "cancel" (L "cancelTitle"); return }
     for ($k = 1; $k -le $script:stepLabels.Count; $k++) { if ($script:stepLabels[$k - 1].Text -match [char]0x25B6) { Set-Step $k "fail" } }
-    $lblState.Text = (L "failTitle")
+    $lblState.Text = (L "failTitle"); Tween $progFill $cRed 400
     $msg = ""
     if ($script:lang -eq "ar" -and $script:failKey -and $AR.ContainsKey($script:failKey)) { $msg = $AR[$script:failKey] }
     elseif ($script:failMsg) { $msg = $script:failMsg; if ($script:nextMsg) { $msg += "`r`n" + (L "next") + ": " + $script:nextMsg } }
@@ -445,7 +487,7 @@ function Start-Op([string]$op) {
     $script:op = $op; $script:curStep = 0; $script:failMsg = ""; $script:nextMsg = ""; $script:failKey = ""
     $script:done = $null; $script:cancelled = $false; $script:finished = $false; $script:pos = 0L; $script:buf = ""
     $script:recent.Clear()
-    $result.Visible = $false; $log.Clear(); $prog.Value = 0
+    $result.Visible = $false; $log.Clear(); Set-Prog 0; $progFill.BackColor = $cBlue; $script:resTarget = 0
     Build-Steps (L ("s_" + $op))
     $content.RowStyles[2].Height = $(if ($op -eq "status") { 0 } else { 100 })
     $engine = switch ($op) { "install" { "install-or-update.ps1" } "switch" { "rollback.ps1" } default { "status.ps1" } }
@@ -479,5 +521,42 @@ Build-Steps (L "s_install")
 Apply-Lang
 Layout-Header
 Write-Log "ERP installer ready. Choose an action above." ([System.Drawing.Color]::Silver)
+
+$anim = New-Object System.Windows.Forms.Timer
+$anim.Interval = 30
+$anim.Add_Tick({
+    try {
+        $now = $script:clock.ElapsedMilliseconds
+        for ($i = $script:tw.Count - 1; $i -ge 0; $i--) {
+            $e = $script:tw[$i]
+            $t = [Math]::Min(1.0, ($now - $e.t0) / [double]$e.ms); $k = $t * $t * (3 - 2 * $t)
+            $e.c.BackColor = Mix $e.from $e.to $k
+            if ($t -ge 1.0) { $script:tw.RemoveAt($i) }
+        }
+        $script:progCur += ($script:progTarget - $script:progCur) * 0.12
+        if ([Math]::Abs($script:progTarget - $script:progCur) -lt 0.002) { $script:progCur = $script:progTarget }
+        $w = [int]($prog.Width * $script:progCur)
+        if ($progFill.Width -ne $w) { $progFill.Width = $w }
+        if ($script:busy -and $w -gt 12) { $shim.Left = [int](($now % 1300) / 1300.0 * ($w + 70)) - 70; $shim.Visible = $true } else { $shim.Visible = $false }
+        if ($script:pulseIdx -gt 0 -and $script:pulseIdx -le $script:stepStrips.Count) {
+            $stp = $script:stepStrips[$script:pulseIdx - 1]; $moving = $false
+            foreach ($e in $script:tw) { if ([object]::ReferenceEquals($e.c, $stp)) { $moving = $true } }
+            if (-not $moving) { $stp.BackColor = Mix $cCyanDark $cCyan (([Math]::Sin($now / 280.0) + 1) / 2) }
+        }
+        for ($i = $script:fades.Count - 1; $i -ge 0; $i--) {
+            $fm = $script:fades[$i]
+            if ($fm.IsDisposed) { $script:fades.RemoveAt($i); continue }
+            $o = [Math]::Min(1.0, $fm.Opacity + 0.09); $fm.Opacity = $o
+            if ($o -ge 1.0) { $script:fades.RemoveAt($i) }
+        }
+        if ($script:resTarget -gt 0 -and $result.Visible -and $result.Height -lt $script:resTarget) {
+            $result.Height = [int][Math]::Min($script:resTarget, $result.Height + [Math]::Max(4, ($script:resTarget - $result.Height) * 0.25))
+        }
+        if ($script:copiedUntil -gt 0 -and $now -gt $script:copiedUntil) { $btnCopy.Text = (L "copylog"); $script:copiedUntil = 0 }
+    }
+    catch { $script:animOn = $false; $anim.Stop() }
+})
+$form.Opacity = 0; [void]$script:fades.Add($form)
+$anim.Start()
 [void]$form.ShowDialog()
 exit 0

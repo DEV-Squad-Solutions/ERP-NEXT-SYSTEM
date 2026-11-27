@@ -13,7 +13,7 @@ function Show-SqlCredDialog([string]$prompt, [string]$defUser = "sa", [string]$l
     $f.Font = New-Object Drawing.Font("Segoe UI", 10); $f.ClientSize = New-Object Drawing.Size($W, 330)
     if ($ar) { $f.RightToLeft = "Yes"; $f.RightToLeftLayout = $true }
     $f.Add_Paint({ param($s, $e) $p = New-Object Drawing.Pen([Drawing.Color]::FromArgb(34, 46, 66)); $e.Graphics.DrawRectangle($p, 0, 0, $s.Width - 1, $s.Height - 1); $p.Dispose() })
-    $head = New-Object Windows.Forms.Label; $head.Text = "  " + [string][char]0x1F512 + "  " + $S.title; $head.Font = New-Object Drawing.Font("Segoe UI Semibold", 12); $head.ForeColor = $txt; $head.BackColor = [Drawing.Color]::Black
+    $head = New-Object Windows.Forms.Label; $head.Text = "  " + [char]::ConvertFromUtf32(0x1F512) + "  " + $S.title; $head.Font = New-Object Drawing.Font("Segoe UI Semibold", 12); $head.ForeColor = $txt; $head.BackColor = [Drawing.Color]::Black
     $head.SetBounds(0, 0, $W, 54); $head.TextAlign = $(if ($ar) { "MiddleRight" } else { "MiddleLeft" }); $f.Controls.Add($head)
     $acc = New-Object Windows.Forms.Panel; $acc.BackColor = $blue; $acc.SetBounds(0, 54, $W, 2); $f.Controls.Add($acc)
     $script:cdrag = $false

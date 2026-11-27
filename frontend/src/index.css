@@ -675,6 +675,9 @@ html.dark :where(.bg-emerald-100, .bg-green-100) { background-color: rgba(16, 18
 html.dark :where(.bg-amber-100, .bg-orange-100, .bg-yellow-100) { background-color: rgba(245, 158, 11, 0.18); }
 html.dark :where(.bg-red-100, .bg-rose-100) { background-color: rgba(239, 68, 68, 0.18); }
 
+html.dark :where(.bg-primary-50) { background-color: rgb(var(--c-primary-500) / 0.14); }
+html.dark :where([class~="text-ink-400/50"]) { color: #8498b0; }
+
 /* Extra dark-mode readability for colored text that only had light-mode values. */
 html.dark :where(.text-emerald-900, .text-emerald-800, .text-emerald-700) { color: #6ee7b7; }
 html.dark :where(.text-primary-700, .text-primary-600, .text-primary-500) { color: #8fc7ff; }

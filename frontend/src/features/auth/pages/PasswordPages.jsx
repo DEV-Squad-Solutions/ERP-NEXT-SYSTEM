@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { t, getDir } from "../../../i18n";
 import {
   useForgotPasswordMutation,
+  useSubmitRegistrationMutation,
   useResetPasswordMutation,
 } from "../authApi";
 
@@ -175,6 +176,53 @@ export function ResetPasswordPage() {
           {isLoading ? <Loader2 size={17} className="animate-spin" /> : t("حفظ كلمة المرور")}
         </button>
       </form>
+    </Shell>
+  );
+}
+
+export function RegisterRequestPage() {
+  const [f, setF] = useState({ firstName: "", lastName: "", userName: "", email: "", phoneNumber: "", password: "", note: "" });
+  const [pw2, setPw2] = useState("");
+  const [local, setLocal] = useState("");
+  const [done, setDone] = useState(false);
+  const [submit, { isLoading, error }] = useSubmitRegistrationMutation();
+  const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLocal("");
+    if (f.password.length < 8) return setLocal(t("كلمة المرور لازم تكون 8 أحرف على الأقل"));
+    if (f.password !== pw2) return setLocal(t("كلمتا المرور غير متطابقتين"));
+    const res = await submit({ ...f, phoneNumber: f.phoneNumber || null, note: f.note || null });
+    if (!res.error) setDone(true);
+  };
+
+  return (
+    <Shell title={t("طلب حساب جديد")} subtitle={t("سيراجع المسؤول طلبك ويحدد الشركة والصلاحية قبل تفعيل الحساب")}>
+      {done ? (
+        <div className="flex items-start gap-2.5 rounded-xl bg-primary-500/10 p-3 text-[12px] leading-5 text-ink-700">
+          <MailCheck size={18} className="mt-0.5 shrink-0 text-primary-500" />
+          <span>{t("تم إرسال الطلب. هيتواصل معاك المسؤول بعد المراجعة.")}</span>
+        </div>
+      ) : (
+        <form onSubmit={onSubmit} className="space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <input className={inputCls} placeholder={t("الاسم الأول")} aria-label={t("الاسم الأول")} value={f.firstName} onChange={set("firstName")} disabled={isLoading} />
+            <input className={inputCls} placeholder={t("الاسم الأخير")} aria-label={t("الاسم الأخير")} value={f.lastName} onChange={set("lastName")} disabled={isLoading} />
+          </div>
+          <input className={inputCls} dir="ltr" autoComplete="username" placeholder={t("اسم المستخدم")} aria-label={t("اسم المستخدم")} value={f.userName} onChange={set("userName")} disabled={isLoading} />
+          <input className={inputCls} dir="ltr" type="email" autoComplete="email" placeholder={t("البريد الإلكتروني")} aria-label={t("البريد الإلكتروني")} value={f.email} onChange={set("email")} disabled={isLoading} />
+          <input className={inputCls} dir="ltr" type="tel" placeholder={t("رقم الهاتف (اختياري)")} aria-label={t("رقم الهاتف (اختياري)")} value={f.phoneNumber} onChange={set("phoneNumber")} disabled={isLoading} />
+          <input className={inputCls} dir="ltr" type="password" autoComplete="new-password" placeholder={t("كلمة مرور جديدة")} aria-label={t("كلمة مرور جديدة")} value={f.password} onChange={set("password")} disabled={isLoading} />
+          <input className={inputCls} dir="ltr" type="password" autoComplete="new-password" placeholder={t("تأكيد كلمة المرور")} aria-label={t("تأكيد كلمة المرور")} value={pw2} onChange={(e) => setPw2(e.target.value)} disabled={isLoading} />
+          <input className={inputCls} placeholder={t("ملاحظة للمسؤول (اختياري)")} aria-label={t("ملاحظة للمسؤول (اختياري)")} value={f.note} onChange={set("note")} maxLength={500} disabled={isLoading} />
+          {local && <p role="alert" className="text-[11px] text-red-600">{local}</p>}
+          <ErrorBox error={error} />
+          <button type="submit" disabled={isLoading || !f.firstName || !f.lastName || !f.userName || !f.email || !f.password} className={btnCls}>
+            {isLoading ? <Loader2 size={17} className="animate-spin" /> : t("إرسال الطلب")}
+          </button>
+        </form>
+      )}
     </Shell>
   );
 }

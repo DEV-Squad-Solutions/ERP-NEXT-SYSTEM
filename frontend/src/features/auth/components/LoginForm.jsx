@@ -360,6 +360,12 @@ export default function LoginForm() {
         </button>
       </form>
 
+      <p className="mt-4 text-center text-[11px] text-ink-400">
+        <Link to="/register" className="font-medium text-primary-500 hover:text-primary-600">
+          {t("ليس لديك حساب؟ اطلب حساباً")}
+        </Link>
+      </p>
+
       <style>{`
         @keyframes errorIn {
           from {

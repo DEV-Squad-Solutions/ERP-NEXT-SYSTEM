@@ -2,12 +2,14 @@
 import { useState } from "react";
 import CompaniesTab from "../components/CompaniesTab";
 import UsersTab from "../components/UsersTab";
+import RequestsTab from "../components/RequestsTab";
 
 import { t } from "../../../i18n";
 import { getDir } from "../../../i18n";
 const TABS = [
   { key: "companies", label: t("الشركات") },
   { key: "users", label: t("المستخدمون والصلاحيات") },
+  { key: "requests", label: t("طلبات الحساب") },
 ];
 
 export default function PermissionsPage() {
@@ -40,6 +42,7 @@ export default function PermissionsPage() {
 
       {activeTab === "companies" && <CompaniesTab />}
       {activeTab === "users" && <UsersTab />}
+      {activeTab === "requests" && <RequestsTab />}
     </div>
   );
 }

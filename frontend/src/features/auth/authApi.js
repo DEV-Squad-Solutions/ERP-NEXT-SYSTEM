@@ -36,6 +36,36 @@ export const authApi = baseApi.injectEndpoints({
       query: (body) => ({ url: "/auth/reset-password", method: "POST", body }),
     }),
 
+    submitRegistration: builder.mutation({
+      query: (body) => ({ url: "/registrationrequests", method: "POST", body }),
+    }),
+
+    getRegistrationRequests: builder.query({
+      query: (status) => ({
+        url: "/registrationrequests",
+        params: status ? { status } : undefined,
+      }),
+      providesTags: [{ type: "User", id: "REQUESTS" }],
+    }),
+
+    approveRegistration: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/registrationrequests/${id}/approve`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "User", id: "REQUESTS" }, { type: "User", id: "LIST" }],
+    }),
+
+    rejectRegistration: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/registrationrequests/${id}/reject`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: [{ type: "User", id: "REQUESTS" }],
+    }),
+
     selectCompany: builder.mutation({
       query: (body) => ({
         url: "/auth/select-company",
@@ -92,6 +122,10 @@ export const authApi = baseApi.injectEndpoints({
 
 export const {
   useLoginMutation,
+  useSubmitRegistrationMutation,
+  useGetRegistrationRequestsQuery,
+  useApproveRegistrationMutation,
+  useRejectRegistrationMutation,
   useChangePasswordMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,

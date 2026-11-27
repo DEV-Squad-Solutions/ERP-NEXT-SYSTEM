@@ -90,7 +90,7 @@ function Find-OldEnvFiles([string]$root) {
     } catch { }
     $files = New-Object System.Collections.ArrayList
     foreach ($d in $dirs) {
-        foreach ($f in @(Get-ChildItem -Path $d -File -Force -ErrorAction SilentlyContinue | Where-Object { ($_.Name -like ".env*" -or $_.Name -like "*.env") -and $_.Length -lt 65536 })) {
+        foreach ($f in @(Get-ChildItem -Path $d -File -Force -ErrorAction SilentlyContinue | Where-Object { ($_.Name -like ".env*" -or $_.Name -like "*.env" -or $_.Name -like "appsettings*.json" -or $_.Name -like "*.config") -and $_.Length -lt 262144 })) {
             if (-not $files.Contains($f.FullName)) { [void]$files.Add($f.FullName) }
         }
     }
@@ -107,7 +107,11 @@ function Get-EnvLoginCandidates([string[]]$files) {
         if ($um.Success) { $u2 = $um.Groups[1].Value.Trim().Trim('"').Trim("'"); if ($u2) { $user = $u2 } }
         $pw = New-Object System.Collections.ArrayList
         foreach ($m in [regex]::Matches($t, '(?m)^[ \t]*(?:export[ \t]+)?(?:SQL_SA_PASSWORD|MSSQL_SA_PASSWORD|SA_PASSWORD|SQL_PASSWORD|DB_PASSWORD)[ \t]*=[ \t]*([^\r\n]+)')) { [void]$pw.Add($m.Groups[1].Value.Trim().Trim('"').Trim("'")) }
-        foreach ($m in [regex]::Matches($t, '(?i)Password=([^;\r\n"'']+)')) { [void]$pw.Add($m.Groups[1].Value.Trim()) }
+        foreach ($m in [regex]::Matches($t, '(?i)(?:Password|Pwd)=([^;\r\n"'']+)')) { [void]$pw.Add($m.Groups[1].Value.Trim()) }
+        foreach ($cs in [regex]::Matches($t, '(?i)[^"\r\n]*(?:Password|Pwd)=[^"\r\n]*')) {
+            $csu = [regex]::Match($cs.Value, '(?i)(?:User Id|UID|User)\s*=\s*([^;"'']+)'); $csp = [regex]::Match($cs.Value, '(?i)(?:Password|Pwd)=([^;"'']+)')
+            if ($csu.Success -and $csp.Success) { $cu = $csu.Groups[1].Value.Trim(); $cp = $csp.Groups[1].Value.Trim(); if ($cu -and $cp -and $cp.Length -ge 3 -and -not $seen.ContainsKey($cu + "|" + $cp)) { $seen[$cu + "|" + $cp] = $true; [void]$out.Add(@{ user = $cu; pass = $cp; src = $f }) } }
+        }
         foreach ($p in $pw) {
             if (-not $p -or $p.Length -lt 3 -or $seen.ContainsKey($p)) { continue }
             $seen[$p] = $true; [void]$out.Add(@{ user = $user; pass = $p; src = $f })
@@ -116,17 +120,43 @@ function Get-EnvLoginCandidates([string[]]$files) {
     }
     return @($out)
 }
-function Try-AutoLogin([scriptblock]$test, [string]$root, [int]$max = 10) {
+function Get-ContainerLoginCandidates {
+    # Logins from the ENVIRONMENT of the app/db containers (minierp-*, erp-*): connection strings (ConnectionStrings__*) and *PASSWORD variables.
+    # Read with docker inspect, kept in memory only, never printed. src is a label like "container minierp-api" (no values).
+    $out = New-Object System.Collections.ArrayList; $seen = @{}
+    $names = @(); try { $names = @(docker ps -a --format "{{.Names}}" 2>$null | Where-Object { $_ -match '^(minierp|erp)' }) } catch { }
+    foreach ($n in $names) {
+        $lines = @(); try { $lines = @(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' $n 2>$null) } catch { }
+        $cuser = "sa"
+        foreach ($l in $lines) { if ($l -match '^(?:SQL_USER|DB_USER|MSSQL_USER)=(.+)$') { $cuser = $Matches[1].Trim() } }
+        foreach ($l in $lines) {
+            if (-not $l) { continue }
+            $u = $null; $p = $null
+            if ($l -match '(?i)(?:Password|Pwd)=([^;]+)') {
+                $p = $Matches[1].Trim()
+                if ($l -match '(?i)(?:User Id|UID|User)\s*=\s*([^;]+)') { $u = $Matches[1].Trim() } else { $u = $cuser }
+            }
+            elseif ($l -match '^(?:SQL_SA_PASSWORD|MSSQL_SA_PASSWORD|SA_PASSWORD|SQL_PASSWORD|DB_PASSWORD)=(.+)$') { $p = $Matches[1].Trim(); $u = $cuser }
+            if ($u -and $p -and $p.Length -ge 3 -and -not $seen.ContainsKey($u + "|" + $p)) {
+                $seen[$u + "|" + $p] = $true; [void]$out.Add(@{ user = $u; pass = $p; src = "container $n" })
+                if ($u -ne "sa" -and -not $seen.ContainsKey("sa|" + $p)) { $seen["sa|" + $p] = $true; [void]$out.Add(@{ user = "sa"; pass = $p; src = "container $n" }) }
+            }
+        }
+    }
+    return @($out)
+}
+function Try-AutoLogin([scriptblock]$test, [string]$root, [int]$max = 14) {
     # Tries the passwords found in old .env files with a REAL login (the $test block gets user and password). Returns @{user;pass;src} or $null.
     # At most $max attempts so the sa login is never locked. Nothing secret is printed or logged; only counts and the folder of the file that worked.
     $files = @(Find-OldEnvFiles $root)
-    $cands = @(Get-EnvLoginCandidates $files)
-    Write-Host ("  Looked for old .env files automatically: {0} file(s) found, {1} candidate login(s) (values are not shown)." -f $files.Count, $cands.Count) -ForegroundColor DarkGray
+    $cands = @(Get-ContainerLoginCandidates) + @(Get-EnvLoginCandidates $files)
+    Write-Host ("  Looked automatically in container settings, old .env and appsettings files: {0} file(s) found, {1} candidate login(s) (values are not shown)." -f $files.Count, $cands.Count) -ForegroundColor DarkGray
     $n = 0
     foreach ($c in $cands) {
         if ($n -ge $max) { break }; $n++
         if (& $test $c.user $c.pass) {
-            Write-Host ("  OK  A saved login from an old .env worked ({0}). Not shown and not copied anywhere." -f (Split-Path $c.src -Parent)) -ForegroundColor Green
+            $srcLabel = $(if ($c.src -like "container *") { $c.src } else { Split-Path $c.src -Parent })
+            Write-Host ("  OK  A saved login worked (source: {0}). Not shown and not copied anywhere." -f $srcLabel) -ForegroundColor Green
             return $c
         }
     }

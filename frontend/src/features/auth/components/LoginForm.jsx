@@ -8,6 +8,7 @@ import {
   AlertCircle,
   LogIn,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useLoginMutation } from "../authApi";
 import { useDispatch } from "react-redux";
 import { baseApi } from "../../../lib/baseApi";
@@ -85,7 +86,7 @@ export default function LoginForm() {
               text-ink-600
             "
           >
-            {t("اسم المستخدم")}
+            {t("اسم المستخدم أو البريد الإلكتروني")}
           </label>
 
           <div className="group relative">
@@ -107,7 +108,7 @@ export default function LoginForm() {
               type="text"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              placeholder={t("اسم المستخدم")}
+              placeholder={t("اسم المستخدم أو البريد الإلكتروني")}
               autoComplete="username"
               dir="ltr"
               disabled={isLoading}
@@ -242,6 +243,15 @@ export default function LoginForm() {
               )}
             </button>
           </div>
+        </div>
+
+        <div className="-mt-1 text-end">
+          <Link
+            to="/forgot-password"
+            className="text-[11px] font-medium text-primary-500 transition-colors hover:text-primary-600"
+          >
+            {t("نسيت كلمة المرور؟")}
+          </Link>
         </div>
 
         {/* Error */}

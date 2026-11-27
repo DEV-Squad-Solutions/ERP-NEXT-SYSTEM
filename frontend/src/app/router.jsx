@@ -3,6 +3,8 @@ import { lazyRetry as lazy } from "../lib/lazyRetry";
 import RouteError from "../shared/components/RouteError";
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage";
+import { ForgotPasswordPage, ResetPasswordPage } from "../features/auth/pages/PasswordPages";
+import ChangePasswordPage from "../features/auth/pages/ChangePasswordPage";
 import SetupPage from "../features/setup/pages/SetupPage";
 import ProtectedRoute from "../shared/components/ProtectedRoute";
 import RoleRoute from "../shared/components/RoleRoute";
@@ -315,6 +317,8 @@ export const router = createBrowserRouter([
     errorElement: <RouteError />,
     element: <LoginPage />,
   },
+  { path: "/forgot-password", errorElement: <RouteError />, element: <ForgotPasswordPage /> },
+  { path: "/reset-password", errorElement: <RouteError />, element: <ResetPasswordPage /> },
   {
     path: "/setup",
     errorElement: <RouteError />,
@@ -333,6 +337,7 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     children: [
+      { path: "change-password", element: <ChangePasswordPage /> },
       {
         index: true,
         element: (

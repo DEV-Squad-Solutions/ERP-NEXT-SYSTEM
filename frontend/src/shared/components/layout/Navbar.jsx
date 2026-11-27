@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   UserRound,
   Pencil,
+  KeyRound,
 } from "lucide-react";
 
 import { logout, selectIsAdmin } from "../../../features/auth/authSlice";
@@ -753,6 +754,18 @@ export default function Navbar({ onMenuClick, showMenuButton = false }) {
             <LanguageSwitcher />
             <ThemePicker />
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setProfileOpen(false);
+              navigate("/dashboard/change-password");
+            }}
+            className="mb-2 flex w-full items-center gap-3 rounded-xl border border-ink-200 p-3 text-start text-sm font-medium text-ink-700 transition-colors duration-200 hover:bg-ink-50 dark:border-ink-700 dark:text-ink-200 dark:hover:bg-ink-800"
+          >
+            <KeyRound size={16} strokeWidth={1.9} />
+            {t("تغيير كلمة المرور")}
+          </button>
 
           {/* =================================================
               LOGOUT

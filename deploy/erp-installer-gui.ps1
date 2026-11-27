@@ -87,12 +87,21 @@ $form.BackColor = $cBg
 $form.ForeColor = $cText
 
 function New-Panel($color) { $p = New-Object System.Windows.Forms.Panel; $p.BackColor = $color; $p.Margin = New-Object System.Windows.Forms.Padding(0); return $p }
+function Round-Region($c, [int]$r) {
+    if ($c.Width -lt 4 -or $c.Height -lt 4) { return }
+    $gp = New-Object System.Drawing.Drawing2D.GraphicsPath
+    $d = $r * 2; $w = $c.Width; $h = $c.Height
+    $gp.AddArc(0, 0, $d, $d, 180, 90); $gp.AddArc($w - $d, 0, $d, $d, 270, 90); $gp.AddArc($w - $d, $h - $d, $d, $d, 0, 90); $gp.AddArc(0, $h - $d, $d, $d, 90, 90); $gp.CloseFigure()
+    $c.Region = New-Object System.Drawing.Region($gp)
+}
+function Make-Round($c, [int]$r) { $c.Add_Resize({ param($s, $e) Round-Region $s 9 }); Round-Region $c $r }
 function New-Btn($color, $w = 200) {
     $b = New-Object System.Windows.Forms.Button
     $b.Width = $w; $b.Height = 44; $b.FlatStyle = "Flat"; $b.BackColor = $color; $b.ForeColor = "White"; $b.UseVisualStyleBackColor = $false
     $b.Font = $fontB; $b.FlatAppearance.BorderSize = 0; $b.Cursor = [System.Windows.Forms.Cursors]::Hand
     $b.FlatAppearance.MouseOverBackColor = [System.Windows.Forms.ControlPaint]::Light($color, 0.25)
-    $b.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 10)
+    $b.Margin = New-Object System.Windows.Forms.Padding(0, 0, 0, 10); $b.TextAlign = "MiddleCenter"
+    Make-Round $b 9
     return $b
 }
 
@@ -108,6 +117,7 @@ $nav.Dock = "Fill"; $nav.FlowDirection = "TopDown"; $nav.WrapContents = $false; 
 $btnInstall = New-Btn $cBlue 192
 $btnSwitch = New-Btn ([System.Drawing.Color]::FromArgb(30, 41, 59)) 192
 $btnStatus = New-Btn ([System.Drawing.Color]::FromArgb(30, 41, 59)) 192
+foreach ($nb in @($btnInstall, $btnSwitch, $btnStatus)) { $nb.TextAlign = "MiddleLeft"; $nb.Padding = New-Object System.Windows.Forms.Padding(16, 0, 10, 0); $nb.Height = 46 }
 $nav.Controls.AddRange(@($btnInstall, $btnSwitch, $btnStatus))
 $foot = New-Panel $cSide
 $foot.Dock = "Bottom"; $foot.Height = 112; $foot.Padding = New-Object System.Windows.Forms.Padding(14, 8, 14, 14)
@@ -138,7 +148,15 @@ $lblTitle = New-Object System.Windows.Forms.Label
 $lblTitle.Dock = "Top"; $lblTitle.Height = 36; $lblTitle.ForeColor = "White"; $lblTitle.Font = New-Object System.Drawing.Font("Segoe UI Semibold", 18)
 $lblSub = New-Object System.Windows.Forms.Label
 $lblSub.Dock = "Fill"; $lblSub.ForeColor = $cMuted; $lblSub.Font = $font
-$hdr.Controls.Add($lblSub); $hdr.Controls.Add($lblTitle)
+$verTxt = ""
+$tarFound = Get-ChildItem @($PSScriptRoot, (Join-Path $PSScriptRoot "..\images")) -Filter "erp-images-*.tar" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+if ($tarFound) { $verTxt = "v" + ($tarFound.BaseName -replace '^erp-images-', '') }
+$chip = New-Object System.Windows.Forms.Label
+$chip.Dock = "Right"; $chip.Width = 84; $chip.Text = $(if ($verTxt) { $verTxt } else { "ERP" }); $chip.TextAlign = "MiddleCenter"
+$chip.Font = New-Object System.Drawing.Font("Segoe UI Semibold", 9.5); $chip.ForeColor = $cCyan; $chip.BackColor = [System.Drawing.Color]::FromArgb(14, 40, 68)
+$chipHolder = New-Panel $cBg; $chipHolder.Dock = "Right"; $chipHolder.Width = 96; $chipHolder.Padding = New-Object System.Windows.Forms.Padding(0, 8, 0, 24)
+$chip.Dock = "Fill"; $chipHolder.Controls.Add($chip); Make-Round $chip 8
+$hdr.Controls.Add($lblSub); $hdr.Controls.Add($lblTitle); $hdr.Controls.Add($chipHolder)
 
 $stateP = New-Panel $cBg
 $lblState = New-Object System.Windows.Forms.Label
@@ -167,10 +185,15 @@ $log.Font = New-Object System.Drawing.Font("Consolas", 10); $log.RightToLeft = "
 $logInner.Controls.Add($log); $logInner.Controls.Add($logCap)
 $logBox.Controls.Add($logInner)
 
-$result = New-Object System.Windows.Forms.Label
-$result.Margin = New-Object System.Windows.Forms.Padding(0, 12, 0, 0)
-$result.Padding = New-Object System.Windows.Forms.Padding(16, 10, 16, 10); $result.Height = 60
-$result.Font = New-Object System.Drawing.Font("Segoe UI", 10); $result.Visible = $false
+$result = New-Panel $cCard
+$result.Margin = New-Object System.Windows.Forms.Padding(0, 12, 0, 0); $result.Height = 70; $result.Visible = $false
+$resBar = New-Panel $cGreen; $resBar.Dock = "Left"; $resBar.Width = 6
+$resTitle = New-Object System.Windows.Forms.Label
+$resTitle.Dock = "Top"; $resTitle.Height = 32; $resTitle.Font = New-Object System.Drawing.Font("Segoe UI Semibold", 12); $resTitle.TextAlign = "MiddleLeft"; $resTitle.Padding = New-Object System.Windows.Forms.Padding(14, 6, 10, 0)
+$resBody = New-Object System.Windows.Forms.Label
+$resBody.Dock = "Fill"; $resBody.Font = New-Object System.Drawing.Font("Segoe UI", 10); $resBody.Padding = New-Object System.Windows.Forms.Padding(14, 0, 10, 8)
+$result.Controls.Add($resBody); $result.Controls.Add($resTitle); $result.Controls.Add($resBar)
+Make-Round $result 10
 foreach ($c in @($hdr, $stateP, $stepsBox, $logBox, $result)) { $c.Dock = "Fill" }
 $i = 0; foreach ($c in @($hdr, $stateP, $stepsBox, $logBox, $result)) { $content.Controls.Add($c, 0, $i); $i++ }
 
@@ -199,26 +222,31 @@ function Build-Steps([string[]]$names) {
     $cols = [Math]::Max(1, $names.Count)
     $stepsPanel.ColumnCount = $cols
     for ($c = 0; $c -lt $cols; $c++) { [void]$stepsPanel.ColumnStyles.Add((New-Object System.Windows.Forms.ColumnStyle("Percent", (100.0 / $cols)))) }
-    $script:stepLabels = @()
+    $script:stepLabels = @(); $script:stepStrips = @()
     for ($i = 0; $i -lt $names.Count; $i++) {
+        $card = New-Panel $cCard
+        $card.Dock = "Fill"; $card.Margin = New-Object System.Windows.Forms.Padding(0, 0, 8, 0)
+        $strip = New-Panel $cBorder; $strip.Dock = "Top"; $strip.Height = 4
         $l = New-Object System.Windows.Forms.Label
-        $l.AutoSize = $false; $l.Dock = "Fill"; $l.TextAlign = "MiddleCenter"; $l.Margin = New-Object System.Windows.Forms.Padding(0, 0, 6, 0)
+        $l.AutoSize = $false; $l.Dock = "Fill"; $l.TextAlign = "MiddleCenter"
         $l.Font = New-Object System.Drawing.Font("Segoe UI", 9)
-        $l.BackColor = $cCard; $l.ForeColor = $cMuted
+        $l.ForeColor = $cMuted
         $l.Text = ("{0}`r`n{1}" -f [char]0x25CB, $names[$i])
-        $stepsPanel.Controls.Add($l)
-        $script:stepLabels += $l
+        $card.Controls.Add($l); $card.Controls.Add($strip)
+        Make-Round $card 8
+        $stepsPanel.Controls.Add($card)
+        $script:stepLabels += $l; $script:stepStrips += $strip
     }
 }
 function Set-Step([int]$i, [string]$state) {   # state: run | ok | fail | skip | pending
     if ($i -lt 1 -or $i -gt $script:stepLabels.Count) { return }
-    $l = $script:stepLabels[$i - 1]; $n = $script:stepNames[$i - 1]
+    $l = $script:stepLabels[$i - 1]; $n = $script:stepNames[$i - 1]; $st = $script:stepStrips[$i - 1]; $card = $l.Parent
     $bold = New-Object System.Drawing.Font("Segoe UI Semibold", 9)
     switch ($state) {
-        "run"  { $l.Text = ("{0}`r`n{1}" -f [char]0x25B6, $n); $l.ForeColor = $cCyan; $l.BackColor = [System.Drawing.Color]::FromArgb(14, 40, 68); $l.Font = $bold }
-        "ok"   { $l.Text = ("{0}`r`n{1}" -f [char]0x2714, $n); $l.ForeColor = $cGreen; $l.BackColor = [System.Drawing.Color]::FromArgb(14, 40, 30); $l.Font = $bold }
-        "fail" { $l.Text = ("{0}`r`n{1}" -f [char]0x2716, $n); $l.ForeColor = $cRed; $l.BackColor = [System.Drawing.Color]::FromArgb(58, 20, 26); $l.Font = $bold }
-        "skip" { $l.Text = ("-`r`n{0}" -f $n); $l.ForeColor = $cMuted; $l.BackColor = $cCard }
+        "run"  { $l.Text = ("{0}`r`n{1}" -f [char]0x25B6, $n); $l.ForeColor = $cCyan; $card.BackColor = [System.Drawing.Color]::FromArgb(14, 40, 68); $st.BackColor = $cCyan; $l.Font = $bold }
+        "ok"   { $l.Text = ("{0}`r`n{1}" -f [char]0x2714, $n); $l.ForeColor = $cGreen; $card.BackColor = [System.Drawing.Color]::FromArgb(14, 40, 30); $st.BackColor = $cGreen; $l.Font = $bold }
+        "fail" { $l.Text = ("{0}`r`n{1}" -f [char]0x2716, $n); $l.ForeColor = $cRed; $card.BackColor = [System.Drawing.Color]::FromArgb(58, 20, 26); $st.BackColor = $cRed; $l.Font = $bold }
+        "skip" { $l.Text = ("-`r`n{0}" -f $n); $l.ForeColor = $cMuted; $card.BackColor = $cCard; $st.BackColor = $cBorder }
     }
 }
 
@@ -227,7 +255,7 @@ function Apply-Lang {
     $form.RightToLeft = $(if ($rtl) { "Yes" } else { "No" })
     $log.RightToLeft = "No"
     $form.Text = (L "title"); $lblTitle.Text = (L "title"); $lblSub.Text = (L "sub")
-    $btnInstall.Text = (L "install"); $btnSwitch.Text = (L "switchv"); $btnStatus.Text = (L "status"); $btnClose.Text = (L "close")
+    $btnInstall.Text = ([string][char]0x2B07 + "   " + (L "install")); $btnSwitch.Text = ([string][char]0x21C4 + "   " + (L "switchv")); $btnStatus.Text = ([string][char]0x25C9 + "   " + (L "status")); $btnClose.Text = (L "close")
     $stepsCap.Text = (L "steps"); $logCap.Text = (L "log")
     $btnEn.FlatAppearance.BorderColor = $(if (-not $rtl) { $cCyan } else { $cBorder })
     $btnAr.FlatAppearance.BorderColor = $(if ($rtl) { $cCyan } else { $cBorder })
@@ -245,14 +273,18 @@ function Set-Busy([bool]$b) {
 function Show-Result([string]$kind, [string]$text) {   # kind: ok | fail | cancel
     $result.Visible = $true
     switch ($kind) {
-        "ok"     { $result.BackColor = [System.Drawing.Color]::FromArgb(16, 54, 38); $result.ForeColor = [System.Drawing.Color]::FromArgb(150, 240, 185) }
-        "fail"   { $result.BackColor = [System.Drawing.Color]::FromArgb(66, 22, 30); $result.ForeColor = [System.Drawing.Color]::FromArgb(255, 170, 178) }
-        default  { $result.BackColor = [System.Drawing.Color]::FromArgb(64, 48, 14); $result.ForeColor = [System.Drawing.Color]::FromArgb(255, 220, 140) }
+        "ok"     { $result.BackColor = [System.Drawing.Color]::FromArgb(14, 46, 34); $col = [System.Drawing.Color]::FromArgb(150, 240, 185); $bar = $cGreen; $ico = [char]0x2714 }
+        "fail"   { $result.BackColor = [System.Drawing.Color]::FromArgb(58, 20, 28); $col = [System.Drawing.Color]::FromArgb(255, 170, 178); $bar = $cRed; $ico = [char]0x2716 }
+        default  { $result.BackColor = [System.Drawing.Color]::FromArgb(58, 44, 14); $col = [System.Drawing.Color]::FromArgb(255, 220, 140); $bar = [System.Drawing.Color]::Gold; $ico = [char]0x26A0 }
     }
-    $result.Text = $text
-    $w = [Math]::Max(300, $content.ClientSize.Width - 48 - 32)
-    $sz = [System.Windows.Forms.TextRenderer]::MeasureText($text, $result.Font, (New-Object System.Drawing.Size($w, 0)), [System.Windows.Forms.TextFormatFlags]::WordBreak)
-    $result.Height = [Math]::Min(170, [Math]::Max(44, $sz.Height + 24))
+    $parts = $text -split "`r?`n", 2
+    $body = $(if ($parts.Count -gt 1) { $parts[1].Trim() } else { "" })
+    $resTitle.Text = ("{0}  {1}" -f $ico, $parts[0]); $resBody.Text = $body
+    $resTitle.ForeColor = $col; $resBody.ForeColor = $col; $resBar.BackColor = $bar
+    $w = [Math]::Max(300, $content.ClientSize.Width - 48 - 40)
+    $bh = 0
+    if ($body) { $sz = [System.Windows.Forms.TextRenderer]::MeasureText($body, $resBody.Font, (New-Object System.Drawing.Size($w, 0)), [System.Windows.Forms.TextFormatFlags]::WordBreak); $bh = $sz.Height + 12 }
+    $result.Height = [Math]::Min(190, 36 + $bh + 6)
 }
 
 function Ask-Input([string]$prompt) {

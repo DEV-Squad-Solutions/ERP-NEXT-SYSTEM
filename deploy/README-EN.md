@@ -93,3 +93,8 @@ It makes a verified COPY_ONLY backup of every database in `minierp-db` into `D:\
 
 If the installer finds another SQL Server container (for example an old MiniErp), it first takes a verified read-only backup of it (COPY_ONLY, RESTORE VERIFYONLY, size and SHA256 check) into `D:\minierp_backup\<container>` (or `C:\ERP_backup\old-sql-backup\<container>` if there is no D: drive), shows the path in the window and the summary, then continues. The other container is never stopped or changed by the backup. If the backup or the check fails, the installer stops. A stopped container cannot be read, so it is only reported and left untouched.
 If port 80 or 8080 is used by another container, the window shows two buttons: stop that container (stop only, never deleted; start it again with `docker start <name>`) or let ERP use other ports (saved in `.env`). Copy the backup folder to a second disk or USB.
+
+## One-file installer (.exe)
+
+On the dev PC: `git pull`, `build-images.ps1 -Version 2.1`, then `powershell -ExecutionPolicy Bypass -File .\build-exe.ps1 -Version 2.1`.
+Result: `dist\DevSquad-ERP-Installer-2.1.exe` (Dev Squad icon, compressed, contains the whole package including the images tar). Copy that single file to the USB drive. On the server double-click it: it unpacks to `C:\ERP-Installer\DevSquad-ERP-Installer-2.1` and opens the installer window. Newer versions unpack over the app files only; `.env` and release history are never overwritten. The exe is not code-signed, so Windows SmartScreen may ask: More info, Run anyway. Use `-NoImages` to leave the big tar out and copy it into the `images` folder yourself.

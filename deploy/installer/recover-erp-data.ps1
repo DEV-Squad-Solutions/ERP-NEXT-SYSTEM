@@ -228,7 +228,7 @@ function Recover-OnCopy {
     $bakOk = ($LASTEXITCODE -eq 0)
     if ($bakOk) {
         $bdir = Join-Path $BackupDir "recovered"; New-Item -ItemType Directory -Force -Path $bdir | Out-Null
-        $bfile = Join-Path $bdir ("MiniErp_recovered_" + (Get-Date -Format "yyyyMMdd_HHmmss") + ".bak")
+        $bfile = Join-Path $bdir ("ERP_DB_backup_recovered_" + (Get-Date -Format "yyyyMMdd_HHmmss") + ".bak")
         docker cp "${Tmp}:/tmp/MiniErp_recovered.bak" $bfile 2>&1 | Out-Null
         if (Test-Path $bfile) { Say ("  OK  Verified backup: {0}  ({1} MB)" -f $bfile, [int]((Get-Item $bfile).Length / 1MB)) Green } else { Say "  The backup could not be copied out. The recovered volume is still fine." Yellow }
     } else { Say "  The backup step failed (the recovered volume is still fine)." Yellow }

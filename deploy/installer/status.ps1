@@ -40,7 +40,7 @@ if (Test-ErpApiOnPort $apiPort) {
     if ($own -and $own -notmatch '^erp-') { Row "Health (ready)" "not running (port $apiPort is used by another container: $own)" Yellow }
     else { Row "Health (ready)" "not running (erp-api is not running)" Yellow }
 }
-$bak = Get-ChildItem $BackupDir -Filter "MiniErp_*.bak" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+$bak = Get-ChildItem $BackupDir -Filter "*.bak" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^(ERP_DB_backup_|MiniErp_).*\.bak$' } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if ($bak) { Row "Latest backup" ("{0} ({1} MB, {2})" -f $bak.Name, [math]::Round($bak.Length/1MB,1), $bak.LastWriteTime.ToString("yyyy-MM-dd HH:mm")) } else { Row "Latest backup" "none in $BackupDir" Yellow }
 $hist = Join-Path $Root "release-history.txt"
 if (Test-Path $hist) { Row "Last update" (Get-Content $hist -Tail 1) } else { Row "Last update" "no history yet" }

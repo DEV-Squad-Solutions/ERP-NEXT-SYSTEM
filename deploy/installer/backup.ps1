@@ -21,7 +21,9 @@ if (-not $saPass) { throw "SQL_SA_PASSWORD not found in .env" }
 
 New-Item -ItemType Directory -Force -Path $BackupDir | Out-Null
 $stamp = Get-Date -Format "yyyyMMdd_HHmm"
-$bakName = "MiniErp_$stamp.bak"
+$ver = "unversioned"
+foreach ($l in [IO.File]::ReadAllLines($envFile, [Text.Encoding]::UTF8)) { if ($l -match '^\s*ERP_VERSION\s*=\s*(\S+)\s*$') { $ver = ($Matches[1] -replace '[^A-Za-z0-9._-]', '-') } }
+$bakName = "ERP_DB_backup_${ver}_$stamp.bak"   # ERP_DB_backup_<version>_<yyyyMMdd_HHmm>.bak (old MiniErp_*.bak files are still recognised)
 $inContainer = "/var/opt/mssql/backup/$bakName"
 
 if (-not (docker ps --filter "name=^erp-db$" --filter "status=running" -q)) {
@@ -51,7 +53,7 @@ $cutoff = (Get-Date).AddDays(-$RetainDays)
 $keep = @()
 $hist = Join-Path $Root "release-history.txt"
 if (Test-Path $hist) { $keep = Get-Content $hist | ForEach-Object { if ($_ -match 'backup=(.*)$') { $Matches[1].Trim() } } }
-Get-ChildItem $BackupDir -Filter "MiniErp_*.bak" |
+Get-ChildItem $BackupDir -Filter "*.bak" | Where-Object { $_.Name -match '^(ERP_DB_backup_|MiniErp_).*\.bak$' } |
     Where-Object { $_.LastWriteTime -lt $cutoff -and ($keep -notcontains $_.FullName) } |
     ForEach-Object { Remove-Item $_.FullName -Force }
 

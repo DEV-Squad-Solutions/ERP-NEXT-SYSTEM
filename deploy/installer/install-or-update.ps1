@@ -397,7 +397,7 @@ try {
         else {
         & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "backup.ps1") -BackupDir $BackupDir
         if ($LASTEXITCODE -ne 0) { Fail "Backup failed. The update was cancelled and nothing was changed." "Make sure erp-db is running and the disk has free space, then run again. Send the log file if it repeats." "backup" }
-        $bak = Get-ChildItem $BackupDir -Filter "MiniErp_*.bak" -ErrorAction SilentlyContinue |
+        $bak = Get-ChildItem $BackupDir -Filter "*.bak" -ErrorAction SilentlyContinue | Where-Object { $_.Name -match '^(ERP_DB_backup_|MiniErp_).*\.bak$' } |
             Sort-Object LastWriteTime -Descending | Select-Object -First 1
         if (-not $bak -or $bak.Length -lt 1MB -or $bak.LastWriteTime -lt (Get-Date).AddMinutes(-30)) {
             Fail "No fresh, valid backup found in $BackupDir. The update was cancelled." "Run backup.ps1 manually and check the folder, then run again." "backup"

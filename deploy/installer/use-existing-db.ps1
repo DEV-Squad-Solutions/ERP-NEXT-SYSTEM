@@ -108,14 +108,14 @@ function Get-Facts {
     return $f
 }
 function Find-Newest-Bak([datetime]$since) {
-    $c = Get-ChildItem -Path $OutDir -Filter "${Db}_*.bak" -File -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -ge $since } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $c = Get-ChildItem -Path $OutDir -Filter "*.bak" -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match ('^(ERP_DB_backup_old-' + $Db + '_|' + $Db + '_).*\.bak$') } | Where-Object { $_.LastWriteTime -ge $since } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     return $c
 }
 function Run-Backup([string]$dir) {
     $since = (Get-Date).AddSeconds(-5)
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "minierp-backup.ps1") -Container $Container -OutDir $dir
     if ($LASTEXITCODE -ne 0) { return $null }
-    $c = Get-ChildItem -Path $dir -Filter "${Db}_*.bak" -File -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -ge $since } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $c = Get-ChildItem -Path $dir -Filter "*.bak" -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match ('^(ERP_DB_backup_old-' + $Db + '_|' + $Db + '_).*\.bak$') } | Where-Object { $_.LastWriteTime -ge $since } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     return $c
 }
 function Test-PortFree([int]$port) { try { $l = New-Object System.Net.Sockets.TcpListener([System.Net.IPAddress]::Any, $port); $l.Start(); $l.Stop(); return $true } catch { return $false } }
@@ -201,7 +201,7 @@ function Restore-Db {
     $st = $null; if (Test-Path $stateFile) { try { $st = Get-Content $stateFile -Raw | ConvertFrom-Json } catch { } }
     if ($st) { $script:Container = [string]$st.container; $script:Db = [string]$st.db; if ($st.backupDir) { $script:OutDir = [string]$st.backupDir } }
     Connect-Sql
-    $files = @(Get-ChildItem -Path $OutDir -Filter "${Db}_*.bak" -File -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 6)
+    $files = @(Get-ChildItem -Path $OutDir -Filter "*.bak" -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match ('^(ERP_DB_backup_old-' + $Db + '_|' + $Db + '_).*\.bak$') } | Sort-Object LastWriteTime -Descending | Select-Object -First 6)
     if ($st -and $st.backup -and (Test-Path ([string]$st.backup))) { $files = @(Get-Item ([string]$st.backup)) + @($files | Where-Object { $_.FullName -ne [string]$st.backup }) }
     if ($files.Count -eq 0) { Stop-Now "No $Db backup file found in $OutDir." }
     for ($i = 0; $i -lt $files.Count; $i++) { Say ("  {0}  {1}   {2} MB   {3}" -f ($i + 1), $files[$i].Name, [int]($files[$i].Length / 1MB), $files[$i].LastWriteTime) }

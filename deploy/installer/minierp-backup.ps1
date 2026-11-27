@@ -66,7 +66,7 @@ foreach ($db in $dbs) {
     if ($LASTEXITCODE -ne 0 -or $v -notmatch 'valid') { Fail "Verification of $db did not report a valid backup." }
     Ok "Backup is valid"
     Hdr "[4/4] Copy to this PC and check size"
-    $dest = Join-Path $OutDir ("{0}_{1}.bak" -f $db, $stamp)
+    $dest = Join-Path $OutDir ("ERP_DB_backup_old-{0}_{1}.bak" -f $db, $stamp)
     docker cp "${Container}:/tmp/$db.bak" $dest
     if ($LASTEXITCODE -ne 0) { Fail "Copy of $db to $dest failed." }
     $inSize = [int64](docker exec $Container bash /tmp/erp_mb.sh size $db | Out-String).Trim()

@@ -137,7 +137,7 @@ $safetyPath = "(none, no database)"
 if ($probe -cmatch '(?m)^\s*YES\s*$') {
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "backup.ps1") -BackupDir $BackupDir
     if ($LASTEXITCODE -ne 0) { Stop-Safe "Safety backup failed. Nothing was changed." "Fix the backup problem first, then run again." }
-    $sb = Get-ChildItem $BackupDir -Filter "MiniErp_*.bak" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $sb = Get-ChildItem $BackupDir -Filter "*.bak" | Where-Object { $_.Name -match '^(ERP_DB_backup_|MiniErp_).*\.bak$' } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
     if (-not $sb -or $sb.Length -lt 1MB -or $sb.LastWriteTime -lt (Get-Date).AddMinutes(-30)) { Stop-Safe "No fresh valid safety backup found. Nothing was changed." "Run backup.ps1 and check $BackupDir." }
     $safetyPath = $sb.FullName
     Ok "Safety backup: $safetyPath"

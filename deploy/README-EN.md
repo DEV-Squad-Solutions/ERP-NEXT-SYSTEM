@@ -26,7 +26,7 @@ Success: `erp-images-2.1.tar` exists in deploy and the script prints DONE.
 |---|---|---|
 | [1/6] Docker | Checks Docker is running | `OK Docker is running` |
 | [2/6] Install type | Fresh install or update, checks `.env` | `Mode: FRESH INSTALL` or `Mode: UPDATE` |
-| [3/6] Backup | Update only: backup to `C:\ERP_backup` (must succeed or it stops) | `Backup verified: MiniErp_....bak` |
+| [3/6] Backup | Update only: backup to `C:\ERP_backup` (must succeed or it stops) | `Backup verified: ERP_DB_backup_<version>_<date>.bak` |
 | [4/6] Load images | Loads the images from the tar file | `Images ready` |
 | [5/6] Start | Starts services (update: API + web only, database untouched) | `Containers started` |
 | [6/6] Health | Waits up to 5 minutes | `System is ready`, then the green SUCCESS box |
@@ -65,7 +65,7 @@ Double-click `ERP Installer.bat`, choose **[2] Switch version / roll back** (or 
 The menu ([2] then [2]) does this safely with a safety backup and a typed confirmation. By hand:
 1. `powershell -ExecutionPolicy Bypass -File .\installer\backup.ps1`
 2. `docker stop erp-api erp-frontend`
-3. `docker cp C:\ERP_backup\MiniErp_XXXX.bak erp-db:/var/opt/mssql/backup/restore.bak`
+3. `docker cp C:\ERP_backup\ERP_DB_backup_XXXX.bak erp-db:/var/opt/mssql/backup/restore.bak`
 4. `docker exec erp-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "<SQL_SA_PASSWORD>" -C -Q "ALTER DATABASE MiniErp SET SINGLE_USER WITH ROLLBACK IMMEDIATE; RESTORE DATABASE MiniErp FROM DISK='/var/opt/mssql/backup/restore.bak' WITH REPLACE; ALTER DATABASE MiniErp SET MULTI_USER;"`
 5. `docker start erp-api erp-frontend`, then check `http://localhost:8080/health/ready`.
 

@@ -33,6 +33,7 @@ $known = @(
     "20260921142734_AddManualReturnPricing",
     "20260922161421_AddCashboxRevaluation",
     "20260922174234_AddMonetaryAccountRevaluation",
+    "20260925090000_AddRefreshTokenSecurityStamp",
     "20260925191447_AddServiceInvoiceMappings",
     "20260926165941_AddFiscalYearOwnershipToTransactions",
     "20260926191518_AddFiscalYearOwnershipToExchangeRates",
@@ -70,7 +71,7 @@ function Probe([string]$c, [string]$saFromEnv) {
     [IO.File]::WriteAllText($tmp, ($sh -replace "`r", ""), (New-Object Text.UTF8Encoding($false)))
     docker cp $tmp "${c}:/tmp/erp_cmp.sh" | Out-Null; Remove-Item $tmp -Force -ErrorAction SilentlyContinue
     if ($saFromEnv) { $out = docker exec -e "MSSQL_SA_PASSWORD=$saFromEnv" $c bash /tmp/erp_cmp.sh 2>&1 | Out-String } else { $out = docker exec $c bash /tmp/erp_cmp.sh 2>&1 | Out-String }
-    docker exec $c rm -f /tmp/erp_cmp.sh | Out-Null
+    docker exec -u 0 $c rm -f /tmp/erp_cmp.sh | Out-Null
     if ($out -match 'ERR_NO_PASSWORD_ENV') { Write-Host "  no SA password variable in this container." -ForegroundColor Yellow; return }
     if ($out -match 'Login failed') { Write-Host "  login failed: the SQL password does not match this database." -ForegroundColor Red; return }
     $mig = @(); $cur = ""

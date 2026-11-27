@@ -77,7 +77,7 @@ foreach ($db in $dbs) {
     $report += ("{0}  {1} bytes  sha256={2}" -f $dest, $hostSize, $hash)
     docker exec $Container bash /tmp/erp_mb.sh clean $db
 }
-docker exec $Container rm -f /tmp/erp_mb.sh
+docker exec -u 0 $Container rm -f /tmp/erp_mb.sh
 $rf = Join-Path $OutDir ("backup-report_{0}.txt" -f $stamp)
 $report | Set-Content -Path $rf -Encoding UTF8
 Write-Host ""

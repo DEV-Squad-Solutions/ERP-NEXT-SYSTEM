@@ -34,7 +34,7 @@ function Ask-Phrase([string]$phrase, [string]$en, [string]$ar) {
     return (Read-Host "  Type exactly $phrase to continue (anything else cancels)")
 }
 function Say($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
-function Stop-Now($m) { Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The database was not changed unless a line above says so." Yellow; if ($script:helped) { docker exec $Container rm -f /tmp/erp_rq.sh /tmp/erp_restore.bak 2>$null | Out-Null }; if ($Gui) { Write-Host "  FAIL $m" } else { [void](Read-Host "Press Enter to close") }; exit 1 }
+function Stop-Now($m) { Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The database was not changed unless a line above says so." Yellow; if ($script:helped) { docker exec -u 0 $Container rm -f /tmp/erp_rq.sh /tmp/erp_restore.bak 2>$null | Out-Null }; if ($Gui) { Write-Host "  FAIL $m" } else { [void](Read-Host "Press Enter to close") }; exit 1 }
 function Read-Masked([string]$prompt) {
     if ($Gui) { return (Ask ($prompt + " [[secret:nogen]]")) }
     $ss = Read-Host $prompt -AsSecureString
@@ -234,7 +234,7 @@ function Restore-Db {
     Say "[5/6] Checking the restored database" Cyan
     $f = Get-Facts
     Say ("  {0}: {1} tables, {2} rows, migrations applied {3}" -f $Db, $f.tables, $f.rows, $f.mig.Count) White
-    docker exec $Container rm -f /tmp/erp_restore.bak | Out-Null
+    docker exec -u 0 $Container rm -f /tmp/erp_restore.bak | Out-Null
     Say "[6/6] Starting the old app containers again" Cyan
     if ($st -and $st.stopped) { foreach ($n in @($st.stopped)) { docker start ([string]$n) | Out-Null; Say "  started $n" DarkGray } } else { Say "  (no list of stopped containers saved: start them from Docker Desktop if needed)" Yellow }
     $script:summary = "Database restored from $($bf.Name). erp-api and erp-frontend stay stopped on purpose."
@@ -255,6 +255,6 @@ if ($Mode -eq "menu") {
     $Mode = switch ($a) { "1" { "connect" } "2" { "restore" } "3" { "status" } default { "quit" } }
 }
 switch ($Mode) { "connect" { Connect-Existing } "restore" { Restore-Db } "status" { Show-Status } default { Say "Nothing done." } }
-if ($script:helped) { docker exec $Container rm -f /tmp/erp_rq.sh 2>$null | Out-Null }
+if ($script:helped) { docker exec -u 0 $Container rm -f /tmp/erp_rq.sh 2>$null | Out-Null }
 Say ""; Say "Finished." Green
 if ($Gui) { Write-Host ("@@DONE|" + $(if ($Mode -eq "status") { "STATUS" } else { "EXISTING" }) + "|" + ($script:summary -replace '\|', '/')) } else { [void](Read-Host "Press Enter to close") }

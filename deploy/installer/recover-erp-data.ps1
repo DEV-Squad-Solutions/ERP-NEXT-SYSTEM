@@ -138,7 +138,7 @@ function Change-Password {
     docker cp $tmp "erp-db:/tmp/erp_alter.sh" | Out-Null; Remove-Item $tmp -Force -ErrorAction SilentlyContinue
     $o = docker exec -e "MSSQL_SA_PASSWORD=$old" -e "NEW_SA_PASSWORD=$new" erp-db bash /tmp/erp_alter.sh 2>&1 | Out-String
     $altered = ($LASTEXITCODE -eq 0)
-    docker exec erp-db rm -f /tmp/erp_alter.sh | Out-Null
+    docker exec -u 0 erp-db rm -f /tmp/erp_alter.sh | Out-Null
     if (-not $altered) { Remove-Item $pending -Force -ErrorAction SilentlyContinue; Say $o DarkGray; Stop-Now "The database refused the change (message above has no passwords). The old password is still valid. Nothing changed." }
     Say "  [4/6] Checking the NEW password" DarkGray
     $r = Wait-Login $new 6

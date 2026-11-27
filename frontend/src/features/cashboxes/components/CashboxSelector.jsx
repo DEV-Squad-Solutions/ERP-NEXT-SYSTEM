@@ -13,7 +13,7 @@ export default function CashboxSelector({ cashboxId, onChange, onAddNew }) {
   return (
     <div className="bg-white rounded-2xl border border-ink-400/10 shadow-card p-4 mb-4">
       <div className="flex items-stretch gap-2">
-        <div className="w-11 h-11 rounded-xl bg-gold-50 text-gold-600 flex items-center justify-center shrink-0">
+        <div className="w-11 h-11 rounded-xl bg-gold-50 text-gold-700 flex items-center justify-center shrink-0">
           <Wallet2 size={20} />
         </div>
         <div className="flex-1">

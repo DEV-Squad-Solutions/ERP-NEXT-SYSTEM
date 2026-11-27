@@ -1797,7 +1797,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
                     {isReturnInvoice ? t("أصناف المرتجع") : t("الأصناف")}
                   </span>
                   {unpricedCount > 0 && (
-                    <span className="rounded-full bg-gold-50 px-2 py-0.5 text-xs font-medium text-gold-600">
+                    <span className="rounded-full bg-gold-50 px-2 py-0.5 text-xs font-medium text-gold-700">
                       {unpricedCount} {t("بدون سعر")}
                     </span>
                   )}
@@ -2172,7 +2172,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
       >
         <div className="space-y-5">
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold-50 text-gold-600">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold-50 text-gold-700">
               <AlertTriangle size={28} />
             </div>
             <h4 className="mt-4 text-base font-bold text-ink-900">

@@ -721,7 +721,7 @@ export default function JournalEntriesListPage() {
                 </div>
               </div>
 
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
                 <Coins size={17} />
               </div>
             </div>

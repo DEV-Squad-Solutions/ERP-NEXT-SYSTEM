@@ -91,7 +91,7 @@ export default function StoreTransfersTab({ storeId }) {
 
       {isError && !isFetching && (
         <div className="py-16 flex flex-col items-center justify-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
             <Package size={22} />
           </div>
 
@@ -182,7 +182,7 @@ export default function StoreTransfersTab({ storeId }) {
 
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
+                            <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
                               <Warehouse size={15} />
                             </div>
 

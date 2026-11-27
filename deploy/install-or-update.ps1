@@ -165,9 +165,11 @@ try {
         if ($other) { Fail "Found a database volume with another name ($($other -join ', ')). This looks like an older install." "Do not continue. Send this volume name to your developer (stopped so no empty database is created next to your data)." "volume" }
     }
 
-    # ports 80 and 8080 must be free (or used by our own erp-* containers)
-    $busy = docker ps --format "{{.Names}}|{{.Ports}}" | Where-Object { $_ -notmatch '^erp-' -and $_ -match '(:|^|, )(80|8080)->' }
-    if ($busy) { Fail "Port 80 or 8080 is already used by another container: $(($busy | ForEach-Object { ($_ -split '\|')[0] }) -join ', ')." "Stop that container (docker stop <name>) if it is not needed, then run this again. It is not deleted by stopping." "docker2" }
+    # a data volume must never be used by two SQL Server containers at once (data corruption risk)
+    if ($ourVolume) {
+        $users = docker ps -a --filter "volume=erp_sql_data" --format "{{.Names}}" | Where-Object { $_ -notmatch '^erp-' }
+        if ($users) { Fail "The data volume erp_sql_data is already used by another container: $($users -join ', '). Two SQL Server containers on the same data would corrupt it." "Do not continue. Send this name to your developer. Nothing was changed." "volume" }
+    }
 
     $envFile = Join-Path $PSScriptRoot ".env"
     $envText = ""
@@ -197,6 +199,12 @@ try {
     $envText = [IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8)
     if ($envText -match '(?im)^\s*SEED_ENABLED\s*=\s*true') { Fail "SEED_ENABLED is true in .env." "Set SEED_ENABLED=false in .env (this is a real-data server), then run again." "seed" }
     Ok "Seeding is off"
+
+    $apiPort = $(if (Get-EnvValue $envText "ERP_API_PORT") { Get-EnvValue $envText "ERP_API_PORT" } else { "8080" })
+    $webPort = $(if (Get-EnvValue $envText "ERP_WEB_PORT") { Get-EnvValue $envText "ERP_WEB_PORT" } else { "80" })
+    $busy = docker ps --format "{{.Names}}|{{.Ports}}" | Where-Object { $_ -notmatch '^erp-' -and ($_ -match ":$apiPort->" -or $_ -match ":$webPort->") }
+    if ($busy) { Fail "Port $apiPort or $webPort is already used by another container: $(($busy | ForEach-Object { ($_ -split '\|')[0] }) -join ', ')." "Stop that container (docker stop <name>, nothing is deleted) or set ERP_API_PORT / ERP_WEB_PORT in .env to free ports, then run again." "docker2" }
+    Ok "Ports $webPort (web) and $apiPort (api) are free"
 
     $tar = Get-ChildItem $PSScriptRoot -Filter "erp-images-*.tar" -ErrorAction SilentlyContinue |
         Sort-Object LastWriteTime -Descending | Select-Object -First 1
@@ -290,7 +298,7 @@ try {
     while ((Get-Date) -lt $deadline) {
         Start-Sleep -Seconds 5
         try {
-            $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:8080/health/ready" -TimeoutSec 5
+            $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:$apiPort/health/ready" -TimeoutSec 5
             if ($r.StatusCode -eq 200) { $ok = $true; break }
         } catch { }
         Write-Host "." -NoNewline
@@ -309,8 +317,8 @@ try {
     Line "  +------------------------------------------------------------+" Green
     Line ("  Mode      : {0}" -f $(if ($isUpdate) { "UPDATE" } else { "FRESH INSTALL" })) White
     Line "  Version   : $version" White
-    Line "  Open      : http://localhost   (other PCs: http://192.168.1.5)" White
-    Line "  Health    : http://localhost:8080/health/ready" White
+    Line ("  Open      : http://localhost{0}   (other PCs: http://192.168.1.5{0})" -f $(if ($webPort -ne "80") { ":$webPort" } else { "" })) White
+    Line "  Health    : http://localhost:$apiPort/health/ready" White
     Line "  Backup    : $bakName" White
     Line "  Log file  : $logFile" White
     Write-Host ""

@@ -20,7 +20,8 @@ $img = docker inspect -f "{{.Config.Image}}" erp-api 2>$null
 Row "Running API image" $(if ($img) { $img } else { "-" })
 $vol = docker volume ls -q --filter "name=^erp_sql_data$"
 Row "Data volume" $(if ($vol) { "erp_sql_data (present)" } else { "erp_sql_data NOT found" }) $(if ($vol) { "Green" } else { "Yellow" })
-try { $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:8080/health/ready" -TimeoutSec 5; Row "Health (ready)" "HTTP $($r.StatusCode)" Green } catch { Row "Health (ready)" "not ready" Yellow }
+$apiPort = "8080"; $ef = Join-Path $PSScriptRoot ".env"; if (Test-Path $ef) { $m = [regex]::Match([IO.File]::ReadAllText($ef, [Text.Encoding]::UTF8), "(?m)^\s*ERP_API_PORT\s*=\s*(\S+)"); if ($m.Success) { $apiPort = $m.Groups[1].Value } }
+try { $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:$apiPort/health/ready" -TimeoutSec 5; Row "Health (ready)" "HTTP $($r.StatusCode)" Green } catch { Row "Health (ready)" "not ready" Yellow }
 $bak = Get-ChildItem $BackupDir -Filter "MiniErp_*.bak" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if ($bak) { Row "Latest backup" ("{0} ({1} MB, {2})" -f $bak.Name, [math]::Round($bak.Length/1MB,1), $bak.LastWriteTime.ToString("yyyy-MM-dd HH:mm")) } else { Row "Latest backup" "none in $BackupDir" Yellow }
 $hist = Join-Path $PSScriptRoot "release-history.txt"

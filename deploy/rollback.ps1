@@ -49,6 +49,7 @@ $envFile = Join-Path $PSScriptRoot ".env"
 if (-not (Test-Path $envFile)) { Stop-Safe ".env not found next to this script." "Run this from the deploy folder you installed from." }
 $envText = [IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8)
 $sa = Get-EnvValue $envText "SQL_SA_PASSWORD"
+$apiPort = $(if (Get-EnvValue $envText "ERP_API_PORT") { Get-EnvValue $envText "ERP_API_PORT" } else { "8080" })
 if (-not $sa) { Stop-Safe "SQL_SA_PASSWORD is empty in .env." "Fill it with the existing value." }
 
 # Current version = tag of the running api image, else ERP_VERSION in .env
@@ -164,7 +165,7 @@ Step "4" "Waiting for the system to be ready (up to $HealthTimeoutSec seconds)"
 $ok = $false; $deadline = (Get-Date).AddSeconds($HealthTimeoutSec)
 while ((Get-Date) -lt $deadline) {
     Start-Sleep -Seconds 5
-    try { $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:8080/health/ready" -TimeoutSec 5; if ($r.StatusCode -eq 200) { $ok = $true; break } } catch { }
+    try { $r = Invoke-WebRequest -UseBasicParsing -Uri "http://localhost:$apiPort/health/ready" -TimeoutSec 5; if ($r.StatusCode -eq 200) { $ok = $true; break } } catch { }
     Write-Host "." -NoNewline
 }
 Write-Host ""

@@ -13,7 +13,7 @@ export function useCashboxLedgerPrint({ title = t("كشف حركة الخزنة"
     pageStyle: `
       @page {
         size: A4 landscape;
-        margin: 12mm;
+        margin: 0; /* the template pads itself 12mm inside a 297mm-wide page */
       }
 
       @media print {

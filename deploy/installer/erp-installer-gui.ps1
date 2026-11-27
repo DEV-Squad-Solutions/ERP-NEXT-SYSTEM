@@ -783,11 +783,15 @@ $timer.Add_Tick({
 
 function Start-Op([string]$op) {
     if ($script:proc) { [void][System.Windows.Forms.MessageBox]::Show((L "busy")); return }
+    # The old minierp stack (minierp-db) is the source of truth: Install / Update goes through the Existing DB upgrade (verified backup, typed confirmation, Restore as rollback).
+    $oldStack = $false
+    if ($op -eq "install") { try { $oldStack = [bool](docker ps -a --filter "name=^minierp-db$" --format "{{.Names}}" 2>$null) } catch { $oldStack = $false }; if ($oldStack) { $op = "exconnect" } }
     $script:op = $op; $script:curStep = 0; $script:failMsg = ""; $script:nextMsg = ""; $script:failKey = ""
     $script:done = $null; $script:cancelled = $false; $script:finished = $false; $script:pos = 0L; $script:buf = ""
     $script:recent.Clear()
     $result.Visible = $false; $log.Clear(); Set-Prog 0; $progFill.BackColor = $cBlue; $script:resTarget = 0
     Build-Steps (L ("s_" + $op))
+    if ($oldStack) { Write-Log "Found the old stack (minierp-db). Using it as the source of truth: erp-db / erp_sql_data are ignored and not touched." ([System.Drawing.Color]::LightSkyBlue) }
     $content.RowStyles[2].Height = $(if ($op -eq "status" -or $op -eq "exstatus") { 0 } else { 100 })
     $engine = switch ($op) { "install" { "install-or-update.ps1" } "switch" { "rollback.ps1" } "exconnect" { "use-existing-db.ps1" } "exrestore" { "use-existing-db.ps1" } "exstatus" { "use-existing-db.ps1" } "exdry" { "use-existing-db.ps1" } "images" { "get-images.ps1" } default { "status.ps1" } }
     $exMode = switch ($op) { "exdry" { "dryrun" } "exconnect" { "connect" } "exrestore" { "restore" } default { "status" } }

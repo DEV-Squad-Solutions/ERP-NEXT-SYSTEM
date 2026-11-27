@@ -209,6 +209,14 @@ try {
     if ($LASTEXITCODE -ne 0) { Fail "Docker is not running." "Start Docker Desktop, wait until it says it is running, then double-click ERP Installer.bat again." "docker" }
     Ok "Docker is running"
 
+    # ---------- Old stack (minierp-db) is the source of truth: hand over to the Existing DB upgrade (verified backup, typed confirmation, Restore) ----------
+    if (-not $Gui -and (docker ps -a --filter "name=^minierp-db$" --format "{{.Names}}" 2>$null)) {
+        Write-Host "  Found the old stack (minierp-db). Using it as the source of truth. erp-db / erp_sql_data are ignored and not touched." -ForegroundColor Cyan
+        try { Stop-Transcript | Out-Null } catch { }
+        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "use-existing-db.ps1") -Mode connect -BackupDir $BackupDir
+        exit $LASTEXITCODE
+    }
+
     # ---------- 2. Install type + config ----------
     Step 2 "Detecting install type and checking configuration"
     $dbContainer = docker ps -a --filter "name=^erp-db$" -q

@@ -62,28 +62,33 @@ function L($k) { return $T[$script:lang][$k] }
 # ---------------- UI ----------------
 $font = New-Object System.Drawing.Font("Segoe UI", 10)
 $form = New-Object System.Windows.Forms.Form
-$form.Size = New-Object System.Drawing.Size(1000, 760)
-$form.MinimumSize = New-Object System.Drawing.Size(900, 680)
+# fit small screens (e.g. 1366x768): never bigger than the usable work area
+$wa = [System.Windows.Forms.Screen]::PrimaryScreen.WorkingArea
+$fw = [Math]::Min(980, $wa.Width - 20); $fh = [Math]::Min(700, $wa.Height - 10)
+$form.Size = New-Object System.Drawing.Size($fw, $fh)
+$form.MinimumSize = New-Object System.Drawing.Size([Math]::Min(760, $fw), [Math]::Min(560, $fh))
 $form.StartPosition = "CenterScreen"
+$iconFile = Join-Path $PSScriptRoot "erp-icon.ico"
+if (Test-Path $iconFile) { try { $form.Icon = New-Object System.Drawing.Icon($iconFile) } catch {} }
 $form.Font = $font
 $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
 
 $hdr = New-Object System.Windows.Forms.Panel
-$hdr.Dock = "Top"; $hdr.Height = 78; $hdr.BackColor = [System.Drawing.Color]::FromArgb(15, 61, 62)
+$hdr.Dock = "Top"; $hdr.Height = 70; $hdr.BackColor = [System.Drawing.Color]::FromArgb(15, 61, 62)
 $lblTitle = New-Object System.Windows.Forms.Label
 $lblTitle.ForeColor = "White"; $lblTitle.Font = New-Object System.Drawing.Font("Segoe UI", 16, [System.Drawing.FontStyle]::Bold)
-$lblTitle.AutoSize = $true; $lblTitle.Location = New-Object System.Drawing.Point(20, 10)
+$lblTitle.AutoSize = $true; $lblTitle.Location = New-Object System.Drawing.Point(20, 8)
 $lblSub = New-Object System.Windows.Forms.Label
-$lblSub.ForeColor = [System.Drawing.Color]::FromArgb(200, 225, 225); $lblSub.AutoSize = $true; $lblSub.Location = New-Object System.Drawing.Point(22, 46)
+$lblSub.ForeColor = [System.Drawing.Color]::FromArgb(200, 225, 225); $lblSub.AutoSize = $true; $lblSub.Location = New-Object System.Drawing.Point(22, 42)
 $btnEn = New-Object System.Windows.Forms.Button; $btnEn.Text = "English"; $btnEn.Width = 90; $btnEn.Height = 30; $btnEn.FlatStyle = "Flat"; $btnEn.ForeColor = "White"; $btnEn.BackColor = [System.Drawing.Color]::FromArgb(30, 100, 100)
 $btnAr = New-Object System.Windows.Forms.Button; $btnAr.Text = "العربية"; $btnAr.Width = 90; $btnAr.Height = 30; $btnAr.FlatStyle = "Flat"; $btnAr.ForeColor = "White"; $btnAr.BackColor = [System.Drawing.Color]::FromArgb(30, 100, 100)
 $hdr.Controls.AddRange(@($lblTitle, $lblSub, $btnEn, $btnAr))
 
 $bar = New-Object System.Windows.Forms.FlowLayoutPanel
-$bar.Dock = "Top"; $bar.Height = 58; $bar.Padding = New-Object System.Windows.Forms.Padding(14, 10, 14, 6)
+$bar.Dock = "Top"; $bar.Height = 60; $bar.Padding = New-Object System.Windows.Forms.Padding(14, 10, 14, 6); $bar.WrapContents = $false; $bar.BackColor = [System.Drawing.Color]::White
 function New-Btn($color) {
     $b = New-Object System.Windows.Forms.Button
-    $b.Width = 230; $b.Height = 38; $b.FlatStyle = "Flat"; $b.BackColor = $color; $b.ForeColor = "White"
+    $b.Width = 200; $b.Height = 40; $b.Cursor = [System.Windows.Forms.Cursors]::Hand; $b.FlatStyle = "Flat"; $b.BackColor = $color; $b.ForeColor = "White"
     $b.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold); $b.FlatAppearance.BorderSize = 0
     $b.Margin = New-Object System.Windows.Forms.Padding(4, 0, 4, 0)
     return $b
@@ -92,7 +97,7 @@ $btnInstall = New-Btn ([System.Drawing.Color]::FromArgb(22, 121, 99))
 $btnSwitch = New-Btn ([System.Drawing.Color]::FromArgb(180, 110, 20))
 $btnStatus = New-Btn ([System.Drawing.Color]::FromArgb(50, 90, 150))
 $btnClose = New-Btn ([System.Drawing.Color]::FromArgb(110, 110, 110))
-$btnClose.Width = 110
+$btnClose.Width = 100
 $bar.Controls.AddRange(@($btnInstall, $btnSwitch, $btnStatus, $btnClose))
 
 $prog = New-Object System.Windows.Forms.ProgressBar
@@ -101,20 +106,20 @@ $lblState = New-Object System.Windows.Forms.Label
 $lblState.Dock = "Top"; $lblState.Height = 28; $lblState.Padding = New-Object System.Windows.Forms.Padding(14, 5, 14, 0)
 
 $stepsBox = New-Object System.Windows.Forms.GroupBox
-$stepsBox.Dock = "Top"; $stepsBox.Height = 120
+$stepsBox.Dock = "Top"; $stepsBox.Height = 96; $stepsBox.Padding = New-Object System.Windows.Forms.Padding(8, 4, 8, 4)
 $stepsPanel = New-Object System.Windows.Forms.TableLayoutPanel
 $stepsPanel.Dock = "Fill"; $stepsPanel.ColumnCount = 3; $stepsPanel.RowCount = 2
 $stepsBox.Controls.Add($stepsPanel)
 
 $result = New-Object System.Windows.Forms.Label
-$result.Dock = "Bottom"; $result.Height = 150; $result.Padding = New-Object System.Windows.Forms.Padding(14, 8, 14, 8)
+$result.Dock = "Bottom"; $result.Height = 118; $result.AutoEllipsis = $true; $result.Padding = New-Object System.Windows.Forms.Padding(14, 8, 14, 8)
 $result.Font = New-Object System.Drawing.Font("Segoe UI", 10); $result.Visible = $false
 
 $logBox = New-Object System.Windows.Forms.GroupBox
-$logBox.Dock = "Fill"
+$logBox.Dock = "Fill"; $logBox.Padding = New-Object System.Windows.Forms.Padding(8, 4, 8, 8)
 $log = New-Object System.Windows.Forms.RichTextBox
 $log.Dock = "Fill"; $log.ReadOnly = $true; $log.BackColor = [System.Drawing.Color]::FromArgb(24, 26, 30); $log.ForeColor = [System.Drawing.Color]::Gainsboro
-$log.Font = New-Object System.Drawing.Font("Consolas", 9.5); $log.RightToLeft = "No"; $log.WordWrap = $true
+$log.Font = New-Object System.Drawing.Font("Consolas", 10); $log.BorderStyle = "None"; $log.RightToLeft = "No"; $log.WordWrap = $true
 $logBox.Controls.Add($log)
 
 # dock order: last added docks first
@@ -203,13 +208,12 @@ function Show-Result([string]$kind, [string]$text) {   # kind: ok | fail | cance
 
 function Ask-Input([string]$prompt) {
     $dlg = New-Object System.Windows.Forms.Form
-    $dlg.Text = (L "promptTitle"); $dlg.Size = New-Object System.Drawing.Size(760, 520); $dlg.StartPosition = "CenterParent"; $dlg.Font = $font
+    $dlg.Text = (L "promptTitle"); $dlg.ClientSize = New-Object System.Drawing.Size([Math]::Min(720, $wa.Width - 40), [Math]::Min(470, $wa.Height - 60)); $dlg.StartPosition = "CenterParent"; $dlg.Font = $font
     $dlg.RightToLeft = $form.RightToLeft; $dlg.RightToLeftLayout = ($script:lang -eq "ar")
     $dlg.FormBorderStyle = "FixedDialog"; $dlg.MaximizeBox = $false; $dlg.MinimizeBox = $false
     $ctx = New-Object System.Windows.Forms.TextBox
     $ctx.Multiline = $true; $ctx.ReadOnly = $true; $ctx.ScrollBars = "Vertical"; $ctx.RightToLeft = "No"; $ctx.Font = New-Object System.Drawing.Font("Consolas", 9.5)
-    $ctx.Dock = "Top"; $ctx.Height = 270
-    $ctx.Text = (($script:recent | Select-Object -Last 22) -join "`r`n")
+        $ctx.Text = (($script:recent | Select-Object -Last 22) -join "`r`n")
     $ctx.SelectionStart = $ctx.TextLength; $ctx.ScrollToCaret()
     $lbl = New-Object System.Windows.Forms.Label
     $lbl.Dock = "Top"; $lbl.Height = 70; $lbl.Padding = New-Object System.Windows.Forms.Padding(8, 8, 8, 0); $lbl.RightToLeft = "No"; $lbl.Text = $prompt
@@ -219,7 +223,8 @@ function Ask-Input([string]$prompt) {
     $ok = New-Object System.Windows.Forms.Button; $ok.Text = (L "ok"); $ok.Width = 110; $ok.Height = 34; $ok.DialogResult = "OK"
     $cn = New-Object System.Windows.Forms.Button; $cn.Text = (L "cancel"); $cn.Width = 110; $cn.Height = 34; $cn.DialogResult = "Cancel"
     $pnl.Controls.AddRange(@($ok, $cn))
-    $dlg.Controls.Add($pnl); $dlg.Controls.Add($tb); $dlg.Controls.Add($lbl); $dlg.Controls.Add($ctx)
+    $ctx.Dock = "Fill"; $ctx.Height = 100
+    $dlg.Controls.Add($ctx); $dlg.Controls.Add($tb); $dlg.Controls.Add($lbl); $dlg.Controls.Add($pnl)
     $dlg.AcceptButton = $ok; $dlg.CancelButton = $cn
     $dlg.ActiveControl = $tb
     $r = $dlg.ShowDialog($form)

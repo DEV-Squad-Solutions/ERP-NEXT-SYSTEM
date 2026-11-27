@@ -73,3 +73,18 @@ The menu ([2] then [2]) does this safely with a safety backup and a typed confir
 `powershell -ExecutionPolicy Bypass -File .\backup.ps1` (saved to `C:\ERP_backup`, keeps 14 days).
 
 **Honest status:** the scripts are written and reviewed but not yet run on real Docker. Watch the first run on the server and send the log file if anything fails.
+
+## Building the USB package (dev PC)
+
+1. `git pull`, then `powershell -ExecutionPolicy Bypass -File .\build-images.ps1 -Version 2.1` (makes `erp-images-2.1.tar`).
+2. `powershell -ExecutionPolicy Bypass -File .\build-package.ps1 -Version 2.1`
+3. Copy `dist\ERP-Installer-2.1` to the USB drive. On the server double-click `ERP Installer.bat`.
+   Optional: `Create Desktop Shortcut.bat` adds a Desktop icon.
+
+The package never contains `.env`, passwords, logs or backups. Layout: `ERP Installer.bat`, `images\`, `tools\`, `app\`.
+Ports can be changed in `.env` with `ERP_API_PORT` / `ERP_WEB_PORT` (defaults 8080 / 80).
+
+## Backing up an old MiniErp container (read-only)
+
+`powershell -ExecutionPolicy Bypass -File .\minierp-backup.ps1` (or `tools\Backup old MiniErp container.bat`).
+It makes a verified COPY_ONLY backup of every database in `minierp-db` into `D:\minierp_backup`. It changes nothing in the container.

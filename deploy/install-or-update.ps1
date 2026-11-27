@@ -206,12 +206,12 @@ try {
     if ($busy) { Fail "Port $apiPort or $webPort is already used by another container: $(($busy | ForEach-Object { ($_ -split '\|')[0] }) -join ', ')." "Stop that container (docker stop <name>, nothing is deleted) or set ERP_API_PORT / ERP_WEB_PORT in .env to free ports, then run again." "docker2" }
     Ok "Ports $webPort (web) and $apiPort (api) are free"
 
-    $tar = Get-ChildItem $PSScriptRoot -Filter "erp-images-*.tar" -ErrorAction SilentlyContinue |
+    $tar = Get-ChildItem @($PSScriptRoot, (Join-Path $PSScriptRoot "..\images")) -Filter "erp-images-*.tar" -ErrorAction SilentlyContinue |
         Sort-Object LastWriteTime -Descending | Select-Object -First 1
     $version = $null
     if ($tar) { $version = ($tar.BaseName -replace '^erp-images-', '') }
     else { $version = Get-EnvValue $envText "ERP_VERSION" }
-    if (-not $version) { Fail "No erp-images-*.tar file found next to this script." "Copy the erp-images-<version>.tar file from the USB drive into this same folder, then run again." "notar" }
+    if (-not $version) { Fail "No erp-images-*.tar file found next to this script." "Copy the erp-images-<version>.tar file from the USB drive into the "images" folder of this package, then run again." "notar" }
     $env:ERP_VERSION = $version
     Ok "Version to install: $version"
 

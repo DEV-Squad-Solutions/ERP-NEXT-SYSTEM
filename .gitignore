@@ -5,3 +5,4 @@ deploy/erp-install-*.log
 deploy/*.tar
 deploy/.env.bak
 deploy/release-history.txt
+dist/

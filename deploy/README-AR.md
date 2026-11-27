@@ -58,18 +58,18 @@
 | `database volume with another name` | وقّف. ده معناه تثبيت قديم باسم مختلف. ابعت الاسم اللي ظهر |
 | `The API did not become ready` | ابعت ملف اللوج وآخر سطور الـ API اللي ظهرت. متمسحش حاجة |
 
-## الرجوع لإصدار أقدم (الكود بس)
-الصور القديمة بتفضل على السيرفر. افتح `.env` وغيّر سطر `ERP_VERSION=` للرقم القديم (مثلا 2.0) ثم من فولدر deploy:
-`docker compose -p erp up -d --no-deps api frontend`
-(تعديلات القاعدة إضافية بس، فالكود القديم بيشتغل عليها.)
+## تبديل الإصدار / الرجوع لإصدار أقدم (من القائمة)
+دبل كليك على `install-or-update.bat` ثم اختار **[2] Switch version / roll back** (أو شغّل `rollback.ps1`). مفيش حاجة بتتعمل لوحدها.
+- بتشوف **كل الإصدارات المثبتة** على السيرفر (صورها بتفضل ومبتتمسحش) وتختار أي واحد (قدّام أو ورا).
+- **دايماً** بياخد الأول نسخة احتياطية أمان من الداتا الحالية.
+- **[1] الكود بس:** الداتا مبتتلمسش (الأمان الأعلى). تعديلات القاعدة (migrations) إضافية ومبتترجعش، والكود القديم عادة بيشتغل عليها بس مش مضمون. جرّب بعد التبديل.
+- **[2] الكود + استرجاع الداتا:** بيرجّع النسخة الاحتياطية اللي اتاخدت وانت سايب الإصدار ده. **بيستبدل كل الداتا الحالية** وأي حاجة اتسجلت بعدها هتضيع (نسخة الأمان بتحميك). لازم تكتب `RESTORE` بإيدك للتأكيد.
+- لو الإصدار المطلوب مش مثبت: انسخ ملف `erp-images-<version>.tar` القديم جنب السكربت وشغّل `docker load -i` عليه.
+- النسخ الاحتياطية اللي متسجلة في `release-history.txt` مبتتمسحش بالتنضيف التلقائي (14 يوم).
+- **الحالة (قراءة فقط):** اختار **[3]** أو شغّل `status.ps1`: الإصدار الشغال، الحاويات، آخر نسخة احتياطية، آخر تحديث.
 
-## استرجاع نسخة احتياطية (طوارئ فقط)
-**ابعتلي الأول قبل ما تعمله.** بيستبدل الداتا الحالية بنسخة قديمة. الخطوات:
-1. خد نسخة جديدة الأول: `powershell -ExecutionPolicy Bypass -File .\backup.ps1`
-2. `docker stop erp-api erp-frontend`
-3. `docker cp C:\ERP_backup\MiniErp_XXXX.bak erp-db:/var/opt/mssql/backup/restore.bak`
-4. `docker exec erp-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "<SQL_SA_PASSWORD>" -C -Q "ALTER DATABASE MiniErp SET SINGLE_USER WITH ROLLBACK IMMEDIATE; RESTORE DATABASE MiniErp FROM DISK='/var/opt/mssql/backup/restore.bak' WITH REPLACE; ALTER DATABASE MiniErp SET MULTI_USER;"`
-5. `docker start erp-api erp-frontend` وتأكد من `http://localhost:8080/health/ready`.
+## استرجاع نسخة احتياطية يدوي (طوارئ فقط)
+**ابعتلي الأول.** القائمة اللي فوق ([2] ثم [2]) بتعمل ده بأمان مع نسخة أمان وتأكيد. الخطوات اليدوية موجودة في `README-EN.md`.
 
 ## نسخة احتياطية يدوية في أي وقت
 `powershell -ExecutionPolicy Bypass -File .\backup.ps1` (بتتحفظ في `C:\ERP_backup` وبتحتفظ بآخر 14 يوم).

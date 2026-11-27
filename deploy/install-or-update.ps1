@@ -58,6 +58,25 @@ function Choose-Language {
     Write-Host $(if ($script:Lang -eq "ar") { "Arabic" } else { "English" })
 }
 
+function Choose-Action {
+    Write-Host ""
+    Write-Host "  What do you want to do?" -ForegroundColor White
+    Write-Host "    [1] Install / Update   (default)"
+    Write-Host "    [2] Switch version / roll back"
+    Write-Host "    [3] Show status (read-only)"
+    Write-Host "  Press 1, 2 or 3, or wait 10 seconds for [1]: " -NoNewline
+    $end = (Get-Date).AddSeconds(10)
+    $a = "1"
+    try {
+        while ((Get-Date) -lt $end) {
+            if ([Console]::KeyAvailable) { $k = [Console]::ReadKey($true).KeyChar; if ($k -eq "2" -or $k -eq "3") { $a = "$k" }; break }
+            Start-Sleep -Milliseconds 200
+        }
+    } catch { }
+    Write-Host $(switch ($a) { "2" { "Roll back" } "3" { "Status" } default { "Install / Update" } })
+    return $a
+}
+
 function Line($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
 function Step($n, $t) { Write-Host ""; Write-Host ("[{0}/{1}] {2}" -f $n, $total, $t) -ForegroundColor Cyan }
 function Ok($t) { Write-Host "      OK   " -ForegroundColor Green -NoNewline; Write-Host $t }
@@ -103,6 +122,13 @@ Line "    Offline server mode (Docker). Data is never deleted." Gray
 Line "  ================================================================" Cyan
 
 Choose-Language
+$action = Choose-Action
+if ($action -ne "1") {
+    try { Stop-Transcript | Out-Null } catch { }
+    $target = $(if ($action -eq "2") { "rollback.ps1" } else { "status.ps1" })
+    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot $target) -BackupDir $BackupDir
+    exit $LASTEXITCODE
+}
 Show-Ar "start"
 
 try {
@@ -230,6 +256,11 @@ try {
     Copy-Item $envFile "$envFile.bak" -Force
     $envText = Set-EnvValue $envText "ERP_VERSION" $version
     [IO.File]::WriteAllText($envFile, $envText, (New-Object Text.UTF8Encoding($false)))
+
+    # remember what we are moving from, so a rollback is possible (images are never deleted)
+    $prevImg = docker inspect -f "{{.Config.Image}}" erp-api 2>$null
+    $prevVer = $(if ($prevImg -and $prevImg -match ':(.+)$') { $Matches[1] } else { "none" })
+    Add-Content -Path (Join-Path $PSScriptRoot "release-history.txt") -Value ("{0}|from={1}|to={2}|backup={3}" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"), $prevVer, $version, $bakName) -Encoding UTF8
 
     # ---------- 5. Start ----------
     Step 5 "Starting services"

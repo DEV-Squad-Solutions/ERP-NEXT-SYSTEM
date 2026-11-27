@@ -49,12 +49,19 @@ The installer stops with a red STOPPED box and a "What to do next" line. Nothing
 | `database volume with another name` | Stop. This is an older install under another name. Send the name shown |
 | `The API did not become ready` | Send the log file and the API log lines shown |
 
-## Roll back the code only
-Old images stay on the server. In `.env` set `ERP_VERSION=` to the old number (e.g. 2.0), then from deploy: `docker compose -p erp up -d --no-deps api frontend`. Migrations are additive, so older code still works.
+## Switch version / roll back (menu)
+Double-click `install-or-update.bat`, choose **[2] Switch version / roll back** (or run `rollback.ps1`). Nothing runs automatically.
+- It lists **every installed version** (their images stay on the server and are never deleted) and you pick any one, older or newer.
+- It **always** takes a safety backup of the current database first.
+- **[1] Code only:** database untouched (safest). Migrations are additive and are NOT reversed. Older code usually runs on a newer database but this is not guaranteed. Test after switching.
+- **[2] Code + restore data:** restores the backup taken when you left that version. It **replaces all current data**; anything entered after that backup is lost (the safety backup protects you). You must type `RESTORE`.
+- If the version you want is not installed: put its `erp-images-<version>.tar` next to the script and run `docker load -i` on it.
+- Backups listed in `release-history.txt` are never removed by the 14-day cleanup.
+- **Status (read-only):** choose **[3]** or run `status.ps1`: running version, containers, latest backup, last update.
 
-## Restore a backup (emergency only, ask first)
-It replaces current data with an older copy.
-1. `powershell -ExecutionPolicy Bypass -File .\backup.ps1` (take a fresh backup first)
+## Manual restore (emergency only, ask first)
+The menu ([2] then [2]) does this safely with a safety backup and a typed confirmation. By hand:
+1. `powershell -ExecutionPolicy Bypass -File .\backup.ps1`
 2. `docker stop erp-api erp-frontend`
 3. `docker cp C:\ERP_backup\MiniErp_XXXX.bak erp-db:/var/opt/mssql/backup/restore.bak`
 4. `docker exec erp-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "<SQL_SA_PASSWORD>" -C -Q "ALTER DATABASE MiniErp SET SINGLE_USER WITH ROLLBACK IMMEDIATE; RESTORE DATABASE MiniErp FROM DISK='/var/opt/mssql/backup/restore.bak' WITH REPLACE; ALTER DATABASE MiniErp SET MULTI_USER;"`

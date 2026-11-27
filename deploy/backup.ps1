@@ -1,6 +1,6 @@
 ﻿<#
  Backs up the ERP database (inside container erp-db) to a folder on this server.
- Keeps the last N days. Warns when disk space is low.
+ Keeps the last N days (backups listed in release-history.txt are always kept). Warns when disk space is low.
  Example: powershell -ExecutionPolicy Bypass -File .\backup.ps1
 #>
 [CmdletBinding()]
@@ -46,8 +46,12 @@ if ($LASTEXITCODE -ne 0) { throw "Could not copy the backup to this server" }
 docker exec -u 0 erp-db rm -f $inContainer
 
 $cutoff = (Get-Date).AddDays(-$RetainDays)
+# Never delete a backup that release-history.txt points to (it is the data of a specific version).
+$keep = @()
+$hist = Join-Path $PSScriptRoot "release-history.txt"
+if (Test-Path $hist) { $keep = Get-Content $hist | ForEach-Object { if ($_ -match 'backup=(.*)$') { $Matches[1].Trim() } } }
 Get-ChildItem $BackupDir -Filter "MiniErp_*.bak" |
-    Where-Object { $_.LastWriteTime -lt $cutoff } |
+    Where-Object { $_.LastWriteTime -lt $cutoff -and ($keep -notcontains $_.FullName) } |
     ForEach-Object { Remove-Item $_.FullName -Force }
 
 $drive = (Get-PSDrive -Name $BackupDir.Substring(0,1).ToUpper()).Free

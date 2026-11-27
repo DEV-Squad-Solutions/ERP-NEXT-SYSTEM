@@ -355,11 +355,24 @@ try {
         }
         Info "Waiting for the database to accept connections"
         $dbReady = $false
-        for ($i = 0; $i -lt 36; $i++) {
-            $h = docker inspect -f "{{.State.Health.Status}}" erp-db 2>$null
-            if ($h -eq "healthy") { $dbReady = $true; break }
-            if (-not $h -or $h -eq "<no value>") { Start-Sleep -Seconds 40; $dbReady = $true; break }
-            Start-Sleep -Seconds 5
+        $loginBad = $false
+        $t0 = Get-Date; $lastNote = 0
+        for ($i = 0; $i -lt 90; $i++) {
+            $st = docker inspect -f "{{.State.Status}}" erp-db 2>$null
+            if ($st -and $st -ne "running" -and $st -ne "restarting") { break }   # container stopped: diagnosis below
+            # a real login probe every ~2 s: tells "still starting" (keep waiting) from "up, but this password is refused" (stop waiting now)
+            $env:SQLCMDPASSWORD = $sa
+            $pr = ""
+            try { $eapOld = $ErrorActionPreference; $ErrorActionPreference = "Continue"; $pr = docker exec -e SQLCMDPASSWORD erp-db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -C -b -l 3 -Q "SELECT 1" 2>&1 | Out-String; $prc = $LASTEXITCODE } catch { $prc = 1 } finally { $ErrorActionPreference = $eapOld; Remove-Item Env:SQLCMDPASSWORD -ErrorAction SilentlyContinue }
+            if ($prc -eq 0) { $dbReady = $true; break }
+            if ($pr -match 'Login failed|18456') {
+                $dbReady = $true; $loginBad = $true
+                Info "The database is running but refuses the password in .env (login failed). Not waiting any longer: the backup step looks for the right login (old .env files, then a masked dialog)."
+                break
+            }
+            $sec = [int]((Get-Date) - $t0).TotalSeconds
+            if ($sec - $lastNote -ge 10) { Info ("Still waiting for the database to start... {0} s (up to 180 s)" -f $sec); $lastNote = $sec }
+            Start-Sleep -Seconds 2
         }
         if (-not $dbReady) {
             # diagnosis: last lines of the SQL Server log and the last health probe (SQL logs contain no passwords)
@@ -378,7 +391,7 @@ try {
 
         # Is there a MiniErp database to back up?
         $sqlcmd = "/opt/mssql-tools18/bin/sqlcmd"
-        $probe = docker exec erp-db $sqlcmd -S localhost -U sa -P $sa -C -h -1 -W -Q "SET NOCOUNT ON; SELECT CASE WHEN DB_ID('MiniErp') IS NULL THEN 'NO' ELSE 'YES' END" 2>&1 | Out-String
+        if ($loginBad) { $probe = "YES" } else { $probe = docker exec erp-db $sqlcmd -S localhost -U sa -P $sa -C -h -1 -W -Q "SET NOCOUNT ON; SELECT CASE WHEN DB_ID('MiniErp') IS NULL THEN 'NO' ELSE 'YES' END" 2>&1 | Out-String }
         if ($probe -cmatch '(?m)^\s*YES\s*$') { $hasDb = $true }
         elseif ($probe -cmatch '(?m)^\s*NO\s*$') { $hasDb = $false }
         else {

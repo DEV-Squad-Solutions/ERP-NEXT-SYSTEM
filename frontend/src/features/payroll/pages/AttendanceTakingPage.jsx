@@ -34,6 +34,7 @@ import DateInput from "../../../shared/components/ui/DateInput.jsx";
 
 import { t } from "../../../i18n";
 import { getDir } from "../../../i18n";
+const DESKTOP_GRID = { gridTemplateColumns: "28px minmax(130px,1.2fr) 140px 104px 104px 112px 112px 112px minmax(150px,1.4fr)" };
 const DEFAULT_CHECK_IN = "09:00";
 const DEFAULT_CHECK_OUT = "17:00";
 
@@ -165,6 +166,7 @@ const AttendanceTakingPage = () => {
   const [workDate, setWorkDate] = useState(getToday);
   const [search, setSearch] = useState("");
   const [narrow, setNarrow] = useState(() => typeof window !== "undefined" && window.innerWidth < 768);
+  const lbl = (text) => (narrow ? text : <span className="sr-only">{text}</span>);
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
     const on = () => setNarrow(mq.matches);
@@ -309,7 +311,7 @@ const AttendanceTakingPage = () => {
   const rowVirtualizer = useVirtualizer({
     count: filteredRows.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => (narrow ? 346 : 118),
+    estimateSize: () => (narrow ? 346 : 60),
     overscan: 10,
   });
 
@@ -578,7 +580,7 @@ const AttendanceTakingPage = () => {
   const isFetching = employeesFetching || attendanceFetching;
 
   return (
-    <div dir={getDir()} className="flex h-full min-h-0 flex-col gap-4 p-4">
+    <div dir={getDir()} className="flex min-h-0 flex-col gap-4 p-4">
       {isFiscalYearReadOnly && (
         <ReadOnlyFiscalYearBanner fiscalYear={fiscalYear} />
       )}
@@ -867,8 +869,8 @@ const AttendanceTakingPage = () => {
         )}
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm">
-        <div ref={parentRef} className="min-h-0 flex-1 overflow-auto">
+      <div className="flex min-h-0 flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white shadow-sm">
+        <div ref={parentRef} className="min-h-[160px] max-h-[70vh] overflow-auto">
           {isLoading ? (
             <div className="flex h-64 items-center justify-center">
               <Loader2 size={28} className="animate-spin text-primary-600" />
@@ -879,6 +881,23 @@ const AttendanceTakingPage = () => {
               <p className="text-sm">{t("لا توجد بيانات مطابقة")}</p>
             </div>
           ) : (
+            <div className={narrow ? "" : "min-w-[1020px]"}>
+            {!narrow && (
+              <div
+                className="sticky top-0 z-10 grid items-center gap-x-2 border-b border-ink-100 bg-ink-50 px-3 py-2 text-[11px] font-semibold text-ink-500"
+                style={DESKTOP_GRID}
+              >
+                <span />
+                <span>{t("الموظف")}</span>
+                <span>{t("الحالة")}</span>
+                <span>{t("الحضور")}</span>
+                <span>{t("الانصراف")}</span>
+                <span>{t("نسبة اليوم")}</span>
+                <span>{t("الإضافي")}</span>
+                <span>{t("الخصم")}</span>
+                <span>{t("ملاحظات")}</span>
+              </div>
+            )}
             <div
               className="relative"
               style={{
@@ -897,14 +916,14 @@ const AttendanceTakingPage = () => {
                 return (
                   <div
                     key={employeeId}
-                    className={narrow ? "absolute start-0 end-0 px-2.5 py-1.5" : "absolute start-0 end-0 border-b border-ink-100 bg-white px-3 py-2 transition hover:bg-ink-50/50"}
+                    className={narrow ? "absolute start-0 end-0 px-2.5 py-1.5" : "absolute start-0 end-0 border-b border-ink-100 bg-white px-3 transition hover:bg-ink-50/60"}
                     style={{
                       height: `${virtualRow.size}px`,
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
                   >
-                    <div className={narrow ? "grid h-full grid-cols-2 content-start gap-x-3 gap-y-2.5 overflow-hidden rounded-xl border border-ink-200 bg-white p-3 shadow-sm" : "grid items-end gap-x-2 gap-y-1.5"} style={narrow ? undefined : { gridTemplateColumns: "44px repeat(4, minmax(0, 1fr))" }}>
-                      <div className={narrow ? "col-span-2 flex items-center gap-2" : "flex h-9 items-center"}>
+                    <div className={narrow ? "grid h-full grid-cols-2 content-start gap-x-3 gap-y-2.5 overflow-hidden rounded-xl border border-ink-200 bg-white p-3 shadow-sm" : "grid h-full items-center gap-x-2"} style={narrow ? undefined : DESKTOP_GRID}>
+                      <div className={narrow ? "col-span-2 flex items-center gap-2" : "flex h-9 items-center justify-center"}>
                         <input
                           type="checkbox"
                           checked={selected}
@@ -916,12 +935,12 @@ const AttendanceTakingPage = () => {
                         )}
                       </div>
                       {!narrow && (
-                        <div className="min-w-0 pb-1">
+                        <div className="min-w-0">
                           <div className="truncate font-semibold text-ink-800">{row.employee.name}</div>
                           <div className="text-xs text-ink-400">#{row.employee.id}</div>
                         </div>
                       )}
-                      <label className={"block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1" + (narrow ? " col-span-2" : "")}>{t("الحالة")}
+                      <label className={"block min-w-0 text-[11px] font-medium text-ink-500 max-md:[&>div]:mt-1 max-md:[&>input]:mt-1" + (narrow ? " col-span-2" : "")}>{lbl(t("الحالة"))}
                         <CompactSelect
                           value={row.status}
                           onChange={(value) => setEmployeeStatus(employeeId, value)}
@@ -933,18 +952,17 @@ const AttendanceTakingPage = () => {
                           placeholder={t("الحالة")}
                         />
                       </label>
-                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("الحضور")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 max-md:[&>div]:mt-1 max-md:[&>input]:mt-1">{lbl(t("الحضور"))}
                         <input type="time" value={present ? row.checkIn || "" : ""} disabled={!present}
                           onChange={(event) => updateRow(employeeId, { checkIn: event.target.value })}
-                          className="h-[38px] w-full min-w-0 max-w-full appearance-none rounded-lg border border-ink-200 bg-white px-2 text-start text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500" />
+                          className="h-9 md:h-9 max-md:h-[38px] w-full min-w-0 max-w-full appearance-none rounded-lg border border-ink-200 bg-white px-2 text-start text-sm outline-none transition disabled:cursor-not-allowed disabled:border-dashed disabled:bg-transparent disabled:text-ink-300 focus:border-primary-500" />
                       </label>
-                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("الانصراف")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 max-md:[&>div]:mt-1 max-md:[&>input]:mt-1">{lbl(t("الانصراف"))}
                         <input type="time" value={present ? row.checkOut || "" : ""} disabled={!present}
                           onChange={(event) => updateRow(employeeId, { checkOut: event.target.value })}
-                          className="h-[38px] w-full min-w-0 max-w-full appearance-none rounded-lg border border-ink-200 bg-white px-2 text-start text-sm outline-none transition disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-300 focus:border-primary-500" />
+                          className="h-9 md:h-9 max-md:h-[38px] w-full min-w-0 max-w-full appearance-none rounded-lg border border-ink-200 bg-white px-2 text-start text-sm outline-none transition disabled:cursor-not-allowed disabled:border-dashed disabled:bg-transparent disabled:text-ink-300 focus:border-primary-500" />
                       </label>
-                      {!narrow && <div />}
-                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("نسبة اليوم")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 max-md:[&>div]:mt-1 max-md:[&>input]:mt-1">{lbl(t("نسبة اليوم"))}
                         <CompactSelect
                           value={present ? (row.workDayRatio ?? 1) : ""}
                           onChange={(value) => updateRow(employeeId, { workDayRatio: normalizeRatio(value, 1) })}
@@ -953,7 +971,7 @@ const AttendanceTakingPage = () => {
                           isDisabled={!present}
                         />
                       </label>
-                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("الإضافي")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 max-md:[&>div]:mt-1 max-md:[&>input]:mt-1">{lbl(t("الإضافي"))}
                         <CompactSelect
                           value={row.workOverTimeRatio || ""}
                           onChange={(value) => updateRow(employeeId, { workOverTimeRatio: value })}
@@ -961,7 +979,7 @@ const AttendanceTakingPage = () => {
                           placeholder={t("الإضافي")}
                         />
                       </label>
-                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("الخصم")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 max-md:[&>div]:mt-1 max-md:[&>input]:mt-1">{lbl(t("الخصم"))}
                         <CompactSelect
                           value={row.workDaysDeductionRatio || ""}
                           onChange={(value) => updateRow(employeeId, { workDaysDeductionRatio: value })}
@@ -970,16 +988,17 @@ const AttendanceTakingPage = () => {
                           isDisabled={!present}
                         />
                       </label>
-                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 [&>div]:mt-1 [&>input]:mt-1">{t("ملاحظات")}
+                      <label className="block min-w-0 text-[11px] font-medium text-ink-500 max-md:[&>div]:mt-1 max-md:[&>input]:mt-1">{lbl(t("ملاحظات"))}
                         <input type="text" value={row.notes || ""}
                           onChange={(event) => updateRow(employeeId, { notes: event.target.value })}
                           placeholder={t("ملاحظات...")}
-                          className="h-[38px] w-full min-w-0 rounded-lg border border-ink-200 bg-white px-3 text-sm outline-none transition placeholder:text-ink-400 focus:border-primary-500" />
+                          className="h-9 max-md:h-[38px] w-full min-w-0 rounded-lg border border-ink-200 bg-white px-3 text-sm outline-none transition placeholder:text-ink-400 focus:border-primary-500" />
                       </label>
                     </div>
                   </div>
                 );
               })}
+            </div>
             </div>
           )}
         </div>

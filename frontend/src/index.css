@@ -660,6 +660,21 @@ html.dark :where([class~="bg-gold-50/40"]) {
   background-color: rgba(212, 175, 55, 0.1);
 }
 
+/* Light tinted status panels (bg-emerald-50 ...) stayed light in dark mode, which made
+   the light text colors above unreadable. Low-specificity, component dark: variants still win. */
+html.dark :where(.bg-emerald-50, .bg-green-50) { background-color: rgba(16, 185, 129, 0.12); }
+html.dark :where(.bg-amber-50, .bg-orange-50, .bg-yellow-50, .bg-gold-50) { background-color: rgba(245, 158, 11, 0.12); }
+html.dark :where(.bg-red-50, .bg-rose-50) { background-color: rgba(239, 68, 68, 0.12); }
+html.dark :where(.bg-blue-50, .bg-sky-50) { background-color: rgba(59, 130, 246, 0.12); }
+
+html.dark :where(.text-emerald-600, .text-emerald-500, .text-green-700, .text-green-600) { color: #6ee7b7; }
+html.dark :where(.text-amber-900, .text-amber-800, .text-amber-700, .text-amber-600, .text-orange-700, .text-orange-600) { color: #fbbf24; }
+html.dark :where(.text-red-800, .text-red-700, .text-red-600, .text-rose-800, .text-rose-700, .text-rose-600) { color: #fca5a5; }
+
+html.dark :where(.bg-emerald-100, .bg-green-100) { background-color: rgba(16, 185, 129, 0.18); }
+html.dark :where(.bg-amber-100, .bg-orange-100, .bg-yellow-100) { background-color: rgba(245, 158, 11, 0.18); }
+html.dark :where(.bg-red-100, .bg-rose-100) { background-color: rgba(239, 68, 68, 0.18); }
+
 /* Extra dark-mode readability for colored text that only had light-mode values. */
 html.dark :where(.text-emerald-900, .text-emerald-800, .text-emerald-700) { color: #6ee7b7; }
 html.dark :where(.text-primary-700, .text-primary-600, .text-primary-500) { color: #8fc7ff; }

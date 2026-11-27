@@ -50,6 +50,8 @@ $T = @{
     s_exconnect = @("Check old database", "Read tables and migrations", "Old app containers", "Verified backup", "Stop old app", "Write settings", "Images", "Start ERP 2.0")
     s_exrestore = @("Verify backup file", "Pre-restore backup", "Stop ERP 2.0", "Restore", "Check result", "Start old app")
     s_exstatus = @("Read status")
+    s_exdry = @("Choose backup", "Check images and ports", "Throwaway SQL Server", "Restore into the copy", "Run migrations on the copy", "Check result", "Remove the copy")
+    exDry = "Test the upgrade on a COPY first (recommended, changes nothing real)"
     exTitle = "Existing database (no new database)"; exHelp = "Choose what to do with your existing database."; exConnect = "Connect ERP 2.0 (verified backup first, then upgrade in place)"; exRestore = "Restore from a backup file (rollback)"; exStatus = "Status (read only)"
     unexpected = "The operation ended unexpectedly. Send the log file to your developer."
   }
@@ -66,6 +68,8 @@ $T = @{
     s_exconnect = @("فحص الداتابيز القديمة", "قراءة الجداول والـ migrations", "حاويات التطبيق القديم", "نسخة احتياطية متحقق منها", "إيقاف التطبيق القديم", "كتابة الإعدادات", "الصور", "تشغيل ERP 2.0")
     s_exrestore = @("فحص ملف النسخة", "نسخة قبل الاسترجاع", "إيقاف ERP 2.0", "الاسترجاع", "فحص النتيجة", "تشغيل التطبيق القديم")
     s_exstatus = @("قراءة الحالة")
+    s_exdry = @("اختيار النسخة", "فحص الصور والبورتات", "SQL مؤقت", "استرجاع في النسخة", "تشغيل الـ migrations على النسخة", "فحص النتيجة", "مسح النسخة")
+    exDry = "جرّب الترقية على نسخة الأول (موصى بيه، مش بيغيّر حاجة حقيقية)"
     exTitle = "الداتابيز الحالية (من غير داتابيز جديدة)"; exHelp = "اختار هتعمل إيه في الداتابيز الحالية."; exConnect = "وصّل ERP 2.0 (نسخة احتياطية متحقق منها وبعدين ترقية في نفس المكان)"; exRestore = "استرجاع من ملف نسخة (رجوع)"; exStatus = "الحالة (قراءة فقط)"
     unexpected = "العملية وقفت بشكل غير متوقع. ابعت ملف السجل للمطوّر."
   }
@@ -770,8 +774,8 @@ function Start-Op([string]$op) {
     $result.Visible = $false; $log.Clear(); Set-Prog 0; $progFill.BackColor = $cBlue; $script:resTarget = 0
     Build-Steps (L ("s_" + $op))
     $content.RowStyles[2].Height = $(if ($op -eq "status" -or $op -eq "exstatus") { 0 } else { 100 })
-    $engine = switch ($op) { "install" { "install-or-update.ps1" } "switch" { "rollback.ps1" } "exconnect" { "use-existing-db.ps1" } "exrestore" { "use-existing-db.ps1" } "exstatus" { "use-existing-db.ps1" } default { "status.ps1" } }
-    $exMode = switch ($op) { "exconnect" { "connect" } "exrestore" { "restore" } default { "status" } }
+    $engine = switch ($op) { "install" { "install-or-update.ps1" } "switch" { "rollback.ps1" } "exconnect" { "use-existing-db.ps1" } "exrestore" { "use-existing-db.ps1" } "exstatus" { "use-existing-db.ps1" } "exdry" { "use-existing-db.ps1" } default { "status.ps1" } }
+    $exMode = switch ($op) { "exdry" { "dryrun" } "exconnect" { "connect" } "exrestore" { "restore" } default { "status" } }
     $script:ioDir = Join-Path $env:TEMP ("erp-installer-" + [guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Force -Path $script:ioDir | Out-Null
     $script:outFile = Join-Path $script:ioDir "out.txt"
@@ -792,9 +796,9 @@ $btnStatus.Add_Click({ Start-Op "status" })
 function Start-Existing {
     try {
         if ($script:busy) { return }
-        $ch = @(@("exconnect", (L "exConnect")), @("exrestore", (L "exRestore")), @("exstatus", (L "exStatus")))
+        $ch = @(@("exdry", (L "exDry")), @("exconnect", (L "exConnect")), @("exrestore", (L "exRestore")), @("exstatus", (L "exStatus")))
         $pick = Show-Dlg ((L "exTitle") + "`n" + (L "exHelp")) "choice" $false $ch
-        if ($pick -in @("exconnect", "exrestore", "exstatus")) { Start-Op $pick }
+        if ($pick -in @("exdry", "exconnect", "exrestore", "exstatus")) { Start-Op $pick }
     } catch { Log-GuiError $_.Exception "existingdb" }
 }
 $btnEx.Add_Click({ Start-Existing })

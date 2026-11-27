@@ -15,7 +15,7 @@ $ErrorActionPreference = "Continue"
 $Root = $(if (Test-Path (Join-Path $PSScriptRoot "docker-compose.yml")) { $PSScriptRoot } else { Split-Path $PSScriptRoot -Parent })
 $envFile = Join-Path $Root ".env"; $stateFile = Join-Path $Root "existing-db-state.json"
 if (-not $OutDir) { $OutDir = $(if (Test-Path "D:\") { "D:\minierp_backup" } else { "C:\ERP_backup\old-sql-backup" }) }
-$script:pw = ""; $script:helped = $false; $script:summary = ""; $script:askN = 0
+$script:pw = ""; $script:helped = $false; $script:summary = ""; $script:askN = 0; $script:dryActive = $false
 if ($Gui) { [Console]::OutputEncoding = [Text.Encoding]::UTF8 }
 function T([string]$en, [string]$ar) { if ($Lang -eq "ar") { return $ar } else { return $en } }
 function Ask([string]$text) {
@@ -34,7 +34,7 @@ function Ask-Phrase([string]$phrase, [string]$en, [string]$ar) {
     return (Read-Host "  Type exactly $phrase to continue (anything else cancels)")
 }
 function Say($t, $c = "Gray") { Write-Host $t -ForegroundColor $c }
-function Stop-Now($m) { Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The database was not changed unless a line above says so." Yellow; if ($script:helped) { docker exec -u 0 $Container rm -f /tmp/erp_rq.sh /tmp/erp_restore.bak 2>$null | Out-Null }; if ($Gui) { Write-Host "  FAIL $m" } else { [void](Read-Host "Press Enter to close") }; exit 1 }
+function Stop-Now($m) { if ($script:dryActive) { Cleanup-Dry }; Say ""; Say "STOPPED: $m" Red; Say "Nothing was deleted. The database was not changed unless a line above says so." Yellow; if ($script:helped) { docker exec -u 0 $Container rm -f /tmp/erp_rq.sh /tmp/erp_restore.bak 2>$null | Out-Null }; if ($Gui) { Write-Host "  FAIL $m" } else { [void](Read-Host "Press Enter to close") }; exit 1 }
 function Read-Masked([string]$prompt) {
     if ($Gui) { return (Ask ($prompt + " [[secret:nogen]]")) }
     $ss = Read-Host $prompt -AsSecureString
@@ -240,6 +240,117 @@ function Restore-Db {
     $script:summary = "Database restored from $($bf.Name). erp-api and erp-frontend stay stopped on purpose."
     Say ""; Say "  DONE. erp-api and erp-frontend stay stopped on purpose. Run option 1 again when you want to retry the upgrade." Green
 }
+function Cleanup-Dry {
+    # removes ONLY the throwaway project erp-dryrun (its containers, its network, its own volume). Never anything else.
+    Push-Location $Root
+    $env:DRYRUN_SA_PASSWORD = "x"; $env:DRYRUN_JWT = "x"; $env:DRYRUN_API_PORT = "1"
+    docker compose -p erp-dryrun -f docker-compose.dryrun.yml down -v --remove-orphans 2>&1 | ForEach-Object { Say "  $_" DarkGray }
+    Remove-Item Env:DRYRUN_SA_PASSWORD, Env:DRYRUN_JWT, Env:DRYRUN_API_PORT -ErrorAction SilentlyContinue
+    Pop-Location
+    $script:dryActive = $false
+    Say "  Test copy removed (only erp-dryrun-db, erp-dryrun-api and their own volume)." DarkGray
+}
+function Dry-Run {
+    Say ""; Say "=== Test the upgrade on a COPY (nothing real is changed) ===" Cyan
+    $realContainer = $Container
+    Say "[1/7] Choosing the backup to test" Cyan
+    docker version --format "{{.Server.Version}}" *> $null
+    if ($LASTEXITCODE -ne 0) { Stop-Now "Docker is not running. Start Docker Desktop and run this again." }
+    if ($Db -notmatch '^[A-Za-z0-9_]+$') { Stop-Now "Unsafe database name." }
+    $pat = '^(ERP_DB_backup_old-' + $Db + '_|' + $Db + '_).*\.bak$'
+    $bf = Get-ChildItem -Path $OutDir -Filter "*.bak" -File -ErrorAction SilentlyContinue | Where-Object { $_.Name -match $pat } | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    if ($bf -and $bf.LastWriteTime -lt (Get-Date).AddDays(-1)) {
+        $a = Ask-Choice-Dry ("The newest backup is from {0:yyyy-MM-dd HH:mm}. Test with it, or take a fresh verified backup of {1} first (read-only COPY_ONLY, the database is not changed)?" -f $bf.LastWriteTime, $realContainer) @(@("old", "Use the existing backup"), @("new", "Take a fresh verified backup first"))
+        if ($a -eq "new") { $bf = $null } elseif ($a -ne "old") { Stop-Now "Cancelled. Nothing was changed." }
+    }
+    if (-not $bf) {
+        Say "  Taking a fresh verified backup of $realContainer (COPY_ONLY, nothing is stopped or changed)." Yellow
+        Connect-Sql
+        $bf = Run-Backup $OutDir
+        if (-not $bf) { Stop-Now "The backup failed or could not be verified. Nothing was changed." }
+    }
+    Say ("  Using {0}  ({1} MB, {2:yyyy-MM-dd HH:mm})" -f $bf.FullName, [int]($bf.Length / 1MB), $bf.LastWriteTime) White
+    Say "[2/7] Checking images, ports and leftovers" Cyan
+    $ver = Get-EnvVal "ERP_VERSION"; if (-not $ver) { $ver = "2.0" }
+    docker image inspect "erp-api:$ver" *> $null
+    if ($LASTEXITCODE -ne 0) { Stop-Now "The image erp-api:$ver is not loaded. Run ERP Installer once to load the images (the test needs the same API image), then run this again." }
+    docker image inspect "mcr.microsoft.com/mssql/server:2022-latest" *> $null
+    if ($LASTEXITCODE -ne 0) { Stop-Now "The SQL Server image mcr.microsoft.com/mssql/server:2022-latest is not on this PC (no internet needed if it is loaded). Nothing was changed." }
+    $port = 0; foreach ($p in 18080..18099) { if (Test-PortFree $p) { $port = $p; break } }
+    if ($port -eq 0) { Stop-Now "No free test port between 18080 and 18099." }
+    $left = @(docker ps -a --filter "name=^erp-dryrun-" --format "{{.Names}}")
+    if ($left.Count -gt 0) { Say "  Found leftovers of an earlier test ($($left -join ', ')). Removing them (they are only the test copy)." Yellow; $script:dryActive = $true; Cleanup-Dry }
+    Say ("  OK  Images found, test port {0}. This test needs about 2 GB of free RAM and the backup size in disk space." -f $port) Green
+    $sa = New-Secret 22; $jwt = New-Secret 48
+    $env:DRYRUN_SA_PASSWORD = $sa; $env:DRYRUN_JWT = $jwt; $env:DRYRUN_API_PORT = "$port"
+    $script:dryActive = $true
+    Say "[3/7] Starting a throwaway SQL Server (own container erp-dryrun-db and own volume)" Cyan
+    Push-Location $Root
+    docker compose -p erp-dryrun -f docker-compose.dryrun.yml up -d db 2>&1 | ForEach-Object { Say "  $_" DarkGray }
+    Pop-Location
+    $script:Container = "erp-dryrun-db"; $script:pw = $sa; Put-Helper
+    $up = $false
+    for ($i = 0; $i -lt 60; $i++) { $null = Run-Sql "SELECT 1"; if ($LASTEXITCODE -eq 0) { $up = $true; break }; Start-Sleep -Seconds 3 }
+    if (-not $up) { docker logs --tail 20 erp-dryrun-db 2>&1 | ForEach-Object { Say "  | $_" DarkGray }; Stop-Now "The throwaway SQL Server did not start. See the lines above. Nothing real was touched." }
+    Say "  OK  Throwaway SQL Server is running." Green
+    Say "[4/7] Restoring the backup into the throwaway server" Cyan
+    docker cp $bf.FullName "erp-dryrun-db:/tmp/erp_restore.bak" | Out-Null
+    $v = Run-Sql "RESTORE VERIFYONLY FROM DISK = N'/tmp/erp_restore.bak' WITH CHECKSUM"
+    if ($LASTEXITCODE -ne 0 -or $v -notmatch 'valid') { Say $v DarkGray; Stop-Now "The backup file did not verify. Nothing real was touched." }
+    $fl = Run-Sql "RESTORE FILELISTONLY FROM DISK = N'/tmp/erp_restore.bak'"
+    $moves = @(); $n = 0
+    foreach ($l in ($fl -split "`n")) {
+        $t = @($l.Trim() -split '\s+')
+        if ($t.Count -ge 3 -and $t[1] -like "/*" -and ($t[2] -eq "D" -or $t[2] -eq "L")) { $n++; $ext = [IO.Path]::GetExtension($t[1]); $moves += ("MOVE N'{0}' TO N'/var/opt/mssql/data/dryrun_{1}{2}'" -f $t[0], $n, $ext) }
+    }
+    if ($moves.Count -lt 2) { Say $fl DarkGray; Stop-Now "Could not read the file list of the backup. Nothing real was touched." }
+    $r = Run-Sql ("RESTORE DATABASE [$Db] FROM DISK = N'/tmp/erp_restore.bak' WITH " + ($moves -join ", ") + ", REPLACE, RECOVERY, STATS = 20")
+    if ($LASTEXITCODE -ne 0) { Say $r DarkGray; Stop-Now "The restore into the test copy failed. Nothing real was touched." }
+    docker exec -u 0 erp-dryrun-db rm -f /tmp/erp_restore.bak | Out-Null
+    $before = Get-Facts
+    if ($before.nodb -or $before.nohist) { Stop-Now "The restored copy has no $Db database or no migration history." }
+    Say ("  OK  Copy restored: {0} tables, {1} rows, migrations applied {2}." -f $before.tables, $before.rows, $before.mig.Count) Green
+    $known = Get-Known
+    $unknown = @($before.mig | Where-Object { $known -notcontains $_ })
+    if ($unknown.Count -gt 0) { Stop-Now ("The copy has migrations this version does not know: " + ($unknown -join ", ")) }
+    $todo = @($known | Where-Object { $before.mig -notcontains $_ })
+    Say "[5/7] Running the pending migrations (erp-api starts on the COPY)" Cyan
+    Say ("  Pending: {0}" -f $todo.Count) White
+    foreach ($t in $todo) { Say "   - $t" DarkGray }
+    Push-Location $Root
+    docker compose -p erp-dryrun -f docker-compose.dryrun.yml up -d api 2>&1 | ForEach-Object { Say "  $_" DarkGray }
+    Pop-Location
+    $healthy = $false
+    for ($i = 0; $i -lt 72; $i++) {
+        $h = docker inspect -f "{{.State.Health.Status}}" erp-dryrun-api 2>$null
+        if ($h -eq "healthy") { $healthy = $true; break }
+        $st = docker inspect -f "{{.State.Status}}" erp-dryrun-api 2>$null
+        if ($st -eq "exited") { break }
+        Start-Sleep -Seconds 5
+    }
+    if (-not $healthy) {
+        Say "  The API did not become healthy on the copy. Last 40 log lines (no passwords):" Yellow
+        docker logs --tail 40 erp-dryrun-api 2>&1 | ForEach-Object { Say "  | $_" DarkGray }
+        Stop-Now "TEST FAILED: the upgrade does not run cleanly on a copy of your data. Do NOT upgrade the real database yet. Send the log lines above to your developer."
+    }
+    Say "  OK  erp-api is healthy on the copy." Green
+    Say "[6/7] Checking the result on the copy" Cyan
+    $after = Get-Facts
+    $missing = @($known | Where-Object { $after.mig -notcontains $_ })
+    Say ("  Tables {0} -> {1}, rows {2} -> {3}, migrations {4} -> {5} (of {6})." -f $before.tables, $after.tables, $before.rows, $after.rows, $before.mig.Count, $after.mig.Count, $known.Count) White
+    if ($missing.Count -gt 0) { Stop-Now ("TEST FAILED: migrations still missing on the copy: " + ($missing -join ", ")) }
+    if ($after.rows -lt $before.rows) { Stop-Now ("TEST FAILED: the copy has FEWER rows after the upgrade ({0} -> {1}). Do NOT upgrade the real database." -f $before.rows, $after.rows) }
+    Say "  OK  All migrations applied, no rows lost." Green
+    Say "[7/7] Removing the test copy" Cyan
+    Cleanup-Dry
+    $script:Container = $realContainer; $script:pw = ""
+    $script:summary = ("TEST PASSED on a copy of {0}: {1} migrations applied ({2} -> {3}), rows {4} -> {5}, erp-api healthy. Your real database was not touched. Next: Existing DB > Connect." -f $bf.Name, $todo.Count, $before.mig.Count, $after.mig.Count, $before.rows, $after.rows)
+    Say ("  RESULT: " + $script:summary) Green
+}
+function Ask-Choice-Dry([string]$text, $opts) {
+    if ($Gui) { $pairs = @($opts | ForEach-Object { "{0}={1}" -f $_[0], $_[1] }); return (Ask ($text + " [[choices:" + ($pairs -join ";") + "]]")) }
+    $a = (Read-Host ("  " + $text + " (old/new, anything else cancels)")).Trim().ToLower(); return $a
+}
 function Show-Status {
     Say ""; Say "=== Status (read-only) ===" Cyan
     if (Test-Path $stateFile) { try { $st = Get-Content $stateFile -Raw | ConvertFrom-Json; Say ("  Existing-database mode: container {0}, database {1}, started {2}" -f $st.container, $st.db, $st.started); Say ("  Backup before upgrade: " + $st.backup) } catch { } } else { Say "  Existing-database mode has not been used on this PC yet." }
@@ -250,11 +361,12 @@ if ($Mode -eq "menu") {
     Say "  1  Connect ERP 2.0 to the existing database (verified backup first, then upgrade in place)"
     Say "  2  Restore the database from a backup file (rollback)"
     Say "  3  Status (read-only)"
+    Say "  T  Test the upgrade on a COPY first (dry run, recommended)"
     Say "  Q  Quit"
     $a = (Read-Host "Choose").Trim().ToUpper()
-    $Mode = switch ($a) { "1" { "connect" } "2" { "restore" } "3" { "status" } default { "quit" } }
+    $Mode = switch ($a) { "1" { "connect" } "2" { "restore" } "3" { "status" } "T" { "dryrun" } default { "quit" } }
 }
-switch ($Mode) { "connect" { Connect-Existing } "restore" { Restore-Db } "status" { Show-Status } default { Say "Nothing done." } }
+switch ($Mode) { "dryrun" { Dry-Run } "connect" { Connect-Existing } "restore" { Restore-Db } "status" { Show-Status } default { Say "Nothing done." } }
 if ($script:helped) { docker exec -u 0 $Container rm -f /tmp/erp_rq.sh 2>$null | Out-Null }
 Say ""; Say "Finished." Green
 if ($Gui) { Write-Host ("@@DONE|" + $(if ($Mode -eq "status") { "STATUS" } else { "EXISTING" }) + "|" + ($script:summary -replace '\|', '/')) } else { [void](Read-Host "Press Enter to close") }

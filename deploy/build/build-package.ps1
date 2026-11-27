@@ -26,7 +26,7 @@ New-Item -ItemType Directory -Force -Path $inst, $tools, $img | Out-Null
 $crlf = "`r`n"
 
 # same layout as the deploy folder of the repo: root = entry bat + compose + .env.example + docs; installer\ = scripts and assets; tools\ = helper bats
-foreach ($f in @("ERP Installer.bat", "Create Desktop Shortcut.bat", "docker-compose.yml", ".env.example", "README-EN.md", "README-AR.md")) {
+foreach ($f in @("ERP Installer.bat", "Create Desktop Shortcut.bat", "docker-compose.yml", "docker-compose.existing.yml", ".env.example", "README-EN.md", "README-AR.md")) {
     $src = Join-Path $deploy $f
     if (-not (Test-Path $src)) { throw "Missing file in deploy folder: $f" }
     Copy-Item $src (Join-Path $pkg $f)

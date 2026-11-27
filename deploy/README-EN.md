@@ -101,3 +101,6 @@ Result: `dist\DevSquad-ERP-Installer-2.1.exe` (Dev Squad icon, compressed, conta
 
 ## If the SQL password does not match the database
 Never reset or delete the volume. Double-click `tools\Recover database.bat`: 1 = copy the database files to a folder first, 2 = test old passwords from old .env files, 3 = recover on a COPY (the original volume is never changed). Details are printed on screen.
+
+## Use your EXISTING database (no new database)
+Click **Existing DB** in the installer (or `tools\Use existing database.bat`). 1 = verified backup, then ERP 2.0 connects to your old SQL container and upgrades the MiniErp database in place (you type UPGRADE EXISTING DATABASE; the old app containers are stopped, not deleted). 2 = Restore from the backup file (type RESTORE DATABASE; a pre-restore backup is made first). The old SQL container and its data are never deleted.

@@ -32,6 +32,8 @@ internal sealed class ApiHost : WebApplicationFactory<Program>
         Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", "Server=unused;Database=unused");
         Environment.SetEnvironmentVariable("Jwt__SigningKey", new string('k', 64));
         Environment.SetEnvironmentVariable("Seed__Enabled", "false");
+        Environment.SetEnvironmentVariable("RateLimiting__AuthPermitPerMinute", "100000");
+        Environment.SetEnvironmentVariable("RateLimiting__GlobalPermitPerMinute", "1000000");
         Environment.SetEnvironmentVariable("Database__ApplyMigrationsOnStartup", "false");
     }
 

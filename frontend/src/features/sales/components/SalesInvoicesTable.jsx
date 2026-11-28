@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
@@ -159,6 +160,39 @@ export default function SalesInvoicesTable({
   const [deleteInvoice] = useDeleteInvoiceMutation();
 
   const [openMenuId, setOpenMenuId] = useState(null);
+  // Position of the open row menu (viewport coordinates). The menu is rendered in a portal so the
+  // table's overflow clipping and other stacking contexts can never hide it.
+  const [menuPos, setMenuPos] = useState(null);
+
+  useEffect(() => {
+    if (openMenuId === null) return undefined;
+    const close = () => setOpenMenuId(null);
+    window.addEventListener("scroll", close, true);
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("resize", close);
+    };
+  }, [openMenuId]);
+
+  const toggleMenu = (event, id) => {
+    if (openMenuId === id) {
+      setOpenMenuId(null);
+      return;
+    }
+    const rect = event.currentTarget.getBoundingClientRect();
+    const width = 160;
+    const height = 48;
+    const rtl = document.documentElement.dir === "rtl";
+    const left = rtl ? rect.left : rect.right - width;
+    const openUp = rect.bottom + height + 8 > window.innerHeight;
+    setMenuPos({
+      top: openUp ? rect.top - height - 4 : rect.bottom + 4,
+      left: Math.min(Math.max(8, left), window.innerWidth - width - 8),
+      width,
+    });
+    setOpenMenuId(id);
+  };
 
   const [sorting, setSorting] = useState([]);
 
@@ -387,43 +421,42 @@ export default function SalesInvoicesTable({
               {/* More */}
 
               <button
-                onClick={() =>
-                  setOpenMenuId(openMenuId === inv.id ? null : inv.id)
-                }
+                onClick={(event) => toggleMenu(event, inv.id)}
                 className="rounded-lg p-1.5 text-ink-400 hover:bg-ink-400/5"
                 title={t("المزيد")}
               >
                 <MoreVertical size={14} />
               </button>
 
-              {openMenuId === inv.id && (
-                <>
-                  {/* Close menu */}
-
-                  <div
-                    onClick={() => setOpenMenuId(null)}
-                    className="fixed inset-0 z-10"
-                  />
-
-                  {/* Menu */}
-
-                  <div className="absolute end-0 top-full z-20 mt-1 w-40 animate-fadeUp rounded-xl border border-ink-400/10 bg-white py-1 shadow-card">
-                    <button
-                      onClick={() => handleDelete(inv)}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-negative hover:bg-negative/5"
+              {openMenuId === inv.id &&
+                menuPos &&
+                createPortal(
+                  <>
+                    <div
+                      onClick={() => setOpenMenuId(null)}
+                      className="fixed inset-0 z-[1000]"
+                    />
+                    <div
+                      style={{ top: menuPos.top, left: menuPos.left, width: menuPos.width }}
+                      className="fixed z-[1001] animate-fadeUp rounded-xl border border-ink-400/10 bg-white py-1 shadow-card"
                     >
-                      <Trash2 size={13} />
-                      {t("حذف الفاتورة")}
-                    </button>
-                  </div>
-                </>
-              )}
+                      <button
+                        onClick={() => handleDelete(inv)}
+                        className="flex w-full items-center gap-2 px-3 py-2 text-start text-xs text-negative hover:bg-negative/5"
+                      >
+                        <Trash2 size={13} />
+                        {t("حذف الفاتورة")}
+                      </button>
+                    </div>
+                  </>,
+                  document.body,
+                )}
             </div>
           );
         },
       }),
     ],
-    [openMenuId, navigate, printInvoice],
+    [openMenuId, menuPos, navigate, printInvoice],
   );
 
   // =========================================================

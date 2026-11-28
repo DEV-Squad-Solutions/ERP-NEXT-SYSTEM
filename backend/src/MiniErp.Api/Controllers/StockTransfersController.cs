@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.StockTransfers.Jobs;
 using MiniErp.Application.Common.Models;
@@ -44,6 +45,7 @@ public sealed class StockTransfersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<StockTransferResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -74,6 +76,7 @@ public sealed class StockTransfersController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<StockTransferResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -97,6 +100,7 @@ public sealed class StockTransfersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

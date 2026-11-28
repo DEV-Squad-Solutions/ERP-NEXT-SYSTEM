@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.Countries.Jobs;
 using MiniErp.Application.Common.Models;
@@ -46,6 +47,7 @@ public sealed class CountriesController(ICountryService countryService)
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpPost]
     [ProducesResponseType<CountryResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
@@ -71,6 +73,7 @@ public sealed class CountriesController(ICountryService countryService)
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<CountryResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -94,6 +97,7 @@ public sealed class CountriesController(ICountryService countryService)
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

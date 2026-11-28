@@ -16,6 +16,9 @@ public static class ApplicationRoles
     public const string AdminOrAccountant =
         Admin + "," + Accountant;
 
+    public const string AdminUserOrAccountant =
+        Admin + "," + User + "," + Accountant;
+
     public static readonly IReadOnlyList<string> All =
     [Admin, User, Accountant, Cashier];
 }

@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Application.Common.Models;
 using MiniErp.Application.Features.InvoiceItemPricing;
@@ -32,6 +34,7 @@ public sealed class InvoiceItemPricingController(
     /// The amounts are pricing hints only. They do not update inventory cost,
     /// inventory valuation, invoices, or accounting entries.
     /// </remarks>
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{itemId:int}/expenses")]
     [ProducesResponseType<ItemPricingExpensesResponse>(
         StatusCodes.Status200OK)]

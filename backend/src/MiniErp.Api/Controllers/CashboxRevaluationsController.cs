@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Application.Features.CashboxRevaluations;
 
@@ -29,6 +30,7 @@ public sealed class CashboxRevaluationsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<CashboxRevaluationResponse>(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(

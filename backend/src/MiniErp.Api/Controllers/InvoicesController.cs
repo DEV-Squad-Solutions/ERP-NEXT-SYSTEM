@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.Invoices.Jobs;
 using MiniErp.Api.Features.ExchangeRates.Jobs;
@@ -174,6 +175,7 @@ public sealed class InvoicesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.StoreContainers.Jobs;
 using MiniErp.Application.Common.Models;
@@ -71,6 +72,7 @@ public sealed class StoreContainersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpPut("upsert")]
     [ProducesResponseType<IReadOnlyList<StoreContainerResponse>>(
         StatusCodes.Status200OK)]

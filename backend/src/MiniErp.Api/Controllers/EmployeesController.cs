@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Application.Common.Models;
 using MiniErp.Application.Features.Employees;
@@ -51,6 +52,7 @@ public sealed class EmployeesController(
     }
 
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<EmployeeResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
@@ -70,6 +72,7 @@ public sealed class EmployeesController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<EmployeeResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -86,6 +89,7 @@ public sealed class EmployeesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

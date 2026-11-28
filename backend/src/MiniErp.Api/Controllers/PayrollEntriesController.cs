@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.EmployeeOpeningBalances.Jobs;
 using MiniErp.Api.Features.PayrollEntries.Jobs;
@@ -76,6 +77,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<PayrollEntryResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -104,6 +106,7 @@ public sealed class PayrollEntriesController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost("out-company")]
     [ProducesResponseType<PayrollEntryResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -133,6 +136,7 @@ public sealed class PayrollEntriesController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost("out-company/bulk")]
     [ProducesResponseType<List<PayrollEntryResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -159,6 +163,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost("bulk")]
     [ProducesResponseType<List<PayrollEntryResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -183,6 +188,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost("{id:int}/move-salary")]
     [ProducesResponseType<PayrollEntryResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -216,6 +222,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost("move-salary/bulk")]
     [HttpPost("bulk/move-salary")]
     [ProducesResponseType<List<PayrollEntryResponse>>(StatusCodes.Status200OK)]
@@ -249,6 +256,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<PayrollEntryResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -269,6 +277,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("bulk")]
     [ProducesResponseType<List<PayrollEntryResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -292,6 +301,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("out-company/{id:int}")]
     [ProducesResponseType<PayrollEntryResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -313,6 +323,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("out-company/bulk")]
     [ProducesResponseType<List<PayrollEntryResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -336,6 +347,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost("{id:int}/recalculate")]
     [ProducesResponseType<PayrollEntryResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -355,6 +367,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -374,6 +387,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("bulk")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]

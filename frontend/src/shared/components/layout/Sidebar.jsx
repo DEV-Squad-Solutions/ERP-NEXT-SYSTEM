@@ -738,7 +738,7 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
         aria-label={t("القائمة الرئيسية")}
         className={[
           "fixed top-0 start-0 z-50",
-          railMode ? "h-screen" : "h-screen w-[260px]",
+          railMode ? "sidebar-h" : "sidebar-h w-[260px]",
           railMode ? "sidebar-rail w-[56px] sm:w-[72px] data-[rail]:w-[260px]" : "",
           "overflow-hidden",
           "flex flex-col",
@@ -913,7 +913,7 @@ function Sidebar({ isOpen, onClose, hideOnDesktop = false, onSwitchLayout, pinne
             FOOTER
         ================================================= */}
 
-        <footer className="shrink-0 border-t border-white/[0.08] bg-ink-900 px-3 py-2.5">
+        <footer className="sidebar-footer shrink-0 border-t border-white/[0.08] bg-ink-900 px-3 pt-2.5">
           <a
             href="https://dev-squad-orpin.vercel.app/"
             target="_blank"

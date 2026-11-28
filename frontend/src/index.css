@@ -694,3 +694,13 @@ html:not(.dark) :where(.text-slate-400, .text-gray-400) {
 html:not(.dark) :where(.text-slate-500, .text-gray-500) {
   color: #5a6760;
 }
+
+/* Mobile browsers: 100vh is taller than the visible area (address/tool bars),
+   which hid the bottom of the drawer. dvh follows the visible area. */
+.sidebar-h {
+  height: 100vh;
+  height: 100dvh;
+}
+.sidebar-footer {
+  padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
+}

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Globe, Users } from "lucide-react";
+import { ArrowUpRight, Briefcase, Globe, Users } from "lucide-react";
 import { Facebook, Linkedin } from "./BrandIcons";
 
 import { t } from "../../../i18n";
@@ -31,6 +31,9 @@ export function DevSquadInline({ className = "", tone = "dark" }) {
       <span aria-hidden="true" className="h-3 w-px bg-current opacity-25" />
       <Link to="/about" className={`font-medium transition-colors ${c}`}>
         {t("عن الفريق")}
+      </Link>
+      <Link to="/portfolio" className={`font-semibold transition-colors ${c}`}>
+        {t("أعمال الشركة")}
       </Link>
     </nav>
   );
@@ -81,6 +84,10 @@ export default function DevSquadCard({ className = "" }) {
         <Link to="/about" className={linkCls}>
           <Users size={14} aria-hidden="true" />
           {t("عن الفريق")}
+        </Link>
+        <Link to="/portfolio" className={`${linkCls} border-gold-400/50 text-gold-400`}>
+          <Briefcase size={14} aria-hidden="true" />
+          {t("أعمال الشركة")}
           <ArrowUpRight size={12} aria-hidden="true" className="rtl:-scale-x-100" />
         </Link>
       </div>

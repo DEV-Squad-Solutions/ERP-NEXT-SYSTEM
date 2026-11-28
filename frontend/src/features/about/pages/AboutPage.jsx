@@ -19,6 +19,7 @@ import {
 import { Facebook, Linkedin } from "../../../shared/components/brand/BrandIcons";
 import { t, getDir } from "../../../i18n";
 import { DEVSQUAD } from "../../../shared/components/brand/devSquad";
+import ContactNumbers from "../../../shared/components/brand/ContactNumbers";
 
 // Only things that exist in this repository are listed here.
 const PRODUCT_AREAS = [
@@ -106,6 +107,10 @@ export default function AboutPage() {
             </p>
 
             <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link to="/portfolio" className="inline-flex h-11 items-center gap-2 rounded-xl bg-gradient-to-r from-gold-400 to-amber-300 px-5 text-[13px] font-bold text-[#070d1a] outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-white/60">
+                {t("أعمال الشركة")}
+                <ArrowUpRight size={14} aria-hidden="true" className="rtl:-scale-x-100" />
+              </Link>
               {CONTACTS.map(({ href, icon: Icon, label }) => (
                 <a
                   key={label}
@@ -184,6 +189,11 @@ export default function AboutPage() {
             </div>
           </div>
         </motion.div>
+
+        <div className="mt-6">
+          <h2 className="font-display text-lg font-bold text-ink-900">{t("للتواصل")}</h2>
+          <ContactNumbers tone="light" callLabel={t("اتصال")} className="mt-3" />
+        </div>
 
         <p className="mt-8 text-center text-[11px] text-ink-400">
           © {new Date().getFullYear()} {DEVSQUAD.name}. {t("جميع الحقوق محفوظة")}

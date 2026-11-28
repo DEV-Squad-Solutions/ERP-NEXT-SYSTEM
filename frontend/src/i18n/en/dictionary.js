@@ -2911,5 +2911,8 @@ export default {
  "تأكيد استكمال القيود": "Confirm completing the entries",
  "هيتم استكمال الحسابات والروابط الناقصة، وإعادة حساب تكلفة المخزون، وإنشاء أو تحديث القيود التلقائية للمصادر القديمة في هذه السنة المالية. العملية آمنة ولن تكرر القيود عند التنفيذ أكتر من مرة، لكنها متاحة للمسؤول فقط.": "Missing accounts and links will be completed, inventory cost will be recalculated, and automatic entries will be created or updated for older sources in this fiscal year. The operation is safe and will not duplicate entries if run more than once, but it is available to the administrator only.",
  "جارِ التنفيذ...": "Running...",
- "تأكيد الاستكمال": "Confirm completion"
+ "تأكيد الاستكمال": "Confirm completion",
+ "أعمال الشركة": "Company portfolio",
+ "للتواصل": "Contact",
+ "اتصال": "Call"
 };

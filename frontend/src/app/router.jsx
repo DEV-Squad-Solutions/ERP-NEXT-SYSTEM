@@ -4,6 +4,7 @@ import RouteError from "../shared/components/RouteError";
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage";
 import AboutPage from "../features/about/pages/AboutPage";
+import PortfolioPage from "../features/about/pages/PortfolioPage";
 import { ForgotPasswordPage, ResetPasswordPage, RegisterRequestPage } from "../features/auth/pages/PasswordPages";
 import ChangePasswordPage from "../features/auth/pages/ChangePasswordPage";
 import SetupPage from "../features/setup/pages/SetupPage";
@@ -308,6 +309,7 @@ export const router = createBrowserRouter([
   },
   { path: "/forgot-password", errorElement: <RouteError />, element: <ForgotPasswordPage /> },
   { path: "/about", errorElement: <RouteError />, element: <AboutPage /> },
+  { path: "/portfolio", errorElement: <RouteError />, element: <PortfolioPage /> },
   { path: "/register", errorElement: <RouteError />, element: <RegisterRequestPage /> },
   { path: "/reset-password", errorElement: <RouteError />, element: <ResetPasswordPage /> },
   {

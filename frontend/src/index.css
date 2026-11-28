@@ -704,3 +704,17 @@ html:not(.dark) :where(.text-slate-500, .text-gray-500) {
 .sidebar-footer {
   padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
 }
+
+/* Printing any screen with the browser: white paper, no clipping, no screen-only chrome. */
+@media print {
+  html, body, #root { height: auto !important; overflow: visible !important; background: #fff !important; color: #000 !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  main, [class*="custom-scroll"] { overflow: visible !important; height: auto !important; }
+  .page-enter { animation: none !important; transform: none !important; }
+  button, [role="tablist"], input[type="search"] { break-inside: avoid; }
+  table { width: 100%; }
+  thead { display: table-header-group; }
+  tr, .break-inside-avoid { break-inside: avoid; }
+  .dark, [data-theme] { color-scheme: light; }
+  @page { margin: 12mm; }
+}

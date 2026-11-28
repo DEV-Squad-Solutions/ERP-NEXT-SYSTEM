@@ -2914,5 +2914,8 @@ export default {
  "تأكيد الاستكمال": "Confirm completion",
  "أعمال الشركة": "Company portfolio",
  "للتواصل": "Contact",
- "اتصال": "Call"
+ "اتصال": "Call",
+ "طباعة الصفحة": "Print page",
+ "القوائم المالية": "Financial statements",
+ "تقارير الموارد البشرية": "HR reports"
 };

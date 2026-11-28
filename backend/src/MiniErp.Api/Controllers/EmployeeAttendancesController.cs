@@ -14,6 +14,7 @@ public sealed class EmployeeAttendancesController(
     IEmployeeAttendanceService employeeAttendanceService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<EmployeeAttendanceResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
@@ -28,6 +29,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("report")]
     [ProducesResponseType<EmployeeAttendanceReportResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -41,6 +43,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("select")]
     [ProducesResponseType<IReadOnlyList<SelectResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSelect(CancellationToken cancellationToken)
@@ -49,6 +52,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<EmployeeAttendanceResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

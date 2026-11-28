@@ -15,6 +15,7 @@ public sealed class JournalEntriesController(
     IJournalEntryService journalEntryService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<JournalEntryResponse>>(
         StatusCodes.Status200OK)]
@@ -30,6 +31,7 @@ public sealed class JournalEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<JournalEntryResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

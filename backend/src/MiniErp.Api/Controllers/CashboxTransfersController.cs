@@ -16,6 +16,7 @@ public sealed class CashboxTransfersController(
     ICashboxTransferService cashboxTransferService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<CashboxTransferListResponse>>(
         StatusCodes.Status200OK)]
@@ -31,6 +32,7 @@ public sealed class CashboxTransfersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<CashboxTransferResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

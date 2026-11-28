@@ -17,6 +17,7 @@ public sealed class CashVouchersController(
     ICashVoucherService cashVoucherService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<CashVoucherResponse>>(
         StatusCodes.Status200OK)]
@@ -32,6 +33,7 @@ public sealed class CashVouchersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("handover-report")]
     [ProducesResponseType<CashVoucherHandoverReportResponse>(
         StatusCodes.Status200OK)]
@@ -47,6 +49,7 @@ public sealed class CashVouchersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("party-select")]
     [ProducesResponseType<CashVoucherPartySelectResponse>(
         StatusCodes.Status200OK)]
@@ -58,6 +61,7 @@ public sealed class CashVouchersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<CashVoucherResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

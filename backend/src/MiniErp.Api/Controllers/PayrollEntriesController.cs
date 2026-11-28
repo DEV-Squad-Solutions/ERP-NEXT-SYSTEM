@@ -19,6 +19,7 @@ public sealed class PayrollEntriesController(
     IPayrollReportService payrollReportService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<PayrollEntriesListResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
@@ -33,6 +34,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<PayrollEntryResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -48,6 +50,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("dashboard")]
     [ProducesResponseType<PayrollDashboardResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDashboard(
@@ -58,6 +61,7 @@ public sealed class PayrollEntriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("report")]
     [ProducesResponseType<PayrollReportResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]

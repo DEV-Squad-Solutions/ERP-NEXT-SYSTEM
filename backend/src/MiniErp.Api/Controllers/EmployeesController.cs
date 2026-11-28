@@ -14,6 +14,7 @@ public sealed class EmployeesController(
     IEmployeeService employeeService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("GetAll")]
     [ProducesResponseType<EmployeePageResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
@@ -28,6 +29,7 @@ public sealed class EmployeesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("select")]
     [ProducesResponseType<IReadOnlyList<SelectResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSelect(
@@ -38,6 +40,7 @@ public sealed class EmployeesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<EmployeeResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

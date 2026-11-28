@@ -12,6 +12,7 @@ namespace MiniErp.Api.Controllers;
 public sealed class CashboxRevaluationsController(
     ICashboxRevaluationService service) : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<CashboxRevaluationResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(

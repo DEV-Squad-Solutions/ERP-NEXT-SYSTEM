@@ -16,6 +16,7 @@ public sealed class EmployeeOpeningBalancesController(
     IEmployeeOpeningBalanceService employeeOpeningBalanceService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<EmployeeOpeningBalanceResponse>>(
         StatusCodes.Status200OK)]
@@ -31,6 +32,7 @@ public sealed class EmployeeOpeningBalancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<EmployeeOpeningBalanceResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

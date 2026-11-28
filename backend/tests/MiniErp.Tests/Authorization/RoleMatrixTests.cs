@@ -146,6 +146,51 @@ public sealed class RoleMatrixTests
         Assert.False(Allowed(controller, method, "User"));
     }
 
+    private static readonly HashSet<string> FinanceReadControllers =
+    [
+        "JournalEntriesController", "PayrollEntriesController", "EmployeesController",
+        "EmployeeAttendancesController", "EmployeeMovementsController", "EmployeeOpeningBalancesController",
+        "FinancialStatementLinesController", "CashVouchersController", "CashboxTransfersController",
+        "CashboxRevaluationsController", "MonetaryAccountRevaluationsController",
+        "PartnerOpeningBalancesController", "DriverOpeningBalancesController",
+        "DashboardController", "KpisController"
+    ];
+
+    [Fact]
+    public void FinanceReads_AreAdminAndAccountantOnly()
+    {
+        var reads = typeof(ApiControllerBase).Assembly.GetTypes()
+            .Where(t => FinanceReadControllers.Contains(t.Name))
+            .SelectMany(t => t.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .Where(m => m.GetCustomAttributes().Any(a => a is HttpGetAttribute))
+                .Select(m => (Controller: t, Action: m)))
+            .ToList();
+
+        Assert.True(reads.Count >= 30, "expected the finance read endpoints to be discovered");
+        foreach (var (c, a) in reads)
+        {
+            Assert.True(Allowed(c, a, "Admin"), $"{c.Name}.{a.Name} Admin");
+            Assert.False(Allowed(c, a, "User"), $"{c.Name}.{a.Name} User must not read finance data");
+            Assert.False(Allowed(c, a, "Cashier"), $"{c.Name}.{a.Name} Cashier must not read finance data");
+        }
+    }
+
+    [Theory]
+    [InlineData(typeof(InvoicesController))]
+    [InlineData(typeof(BusinessPartnersController))]
+    [InlineData(typeof(ItemsController))]
+    [InlineData(typeof(StoresController))]
+    public void SalesLookups_StayReadableByCashier(Type controller)
+    {
+        var gets = controller.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+            .Where(m => m.GetCustomAttributes().Any(a => a is HttpGetAttribute)).ToList();
+        Assert.NotEmpty(gets);
+        foreach (var m in gets)
+        {
+            Assert.True(Allowed(controller, m, "Cashier"), $"{controller.Name}.{m.Name}");
+        }
+    }
+
     [Fact]
     public void Admin_IsAllowedEverywhere()
     {

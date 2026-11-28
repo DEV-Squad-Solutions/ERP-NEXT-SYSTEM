@@ -13,6 +13,7 @@ namespace MiniErp.Api.Controllers;
 public sealed class MonetaryAccountRevaluationsController(
     IMonetaryAccountRevaluationService service) : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("options")]
     [ProducesResponseType<IReadOnlyList<MonetaryAccountRevaluationOption>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetOptions(
@@ -23,6 +24,7 @@ public sealed class MonetaryAccountRevaluationsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<MonetaryAccountRevaluationResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(

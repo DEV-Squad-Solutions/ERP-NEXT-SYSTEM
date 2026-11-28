@@ -15,6 +15,7 @@ public sealed class EmployeeMovementsController(
     IEmployeeMovementService employeeMovementService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<EmployeeMovementResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
@@ -29,6 +30,7 @@ public sealed class EmployeeMovementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("report")]
     [ProducesResponseType<EmployeeMovementReportResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetReport(
@@ -39,6 +41,7 @@ public sealed class EmployeeMovementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<EmployeeMovementResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

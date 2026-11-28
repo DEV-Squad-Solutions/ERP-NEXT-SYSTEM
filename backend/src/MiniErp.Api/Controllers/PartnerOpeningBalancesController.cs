@@ -16,6 +16,7 @@ public sealed class PartnerOpeningBalancesController(
     IPartnerOpeningBalanceService partnerOpeningBalanceService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<PartnerOpeningBalanceResponse>>(
         StatusCodes.Status200OK)]
@@ -31,6 +32,7 @@ public sealed class PartnerOpeningBalancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<PartnerOpeningBalanceResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

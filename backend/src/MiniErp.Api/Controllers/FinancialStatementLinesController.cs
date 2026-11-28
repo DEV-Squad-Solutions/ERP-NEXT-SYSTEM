@@ -16,6 +16,7 @@ public sealed class FinancialStatementLinesController(
     IFinancialStatementLineService financialStatementLineService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<FinancialStatementLineResponse>>(
         StatusCodes.Status200OK)]
@@ -31,6 +32,7 @@ public sealed class FinancialStatementLinesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("tree")]
     [ProducesResponseType<IReadOnlyList<FinancialStatementLineTreeResponse>>(
         StatusCodes.Status200OK)]
@@ -46,6 +48,7 @@ public sealed class FinancialStatementLinesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("select")]
     [ProducesResponseType<IReadOnlyList<FinancialStatementLineSelectResponse>>(
         StatusCodes.Status200OK)]
@@ -61,6 +64,7 @@ public sealed class FinancialStatementLinesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<FinancialStatementLineResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

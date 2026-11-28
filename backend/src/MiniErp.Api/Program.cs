@@ -285,3 +285,4 @@ static IResult DatabaseHealthResult(StartupDatabaseStatus status)
 }
 
 public sealed record HealthStatusResponse(string Status);
+public partial class Program;

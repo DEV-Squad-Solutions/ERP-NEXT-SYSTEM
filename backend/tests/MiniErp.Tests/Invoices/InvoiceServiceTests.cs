@@ -32,7 +32,7 @@ using MiniErp.Tests.CashManagement;
 
 namespace MiniErp.Tests.Invoices;
 
-public sealed class InvoiceServiceTests
+public sealed partial class InvoiceServiceTests
 {
     static InvoiceServiceTests()
     {

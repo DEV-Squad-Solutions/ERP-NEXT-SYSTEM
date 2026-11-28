@@ -5,6 +5,7 @@ export const aiCenterApi = baseApi.injectEndpoints({
     getKpis: builder.query({ query: () => "/Kpis" }),
     getAnomalies: builder.query({ query: () => "/Anomalies" }),
     getSalesForecast: builder.query({ query: () => "/Forecasts/sales" }),
+    getAnalytics: builder.query({ query: () => "/Analytics/overview" }),
     getAiHistory: builder.query({ query: () => "/Ai/history", keepUnusedDataFor: 0 }),
     deleteAiHistoryItem: builder.mutation({ query: (id) => ({ url: `/Ai/history/${id}`, method: "DELETE" }) }),
     clearAiHistory: builder.mutation({ query: () => ({ url: "/Ai/history", method: "DELETE" }) }),
@@ -17,6 +18,7 @@ export const aiCenterApi = baseApi.injectEndpoints({
 export const {
   useGetKpisQuery,
   useGetAnomaliesQuery,
+  useGetAnalyticsQuery,
   useGetSalesForecastQuery,
   useAskAiMutation,
   useGetAiHistoryQuery,

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { PrintPageButton } from "./PrintHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -369,7 +368,6 @@ export default function Navbar({ onMenuClick, showMenuButton = false }) {
             <div className="flex items-center gap-1 max-sm:hidden">
               <LanguageSwitcher />
               <ThemePicker />
-              <PrintPageButton />
             </div>
             <span aria-hidden="true" className="mx-0.5 hidden h-6 w-px bg-ink-200 dark:bg-white/10 sm:block" />
 

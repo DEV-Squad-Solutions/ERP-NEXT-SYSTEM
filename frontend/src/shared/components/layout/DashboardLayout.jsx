@@ -8,6 +8,7 @@ import Navbar from "./Navbar";
 import TopNav from "./TopNav";
 import PageLoader from "./PageLoader";
 import PrintHeader from "./PrintHeader";
+import PagePrintBar from "./PagePrintBar";
 import UnauthorizedPage from "../UnauthorizedPage";
 import useHiddenScreens from "../../../features/screenAccess/useHiddenScreens";
 import { isPathHidden } from "../../../features/screenAccess/screenList";
@@ -161,6 +162,7 @@ export default function DashboardLayout() {
             ].join(" ")}
           >
             <PrintHeader mainRef={mainRef} />
+            <PagePrintBar mainRef={mainRef} pathname={pathname} />
             <Suspense fallback={<PageLoader />}>
               <div key={pathname} className="page-enter">
                 {isPathHidden(pathname, hiddenScreens) ? (

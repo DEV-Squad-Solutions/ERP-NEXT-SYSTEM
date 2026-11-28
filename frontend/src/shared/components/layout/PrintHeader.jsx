@@ -1,23 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Printer } from "lucide-react";
 
 import { getLocale, t } from "../../../i18n";
-
-/** Icon button in the top bar: prints the current screen (header comes from PrintHeader). */
-export function PrintPageButton() {
-  return (
-    <button
-      type="button"
-      onClick={() => window.print()}
-      title={t("طباعة الصفحة")}
-      aria-label={t("طباعة الصفحة")}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-ink-200 bg-white text-ink-600 outline-none transition-colors hover:border-primary-500/50 hover:text-primary-500 focus-visible:ring-2 focus-visible:ring-primary-500/40 dark:border-white/10 dark:bg-white/5 dark:text-white/70"
-    >
-      <Printer size={16} aria-hidden="true" />
-    </button>
-  );
-}
 
 /**
  * Standard header printed at the top of every screen printed with the browser

@@ -1,6 +1,7 @@
 import { t } from "../../i18n";
 export const routeTitles = {
   "/dashboard": t("الرئيسية"),
+  "/dashboard/price-changes": t("تعديل أسعار الأصناف"),
 
   "/dashboard/sales": t("المبيعات والمشتريات"),
   "/dashboard/sales/new": t("فاتورة بيع جديدة"),

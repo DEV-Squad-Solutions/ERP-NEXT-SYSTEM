@@ -544,6 +544,13 @@ export const navigationItems = [
     roles: ["Admin"],
   },
   {
+    label: t("تعديل أسعار الأصناف"),
+    path: "/dashboard/price-changes",
+    icon: ClipboardList,
+    end: true,
+    roles: ["Admin"],
+  },
+  {
     label: t("سجل العمليات"),
     path: "/dashboard/audit-log",
     icon: ClipboardList,

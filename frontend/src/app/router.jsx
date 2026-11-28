@@ -91,6 +91,9 @@ const StockAdjustmentDetailPage = lazy(
 const AiCenterPage = lazy(
   () => import("../features/aiCenter/pages/AiCenterPage"),
 );
+const InvoicePriceChangesPage = lazy(
+  () => import("../features/invoicePriceChanges/pages/InvoicePriceChangesPage"),
+);
 const AuditLogsPage = lazy(
   () => import("../features/auditLogs/pages/AuditLogsPage"),
 );
@@ -1128,6 +1131,16 @@ export const router = createBrowserRouter([
           <LazyPage>
             <Role roles={[ROLES.ADMIN]}>
               <AiCenterPage />
+            </Role>
+          </LazyPage>
+        ),
+      },
+      {
+        path: "price-changes",
+        element: (
+          <LazyPage>
+            <Role roles={[ROLES.ADMIN]}>
+              <InvoicePriceChangesPage />
             </Role>
           </LazyPage>
         ),

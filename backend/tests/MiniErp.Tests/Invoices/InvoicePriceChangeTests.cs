@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using MiniErp.Application.Common.Abstractions;
 using MiniErp.Application.Common.Results;
@@ -272,5 +275,63 @@ public sealed partial class InvoiceServiceTests
         Assert.Equal("Admin", attribute.Roles);
         Assert.Empty(controller.GetMethods()
             .SelectMany(m => m.GetCustomAttributes(typeof(AllowAnonymousAttribute), false)));
+    }
+
+    [Fact]
+    public async Task PriceChange_SalesInvoiceKeepsStockAndCostAndOnlyMovesRevenue()
+    {
+        await using var db = await InvoiceTestDatabase.CreateAsync();
+        await AddPurchaseAsync(db, PcFrom.AddDays(-5), PaymentTerm.Credit, new InvoiceLineRequest(1, 1, 10m, 4m, null));
+        var sale = await db.CreateService().AddAsync(CreateRequest(
+            InvoiceType.Sales, PaymentTerm.Credit, [new InvoiceLineRequest(1, 1, 3m, 9m, null)],
+            invoiceDate: PcFrom.AddDays(1)));
+        Assert.True(sale.IsSuccess, sale.IsFailure ? sale.Error.Description : "");
+        db.Context.ChangeTracker.Clear();
+        var movementBefore = await db.Context.ItemMovements
+            .Where(m => m.MovementType == ItemMovementType.Sales)
+            .Select(m => new { m.QuantityOut, m.UnitCost, m.TotalCost })
+            .SingleAsync();
+        var service = await CreatePriceChangeServiceAsync(db);
+        var request = PcPreview(false, (1, 12.5m)) with { InvoiceType = InvoiceType.Sales };
+
+        var preview = await service.PreviewAsync(request);
+        Assert.Equal([sale.Value.Id], preview.Value.Invoices.Select(i => i.InvoiceId).ToArray());
+        var applied = await service.ApplyAsync(PcApply(request, 1));
+
+        Assert.True(applied.IsSuccess, applied.IsFailure ? applied.Error.Description : "");
+        db.Context.ChangeTracker.Clear();
+        var saved = await db.Context.Invoices.SingleAsync(i => i.Id == sale.Value.Id);
+        Assert.Equal(37.5m, saved.Total);
+        var movementAfter = await db.Context.ItemMovements
+            .Where(m => m.MovementType == ItemMovementType.Sales)
+            .Select(m => new { m.QuantityOut, m.UnitCost, m.TotalCost })
+            .SingleAsync();
+        Assert.Equal(movementBefore, movementAfter);
+    }
+
+    [Theory]
+    [InlineData("Admin", true)]
+    [InlineData("User", false)]
+    [InlineData("Accountant", false)]
+    [InlineData("Cashier", false)]
+    public async Task PriceChange_AuthorizeAttributesAllowOnlyAdminRole(string role, bool allowed)
+    {
+        var services = new ServiceCollection().AddLogging().AddAuthorization().BuildServiceProvider();
+        var attributes = typeof(MiniErp.Api.Controllers.InvoicePriceChangesController)
+            .GetCustomAttributes(typeof(IAuthorizeData), inherit: true)
+            .Cast<IAuthorizeData>().ToArray();
+        Assert.True(attributes.Length >= 2); // base "any role" plus Admin-only
+        var policy = await AuthorizationPolicy.CombineAsync(
+            services.GetRequiredService<IAuthorizationPolicyProvider>(), attributes);
+        var user = new ClaimsPrincipal(new ClaimsIdentity(
+            [new Claim(ClaimTypes.Name, "t"), new Claim(ClaimTypes.Role, role)], "test"));
+
+        var result = await services.GetRequiredService<IAuthorizationService>()
+            .AuthorizeAsync(user, null, policy!.Requirements);
+        var anonymous = await services.GetRequiredService<IAuthorizationService>()
+            .AuthorizeAsync(new ClaimsPrincipal(new ClaimsIdentity()), null, policy.Requirements);
+
+        Assert.Equal(allowed, result.Succeeded);
+        Assert.False(anonymous.Succeeded);
     }
 }

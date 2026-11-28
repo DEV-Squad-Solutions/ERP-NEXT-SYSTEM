@@ -14,7 +14,7 @@ import {
 const selectCls =
   "h-[38px] w-full rounded-lg border border-ink-400/25 bg-white px-3 text-[13px] text-ink-800 dark:bg-ink-900 dark:text-white";
 
-const ACTION_AR = { Created: "إضافة", Updated: "تعديل", Deleted: "حذف" };
+const ACTION_AR = { Created: "إضافة", Updated: "تعديل", Deleted: "حذف", PriceChange: "تعديل أسعار" };
 const ENTITY_AR = {
   Employee: "موظف", Invoice: "فاتورة", Item: "صنف", Account: "حساب", JournalEntry: "قيد يومية",
   BusinessPartner: "عميل/مورد", Cashbox: "خزنة", CashVoucher: "سند", Store: "مخزن", Driver: "سائق",

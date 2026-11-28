@@ -23,6 +23,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__DefaultConnection: Server=${EXISTING_DB_HOST:?EXISTING_DB_HOST missing in .env},1433;Database=${EXISTING_DB_NAME:-MiniErp};User Id=sa;Password=${EXISTING_DB_PASSWORD:?EXISTING_DB_PASSWORD missing in .env};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True
       Jwt__SigningKey: ${JWT_SIGNING_KEY:?JWT_SIGNING_KEY missing in .env}
+      Setup__Token: ${SETUP_TOKEN:-}
       Database__ApplyMigrationsOnStartup: "true"
       Seed__Enabled: "false"
       Swagger__Enabled: ${SWAGGER_ENABLED:-false}

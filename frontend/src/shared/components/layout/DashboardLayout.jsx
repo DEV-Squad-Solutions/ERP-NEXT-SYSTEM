@@ -1,5 +1,7 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectUserId } from "../../../features/auth/authSlice";
 
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
@@ -15,7 +17,17 @@ import { usePhone } from "../../../utils/viewport";
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [layout, setLayout] = useState(() => localStorage.getItem("layout") === "top" ? "top" : "side");
-  const pinned = false;
+  // Sidebar pin: pinned = always open (260px); unpinned = icon rail that opens on hover/focus. Saved per user.
+  const userId = useSelector(selectUserId);
+  const pinKey = `sidebarPinned:${userId ?? "anon"}`;
+  const [pinned, setPinned] = useState(() => localStorage.getItem(pinKey) === "1");
+  useEffect(() => { setPinned(localStorage.getItem(pinKey) === "1"); }, [pinKey]);
+  const togglePin = () => {
+    setPinned((v) => {
+      localStorage.setItem(pinKey, v ? "0" : "1");
+      return !v;
+    });
+  };
   const phone = usePhone();
   // On a phone the 56px side rail eats the screen: use the drawer (menu button) instead.
   const isTop = layout === "top" || phone;
@@ -56,7 +68,7 @@ export default function DashboardLayout() {
           SIDEBAR
       ===================================================== */}
 
-      <div className="contents print:hidden"><Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} hideOnDesktop={isTop} onSwitchLayout={switchLayout} pinned={pinned} /></div>
+      <div className="contents print:hidden"><Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} hideOnDesktop={isTop} onSwitchLayout={switchLayout} pinned={pinned} onTogglePin={togglePin} /></div>
 
       {/* =====================================================
           MAIN APPLICATION AREA

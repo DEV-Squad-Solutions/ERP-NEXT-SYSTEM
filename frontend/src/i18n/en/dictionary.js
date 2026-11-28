@@ -1205,6 +1205,8 @@ export default {
   "تعذر عرض هذه الصفحة. حاول مرة أخرى، وإن استمرت المشكلة تواصل مع الدعم.": "This page could not be shown. Try again, and contact support if it continues.",
   "تحديث الصفحة": "Reload page",
   "نقل القائمة إلى الأعلى": "Move menu to top",
+  "تثبيت القائمة": "Pin sidebar",
+  "إلغاء تثبيت القائمة": "Unpin sidebar (auto-hide)",
   "نقل القائمة إلى الجانب": "Move menu to side",
   "جانبي": "Side",
  "و": "and",

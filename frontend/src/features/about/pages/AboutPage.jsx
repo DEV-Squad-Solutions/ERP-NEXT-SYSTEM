@@ -11,7 +11,7 @@ import {
   Users,
 } from "lucide-react";
 
-import { Facebook, Github, Linkedin } from "../../../shared/components/brand/BrandIcons";
+import { Facebook, Linkedin } from "../../../shared/components/brand/BrandIcons";
 import { t, getDir } from "../../../i18n";
 import { DEVSQUAD } from "../../../shared/components/brand/devSquad";
 
@@ -87,9 +87,6 @@ export default function AboutPage() {
             </a>
             <a href={DEVSQUAD.website} target="_blank" rel="noopener noreferrer" className={linkCls}>
               <Globe size={16} aria-hidden="true" /> {t("الموقع")}
-            </a>
-            <a href={DEVSQUAD.github} target="_blank" rel="noopener noreferrer" className={linkCls}>
-              <Github size={16} aria-hidden="true" /> GitHub
             </a>
           </div>
         </div>

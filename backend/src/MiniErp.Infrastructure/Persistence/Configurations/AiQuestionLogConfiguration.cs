@@ -13,6 +13,7 @@ public sealed class AiQuestionLogConfiguration : IEntityTypeConfiguration<AiQues
         builder.Property(log => log.Question).HasMaxLength(500).IsRequired();
         builder.Property(log => log.Answer).HasMaxLength(4000);
         builder.Property(log => log.Provider).HasMaxLength(50);
+        builder.Property(log => log.ToolsUsed).HasMaxLength(200);
         builder.HasIndex(log => new { log.CompanyId, log.UserId, log.AskedOn });
     }
 }

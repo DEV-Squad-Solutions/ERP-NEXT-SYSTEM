@@ -14,7 +14,7 @@ public sealed class AiAssistantServiceTests
 {
     private sealed class FakeTools : IAiToolRegistry
     {
-        public IReadOnlyList<(string Name, string Description)> Describe() => [("T", "d")];
+        public IReadOnlyList<(string Name, string Description)> Describe() => [("GetCompanyOverview", "d"), ("GetAnalytics", "d"), ("GetKpis", "d")];
 
         public Task<AiToolResult> ExecuteAsync(string name, DashboardFilterRequest f, CancellationToken ct = default) =>
             Task.FromResult(new AiToolResult(name, new { total = 5 }, null));
@@ -83,6 +83,7 @@ public sealed class AiAssistantServiceTests
         Assert.True(r.IsSuccess);
         Assert.Equal("built-in", r.Value.Provider);
         Assert.Single(r.Value.Sources);
+        Assert.Equal(["GetCompanyOverview"], r.Value.ToolsUsed);
         Assert.Equal(0, p.Calls);
     }
 
@@ -118,5 +119,19 @@ public sealed class AiAssistantServiceTests
     {
         var r = await Make(new FakeProvider(true), 2).AskAsync(new AiAskRequest(new string('x', 501)));
         Assert.True(r.IsFailure);
+    }
+
+    [Fact]
+    public async Task Every_question_and_the_tools_it_ran_are_audited()
+    {
+        var db = NewDb();
+        var user = Guid.NewGuid();
+        await Make(new FakeProvider(false), 2, db, user).AskAsync(new AiAskRequest("top customers"));
+        await Make(new FakeProvider(false), 2, db, user).AskAsync(new AiAskRequest("كم المبيعات؟"));
+        var logs = db.AiQuestionLogs.OrderBy(l => l.Id).ToList();
+        Assert.Equal(2, logs.Count);
+        Assert.Equal("GetCompanyOverview,GetAnalytics", logs[0].ToolsUsed);
+        Assert.Equal("GetCompanyOverview", logs[1].ToolsUsed);
+        Assert.All(logs, l => Assert.Equal(user, l.UserId));
     }
 }

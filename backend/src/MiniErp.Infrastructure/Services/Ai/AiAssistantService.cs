@@ -46,7 +46,8 @@ public sealed class AiAssistantService(
                 AskedOn = timeProvider.GetUtcNow().UtcDateTime,
                 Question = result.Value.Question,
                 Answer = answer is { Length: > MaxAnswerLength } ? answer[..MaxAnswerLength] : answer,
-                Provider = result.Value.Provider
+                Provider = result.Value.Provider,
+                ToolsUsed = result.Value.ToolsUsed is { Count: > 0 } used ? string.Join(',', used) : null
             });
             await dbContext.SaveChangesAsync(cancellationToken);
         }
@@ -114,7 +115,9 @@ public sealed class AiAssistantService(
 
         var filters = new DashboardFilterRequest(request.FromDate, request.ToDate);
         var sources = new List<AiToolResult>();
-        foreach (var (name, _) in tools.Describe())
+        var available = tools.Describe().Select(t => t.Name).ToHashSet();
+        var toolsUsed = AiIntentRouter.Route(question, available);
+        foreach (var name in toolsUsed)
         {
             sources.Add(await tools.ExecuteAsync(name, filters, cancellationToken));
         }
@@ -131,14 +134,14 @@ public sealed class AiAssistantService(
                 return Result<AiAnswerResponse>.Success(new AiAnswerResponse(
                     question,
                     $"الفترة: {analytics!.Period.FromDate:yyyy-MM-dd} إلى {analytics.Period.ToDate:yyyy-MM-dd}.\n{analysis}الأرقام محسوبة من فواتير النظام مباشرة (صافي بعد المرتجعات).",
-                    true, BuiltInAnalyst.ProviderName, sources, null));
+                    true, BuiltInAnalyst.ProviderName, sources, null, toolsUsed));
             }
 
             return Result<AiAnswerResponse>.Success(overview is null
                 ? new AiAnswerResponse(question, null, true, BuiltInAnalyst.ProviderName, sources,
-                    "تعذر تحميل أرقام الشركة الآن.")
+                    "تعذر تحميل أرقام الشركة الآن.", toolsUsed)
                 : new AiAnswerResponse(question, BuiltInAnalyst.Answer(question, overview), true,
-                    BuiltInAnalyst.ProviderName, sources, null));
+                    BuiltInAnalyst.ProviderName, sources, null, toolsUsed));
         }
 
         var data = JsonSerializer.Serialize(sources.Where(s => s.Error is null && s.Tool != "GetAnalytics"));
@@ -148,8 +151,8 @@ public sealed class AiAssistantService(
             cancellationToken);
 
         return Result<AiAnswerResponse>.Success(completion.IsSuccess
-            ? new AiAnswerResponse(question, completion.Value, true, provider.Name, sources, null)
+            ? new AiAnswerResponse(question, completion.Value, true, provider.Name, sources, null, toolsUsed)
             : new AiAnswerResponse(question, null, true, provider.Name, sources,
-                "تعذر الحصول على رد من الذكاء الاصطناعي الآن. الأرقام من النظام مباشرة."));
+                "تعذر الحصول على رد من الذكاء الاصطناعي الآن. الأرقام من النظام مباشرة.", toolsUsed));
     }
 }

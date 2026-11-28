@@ -33,7 +33,8 @@ public sealed record AiAnswerResponse(
     bool AiConfigured,
     string? Provider,
     IReadOnlyList<AiToolResult> Sources,
-    string? Note);
+    string? Note,
+    IReadOnlyList<string>? ToolsUsed = null);
 
 public interface IAiToolRegistry : IScopedService
 {

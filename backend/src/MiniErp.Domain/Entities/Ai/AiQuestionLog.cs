@@ -17,4 +17,7 @@ public sealed class AiQuestionLog
     public string? Answer { get; set; }
 
     public string? Provider { get; set; }
+
+    /// <summary>Comma-separated read-only tools the router ran for this question (audit trail).</summary>
+    public string? ToolsUsed { get; set; }
 }

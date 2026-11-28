@@ -1007,6 +1007,10 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("ToolsUsed")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 

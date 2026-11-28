@@ -1,5 +1,6 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { toast } from "sonner";
+import { isRouteNotFound, ROUTE_MISSING_MESSAGE } from "./routeNotFound";
 import { getLang } from "../i18n";
 
 import { updateTokens, logout } from "../features/auth/authSlice";
@@ -51,6 +52,13 @@ const syncFromErrorCode = (error, api) => {
 };
 
 const showErrors = (error) => {
+  if (isRouteNotFound(error)) {
+    toast.error(ROUTE_MISSING_MESSAGE, {
+      id: "route-missing",
+      description: error?.data?.instance,
+    });
+    return;
+  }
   const messages = [...new Set(getApiErrors(error))];
   if (messages.length === 0) return;
 

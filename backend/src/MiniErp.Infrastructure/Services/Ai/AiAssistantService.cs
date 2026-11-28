@@ -13,6 +13,7 @@ namespace MiniErp.Infrastructure.Services.Ai;
 
 public sealed class AiAssistantService(
     IAiToolRegistry tools,
+    IAiEntityTools entityTools,
     IAIProvider provider,
     ICurrentCompanyContext company,
     IOptions<AiOptions> options,
@@ -115,6 +116,26 @@ public sealed class AiAssistantService(
 
         var filters = new DashboardFilterRequest(request.FromDate, request.ToDate);
         var sources = new List<AiToolResult>();
+        // Record lookups (a partner, an employee, an item, the audit log) come first and answer on their own.
+        var entityNames = AiIntentRouter.RouteEntities(
+            question, entityTools.Describe().Select(t => t.Name).ToHashSet());
+        if (entityNames.Count > 0)
+        {
+            var entityQuery = new AiEntityQuery(question, request.FromDate, request.ToDate);
+            var entityResults = new List<AiToolResult>();
+            foreach (var name in entityNames)
+                entityResults.Add(await entityTools.ExecuteAsync(name, entityQuery, cancellationToken));
+
+            // Two "balance of X" lookups (partner and employee): keep the ones that found something, else show the first.
+            if (entityResults.Count > 1 && entityResults.Any(r => r.Data is AiEntityResult { Status: AiEntityStatus.Ok or AiEntityStatus.Ambiguous }))
+                entityResults = entityResults.Where(r => r.Data is AiEntityResult { Status: AiEntityStatus.Ok or AiEntityStatus.Ambiguous }).ToList();
+
+            var text = AiEntityAnswer.Format(question, entityResults);
+            return Result<AiAnswerResponse>.Success(new AiAnswerResponse(
+                question, text, true, BuiltInAnalyst.ProviderName, entityResults, null,
+                entityNames));
+        }
+
         var available = tools.Describe().Select(t => t.Name).ToHashSet();
         var toolsUsed = AiIntentRouter.Route(question, available);
         foreach (var name in toolsUsed)

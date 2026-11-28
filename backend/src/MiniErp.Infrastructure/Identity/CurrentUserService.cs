@@ -18,4 +18,11 @@ public sealed class CurrentUserService(IHttpContextAccessor httpContextAccessor)
             ? Result<Guid>.Success(userId)
             : Result<Guid>.Failure(InvalidUserContext());
     }
+
+    public IReadOnlyCollection<string> GetRoles() =>
+        httpContextAccessor.HttpContext?.User
+            .Claims.Where(c => c.Type is "role" or System.Security.Claims.ClaimTypes.Role)
+            .Select(c => c.Value)
+            .Distinct()
+            .ToList() ?? [];
 }

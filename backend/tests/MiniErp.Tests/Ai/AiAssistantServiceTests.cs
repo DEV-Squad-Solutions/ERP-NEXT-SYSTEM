@@ -20,6 +20,14 @@ public sealed class AiAssistantServiceTests
             Task.FromResult(new AiToolResult(name, new { total = 5 }, null));
     }
 
+    private sealed class NoEntityTools : IAiEntityTools
+    {
+        public IReadOnlyList<(string Name, string Description, string[] Roles)> Describe() => [];
+
+        public Task<AiToolResult> ExecuteAsync(string name, AiEntityQuery q, CancellationToken ct = default) =>
+            throw new NotSupportedException();
+    }
+
     private sealed class FakeProvider(bool configured) : IAIProvider
     {
         public int Calls;
@@ -53,7 +61,7 @@ public sealed class AiAssistantServiceTests
     }
 
     private static AiAssistantService Make(FakeProvider p, int company, ApplicationDbContext? db = null, Guid? user = null) =>
-        new(new FakeTools(), p, new FakeCompany(company), Options.Create(new AiOptions()),
+        new(new FakeTools(), new NoEntityTools(), p, new FakeCompany(company), Options.Create(new AiOptions()),
             db ?? NewDb(), new FakeUser(user ?? Guid.NewGuid()), TimeProvider.System);
 
     [Fact]

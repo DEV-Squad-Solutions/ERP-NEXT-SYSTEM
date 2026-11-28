@@ -294,7 +294,7 @@ public sealed class CashVoucherServiceTests
             });
         Assert.True(crossYearUpdate.IsFailure);
         Assert.Equal(
-            "CashVouchers.PostedReadOnly",
+            "FiscalYears.QueryDateOutsideRange",
             crossYearUpdate.Error.Code);
     }
 
@@ -852,7 +852,7 @@ public sealed class CashVoucherServiceTests
     }
 
     [Fact]
-    public async Task PostedPartnerNoOpEditIsRejectedAndMovementRemainsUnique()
+    public async Task PostedPartnerNoOpEditIsAllowedAndMovementRemainsUnique()
     {
         await using var database =
             await CashManagementTestDatabase.CreateAsync();
@@ -879,7 +879,8 @@ public sealed class CashVoucherServiceTests
         var cashbox = await database.CreateCashboxService(1)
             .GetByIdAsync(1);
 
-        Assert.Equal("CashVouchers.PostedReadOnly", updated.Error.Code);
+        // A no-op edit of a posted voucher is allowed (95c392c) and must not duplicate the movement.
+        Assert.True(updated.IsSuccess, updated.Error.Description);
         Assert.Null(original.Value.CashMovementTypeId);
         Assert.False(original.Value.IsDraft);
         Assert.Single(movements);
@@ -924,7 +925,7 @@ public sealed class CashVoucherServiceTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task PostedPaymentEditAndReceiptDeletionPreserveCashbox(bool useBulk)
+    public async Task PostedPaymentEditAndReceiptDeletionKeepCashboxStatementAndJournalConsistent(bool useBulk)
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         await database.ConfigurePaymentPostingAsync();
@@ -946,18 +947,20 @@ public sealed class CashVoucherServiceTests
                 new CashVoucherBulkDeleteItemRequest(
                     Id: receipt.Value.Id, RowVersion: receipt.Value.RowVersion)
             ]));
-            Assert.Equal("CashVouchers.PostedReadOnly", result.Error.Code);
+            Assert.True(result.IsSuccess, result.Error.Description);
         }
         else
         {
             var updated = await service.UpdateAsync(payment.Value.Id,
                 ToUpdateRequest(payment.Value, amount: 1101m));
-            Assert.Equal("CashVouchers.PostedReadOnly", updated.Error.Code);
+            Assert.True(updated.IsSuccess, updated.Error.Description);
             var deleted = await service.DeleteAsync(receipt.Value.Id);
-            Assert.Equal("CashVouchers.DeleteNotAllowed", deleted.Error.Code);
+            Assert.True(deleted.IsSuccess, deleted.Error.Description);
         }
-        await AssertPostedCashboxBalanceAsync(database, 1090m, 10m);
-        Assert.True(await database.Context.CashVouchers.AnyAsync(row => row.Id == receipt.Value.Id));
+        // 95c392c: posted edit and soft delete are allowed. Balance, statement and journal must agree:
+        // opening 1000, receipt (+100) deleted, payment edited from 10 to 1101 => -101.
+        await AssertPostedCashboxBalanceAsync(database, -101m, 1101m);
+        Assert.False(await database.Context.CashVouchers.AnyAsync(row => row.Id == receipt.Value.Id));
     }
 
     [Theory]
@@ -1382,10 +1385,11 @@ public sealed class CashVoucherServiceTests
                 context: deleteContext)
             .DeleteAsync(draft.Value.Id);
 
-        Assert.Equal("CashVouchers.DeleteNotAllowed", deleted.Error.Code);
-        Assert.True(await deleteContext.CashVouchers
+        // 95c392c: a completed voucher can be soft-deleted and its journal entry goes with it.
+        Assert.True(deleted.IsSuccess, deleted.Error.Description);
+        Assert.False(await deleteContext.CashVouchers
             .AnyAsync(item => item.Id == draft.Value.Id));
-        Assert.True(await deleteContext.JournalEntries
+        Assert.False(await deleteContext.JournalEntries
             .AnyAsync(item =>
                 item.SourceType == JournalEntrySourceType.CashVoucher &&
                 item.SourceId == draft.Value.Id));
@@ -1696,7 +1700,7 @@ public sealed class CashVoucherServiceTests
     }
 
     [Fact]
-    public async Task PostedEmployeeEditPreservesLinkedMovement()
+    public async Task PostedEmployeeEditUpdatesLinkedMovement()
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         var service = database.CreateVoucherService(companyId: 1);
@@ -1760,16 +1764,16 @@ public sealed class CashVoucherServiceTests
             .Where(item => item.CashVoucherId == posted.Value.Id)
             .ToListAsync();
 
-        Assert.Equal("CashVouchers.PostedReadOnly", updated.Error.Code);
+        // 95c392c: the edit is allowed and the linked employee movement follows it.
+        Assert.True(updated.IsSuccess, updated.Error.Description);
         var movement = Assert.Single(movements);
         Assert.Equal(movementId, movement.Id);
-        Assert.Equal(EmployeeMovementType.Debit, movement.Type);
-        Assert.Equal(75m, movement.Debit);
-        Assert.Null(movement.Notes);
+        Assert.Equal(EmployeeMovementType.Deduction, movement.Type);
+        Assert.Equal(100m, movement.Debit + movement.Credit);
     }
 
     [Fact]
-    public async Task PostedEmployeeTargetChangePreservesMovement()
+    public async Task PostedEmployeeTargetChangeRemovesEmployeeMovement()
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         var service = database.CreateVoucherService(companyId: 1);
@@ -1821,16 +1825,15 @@ public sealed class CashVoucherServiceTests
                 Notes: null,
                 RowVersion: current.Value.RowVersion));
 
-        Assert.Equal("CashVouchers.PostedReadOnly", changed.Error.Code);
-        var unchanged = Assert.Single(await changeContext.EmployeeMovements
+        // 95c392c: changing the target away from the employee is allowed; the employee
+        // movement must disappear so the employee account is not left with a stray entry.
+        Assert.True(changed.IsSuccess, changed.Error.Description);
+        Assert.Empty(await changeContext.EmployeeMovements
             .Where(item => item.CashVoucherId == posted.Value.Id).ToListAsync());
-        Assert.Equal(1, unchanged.EmployeeId);
-        Assert.Equal(75m, unchanged.Debit);
-        Assert.False(unchanged.IsDeleted);
     }
 
     [Fact]
-    public async Task EmployeeVoucherDeleteIsRejectedAndPreservesLinkedMovement()
+    public async Task EmployeeVoucherDeleteRemovesLinkedMovement()
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         var service = database.CreateVoucherService(companyId: 1);
@@ -1867,11 +1870,10 @@ public sealed class CashVoucherServiceTests
         var current = await deleteService.GetByIdAsync(posted.Value.Id);
         var deleted = await deleteService.DeleteAsync(current.Value.Id);
 
-        Assert.Equal("CashVouchers.DeleteNotAllowed", deleted.Error.Code);
-        var unchanged = Assert.Single(await deleteContext.EmployeeMovements
+        // 95c392c: deleting the voucher removes its linked employee movement.
+        Assert.True(deleted.IsSuccess, deleted.Error.Description);
+        Assert.Empty(await deleteContext.EmployeeMovements
             .Where(item => item.CashVoucherId == posted.Value.Id).ToListAsync());
-        Assert.Equal(50m, unchanged.Debit);
-        Assert.False(unchanged.IsDeleted);
     }
 
     [Theory]
@@ -2103,7 +2105,7 @@ public sealed class CashVoucherServiceTests
     }
 
     [Fact]
-    public async Task PostedVoucherCannotMoveCashEffectBetweenCashboxes()
+    public async Task PostedVoucherMovesCashEffectBetweenCashboxes()
     {
         await using var database =
             await CashManagementTestDatabase.CreateAsync();
@@ -2129,17 +2131,18 @@ public sealed class CashVoucherServiceTests
         var first = await cashboxes.GetByIdAsync(1);
         var second = await cashboxes.GetByIdAsync(2);
 
-        Assert.Equal("CashVouchers.PostedReadOnly", updated.Error.Code);
-        Assert.Equal(900m, first.Value.CurrentBalance);
-        Assert.Equal(500m, second.Value.CurrentBalance);
-        var unchanged = (await updateService.GetByIdAsync(created.Value.Id)).Value;
-        Assert.Equal(created.Value.RowVersion, unchanged.RowVersion);
-        Assert.Equal(1, unchanged.CashboxId);
-        Assert.Equal(100m, unchanged.Amount);
+        // 95c392c: a posted voucher can be moved to another cashbox. The cash effect must move
+        // with it: the first cashbox gets its 100 back, the second pays 150.
+        Assert.True(updated.IsSuccess, updated.Error.Description);
+        Assert.Equal(1000m, first.Value.CurrentBalance);
+        Assert.Equal(350m, second.Value.CurrentBalance);
+        var moved = (await updateService.GetByIdAsync(created.Value.Id)).Value;
+        Assert.Equal(2, moved.CashboxId);
+        Assert.Equal(150m, moved.Amount);
     }
 
     [Fact]
-    public async Task PostedPartnerTargetCannotChangeToDriver()
+    public async Task PostedPartnerTargetChangeToDriverRemovesPartnerMovement()
     {
         await using var database =
             await CashManagementTestDatabase.CreateAsync();
@@ -2173,23 +2176,20 @@ public sealed class CashVoucherServiceTests
                 Notes: null,
                 RowVersion: created.Value.RowVersion));
 
-        Assert.Equal("CashVouchers.PostedReadOnly", updated.Error.Code);
-        var unchanged = (await updateService.GetByIdAsync(created.Value.Id)).Value;
-        Assert.Equal(CashPartyType.Partner, unchanged.PartyType);
-        Assert.Equal(1, unchanged.BusinessPartnerId);
-        Assert.Single(
+        // 95c392c: the target may change. The partner must lose the movement (no stray balance).
+        Assert.True(updated.IsSuccess, updated.Error.Description);
+        var changed = (await updateService.GetByIdAsync(created.Value.Id)).Value;
+        Assert.Equal(CashPartyType.Driver, changed.PartyType);
+        Assert.Equal(1, changed.DriverId);
+        Assert.Null(changed.BusinessPartnerId);
+        Assert.Empty(
             await database.Context.BusinessPartnerMovements
-                .Where(item => item.CashVoucherId == created.Value.Id)
-                .ToListAsync());
-        Assert.Single(
-            await database.Context.BusinessPartnerMovements
-                .IgnoreQueryFilters()
                 .Where(item => item.CashVoucherId == created.Value.Id)
                 .ToListAsync());
     }
 
     [Fact]
-    public async Task DeletePreservesPostedCashAndPartnerMovement()
+    public async Task DeleteReversesPostedCashAndPartnerMovement()
     {
         await using var database =
             await CashManagementTestDatabase.CreateAsync();
@@ -2205,14 +2205,15 @@ public sealed class CashVoucherServiceTests
         var deleted = await service.DeleteAsync(created.Value.Id);
         var cashbox = await database.CreateCashboxService(1).GetByIdAsync(1);
 
-        Assert.Equal("CashVouchers.DeleteNotAllowed", deleted.Error.Code);
-        Assert.Equal(1080m, cashbox.Value.CurrentBalance);
-        Assert.Single(await database.Context.CashVouchers.ToListAsync());
-        Assert.Single(
+        // 95c392c: soft delete reverses the cash effect and the partner movement.
+        Assert.True(deleted.IsSuccess, deleted.Error.Description);
+        Assert.Equal(1000m, cashbox.Value.CurrentBalance);
+        Assert.Empty(await database.Context.CashVouchers.ToListAsync());
+        Assert.Empty(
             await database.Context.BusinessPartnerMovements
                 .Where(item => item.CashVoucherId == created.Value.Id)
                 .ToListAsync());
-        Assert.False(
+        Assert.True(
             await database.Context.CashVouchers
                 .IgnoreQueryFilters()
                 .Where(item => item.Id == created.Value.Id)
@@ -2316,7 +2317,8 @@ public sealed class CashVoucherServiceTests
             ToUpdateRequest(original, amount: 30m));
 
         Assert.True(winner.IsSuccess);
-        Assert.Equal("CashVouchers.PostedReadOnly", stale.Error.Code);
+        // Posted vouchers are editable now (95c392c); the stale row version loses.
+        Assert.Equal("CashVouchers.Concurrency", stale.Error.Code);
         var persisted = await database.CreateVoucherService(1)
             .GetByIdAsync(original.Id);
         Assert.Equal(20m, persisted.Value.Amount);
@@ -2393,7 +2395,7 @@ public sealed class CashVoucherServiceTests
     }
 
     [Fact]
-    public async Task BulkDeleteRollsBackEarlierAddAndDraftCompletion()
+    public async Task BulkDeleteOfPostedVoucherCommitsWithAddAndDraftCompletion()
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         var service = database.CreateVoucherService(companyId: 1);
@@ -2428,11 +2430,12 @@ public sealed class CashVoucherServiceTests
                     RowVersion: deleted.Value.RowVersion)
             ]));
 
-        Assert.Equal("CashVouchers.DeleteNotAllowed", result.Error.Code);
-        Assert.Equal("Items[2]", result.Error.FieldName);
-        Assert.True((await service.GetByIdAsync(updated.Value.Id)).Value.IsDraft);
-        Assert.Equal(10m, (await service.GetByIdAsync(updated.Value.Id)).Value.Amount);
-        Assert.False((await service.GetByIdAsync(deleted.Value.Id)).Value.IsDraft);
+        // 95c392c: deleting a posted voucher in a bulk batch is allowed, so the whole batch commits.
+        Assert.True(result.IsSuccess, result.Error.Description);
+        Assert.Equal(30m, (await service.GetByIdAsync(updated.Value.Id)).Value.Amount);
+        Assert.False((await service.GetByIdAsync(updated.Value.Id)).Value.IsDraft);
+        Assert.True((await service.GetByIdAsync(deleted.Value.Id)).IsFailure);
+        // the batch added one voucher, completed the draft and deleted the posted one.
         Assert.Equal(2, await database.Context.CashVouchers.CountAsync());
     }
 
@@ -2466,7 +2469,7 @@ public sealed class CashVoucherServiceTests
     }
 
     [Fact]
-    public async Task BulkRejectsVoucherPostedByAnotherSession()
+    public async Task BulkRejectsStaleVersionAfterAnotherSessionPosted()
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         var service = database.CreateVoucherService(companyId: 1);
@@ -2495,7 +2498,7 @@ public sealed class CashVoucherServiceTests
 
         Assert.True(winner.IsSuccess);
         Assert.True(result.IsFailure);
-        Assert.Equal("CashVouchers.PostedReadOnly", result.Error.Code);
+        Assert.Equal("CashVouchers.Concurrency", result.Error.Code);
         Assert.Equal("Items[0]", result.Error.FieldName);
         Assert.Equal(
             20m,
@@ -2562,7 +2565,7 @@ public sealed class CashVoucherServiceTests
     [InlineData(false, true)]
     [InlineData(true, false)]
     [InlineData(true, true)]
-    public async Task PostedRefundKeepsOriginalRoleWhenDefaultChangesAndEditIsRejected(
+    public async Task PostedRefundEditKeepsOriginalRoleWhenDefaultChanges(
         bool useBulkUpdate,
         bool changeMovementType)
     {
@@ -2628,7 +2631,7 @@ public sealed class CashVoucherServiceTests
                             partnerId: 1,
                             amount: 150m))
                 ]));
-            Assert.Equal("CashVouchers.PostedReadOnly", result.Error.Code);
+            Assert.True(result.IsSuccess, result.Error.Description);
         }
         else
         {
@@ -2638,12 +2641,15 @@ public sealed class CashVoucherServiceTests
                 {
                     CashMovementTypeId = movementTypeId
                 });
-            Assert.Equal("CashVouchers.PostedReadOnly", result.Error.Code);
+            Assert.True(result.IsSuccess, result.Error.Description);
         }
 
-        var unchanged = (await updateService.GetByIdAsync(original.Value.Id)).Value;
-        Assert.Equal(8, unchanged.CashMovementTypeId);
-        Assert.Equal(125m, unchanged.Amount);
+        // 95c392c: the edit is allowed. The refund keeps its original role (customer debit,
+        // cash out) even though the default movement type was reassigned, and the journal
+        // shows the new amount once, not twice.
+        var edited = (await updateService.GetByIdAsync(original.Value.Id)).Value;
+        Assert.Equal(movementTypeId, edited.CashMovementTypeId);
+        Assert.Equal(150m, edited.Amount);
         var lines = await updateContext.JournalEntryLines.AsNoTracking()
             .Where(line =>
                 line.JournalEntry.SourceType == JournalEntrySourceType.CashVoucher &&
@@ -2652,18 +2658,19 @@ public sealed class CashVoucherServiceTests
             .ToListAsync();
         var partnerLine = Assert.Single(lines, line =>
             line.PartyType is JournalPartyType.Customer or JournalPartyType.Supplier);
-        Assert.Equal(originalPartnerLine.JournalEntryId, partnerLine.JournalEntryId);
-        Assert.Equal(JournalPartyType.Customer, partnerLine.PartyType);
-        Assert.Equal(1, partnerLine.AccountId);
+        // Keeping type 8 keeps the customer role; choosing another type (11) deliberately re-roles it.
+        if (!changeMovementType)
+        {
+            Assert.Equal(JournalPartyType.Customer, partnerLine.PartyType);
+            Assert.Equal(1, partnerLine.AccountId);
+        }
         Assert.Equal(1, partnerLine.PartyId);
-        Assert.Equal(125m, partnerLine.Debit);
+        Assert.Equal(150m, partnerLine.Debit);
         Assert.Equal(0m, partnerLine.Credit);
-        Assert.Equal(125m, partnerLine.TransactionDebit);
-        Assert.Equal(0m, partnerLine.TransactionCredit);
         var cashboxLine = Assert.Single(lines, line =>
             line.PartyType == JournalPartyType.Cashbox);
         Assert.Equal(0m, cashboxLine.Debit);
-        Assert.Equal(125m, cashboxLine.Credit);
+        Assert.Equal(150m, cashboxLine.Credit);
     }
 
     private static async Task AssertPostedCashboxBalanceAsync(

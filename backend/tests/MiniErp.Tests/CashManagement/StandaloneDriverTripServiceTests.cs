@@ -147,11 +147,12 @@ public sealed class StandaloneDriverTripServiceTests
         Assert.True(completed.IsSuccess, completed.Error.Description);
         Assert.Equal("DriverTrips.LinkedVoucher", (await UpdateAsync(service, trip, 10m, driverId: 2)).Error.Code);
         Assert.Equal("DriverTrips.LinkedVoucher", (await service.DeleteAsync(trip.DriverTripId, trip.RowVersion)).Error.Code);
-        Assert.Equal("CashVouchers.DeleteNotAllowed", (await vouchers.DeleteAsync(draft.Id)).Error.Code);
-        Assert.True(await db.Context.CashVouchers.AnyAsync(voucher => voucher.Id == draft.Id));
-        Assert.Equal("DriverTrips.LinkedVoucher", (await service.DeleteAsync(trip.DriverTripId, trip.RowVersion)).Error.Code);
         Assert.Equal("DriverTrips.LinkedVoucher", (await UpdateAsync(service, trip, 10m, partnerId: 1)).Error.Code);
         Assert.True((await UpdateAsync(service, trip, 7m)).IsSuccess);
+        // 95c392c: the posted voucher may now be deleted (soft delete); the trip stays protected
+        // while a voucher, even a deleted one, references it (see the legacy-deleted test).
+        Assert.True((await vouchers.DeleteAsync(draft.Id)).IsSuccess);
+        Assert.False(await db.Context.CashVouchers.AnyAsync(voucher => voucher.Id == draft.Id));
     }
 
     [Fact]

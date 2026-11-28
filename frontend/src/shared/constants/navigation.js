@@ -161,7 +161,7 @@ export const navigationItems = [
   {
     label: t("السائقين"),
     icon: Truck,
-    roles: FULL_ACCESS_ROLES,
+    roles: PARTNER_STATEMENT_ROLES,
     children: [
       {
         label: t("قائمة السائقين"),
@@ -175,7 +175,7 @@ export const navigationItems = [
         path: "/dashboard/drivers/statement",
         icon: FileText,
         end: true,
-        roles: FULL_ACCESS_ROLES,
+        roles: PARTNER_STATEMENT_ROLES,
       },
       {
         label: t("مصاريف الرحلات"),

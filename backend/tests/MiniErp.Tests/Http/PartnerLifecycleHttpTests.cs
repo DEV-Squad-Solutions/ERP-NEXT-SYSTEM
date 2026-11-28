@@ -47,7 +47,16 @@ public sealed class PartnerLifecycleHttpTests(ITestOutputHelper output)
         Assert.Equal(HttpStatusCode.BadRequest, (await accountant.PostAsJsonAsync("/api/v1/BusinessPartners", Body(""))).StatusCode);
         Assert.Equal(HttpStatusCode.BadRequest, (await accountant.PostAsJsonAsync("/api/v1/BusinessPartners", Body("x", "EGP", -5))).StatusCode);
 
-        // Note: partner create/update/delete is currently open to every signed-in role, including Cashier (open question for Ahmed).
+        // Create is open to every role (needed while selling); update and delete are Admin/Accountant only.
+        var cashier = await host.ClientForAsync("cashier1");
+        var sales = await host.ClientForAsync("sales1");
+        Assert.Equal(HttpStatusCode.Created, (await cashier.PostAsJsonAsync("/api/v1/BusinessPartners", Body("عميل من الكاشير"))).StatusCode);
+        Assert.Equal(HttpStatusCode.Created, (await sales.PostAsJsonAsync("/api/v1/BusinessPartners", Body("عميل من المبيعات"))).StatusCode);
+        foreach (var c in new[] { cashier, sales })
+        {
+            Assert.Equal(HttpStatusCode.Forbidden, (await c.PutAsJsonAsync($"/api/v1/BusinessPartners/{id}", Body("ممنوع"))).StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, (await c.DeleteAsync($"/api/v1/BusinessPartners/{id}")).StatusCode);
+        }
 
         // Delete, then it is gone.
         Assert.Equal(HttpStatusCode.NoContent, (await accountant.DeleteAsync($"/api/v1/BusinessPartners/{id}")).StatusCode);
@@ -60,15 +69,26 @@ public sealed class StatementRoleHttpTests(ITestOutputHelper output)
 {
     // partnerAllowed / employeeAllowed: not 403 (the request itself may be 400/404 for placeholder ids).
     [Theory]
-    [InlineData("manager1", true, true)]
-    [InlineData("accountant1", true, true)]
-    [InlineData("sales1", true, false)]
-    [InlineData("cashier1", false, false)]
-    public async Task Partner_and_employee_statement_roles(string user, bool partnerAllowed, bool employeeAllowed)
+    [InlineData("manager1", true, true, true)]
+    [InlineData("accountant1", true, true, true)]
+    [InlineData("sales1", true, false, false)]
+    [InlineData("cashier1", false, false, false)]
+    public async Task Partner_and_employee_statement_roles(string user, bool partnerAllowed, bool employeeAllowed, bool financialAllowed)
     {
         await using var host = await ApiHost.CreateAsync(output, items: 5);
         var c = await host.ClientForAsync(user);
         Assert.Equal(!partnerAllowed, (await c.GetAsync("/api/v1/Statements/partner?businessPartnerId=1")).StatusCode == HttpStatusCode.Forbidden);
+        Assert.Equal(!partnerAllowed, (await c.GetAsync("/api/v1/Statements/driver?driverId=1")).StatusCode == HttpStatusCode.Forbidden);
+        Assert.Equal(!partnerAllowed, (await c.GetAsync("/api/v1/Statements/container-store?storeId=1")).StatusCode == HttpStatusCode.Forbidden);
+        foreach (var url in new[]
+        {
+            "/api/v1/Statements/trial-balance", "/api/v1/Statements/operational-trial-balance",
+            "/api/v1/Statements/income-statement", "/api/v1/Statements/financial-position", "/api/v1/Statements/cash-flow",
+            "/api/v1/Statements/expenses", "/api/v1/Statements/profitability/invoices", "/api/v1/Statements/profitability/items",
+        })
+            Assert.True(!financialAllowed == ((await c.GetAsync(url)).StatusCode == HttpStatusCode.Forbidden), url);
+        // Cashbox statement: a 403 for Admin can be a business rule (cashbox ownership), so only the denied side is asserted.
+        if (!financialAllowed) Assert.Equal(HttpStatusCode.Forbidden, (await c.GetAsync("/api/v1/Statements/cashbox?cashboxId=1")).StatusCode);
         foreach (var url in new[]
         {
             "/api/v1/Statements/employee?employeeId=1",

@@ -17,6 +17,7 @@ public sealed class StatementsController(
     IProfitabilityReportService profitabilityReportService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("cashbox")]
     [ProducesResponseType<CashboxStatementResponse>(
         StatusCodes.Status200OK)]
@@ -50,6 +51,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpGet("driver")]
     [ProducesResponseType<DriverStatementResponse>(
         StatusCodes.Status200OK)]
@@ -66,6 +68,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpGet("container-store")]
     [ProducesResponseType<ContainerStoreStatementResponse>(
         StatusCodes.Status200OK)]
@@ -82,6 +85,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("operational-trial-balance")]
     [ProducesResponseType<OperationalTrialBalanceResponse>(
         StatusCodes.Status200OK)]
@@ -96,6 +100,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("expenses")]
     [ProducesResponseType<OperationalTrialBalanceResponse>(
         StatusCodes.Status200OK)]
@@ -114,6 +119,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("trial-balance")]
     [ProducesResponseType<TrialBalanceResponse>(
         StatusCodes.Status200OK)]
@@ -127,6 +133,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("income-statement")]
     [ProducesResponseType<FinancialStatementReportResponse>(
         StatusCodes.Status200OK)]
@@ -141,6 +148,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("financial-position")]
     [ProducesResponseType<FinancialStatementReportResponse>(
         StatusCodes.Status200OK)]
@@ -155,6 +163,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("cash-flow")]
     [ProducesResponseType<FinancialStatementReportResponse>(
         StatusCodes.Status200OK)]
@@ -221,6 +230,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("profitability/invoices")]
     [ProducesResponseType<InvoiceProfitabilityListResponse>(
         StatusCodes.Status200OK)]
@@ -236,6 +246,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("profitability/invoices/{invoiceId:int}")]
     [ProducesResponseType<InvoiceProfitabilityResponse>(
         StatusCodes.Status200OK)]
@@ -251,6 +262,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("profitability/items")]
     [ProducesResponseType<ItemProfitabilityListResponse>(
         StatusCodes.Status200OK)]

@@ -1,3 +1,4 @@
+using MiniErp.Application.Common.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniErp.Api.Extensions;
@@ -106,6 +107,7 @@ public sealed class BusinessPartnersController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<BusinessPartnerResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -129,6 +131,7 @@ public sealed class BusinessPartnersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

@@ -504,7 +504,7 @@ export const router = createBrowserRouter([
         path: "drivers/statement",
         element: (
           <LazyPage>
-            <Role roles={FULL_ACCESS_ROLES}>
+            <Role roles={PARTNER_STATEMENT_ROLES}>
               <DriverStatementPage />
             </Role>
           </LazyPage>

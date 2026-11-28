@@ -123,3 +123,13 @@ test("partner statement is open to Admin, Accountant and User, never Cashier; em
     assert.ok(!paths([role]).includes("/dashboard/payroll/employees/statement"), role);
   }
 });
+
+test("driver statement is open to User but not Cashier; the driver list and trial balance stay Admin/Accountant", () => {
+  assert.ok(paths(["User"]).includes("/dashboard/drivers/statement"));
+  assert.ok(!paths(["Cashier"]).includes("/dashboard/drivers/statement"));
+  assert.ok(!paths(["User"]).includes("/dashboard/drivers"));
+  for (const role of ["User", "Cashier"]) {
+    assert.ok(!paths([role]).includes("/dashboard/trial-balance/before-adjustments"), role);
+    assert.ok(!paths([role]).includes("/dashboard/cash-flow"), role);
+  }
+});

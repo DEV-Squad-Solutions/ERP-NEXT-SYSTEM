@@ -103,8 +103,10 @@ public sealed class RoleMatrixTests
     {
         foreach (var (c, a) in Mutations().Where(x => SalesControllers.Contains(x.Controller.Name)))
         {
-            var isInvoiceDelete = c.Name == "InvoicesController" &&
-                a.GetCustomAttribute<HttpDeleteAttribute>() is not null;
+            var isInvoiceDelete = (c.Name == "InvoicesController" &&
+                a.GetCustomAttribute<HttpDeleteAttribute>() is not null) ||
+                (c.Name == "BusinessPartnersController" &&
+                (a.GetCustomAttribute<HttpDeleteAttribute>() is not null || a.GetCustomAttribute<HttpPutAttribute>() is not null));
             Assert.True(Allowed(c, a, "Admin"), $"{c.Name}.{a.Name} Admin");
             Assert.True(Allowed(c, a, "Accountant"), $"{c.Name}.{a.Name} Accountant");
             Assert.Equal(!isInvoiceDelete, Allowed(c, a, "User"));

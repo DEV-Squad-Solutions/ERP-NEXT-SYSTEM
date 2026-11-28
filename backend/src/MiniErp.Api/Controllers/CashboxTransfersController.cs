@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.CashboxTransfers.Jobs;
 using MiniErp.Api.Features.ExchangeRates.Jobs;
@@ -15,6 +16,7 @@ public sealed class CashboxTransfersController(
     ICashboxTransferService cashboxTransferService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<CashboxTransferListResponse>>(
         StatusCodes.Status200OK)]
@@ -30,6 +32,7 @@ public sealed class CashboxTransfersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<CashboxTransferResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -45,6 +48,7 @@ public sealed class CashboxTransfersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<CashboxTransferResponse>(
         StatusCodes.Status201Created)]
@@ -85,6 +89,7 @@ public sealed class CashboxTransfersController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<CashboxTransferResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -117,6 +122,7 @@ public sealed class CashboxTransfersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

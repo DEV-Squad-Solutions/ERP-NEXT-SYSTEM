@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import CompanySelect from "../components/CompanySelect";
 import LoginForm from "../components/LoginForm";
+import { DevSquadInline } from "../../../shared/components/brand/DevSquadCard";
 
 import { t } from "../../../i18n";
 import { getDir } from "../../../i18n";
@@ -55,10 +56,10 @@ export default function LoginPage() {
   return (
     <main
       dir={getDir()}
-      className="relative isolate h-[100dvh] w-full overflow-hidden bg-paper text-ink-900"
+      className="relative isolate h-[100dvh] w-full overflow-y-auto overflow-x-hidden bg-paper text-ink-900"
     >
-      <div className="flex h-full w-full overflow-hidden lg:flex-row">
-        <section className="relative hidden h-full min-w-0 overflow-hidden bg-primary-500 lg:flex lg:w-[43%] lg:shrink-0">
+      <div className="flex min-h-full w-full overflow-hidden lg:flex-row">
+        <section className="relative hidden min-h-[34rem] min-w-0 overflow-hidden bg-primary-500 lg:flex lg:w-[43%] lg:shrink-0">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -81,7 +82,7 @@ export default function LoginPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-black/[0.08]" />
           </div>
 
-          <div className="relative z-10 flex h-full w-full flex-col justify-between overflow-hidden px-8 py-6 xl:px-12 xl:py-8">
+          <div className="relative z-10 flex min-h-full w-full flex-col justify-between overflow-hidden px-8 py-6 xl:px-12 xl:py-8">
             <div className="motion-safe:animate-[fadeDown_0.6s_ease-out_both]">
               <span className="font-display text-lg font-bold text-white">
                 {t("نظام الدفتر")}
@@ -140,6 +141,7 @@ export default function LoginPage() {
               </div>
 
               <div className="flex shrink-0 items-center gap-2 text-white/35">
+                <DevSquadInline tone="light" className="me-2" />
                 <a
                   href="https://dev-squad-orpin.vercel.app/"
                   target="_blank"
@@ -180,7 +182,7 @@ export default function LoginPage() {
           </div>
         </section>
 
-        <section className="relative flex h-full min-w-0 flex-1 items-center justify-center overflow-hidden bg-paper px-4 py-4 sm:px-6 lg:px-10">
+        <section className="relative flex min-h-full min-w-0 flex-1 items-center justify-center overflow-hidden bg-paper px-4 py-4 sm:px-6 lg:px-10">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute -end-32 -top-32 h-64 w-64 rounded-full bg-primary-500/[0.035] blur-3xl"
@@ -234,6 +236,8 @@ export default function LoginPage() {
                 <span>{t("بياناتك محمية وآمنة")}</span>
               </div>
             </div>
+
+            <DevSquadInline className="mt-3 shrink-0" />
 
             <div className="mt-3 flex shrink-0 items-center justify-center gap-1 text-[9px] text-ink-300 motion-safe:animate-[fadeUp_0.5s_ease-out_300ms_both]">
               <span>© {new Date().getFullYear()}</span>

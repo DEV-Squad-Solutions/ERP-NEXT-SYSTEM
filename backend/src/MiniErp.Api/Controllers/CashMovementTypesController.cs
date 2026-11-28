@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.CashMovementTypes.Jobs;
 using MiniErp.Application.Common.Models;
@@ -56,6 +57,7 @@ public sealed class CashMovementTypesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<CashMovementTypeResponse>(
         StatusCodes.Status201Created)]
@@ -82,6 +84,7 @@ public sealed class CashMovementTypesController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<CashMovementTypeResponse>(
         StatusCodes.Status200OK)]
@@ -106,6 +109,7 @@ public sealed class CashMovementTypesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

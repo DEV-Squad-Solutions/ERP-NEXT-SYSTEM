@@ -2917,4 +2917,10 @@ export default {
  "يدوي (يدخله المستخدم)": "Manual (entered by the user)",
  "تلقائي: يرقّم النظام الفواتير لكل شركة وسنة. يدوي: يدخل المستخدم الرقم وهو مرجي فقط وممكن يتكرر.": "Automatic: the system numbers invoices per company and year. Manual: the user enters the number as a reference only, so duplicates are allowed.",
  "رقم الفاتورة مطلوب في الوضع اليدوي": "The invoice number is required in manual mode"
+ "أعمال الشركة": "Company portfolio",
+ "للتواصل": "Contact",
+ "اتصال": "Call",
+ "طباعة الصفحة": "Print page",
+ "القوائم المالية": "Financial statements",
+ "تقارير الموارد البشرية": "HR reports"
 };

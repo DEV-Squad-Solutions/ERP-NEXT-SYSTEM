@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using MiniErp.Application.Common.Abstractions;
 using MiniErp.Application.Common.Results;
 using MiniErp.Application.Features.Ai;
+using MiniErp.Application.Features.Analytics;
 using MiniErp.Application.Features.Dashboard;
 using Microsoft.EntityFrameworkCore;
 using MiniErp.Domain.Entities.Ai;
@@ -123,6 +124,16 @@ public sealed class AiAssistantService(
         if (!useExternal)
         {
             var overview = sources.Select(x => x.Data).OfType<DashboardResponse>().FirstOrDefault();
+            var analytics = sources.Select(x => x.Data).OfType<AnalyticsOverview>().FirstOrDefault();
+            var analysis = analytics is null ? null : BuiltInAnalyst.AnalyticsAnswer(question, analytics);
+            if (analysis is not null)
+            {
+                return Result<AiAnswerResponse>.Success(new AiAnswerResponse(
+                    question,
+                    $"الفترة: {analytics!.Period.FromDate:yyyy-MM-dd} إلى {analytics.Period.ToDate:yyyy-MM-dd}.\n{analysis}الأرقام محسوبة من فواتير النظام مباشرة (صافي بعد المرتجعات).",
+                    true, BuiltInAnalyst.ProviderName, sources, null));
+            }
+
             return Result<AiAnswerResponse>.Success(overview is null
                 ? new AiAnswerResponse(question, null, true, BuiltInAnalyst.ProviderName, sources,
                     "تعذر تحميل أرقام الشركة الآن.")
@@ -130,7 +141,7 @@ public sealed class AiAssistantService(
                     BuiltInAnalyst.ProviderName, sources, null));
         }
 
-        var data = JsonSerializer.Serialize(sources.Where(s => s.Error is null));
+        var data = JsonSerializer.Serialize(sources.Where(s => s.Error is null && s.Tool != "GetAnalytics"));
         var completion = await provider.CompleteAsync(
             SystemPrompt,
             $"Question: {question}\n\nData (JSON):\n{data}",

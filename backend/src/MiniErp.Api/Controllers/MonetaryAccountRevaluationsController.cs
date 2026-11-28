@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Application.Features.MonetaryAccountRevaluations;
 using MiniErp.Domain.Enums;
@@ -12,6 +13,7 @@ namespace MiniErp.Api.Controllers;
 public sealed class MonetaryAccountRevaluationsController(
     IMonetaryAccountRevaluationService service) : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("options")]
     [ProducesResponseType<IReadOnlyList<MonetaryAccountRevaluationOption>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetOptions(
@@ -22,6 +24,7 @@ public sealed class MonetaryAccountRevaluationsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<MonetaryAccountRevaluationResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(
@@ -44,6 +47,7 @@ public sealed class MonetaryAccountRevaluationsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<MonetaryAccountRevaluationResponse>(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(

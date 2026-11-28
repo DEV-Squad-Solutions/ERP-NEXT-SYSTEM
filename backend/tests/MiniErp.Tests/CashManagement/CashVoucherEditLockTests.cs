@@ -12,65 +12,62 @@ public sealed class CashVoucherEditLockTests
     static CashVoucherEditLockTests() => MappingConfiguration.Register(
         typeof(InfrastructureAssemblyMarker).Assembly);
 
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task PostedVoucherRejectsEveryEditIncludingNoOp(bool useDraftEndpoint)
+    // Rule since 95c392c: a posted standalone voucher may be edited (the controller limits
+    // this to Admin and Accountant). The ledger must stay consistent after the edit.
+    [Fact]
+    public async Task PostedVoucherEditIsAllowedAndJournalStaysSingleAndBalanced()
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         var service = database.CreatePostingVoucherService(1);
         var draft = (await service.AddAsync(Draft())).Value;
         var posted = await service.UpdateAsync(draft.Id, Complete(draft));
         Assert.True(posted.IsSuccess, posted.Error.Description);
-        var before = await service.GetByIdAsync(draft.Id);
-        var journalBefore = await database.Context.JournalEntryLines.AsNoTracking()
-            .Where(line => line.JournalEntry.SourceType == JournalEntrySourceType.CashVoucher &&
-                line.JournalEntry.SourceId == draft.Id)
-            .Select(line => new { line.Id, line.Debit, line.Credit, line.ExchangeRate })
-            .ToListAsync();
+        var before = (await service.GetByIdAsync(draft.Id)).Value;
 
-        var result = useDraftEndpoint
-            ? await service.UpdateDraftAsync(draft.Id, DraftUpdate(before.Value))
-            : await service.UpdateAsync(draft.Id, Complete(before.Value));
+        var result = await service.UpdateAsync(draft.Id, Complete(before) with { Amount = 25m });
 
-        Assert.True(result.IsFailure);
-        Assert.Equal("CashVouchers.PostedReadOnly", result.Error.Code);
-        Assert.Equal(ErrorType.Conflict, result.Error.Type);
+        Assert.True(result.IsSuccess, result.Error.Description);
         var after = (await service.GetByIdAsync(draft.Id)).Value;
-        Assert.Equal(before.Value.RowVersion, after.RowVersion);
-        Assert.Equal(10m, after.Amount);
-        Assert.Equal(1m, after.ExchangeRate);
-        Assert.Equal(10m, after.BaseAmount);
-        Assert.Equal("operational", after.Description);
+        Assert.Equal(25m, after.Amount);
         Assert.False(after.IsDraft);
-        var journalAfter = await database.Context.JournalEntryLines.AsNoTracking()
-            .Where(line => line.JournalEntry.SourceType == JournalEntrySourceType.CashVoucher &&
-                line.JournalEntry.SourceId == draft.Id)
-            .Select(line => new { line.Id, line.Debit, line.Credit, line.ExchangeRate })
-            .ToListAsync();
-        Assert.Equal(journalBefore, journalAfter);
+        Assert.NotEqual(before.RowVersion, after.RowVersion);
+        var entries = await database.Context.JournalEntries.AsNoTracking()
+            .Where(entry => entry.SourceType == JournalEntrySourceType.CashVoucher &&
+                entry.SourceId == draft.Id)
+            .Select(entry => entry.Id).ToListAsync();
+        Assert.Single(entries);
+        var lines = await database.Context.JournalEntryLines.AsNoTracking()
+            .Where(line => line.JournalEntryId == entries[0])
+            .Select(line => new { line.Debit, line.Credit }).ToListAsync();
+        Assert.Equal(lines.Sum(l => l.Debit), lines.Sum(l => l.Credit));
+        Assert.Equal(25m, lines.Sum(l => l.Debit));
     }
 
+    // Rule since 95c392c: a standalone voucher may be soft-deleted, even after posting.
+    // Deleting a posted voucher must also remove its journal entry.
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task StandaloneVoucherCannotBeDeletedInEitherState(bool posted)
+    public async Task StandaloneVoucherDeleteIsSoftAndRemovesItsJournal(bool posted)
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         var service = database.CreatePostingVoucherService(1);
         var voucher = (await service.AddAsync(Draft())).Value;
         if (posted)
             voucher = (await service.UpdateAsync(voucher.Id, Complete(voucher))).Value;
-        var before = (await service.GetByIdAsync(voucher.Id)).Value;
+        Assert.Equal(posted ? 1 : 0, await database.Context.JournalEntries.CountAsync(
+            entry => entry.SourceType == JournalEntrySourceType.CashVoucher));
 
         var result = await service.DeleteAsync(voucher.Id);
 
-        Assert.Equal("CashVouchers.DeleteNotAllowed", result.Error.Code);
-        Assert.Equal(ErrorType.Conflict, result.Error.Type);
-        var after = (await service.GetByIdAsync(voucher.Id)).Value;
-        Assert.Equal(before.RowVersion, after.RowVersion);
-        Assert.Equal(before.IsDraft, after.IsDraft);
-        Assert.Equal(10m, after.Amount);
+        Assert.True(result.IsSuccess, result.Error.Description);
+        Assert.True((await service.GetByIdAsync(voucher.Id)).IsFailure);
+        Assert.Equal(0, await database.Context.JournalEntries.CountAsync(
+            entry => entry.SourceType == JournalEntrySourceType.CashVoucher &&
+                entry.SourceId == voucher.Id));
+        var row = await database.Context.CashVouchers.IgnoreQueryFilters().AsNoTracking()
+            .SingleAsync(v => v.Id == voucher.Id);
+        Assert.True(row.IsDeleted);
     }
 
     [Theory]
@@ -93,8 +90,11 @@ public sealed class CashVoucherEditLockTests
             ? await service.UpdateDraftAsync(draft.Id, DraftUpdate(draft) with { Amount = 99m })
             : await service.UpdateAsync(draft.Id, Complete(draft) with { Amount = 99m });
 
+        // The draft endpoint never touches a posted voucher. The full edit is allowed on posted
+        // vouchers now, so only the stale row version protects the winner.
         Assert.True(rejected.IsFailure);
-        Assert.Equal("CashVouchers.PostedReadOnly", rejected.Error.Code);
+        Assert.Equal(saveDraft ? "CashVouchers.PostedReadOnly" : "CashVouchers.Concurrency",
+            rejected.Error.Code);
         var stored = (await service.GetByIdAsync(draft.Id)).Value;
         Assert.Equal(10m, stored.Amount);
         Assert.False(stored.IsDraft);
@@ -118,7 +118,7 @@ public sealed class CashVoucherEditLockTests
         var completed = await service.UpdateAsync(draft.Id, Complete(saved.Value));
         Assert.True(completed.IsSuccess, completed.Error.Description);
         var retry = await service.UpdateAsync(draft.Id, Complete(saved.Value));
-        Assert.Equal("CashVouchers.PostedReadOnly", retry.Error.Code);
+        Assert.Equal("CashVouchers.Concurrency", retry.Error.Code);
         Assert.Equal(25m, (await service.GetByIdAsync(draft.Id)).Value.Amount);
         Assert.Single(await database.Context.JournalEntries.AsNoTracking()
             .Where(entry => entry.SourceType == JournalEntrySourceType.CashVoucher).ToListAsync());
@@ -127,35 +127,35 @@ public sealed class CashVoucherEditLockTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task BulkLockedUpdateOrDeleteRollsBackEarlierCompletion(bool delete)
+    public async Task BulkEditOrDeleteOfPostedVoucherSucceedsAndKeepsLedgerConsistent(bool delete)
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         var service = database.CreatePostingVoucherService(1);
         var first = (await service.AddAsync(Draft())).Value;
-        var locked = (await service.AddAsync(Draft())).Value;
-        var posted = await service.UpdateAsync(locked.Id, Complete(locked));
+        var other = (await service.AddAsync(Draft())).Value;
+        var posted = await service.UpdateAsync(other.Id, Complete(other));
         Assert.True(posted.IsSuccess, posted.Error.Description);
-        locked = (await service.GetByIdAsync(locked.Id)).Value;
+        other = (await service.GetByIdAsync(other.Id)).Value;
 
         var result = await service.BulkAsync(new CashVoucherBulkRequest(Items:
         [
             new CashVoucherBulkUpdateItemRequest(Id: first.Id, RowVersion: first.RowVersion,
                 Voucher: BulkVoucher(accountId: 1)),
             delete
-                ? new CashVoucherBulkDeleteItemRequest(Id: locked.Id, RowVersion: locked.RowVersion)
-                : new CashVoucherBulkUpdateItemRequest(Id: locked.Id, RowVersion: locked.RowVersion,
+                ? new CashVoucherBulkDeleteItemRequest(Id: other.Id, RowVersion: other.RowVersion)
+                : new CashVoucherBulkUpdateItemRequest(Id: other.Id, RowVersion: other.RowVersion,
                     Voucher: BulkVoucher(accountId: 1) with { Amount = 99m })
         ]));
 
-        Assert.Equal(delete ? "CashVouchers.DeleteNotAllowed" : "CashVouchers.PostedReadOnly",
-            result.Error.Code);
-        Assert.StartsWith("Items[1]", result.Error.FieldName);
-        var unchanged = (await service.GetByIdAsync(first.Id)).Value;
-        Assert.True(unchanged.IsDraft);
-        Assert.Equal(first.RowVersion, unchanged.RowVersion);
-        Assert.Equal(10m, (await service.GetByIdAsync(locked.Id)).Value.Amount);
-        Assert.Single(await database.Context.JournalEntries.AsNoTracking()
-            .Where(entry => entry.SourceType == JournalEntrySourceType.CashVoucher).ToListAsync());
+        Assert.True(result.IsSuccess, result.Error.Description);
+        Assert.False((await service.GetByIdAsync(first.Id)).Value.IsDraft);
+        if (delete)
+            Assert.True((await service.GetByIdAsync(other.Id)).IsFailure);
+        else
+            Assert.Equal(99m, (await service.GetByIdAsync(other.Id)).Value.Amount);
+        // first completed (1 entry) + the other voucher's entry unless it was deleted.
+        Assert.Equal(delete ? 1 : 2, await database.Context.JournalEntries.CountAsync(
+            entry => entry.SourceType == JournalEntrySourceType.CashVoucher));
     }
 
     [Fact]
@@ -190,11 +190,11 @@ public sealed class CashVoucherEditLockTests
         var retry = await service.BulkAsync(new CashVoucherBulkRequest(Items:
         [new CashVoucherBulkUpdateItemRequest(Id: draft.Id, RowVersion: draft.RowVersion,
             Voucher: BulkVoucher(accountId: 1))]));
-        Assert.Equal("CashVouchers.PostedReadOnly", retry.Error.Code);
+        Assert.Equal("CashVouchers.Concurrency", retry.Error.Code);
     }
 
     [Fact]
-    public async Task BulkCannotDeleteDraftAndRollsBackNewAdd()
+    public async Task BulkDeleteOfDraftIsAllowedTogetherWithAnAdd()
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         var service = database.CreateVoucherService(1);
@@ -204,9 +204,11 @@ public sealed class CashVoucherEditLockTests
             new CashVoucherBulkAddItemRequest(Voucher: BulkVoucher(accountId: 1)),
             new CashVoucherBulkDeleteItemRequest(Id: draft.Id, RowVersion: draft.RowVersion)
         ]));
-        Assert.Equal("CashVouchers.DeleteNotAllowed", result.Error.Code);
-        Assert.Single(await database.Context.CashVouchers.AsNoTracking().ToListAsync());
-        Assert.True((await service.GetByIdAsync(draft.Id)).Value.IsDraft);
+        Assert.True(result.IsSuccess, result.Error.Description);
+        // The new voucher stays; the deleted draft is gone.
+        var remaining = Assert.Single(await database.Context.CashVouchers.AsNoTracking().ToListAsync());
+        Assert.NotEqual(draft.Id, remaining.Id);
+        Assert.True((await service.GetByIdAsync(draft.Id)).IsFailure);
     }
 
     [Fact]
@@ -278,8 +280,8 @@ public sealed class CashVoucherEditLockTests
             new CashVoucherBulkUpdateItemRequest(Id: draft.Id, RowVersion: draft.RowVersion,
                 Voucher: BulkVoucher(accountId: 1) with { Amount = 99m })
         ]));
-        Assert.Equal(postedByOtherSession ? "CashVouchers.PostedReadOnly" : "CashVouchers.Concurrency",
-            result.Error.Code);
+        // Either way the stale row version is rejected (a posted voucher is editable, but not blindly).
+        Assert.Equal("CashVouchers.Concurrency", result.Error.Code);
         Assert.Equal("Items[1]", result.Error.FieldName);
         var stored = Assert.Single(await database.Context.CashVouchers.AsNoTracking().ToListAsync());
         Assert.Equal(25m, stored.Amount);

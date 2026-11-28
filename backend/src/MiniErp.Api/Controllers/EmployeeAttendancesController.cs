@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Application.Common.Models;
 using MiniErp.Application.Features.EmployeeAttendance;
@@ -13,6 +14,7 @@ public sealed class EmployeeAttendancesController(
     IEmployeeAttendanceService employeeAttendanceService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<EmployeeAttendanceResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
@@ -27,6 +29,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("report")]
     [ProducesResponseType<EmployeeAttendanceReportResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -40,6 +43,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("select")]
     [ProducesResponseType<IReadOnlyList<SelectResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetSelect(CancellationToken cancellationToken)
@@ -48,6 +52,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<EmployeeAttendanceResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -63,6 +68,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<EmployeeAttendanceResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -87,6 +93,7 @@ public sealed class EmployeeAttendancesController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost("bulk")]
     [ProducesResponseType<List<EmployeeAttendanceResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -101,6 +108,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<EmployeeAttendanceResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -117,6 +125,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("bulk")]
     [ProducesResponseType<List<EmployeeAttendanceResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -131,6 +140,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -144,6 +154,7 @@ public sealed class EmployeeAttendancesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("bulk")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]

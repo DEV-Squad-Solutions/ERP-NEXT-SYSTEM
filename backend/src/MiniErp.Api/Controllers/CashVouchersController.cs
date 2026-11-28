@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.Cashboxes.Jobs;
 using MiniErp.Api.Features.CashVouchers.Jobs;
@@ -16,6 +17,7 @@ public sealed class CashVouchersController(
     ICashVoucherService cashVoucherService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<CashVoucherResponse>>(
         StatusCodes.Status200OK)]
@@ -31,6 +33,7 @@ public sealed class CashVouchersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("handover-report")]
     [ProducesResponseType<CashVoucherHandoverReportResponse>(
         StatusCodes.Status200OK)]
@@ -46,6 +49,7 @@ public sealed class CashVouchersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("party-select")]
     [ProducesResponseType<CashVoucherPartySelectResponse>(
         StatusCodes.Status200OK)]
@@ -57,6 +61,7 @@ public sealed class CashVouchersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<CashVoucherResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -72,6 +77,7 @@ public sealed class CashVouchersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<CashVoucherResponse>(
         StatusCodes.Status201Created)]
@@ -103,6 +109,7 @@ public sealed class CashVouchersController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost("bulk")]
     [ProducesResponseType<CashVoucherBulkResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -159,6 +166,7 @@ public sealed class CashVouchersController(
         return Ok(result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<CashVoucherResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -192,6 +200,7 @@ public sealed class CashVouchersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}/draft")]
     [ProducesResponseType<CashVoucherResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -228,6 +237,7 @@ public sealed class CashVouchersController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

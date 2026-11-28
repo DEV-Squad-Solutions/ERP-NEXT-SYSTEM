@@ -138,7 +138,7 @@ public sealed class CrossCurrencyPartnerVoucherTests
     }
 
     [Fact]
-    public async Task MissingPartnerRateFailsAtomicallyAndPostedTargetCannotChange()
+    public async Task MissingPartnerRateFailsAtomicallyAndPostedTargetChangeRemovesMovement()
     {
         await using var database = await CashManagementTestDatabase.CreateAsync();
         await database.ConfigurePaymentPostingAsync();
@@ -159,13 +159,11 @@ public sealed class CrossCurrencyPartnerVoucherTests
         database.Context.ChangeTracker.Clear();
         var changed = await service.UpdateAsync(posted.Value.Id,
             Complete(posted.Value, 5) with { BusinessPartnerId = null, AccountId = 1 });
-        Assert.Equal("CashVouchers.PostedReadOnly", changed.Error.Code);
-        var unchanged = (await service.GetByIdAsync(posted.Value.Id)).Value;
-        Assert.Equal(CurrencyCode.USD, unchanged.PartnerCurrency);
-        Assert.Equal(500m, unchanged.PartnerAmount);
-        Assert.Equal(50m, unchanged.PartnerExchangeRate);
-        Assert.Equal(25_000m, unchanged.PartnerBaseAmount);
-        Assert.Single(await database.Context.BusinessPartnerMovements.Where(m => m.CashVoucherId == draft.Value.Id).ToListAsync());
+        // 95c392c: a posted target may change; the partner snapshot and movement go with it.
+        Assert.True(changed.IsSuccess, changed.Error.Description);
+        var after = (await service.GetByIdAsync(posted.Value.Id)).Value;
+        Assert.Null(after.BusinessPartnerId);
+        Assert.Empty(await database.Context.BusinessPartnerMovements.Where(m => m.CashVoucherId == draft.Value.Id).ToListAsync());
     }
 
     [Fact]
@@ -235,7 +233,7 @@ public sealed class CrossCurrencyPartnerVoucherTests
         context.ChangeTracker.Clear();
         var notesEdit = await service.UpdateAsync(posted.Value.Id,
             Complete(posted.Value, 5) with { ExchangeRate = null, Notes = "Notes only" });
-        Assert.Equal("CashVouchers.PostedReadOnly", notesEdit.Error.Code);
+        Assert.True(notesEdit.IsSuccess, notesEdit.Error.Description);
         context.ChangeTracker.Clear();
         var stored = await context.CashVouchers.SingleAsync(v => v.Id == posted.Value.Id);
         Assert.Equal(usdRate.Value.Id, stored.PartnerExchangeRateId);

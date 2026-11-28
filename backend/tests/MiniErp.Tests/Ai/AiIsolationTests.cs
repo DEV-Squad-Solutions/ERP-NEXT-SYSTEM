@@ -52,7 +52,7 @@ public sealed class AiIsolationTests
     [Fact]
     public async Task Unknown_tool_is_rejected_not_executed()
     {
-        var registry = new AiToolRegistry(null!, null!);
+        var registry = new AiToolRegistry(null!, null!, null!);
         var r = await registry.ExecuteAsync("DropAllTables", new DashboardFilterRequest());
         Assert.NotNull(r.Error);
         Assert.Null(r.Data);

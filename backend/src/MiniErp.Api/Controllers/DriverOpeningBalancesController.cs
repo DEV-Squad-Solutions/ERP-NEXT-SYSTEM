@@ -16,6 +16,7 @@ namespace MiniErp.Api.Controllers;
 public sealed class DriverOpeningBalancesController(IDriverOpeningBalanceService driverOpeningBalanceService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<DriverOpeningBalanceResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
@@ -29,6 +30,7 @@ public sealed class DriverOpeningBalancesController(IDriverOpeningBalanceService
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<DriverOpeningBalanceResponse>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetById(int id, [FromQuery] int? fiscalYearId, CancellationToken cancellationToken)

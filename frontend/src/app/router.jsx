@@ -3,6 +3,8 @@ import { lazyRetry as lazy } from "../lib/lazyRetry";
 import RouteError from "../shared/components/RouteError";
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage";
+import AboutPage from "../features/about/pages/AboutPage";
+import PortfolioPage from "../features/about/pages/PortfolioPage";
 import { ForgotPasswordPage, ResetPasswordPage, RegisterRequestPage } from "../features/auth/pages/PasswordPages";
 import ChangePasswordPage from "../features/auth/pages/ChangePasswordPage";
 import SetupPage from "../features/setup/pages/SetupPage";
@@ -256,24 +258,9 @@ const INVOICE_ROLES = [
   ROLES.USER,
   ROLES.CASHIER,
 ];
-const TREASURY_ROLES = [
-  ROLES.ADMIN,
-  ROLES.ACCOUNTANT,
-  ROLES.USER,
-  ROLES.CASHIER,
-];
-const PAYROLL_ROLES = [
-  ROLES.ADMIN,
-  ROLES.ACCOUNTANT,
-  ROLES.USER,
-  ROLES.CASHIER,
-];
-const EXPENSE_ROLES = [
-  ROLES.ADMIN,
-  ROLES.ACCOUNTANT,
-  ROLES.USER,
-  ROLES.CASHIER,
-];
+const TREASURY_ROLES = FULL_ACCESS_ROLES;
+const PAYROLL_ROLES = FULL_ACCESS_ROLES;
+const EXPENSE_ROLES = FULL_ACCESS_ROLES;
 
 function Role({ roles, children }) {
   return <RoleRoute roles={roles}>{children}</RoleRoute>;
@@ -321,6 +308,8 @@ export const router = createBrowserRouter([
     element: <LoginPage />,
   },
   { path: "/forgot-password", errorElement: <RouteError />, element: <ForgotPasswordPage /> },
+  { path: "/about", errorElement: <RouteError />, element: <AboutPage /> },
+  { path: "/portfolio", errorElement: <RouteError />, element: <PortfolioPage /> },
   { path: "/register", errorElement: <RouteError />, element: <RegisterRequestPage /> },
   { path: "/reset-password", errorElement: <RouteError />, element: <ResetPasswordPage /> },
   {

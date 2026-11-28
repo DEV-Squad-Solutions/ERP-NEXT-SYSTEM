@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.ItemsCategories.Jobs;
 using MiniErp.Application.Common.Models;
@@ -54,6 +55,7 @@ public sealed class ItemsCategoriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpPost]
     [ProducesResponseType<ItemsCategoryResponse>(
         StatusCodes.Status201Created)]
@@ -80,6 +82,7 @@ public sealed class ItemsCategoriesController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<ItemsCategoryResponse>(
         StatusCodes.Status200OK)]
@@ -104,6 +107,7 @@ public sealed class ItemsCategoriesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

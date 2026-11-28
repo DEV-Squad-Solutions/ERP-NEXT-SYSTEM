@@ -5,6 +5,7 @@ import { t } from "../../../i18n";
 import {
   useGetKpisQuery,
   useGetAnomaliesQuery,
+  useGetAnalyticsQuery,
   useGetSalesForecastQuery,
   useAskAiMutation,
   useGetAiHistoryQuery,
@@ -17,11 +18,50 @@ const card =
 const num = (v) =>
   v == null ? "-" : Number(v).toLocaleString("en-GB", { maximumFractionDigits: 2 });
 const MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+const AGING_LABELS = [
+  ["notDue", "لم يستحق"],
+  ["days1To30", "1-30 يوم"],
+  ["days31To60", "31-60 يوم"],
+  ["days61To90", "61-90 يوم"],
+  ["over90", "أكثر من 90 يوم"],
+];
+
+function RankTable({ title, rows, valueKey, valueLabel, nameLabel }) {
+  return (
+    <div className="rounded-xl border border-ink-400/15 p-3">
+      <div className="mb-2 text-[13px] font-bold text-ink-900 dark:text-white">{title}</div>
+      {rows?.length ? (
+        <div className="overflow-x-auto">
+          <table className="w-full text-[12px]">
+            <thead className="text-ink-600 dark:text-white/70">
+              <tr>
+                <th className="px-1 py-1 text-start">{nameLabel}</th>
+                <th className="px-1 py-1 text-start">{valueLabel}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => (
+                <tr key={`${r.itemId ?? r.partnerId ?? i}`} className="border-t border-ink-400/10">
+                  <td className="px-1 py-1">{r.name}</td>
+                  <td className="px-1 py-1">{num(r[valueKey])}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="text-[12px] text-ink-500">{t("لا توجد بيانات")}</p>
+      )}
+    </div>
+  );
+}
+
 const KIND_AR = { Sales: "مبيعات", Purchase: "مشتريات" };
 
 export default function AiCenterPage() {
   const { data: kpis, isError: kpiErr } = useGetKpisQuery();
   const { data: anomalies } = useGetAnomaliesQuery();
+  const { data: analytics, isError: analyticsErr } = useGetAnalyticsQuery();
   const { data: forecast } = useGetSalesForecastQuery();
   const [ask, { isLoading: asking }] = useAskAiMutation();
   const { data: history, refetch: refetchHistory } = useGetAiHistoryQuery();
@@ -65,6 +105,66 @@ export default function AiCenterPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className={card}>
+        <h2 className="mb-1 text-[15px] font-bold text-ink-900 dark:text-white">{t("تحليل البيانات")}</h2>
+        {analyticsErr && <p className="text-[13px] text-ink-600 dark:text-white/70">{t("التحليل متاح للمدير والمحاسب فقط")}</p>}
+        {analytics && (
+          <>
+            <p className="mb-3 text-[11px] text-ink-500">
+              {`${analytics.period.fromDate} → ${analytics.period.toDate} (${analytics.period.currency})`}
+            </p>
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+              <RankTable title={t("الأصناف الأكثر مبيعا")} rows={analytics.topItems} valueKey="revenue" valueLabel={t("الإيراد")} nameLabel={t("الصنف")} />
+              <RankTable title={t("أصناف راكدة (بدون مبيعات)")} rows={analytics.slowItems} valueKey="quantity" valueLabel={t("الكمية")} nameLabel={t("الصنف")} />
+              <RankTable title={t("أفضل العملاء")} rows={analytics.topCustomers} valueKey="total" valueLabel={t("الإجمالي")} nameLabel={t("العميل")} />
+              <RankTable title={t("أكبر الموردين")} rows={analytics.topSuppliers} valueKey="total" valueLabel={t("الإجمالي")} nameLabel={t("المورد")} />
+            </div>
+            <div className="mt-3 rounded-xl border border-ink-400/15 p-3">
+              <div className="mb-2 text-[13px] font-bold">{t("اتجاه المبيعات والمشتريات الشهري")}</div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-[12px]">
+                  <thead className="text-ink-600 dark:text-white/70">
+                    <tr>
+                      <th className="px-1 py-1 text-start">{t("الشهر")}</th>
+                      <th className="px-1 py-1 text-start">{t("مبيعات")}</th>
+                      <th className="px-1 py-1 text-start">{t("مشتريات")}</th>
+                      <th className="px-1 py-1 text-start">{t("تغير المبيعات %")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analytics.trend.map((m) => (
+                      <tr key={`${m.year}-${m.month}`} className="border-t border-ink-400/10">
+                        <td className="px-1 py-1">{`${m.year}-${String(m.month).padStart(2, "0")}`}</td>
+                        <td className="px-1 py-1">{num(m.sales)}</td>
+                        <td className="px-1 py-1">{num(m.purchases)}</td>
+                        <td className="px-1 py-1">{m.salesChangePercent == null ? "-" : num(m.salesChangePercent)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
+              {[["receivables", "أعمار الديون (العملاء)"], ["payables", "أعمار الديون (الموردين)"]].map(([k, title]) => (
+                <div key={k} className="rounded-xl border border-ink-400/15 p-3">
+                  <div className="mb-2 text-[13px] font-bold">{t(title)}</div>
+                  <table className="w-full text-[12px]">
+                    <tbody>
+                      {AGING_LABELS.map(([f, label]) => (
+                        <tr key={f} className="border-t border-ink-400/10">
+                          <td className="px-1 py-1">{t(label)}</td>
+                          <td className="px-1 py-1">{num(analytics.aging[k][f])}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </section>
 
       <section className={card}>

@@ -1,5 +1,6 @@
 using MiniErp.Application.Common.Abstractions;
 using MiniErp.Application.Common.Results;
+using MiniErp.Application.Features.Analytics;
 using MiniErp.Application.Features.Dashboard;
 using MiniErp.Application.Features.Kpis;
 
@@ -66,11 +67,13 @@ public interface IAiAssistantService : IScopedService
 /// </summary>
 public sealed class AiToolRegistry(
     IDashboardService dashboardService,
-    IKpiService kpiService) : IAiToolRegistry
+    IKpiService kpiService,
+    IAnalyticsService analyticsService) : IAiToolRegistry
 {
     private static readonly (string Name, string Description)[] Tools =
     [
         ("GetCompanyOverview", "Sales, purchases, outstanding balances, inventory value, cash balances and counts for the period."),
+        ("GetAnalytics", "Top and slow items, top customers and suppliers, monthly trend and receivable/payable aging for the period."),
         ("GetKpis", "Key figures (revenue, receivables, payables, cash, inventory value, margin) with their formulas."),
     ];
 
@@ -86,6 +89,15 @@ public sealed class AiToolRegistry(
             case "GetCompanyOverview":
             {
                 var result = await dashboardService.GetAsync(filters, cancellationToken);
+                return result.IsSuccess
+                    ? new AiToolResult(name, result.Value, null)
+                    : new AiToolResult(name, null, result.Error.Description);
+            }
+            case "GetAnalytics":
+            {
+                var result = await analyticsService.GetOverviewAsync(
+                    new AnalyticsQuery(filters.FromDate, filters.ToDate, 5),
+                    cancellationToken);
                 return result.IsSuccess
                     ? new AiToolResult(name, result.Value, null)
                     : new AiToolResult(name, null, result.Error.Description);

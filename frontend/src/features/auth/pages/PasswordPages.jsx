@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Loader2, KeyRound, MailCheck, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { t, getDir } from "../../../i18n";
+import DevSquadCard from "../../../shared/components/brand/DevSquadCard";
 import {
   useForgotPasswordMutation,
   useSubmitRegistrationMutation,
@@ -51,6 +52,7 @@ function Shell({ title, subtitle, children }) {
             {t("الرجوع لتسجيل الدخول")}
           </Link>
         </div>
+        <DevSquadCard className="mt-5" />
       </motion.div>
     </main>
   );

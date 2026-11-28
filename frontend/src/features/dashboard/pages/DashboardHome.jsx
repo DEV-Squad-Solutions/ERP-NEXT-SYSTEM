@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import DevSquadCard from "../../../shared/components/brand/DevSquadCard";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { motion, animate } from "framer-motion";
@@ -717,6 +718,7 @@ export default function DashboardPage() {
           ))}
         </div>
       </SectionCard>
+      <DevSquadCard />
       <div className="hidden">
         <div ref={printRef}>
           <DashboardPrintTemplate data={data} />

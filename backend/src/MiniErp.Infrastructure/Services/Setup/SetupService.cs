@@ -36,8 +36,10 @@ public sealed class SetupService(
     {
         var requiresSetup = !await AdminExistsAsync(cancellationToken);
         return Result<SetupStatusResponse>.Success(
-            new SetupStatusResponse(requiresSetup, !string.IsNullOrWhiteSpace(
-                configuration["Setup:Token"])));
+            new SetupStatusResponse(
+                requiresSetup,
+                !string.IsNullOrWhiteSpace(
+                    SetupTokenPolicy.ExpectedToken(configuration))));
     }
 
     public async Task<Result<SetupInitializeResponse>> InitializeAsync(
@@ -50,7 +52,7 @@ public sealed class SetupService(
                 SetupErrors.AlreadyInitialized());
         }
 
-        var expectedToken = configuration["Setup:Token"];
+        var expectedToken = SetupTokenPolicy.ExpectedToken(configuration);
         if (!string.IsNullOrWhiteSpace(expectedToken) &&
             !TokenMatches(expectedToken, request.SetupToken))
         {

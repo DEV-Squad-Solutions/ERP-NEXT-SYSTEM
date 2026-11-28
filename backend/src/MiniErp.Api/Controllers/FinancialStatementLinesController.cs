@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.FinancialStatementLines.Jobs;
 using MiniErp.Application.Common.Models;
@@ -15,6 +16,7 @@ public sealed class FinancialStatementLinesController(
     IFinancialStatementLineService financialStatementLineService)
     : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<PagedResponse<FinancialStatementLineResponse>>(
         StatusCodes.Status200OK)]
@@ -30,6 +32,7 @@ public sealed class FinancialStatementLinesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("tree")]
     [ProducesResponseType<IReadOnlyList<FinancialStatementLineTreeResponse>>(
         StatusCodes.Status200OK)]
@@ -45,6 +48,7 @@ public sealed class FinancialStatementLinesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("select")]
     [ProducesResponseType<IReadOnlyList<FinancialStatementLineSelectResponse>>(
         StatusCodes.Status200OK)]
@@ -60,6 +64,7 @@ public sealed class FinancialStatementLinesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("{id:int}")]
     [ProducesResponseType<FinancialStatementLineResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -75,6 +80,7 @@ public sealed class FinancialStatementLinesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<FinancialStatementLineResponse>(
         StatusCodes.Status201Created)]
@@ -106,6 +112,7 @@ public sealed class FinancialStatementLinesController(
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<FinancialStatementLineResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -130,6 +137,7 @@ public sealed class FinancialStatementLinesController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

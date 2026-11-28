@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Application.Features.CashboxRevaluations;
 
@@ -11,6 +12,7 @@ namespace MiniErp.Api.Controllers;
 public sealed class CashboxRevaluationsController(
     ICashboxRevaluationService service) : ApiControllerBase
 {
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet]
     [ProducesResponseType<IReadOnlyList<CashboxRevaluationResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(
@@ -29,6 +31,7 @@ public sealed class CashboxRevaluationsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpPost]
     [ProducesResponseType<CashboxRevaluationResponse>(StatusCodes.Status201Created)]
     public async Task<IActionResult> Create(

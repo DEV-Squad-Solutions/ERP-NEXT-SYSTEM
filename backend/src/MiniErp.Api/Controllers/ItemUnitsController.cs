@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MiniErp.Application.Common.Authentication;
 using MiniErp.Api.Extensions;
 using MiniErp.Api.Features.ItemUnits.Jobs;
 using MiniErp.Application.Common.Models;
@@ -47,6 +48,7 @@ public sealed class ItemUnitsController(IItemUnitService itemUnitService) : ApiC
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpPost]
     [ProducesResponseType<ItemUnitResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -74,6 +76,7 @@ public sealed class ItemUnitsController(IItemUnitService itemUnitService) : ApiC
                 result.Value);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpPut("{id:int}")]
     [ProducesResponseType<ItemUnitResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
@@ -98,6 +101,7 @@ public sealed class ItemUnitsController(IItemUnitService itemUnitService) : ApiC
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]

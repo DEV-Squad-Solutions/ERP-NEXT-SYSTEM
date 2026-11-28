@@ -7,6 +7,7 @@ import {
   useRejectRegistrationMutation,
 } from "../../auth/authApi";
 import { useGetCompaniesForSelectQuery } from "../companiesApi";
+import { isRouteNotFound, ROUTE_MISSING_MESSAGE } from "../../../lib/routeNotFound";
 
 function Row({ r, companies }) {
   const [role, setRole] = useState("User");
@@ -79,11 +80,18 @@ function Row({ r, companies }) {
 }
 
 export default function RequestsTab() {
-  const { data, isLoading } = useGetRegistrationRequestsQuery("Pending");
+  const { data, isLoading, error } = useGetRegistrationRequestsQuery("Pending");
   const { data: companies = [] } = useGetCompaniesForSelectQuery();
   const list = Array.isArray(data) ? data : [];
 
   if (isLoading) return <p className="text-sm text-ink-400">...</p>;
+  if (isRouteNotFound(error)) {
+    return (
+      <p className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+        {t(ROUTE_MISSING_MESSAGE)}
+      </p>
+    );
+  }
   if (list.length === 0) return <p className="text-sm text-ink-400">{t("لا توجد طلبات")}</p>;
   return (
     <ul className="space-y-3">

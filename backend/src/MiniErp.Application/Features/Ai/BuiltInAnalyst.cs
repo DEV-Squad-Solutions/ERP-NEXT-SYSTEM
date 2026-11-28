@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using MiniErp.Application.Features.Analytics;
 using MiniErp.Application.Features.Dashboard;
 
 namespace MiniErp.Application.Features.Ai;
@@ -110,6 +111,69 @@ public static class BuiltInAnalyst
 
         sb.Append("الأرقام من حسابات النظام مباشرة، والمحلل المدمج يعرضها فقط ولا يعيد حسابها.");
         return sb.ToString();
+    }
+
+    /// <summary>
+    /// Extra answer for data-analysis questions (top items, customers, suppliers, aging, trend).
+    /// Quotes the analytics service figures only. Returns null when the question is not about them.
+    /// </summary>
+    public static string? AnalyticsAnswer(string question, AnalyticsOverview a)
+    {
+        var q = Normalize(question);
+        var sb = new StringBuilder();
+        var cur = a.Period.Currency;
+
+        if (Has(q, "اكثر صنف", "اكتر صنف", "افضل صنف", "الاصناف الاكثر", "top item", "best sell", "best-sell"))
+        {
+            sb.Append("أعلى الأصناف مبيعًا (صافي بعد المرتجعات): ");
+            sb.Append(a.TopItems.Count == 0
+                ? "لا توجد مبيعات في الفترة.\n"
+                : string.Join("، ", a.TopItems.Select(i => $"{i.Name} {M(i.Revenue, cur)} ({i.SharePercent.ToString("0.#", CultureInfo.InvariantCulture)}%)")) + ".\n");
+        }
+
+        if (Has(q, "راكد", "بطيء", "اقل صنف", "لم يبع", "slow", "dead stock"))
+        {
+            sb.Append(a.SlowItems.Count == 0
+                ? "كل الأصناف النشطة لها مبيعات في الفترة.\n"
+                : "أصناف نشطة بدون أي مبيعات في الفترة: " + string.Join("، ", a.SlowItems.Select(i => i.Name)) + ".\n");
+        }
+
+        if (Has(q, "افضل عميل", "اكبر عميل", "اكثر عميل", "اكتر عميل", "top customer", "best customer"))
+        {
+            sb.Append(a.TopCustomers.Count == 0
+                ? "لا توجد مبيعات لعملاء في الفترة.\n"
+                : "أكبر العملاء: " + string.Join("، ", a.TopCustomers.Select(c => $"{c.Name} {M(c.Total, cur)} (متبقي {M(c.Outstanding, cur)})")) + ".\n");
+        }
+
+        if (Has(q, "اكبر مورد", "اكثر مورد", "اكتر مورد", "افضل مورد", "top supplier"))
+        {
+            sb.Append(a.TopSuppliers.Count == 0
+                ? "لا توجد مشتريات من موردين في الفترة.\n"
+                : "أكبر الموردين: " + string.Join("، ", a.TopSuppliers.Select(c => $"{c.Name} {M(c.Total, cur)} (متبقي {M(c.Outstanding, cur)})")) + ".\n");
+        }
+
+        if (Has(q, "اعمار", "عمر الدين", "عمر الديون", "aging", "مديونيات"))
+        {
+            var r = a.Aging.Receivables;
+            var p = a.Aging.Payables;
+            sb.Append($"أعمار الديون حتى {a.Aging.AsOf:yyyy-MM-dd}: مستحقات العملاء {M(r.Total, cur)} (لم تستحق {M(r.NotDue, cur)}، 1-30 يوم {M(r.Days1To30, cur)}، 31-60 {M(r.Days31To60, cur)}، 61-90 {M(r.Days61To90, cur)}، أكثر من 90 {M(r.Over90, cur)}).\n");
+            sb.Append($"مستحقات الموردين {M(p.Total, cur)} (لم تستحق {M(p.NotDue, cur)}، 1-30 يوم {M(p.Days1To30, cur)}، 31-60 {M(p.Days31To60, cur)}، 61-90 {M(p.Days61To90, cur)}، أكثر من 90 {M(p.Over90, cur)}).\n");
+        }
+
+        if (Has(q, "اتجاه المبيعات", "تحليل المبيعات", "نمو", "growth", "sales trend"))
+        {
+            if (a.Trend.Count == 0) sb.Append("لا توجد حركة شهرية في الفترة.\n");
+            else
+            {
+                var last = a.Trend[^1];
+                sb.Append($"آخر شهر ({last.Year}/{last.Month:00}): صافي المبيعات {M(last.Sales, cur)}");
+                if (last.SalesChangePercent is { } ch)
+                    sb.Append($"، التغيير عن الشهر السابق {ch.ToString("0.#", CultureInfo.InvariantCulture)}%");
+                sb.Append(".\n");
+            }
+        }
+
+        return sb.Length == 0 ? null : sb.ToString();
     }
 
     private static string Normalize(string s) =>

@@ -1,3 +1,4 @@
+using MiniErp.Api.Extensions;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Hangfire;
@@ -68,11 +69,7 @@ builder.Services
                 namingPolicy: null,
                 allowIntegerValues: true));
     });
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>()
-    ?.Where(origin => !string.IsNullOrWhiteSpace(origin))
-    .ToArray() ?? [];
+var allowedOrigins = CorsOriginsConfig.Read(builder.Configuration);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(
@@ -202,6 +199,21 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+if (MiniErp.Infrastructure.Services.Setup.SetupTokenPolicy
+    .UsesGeneratedToken(app.Configuration))
+{
+    app.Logger.LogWarning(
+        "No Setup:Token is configured. If this server has no Admin yet, first-run setup needs this one-time token (valid until the API restarts): {SetupToken}",
+        MiniErp.Infrastructure.Services.Setup.SetupTokenPolicy
+            .ExpectedToken(app.Configuration));
+}
+
+if (app.Environment.IsProduction() && allowedOrigins.Length == 0)
+{
+    app.Logger.LogWarning(
+        "Cors:AllowedOrigins is empty in Production, so any website origin may call the API. Set it to the real frontend origin.");
+}
 
 app.UseForwardedHeaders();
 app.UseResponseCompression();

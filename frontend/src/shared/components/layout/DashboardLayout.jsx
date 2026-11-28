@@ -5,6 +5,7 @@ import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import TopNav from "./TopNav";
 import PageLoader from "./PageLoader";
+import PrintHeader from "./PrintHeader";
 import UnauthorizedPage from "../UnauthorizedPage";
 import useHiddenScreens from "../../../features/screenAccess/useHiddenScreens";
 import { isPathHidden } from "../../../features/screenAccess/screenList";
@@ -48,13 +49,14 @@ export default function DashboardLayout() {
         "dark:bg-ink-950",
         "dark:text-white",
         "isolate",
+        "print:h-auto print:overflow-visible",
       ].join(" ")}
     >
       {/* =====================================================
           SIDEBAR
       ===================================================== */}
 
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} hideOnDesktop={isTop} onSwitchLayout={switchLayout} pinned={pinned} />
+      <div className="contents print:hidden"><Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} hideOnDesktop={isTop} onSwitchLayout={switchLayout} pinned={pinned} /></div>
 
       {/* =====================================================
           MAIN APPLICATION AREA
@@ -62,7 +64,7 @@ export default function DashboardLayout() {
 
       <div
         className={[
-          "flex h-full min-w-0",
+          "flex h-full min-w-0 print:block print:h-auto print:ms-0",
           "flex-col",
           "transition-[margin]",
           "duration-300",
@@ -74,8 +76,10 @@ export default function DashboardLayout() {
             NAVBAR
         =================================================== */}
 
-        <Navbar onMenuClick={() => setIsSidebarOpen(true)} showMenuButton={isTop} />
-        {isTop && <TopNav onSwitchLayout={switchLayout} />}
+        <div className="contents print:hidden">
+          <Navbar onMenuClick={() => setIsSidebarOpen(true)} showMenuButton={isTop} />
+          {isTop && <TopNav onSwitchLayout={switchLayout} />}
+        </div>
 
         {/* ===================================================
             CONTENT
@@ -90,6 +94,7 @@ export default function DashboardLayout() {
             "min-w-0",
             "overflow-x-hidden",
             "overflow-y-auto",
+            "print:h-auto print:overflow-visible print:bg-white",
             "custom-scroll",
             "bg-gray-50",
             "dark:bg-ink-950",
@@ -143,6 +148,7 @@ export default function DashboardLayout() {
               "xl:p-6",
             ].join(" ")}
           >
+            <PrintHeader mainRef={mainRef} />
             <Suspense fallback={<PageLoader />}>
               <div key={pathname} className="page-enter">
                 {isPathHidden(pathname, hiddenScreens) ? (

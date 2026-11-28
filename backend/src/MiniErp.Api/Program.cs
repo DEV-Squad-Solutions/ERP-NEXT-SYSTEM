@@ -203,6 +203,12 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+if (app.Environment.IsProduction() && allowedOrigins.Length == 0)
+{
+    app.Logger.LogWarning(
+        "Cors:AllowedOrigins is empty in Production, so any website origin may call the API. Set it to the real frontend origin.");
+}
+
 app.UseForwardedHeaders();
 app.UseResponseCompression();
 app.UseMiddleware<SecurityHeadersMiddleware>();

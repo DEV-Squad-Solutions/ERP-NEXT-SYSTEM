@@ -29,6 +29,7 @@ public static class DependencyInjection
 
         services.AddHttpContextAccessor();
         services.TryAddSingleton(TimeProvider.System);
+        services.TryAddSingleton<MiniErp.Infrastructure.Services.Dashboard.DashboardReadinessCache>();
         services.AddScoped<AuditableEntityInterceptor>();
         services.AddScoped<AuditLogInterceptor>();
         services.AddOptions<FrankfurterOptions>()

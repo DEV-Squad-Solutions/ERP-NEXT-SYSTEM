@@ -22,7 +22,8 @@ public sealed class DashboardService(
     IAccountingReadinessService accountingReadinessService,
     TimeProvider timeProvider,
     ILogger<DashboardService>? logger = null,
-    ICashboxAccessService? cashboxAccessService = null)
+    ICashboxAccessService? cashboxAccessService = null,
+    DashboardReadinessCache? readinessCache = null)
     : IDashboardService, IScopedService
 {
     private readonly int companyId = currentCompanyContext.CompanyId;
@@ -167,9 +168,23 @@ public sealed class DashboardService(
             toDate,
             cancellationToken);
 
-        var readinessResult = await accountingReadinessService.GetAsync(
-            fiscalYear.Id,
-            cancellationToken);
+        // Readiness runs ~30 sequential queries; it only changes when documents are posted, so a
+        // 30 second per company/fiscal-year cache keeps the dashboard fast without hiding real problems for long.
+        var readinessKey = (companyId, fiscalYear.Id);
+        Result<AccountingReadinessResponse> readinessResult;
+        if (readinessCache is not null && readinessCache.Items.TryGetValue(readinessKey, out var cached) && cached.Expires > timeProvider.GetUtcNow())
+        {
+            readinessResult = cached.Value;
+        }
+        else
+        {
+            readinessResult = await accountingReadinessService.GetAsync(fiscalYear.Id, cancellationToken);
+            if (readinessResult.IsSuccess && readinessCache is not null)
+            {
+                readinessCache.Items[readinessKey] = (readinessResult, timeProvider.GetUtcNow().AddSeconds(30));
+            }
+        }
+
         if (readinessResult.IsFailure)
         {
             return Result<DashboardResponse>.Failure(readinessResult.Errors);
@@ -530,4 +545,10 @@ public sealed class DashboardService(
 
         public decimal OverdueAmount { get; init; }
     }
+}
+
+/// <summary>Singleton holder for the short-lived accounting-readiness result shown on the dashboard.</summary>
+public sealed class DashboardReadinessCache
+{
+    public System.Collections.Concurrent.ConcurrentDictionary<(int, int), (Result<AccountingReadinessResponse> Value, DateTimeOffset Expires)> Items { get; } = new();
 }

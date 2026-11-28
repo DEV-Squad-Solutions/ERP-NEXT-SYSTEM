@@ -82,14 +82,16 @@ public sealed class DashboardVerificationTests(ITestOutputHelper output)
             Assert.Equal(Sum(2) - Sum(4), (double)d.Purchases.Net, 2);
             Assert.Equal(Sum(2, unpaid), (double)d.Purchases.Outstanding, 2);
 
-            // Invoice status buckets over all invoice types in scope.
-            double Count(string cond) => Scalar(connection, $"SELECT COUNT(*) FROM Invoices {scopeSql} AND {cond}", args);
+            // Invoice status buckets cover sales and purchase invoices only (returns are not payable documents).
+            double Count(string cond) => Scalar(connection, $"SELECT COUNT(*) FROM Invoices {scopeSql} AND InvoiceType IN (1,2) AND {cond}", args);
             Assert.Equal(Count("CAST(Total AS REAL)-CAST(PaidAmount AS REAL) <= 0"), d.InvoiceStatus.PaidCount);
             Assert.Equal(Count("CAST(PaidAmount AS REAL) <= 0 AND CAST(Total AS REAL) > 0"), d.InvoiceStatus.UnpaidCount);
             Assert.Equal(Count("DueDate IS NOT NULL AND DueDate < $today AND CAST(Total AS REAL)-CAST(PaidAmount AS REAL) > 0"), d.InvoiceStatus.OverdueCount);
             Assert.Equal(
-                Scalar(connection, $"SELECT SUM({unpaid}) FROM Invoices {scopeSql} AND DueDate IS NOT NULL AND DueDate < $today AND CAST(Total AS REAL)-CAST(PaidAmount AS REAL) > 0", args),
+                Scalar(connection, $"SELECT SUM({unpaid}) FROM Invoices {scopeSql} AND InvoiceType IN (1,2) AND DueDate IS NOT NULL AND DueDate < $today AND CAST(Total AS REAL)-CAST(PaidAmount AS REAL) > 0", args),
                 (double)d.InvoiceStatus.OverdueAmount, 2);
+
+            Assert.Equal(Count("1=1") - Count("CAST(Total AS REAL)-CAST(PaidAmount AS REAL) <= 0") - Count("CAST(PaidAmount AS REAL) <= 0 AND CAST(Total AS REAL) > 0"), d.InvoiceStatus.PartiallyPaidCount);
 
             // Monthly activity adds back up to the headline numbers.
             Assert.Equal((double)d.Sales.Net, (double)d.MonthlyActivity.Sum(m => m.Sales), 2);

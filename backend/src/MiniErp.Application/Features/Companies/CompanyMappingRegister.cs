@@ -40,6 +40,11 @@ public sealed class CompanyMappingRegister : IRegister
                 response => response.BaseCurrency,
                 company => company.Settings == null
                     ? MiniErp.Domain.Enums.CurrencyCode.EGP
-                    : company.Settings.BaseCurrency);
+                    : company.Settings.BaseCurrency)
+            .Map(
+                response => response.InvoiceNumberMode,
+                company => company.Settings == null
+                    ? MiniErp.Domain.Enums.InvoiceNumberMode.Auto
+                    : company.Settings.InvoiceNumberMode);
     }
 }

@@ -34,7 +34,7 @@ public sealed class CompaniesSwaggerDocumentation : IOperationFilter
             nameof(CompaniesController.GetById) => (
                 "Get a company",
                 SwaggerOperationDescription.Create(
-                    "Admin only. Returns one non-deleted company by its integer ID, including its stock-balance check mode, base currency, and row-version token.",
+                    "Admin only. Returns one non-deleted company by its integer ID, including its stock-balance check mode, invoice number mode, base currency, and row-version token.",
                     "An Admin bearer token and route `id`.",
                     "`id` must be greater than zero.",
                     "Zero or negative IDs return 400. Missing or soft-deleted companies return 404.")),
@@ -42,14 +42,14 @@ public sealed class CompaniesSwaggerDocumentation : IOperationFilter
                 "Create a company",
                 SwaggerOperationDescription.Create(
                     "Admin only. Atomically creates a company, grants the authenticated admin access, and provisions the current fiscal year, the default numeric chart of accounts, operational account mappings, and accounts already classified in the three fixed financial statements.",
-                    "`name`, `address`, `commercialRegister`, `taxNumber`, and `managerName`. Optional `stockBalanceCheckMode` is `None`, `DateCheck`, `FinalCheck`, or `Both`; optional `baseCurrency` defaults to `EGP`.",
+                    "`name`, `address`, `commercialRegister`, `taxNumber`, and `managerName`. Optional `stockBalanceCheckMode` is `None`, `DateCheck`, `FinalCheck`, or `Both`; optional `invoiceNumberMode` is `Auto` or `Manual` and defaults to `Auto`; optional `baseCurrency` defaults to `EGP`.",
                     "Required strings are trimmed and cannot be empty. Maximum lengths: name and managerName 200; address 500; commercialRegister and taxNumber 50.",
                     "Duplicate commercial-register or tax-number values return 409. The entire company, assignment, and accounting setup rolls back on failure. Setup is idempotent; later fiscal years inherit custom account classifications and cashboxes and cash-movement types receive their missing default mappings automatically. The admin must log in again before selecting the new company.")),
             nameof(CompaniesController.Update) => (
                 "Update a company",
                 SwaggerOperationDescription.Create(
                     "Admin only. Updates a company while preserving its ID and creation audit information.",
-                    "An Admin bearer token, positive route `id`, all company request fields, and the exact returned `rowVersion`. `stockBalanceCheckMode` may be changed independently; `baseCurrency` is locked after financial or inventory history exists.",
+                    "An Admin bearer token, positive route `id`, all company request fields, and the exact returned `rowVersion`. `stockBalanceCheckMode` and `invoiceNumberMode` may be changed independently; `baseCurrency` is locked after financial or inventory history exists.",
                     "The same requiredness and maximum lengths as create apply. `rowVersion` must decode to 8 bytes. Duplicate checks exclude the current company.",
                     "Invalid IDs or missing row versions return 400; missing or deleted companies return 404; stale row versions, locked base currency, commercial-register conflicts, or tax-number conflicts return 409.")),
             nameof(CompaniesController.Delete) => (

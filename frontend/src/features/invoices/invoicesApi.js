@@ -111,6 +111,13 @@ export const invoicesApi = baseApi.injectEndpoints({
       providesTags: (result, error, id) => [{ type: "Invoice", id }],
     }),
 
+    // Read-only numbering mode for the current company. Available to every
+    // authenticated user; only admins can change it via company settings.
+    getInvoiceNumberingSettings: builder.query({
+      query: () => ({ url: "Invoices/numbering-settings" }),
+      providesTags: ["Company"],
+    }),
+
     createInvoice: builder.mutation({
       query: (data) => ({ url: "Invoices", method: "POST", body: data }),
       invalidatesTags: invoiceInvalidationTags,
@@ -198,6 +205,7 @@ export const {
   useGetInvoicesQuery,
   useGetInvoicesForSummaryQuery,
   useGetInvoiceByIdQuery,
+  useGetInvoiceNumberingSettingsQuery,
   useCreateInvoiceMutation,
   useLazyGetInvoiceByIdQuery,
   useUpdateInvoiceMutation,

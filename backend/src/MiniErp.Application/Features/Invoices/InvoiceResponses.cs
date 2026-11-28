@@ -262,3 +262,11 @@ public sealed record InvoiceResponse(
 
     public decimal? RealizedExchangeDifference { get; init; }
 }
+
+/// <summary>
+/// Exposes only the invoice numbering mode of the current company. Readable
+/// by every authenticated user so the create form can lock/unlock the field
+/// without access to the admin-only company endpoints.
+/// </summary>
+public sealed record InvoiceNumberingSettingsResponse(
+    InvoiceNumberMode InvoiceNumberMode);

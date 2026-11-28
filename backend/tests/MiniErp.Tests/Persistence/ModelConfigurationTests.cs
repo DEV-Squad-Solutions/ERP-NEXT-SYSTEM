@@ -34,6 +34,19 @@ public sealed class ModelConfigurationTests
         Assert.Equal(CurrencyCode.EGP, property.GetDefaultValue());
     }
 
+    [Fact]
+    public void CompanySettings_InvoiceNumberMode_DefaultsToAuto()
+    {
+        using var context = CreateContext();
+
+        var entityType = context.Model.FindEntityType(typeof(CompanySettings));
+        var property = entityType?.FindProperty(
+            nameof(CompanySettings.InvoiceNumberMode));
+
+        Assert.NotNull(property);
+        Assert.Equal(InvoiceNumberMode.Auto, property.GetDefaultValue());
+    }
+
     private static ApplicationDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()

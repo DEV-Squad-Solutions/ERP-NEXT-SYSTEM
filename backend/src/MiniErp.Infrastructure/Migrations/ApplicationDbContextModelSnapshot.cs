@@ -2533,6 +2533,11 @@ namespace MiniErp.Infrastructure.Migrations
                         .HasColumnType("nvarchar(10)")
                         .HasDefaultValue("light");
 
+                    b.Property<int>("InvoiceNumberMode")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<int>("StockBalanceCheckMode")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")

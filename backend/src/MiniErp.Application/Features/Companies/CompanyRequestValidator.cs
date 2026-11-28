@@ -40,6 +40,10 @@ public sealed class CompanyRequestValidator : AbstractValidator<CompanyRequest>
                 !currency.HasValue ||
                 Enum.IsDefined(currency.Value))
             .WithMessage("عملة الشركة الأساسية غير صالحة.");
+
+        RuleFor(request => request.InvoiceNumberMode)
+            .Must(mode => !mode.HasValue || Enum.IsDefined(mode.Value))
+            .WithMessage("Invoice number mode is invalid.");
     }
 }
 
@@ -82,6 +86,10 @@ public sealed class CompanyUpdateRequestValidator
                 !currency.HasValue ||
                 Enum.IsDefined(currency.Value))
             .WithMessage("Base currency is invalid.");
+
+        RuleFor(request => request.InvoiceNumberMode)
+            .Must(mode => !mode.HasValue || Enum.IsDefined(mode.Value))
+            .WithMessage("Invoice number mode is invalid.");
 
         RuleFor(request => request.RowVersion)
             .NotNull()

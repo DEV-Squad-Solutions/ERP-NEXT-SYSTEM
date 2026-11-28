@@ -143,7 +143,8 @@ public sealed class SetupService(
         {
             BaseCurrency = request.Company.BaseCurrency ?? CurrencyCode.EGP,
             StockBalanceCheckMode = request.Company.StockBalanceCheckMode ??
-                StockBalanceCheckMode.None
+                StockBalanceCheckMode.None,
+            InvoiceNumberMode = InvoiceNumberMode.Auto
         };
         dbContext.UserCompanies.Add(new UserCompany
         {

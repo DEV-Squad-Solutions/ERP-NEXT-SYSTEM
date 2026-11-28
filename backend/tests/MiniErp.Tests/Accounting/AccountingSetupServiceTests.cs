@@ -1765,6 +1765,7 @@ public sealed class AccountingSetupServiceTests
                     CompanyId INTEGER PRIMARY KEY,
                     BaseCurrency INTEGER NOT NULL DEFAULT 1,
                     StockBalanceCheckMode INTEGER NOT NULL DEFAULT 0,
+                    InvoiceNumberMode INTEGER NOT NULL DEFAULT 0,
                     FOREIGN KEY (CompanyId) REFERENCES Companies (Id)
                 );
 

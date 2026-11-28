@@ -2004,7 +2004,9 @@ public sealed class AutomaticPostingServiceTests
                     DefaultThemeMode TEXT NULL,
                     AuditLogRetentionDays INTEGER NULL,
                     CompanyId INTEGER PRIMARY KEY,
-                    BaseCurrency INTEGER NOT NULL DEFAULT 1
+                    BaseCurrency INTEGER NOT NULL DEFAULT 1,
+                    StockBalanceCheckMode INTEGER NOT NULL DEFAULT 0,
+                    InvoiceNumberMode INTEGER NOT NULL DEFAULT 0
                 );
 
                 INSERT INTO CompanySettings (CompanyId, BaseCurrency)

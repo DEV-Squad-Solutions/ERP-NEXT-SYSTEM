@@ -9,7 +9,8 @@ public sealed record CompanyRequest(
     string TaxNumber,
     string ManagerName,
     StockBalanceCheckMode? StockBalanceCheckMode = null,
-    CurrencyCode? BaseCurrency = null);
+    CurrencyCode? BaseCurrency = null,
+    InvoiceNumberMode? InvoiceNumberMode = null);
 
 public sealed record CompanyUpdateRequest(
     string Name,
@@ -19,4 +20,5 @@ public sealed record CompanyUpdateRequest(
     string ManagerName,
     StockBalanceCheckMode? StockBalanceCheckMode,
     CurrencyCode? BaseCurrency,
+    InvoiceNumberMode? InvoiceNumberMode,
     byte[]? RowVersion);

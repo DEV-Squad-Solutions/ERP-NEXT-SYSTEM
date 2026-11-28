@@ -48,6 +48,7 @@ public sealed class CompanyServiceTests
         Assert.Equal("TAX-NEW", result.Value.TaxNumber);
         Assert.Equal("New Manager", result.Value.ManagerName);
         Assert.Equal(StockBalanceCheckMode.None, result.Value.StockBalanceCheckMode);
+        Assert.Equal(InvoiceNumberMode.Auto, result.Value.InvoiceNumberMode);
 
         var assignment = await database.Context.UserCompanies
             .AsNoTracking()
@@ -115,10 +116,58 @@ public sealed class CompanyServiceTests
                 "Updated Manager",
                 StockBalanceCheckMode.FinalCheck,
                 null,
+                InvoiceNumberMode: null,
                 added.Value.RowVersion));
 
         Assert.True(updated.IsSuccess);
         Assert.Equal(StockBalanceCheckMode.FinalCheck, updated.Value.StockBalanceCheckMode);
+    }
+
+    [Fact]
+    public async Task AddAndUpdate_PersistTheInvoiceNumberMode()
+    {
+        await using var database = await CompanyTestDatabase.CreateAsync();
+        var service = database.CreateService(CurrentUserId);
+
+        var added = await service.AddAsync(
+            new CompanyRequest(
+                "New Company",
+                "New Address",
+                "CR-NEW",
+                "TAX-NEW",
+                "New Manager",
+                InvoiceNumberMode: InvoiceNumberMode.Manual));
+
+        Assert.True(added.IsSuccess);
+        Assert.Equal(InvoiceNumberMode.Manual, added.Value.InvoiceNumberMode);
+        Assert.Equal(
+            InvoiceNumberMode.Manual,
+            await database.Context.CompanySettings
+                .Where(settings => settings.CompanyId == added.Value.Id)
+                .Select(settings => settings.InvoiceNumberMode)
+                .SingleAsync());
+
+        var updated = await service.UpdateAsync(
+            added.Value.Id,
+            new CompanyUpdateRequest(
+                "Updated Company",
+                "Updated Address",
+                "CR-NEW",
+                "TAX-NEW",
+                "Updated Manager",
+                null,
+                null,
+                InvoiceNumberMode: InvoiceNumberMode.Auto,
+                added.Value.RowVersion));
+
+        Assert.True(updated.IsSuccess);
+        Assert.Equal(InvoiceNumberMode.Auto, updated.Value.InvoiceNumberMode);
+        Assert.Equal(
+            InvoiceNumberMode.Auto,
+            await database.Context.CompanySettings
+                .Where(settings => settings.CompanyId == added.Value.Id)
+                .Select(settings => settings.InvoiceNumberMode)
+                .SingleAsync());
     }
 
     [Fact]
@@ -212,6 +261,7 @@ public sealed class CompanyServiceTests
                 "  Updated Manager  ",
                 null,
                 null,
+                InvoiceNumberMode: null,
                 current.Value.RowVersion));
 
         Assert.True(result.IsSuccess);
@@ -240,6 +290,7 @@ public sealed class CompanyServiceTests
                 "Updated Manager",
                 null,
                 null,
+                InvoiceNumberMode: null,
                 current.Value.RowVersion));
 
         Assert.True(result.IsFailure);
@@ -336,6 +387,7 @@ public sealed class CompanyServiceTests
                 "Manager",
                 null,
                 null,
+                InvoiceNumberMode: null,
                 null));
 
         Assert.Contains(
@@ -430,6 +482,7 @@ public sealed class CompanyServiceTests
                 "Company Two Manager",
                 null,
                 CurrencyCode.USD,
+                InvoiceNumberMode: null,
                 current.Value.RowVersion));
 
         Assert.True(result.IsFailure);
@@ -454,6 +507,7 @@ public sealed class CompanyServiceTests
                 "Manager",
                 null,
                 null,
+                InvoiceNumberMode: null,
                 current.Value.RowVersion));
 
         Assert.True(result.IsFailure);
@@ -493,6 +547,7 @@ public sealed class CompanyServiceTests
                 "Company Two Manager",
                 null,
                 CurrencyCode.USD,
+                InvoiceNumberMode: null,
                 current.Value.RowVersion));
 
         await Task.WhenAll(insertTask, updateTask);
@@ -654,6 +709,7 @@ public sealed class CompanyServiceTests
                     CompanyId INTEGER NOT NULL PRIMARY KEY,
                     BaseCurrency INTEGER NOT NULL DEFAULT 1,
                     StockBalanceCheckMode INTEGER NOT NULL DEFAULT 0,
+                    InvoiceNumberMode INTEGER NOT NULL DEFAULT 0,
                     FOREIGN KEY (CompanyId) REFERENCES Companies(Id) ON DELETE CASCADE
                 );
 

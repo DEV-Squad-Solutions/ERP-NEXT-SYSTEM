@@ -207,9 +207,9 @@ internal static class InvoiceValidationRules
     public static void AddCreateRules(
         AbstractValidator<InvoiceRequest> validator)
     {
-        validator.RuleFor(request => request.InvoiceNumber)
-            .NotEmpty();
-
+        // Empty is allowed: when the company uses automatic numbering the
+        // server assigns the number inside the create transaction. Manual
+        // mode still requires a number (checked by InvoiceService.Validation).
         validator.RuleFor(request => request.InvoiceNumber)
             .MaximumLength(InvoiceRequest.InvoiceNumberMaximumLength)
             .When(request =>

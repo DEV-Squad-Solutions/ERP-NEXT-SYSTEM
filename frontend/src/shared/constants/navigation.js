@@ -41,11 +41,11 @@ const LIMITED_ACCESS_ROLES = ["User", "Cashier"];
 
 const INVOICE_ROLES = ["Admin", "Accountant", "User", "Cashier"];
 
-const TREASURY_ROLES = ["Admin", "Accountant", "User", "Cashier"];
+const TREASURY_ROLES = FULL_ACCESS_ROLES;
 
-const EXPENSE_ROLES = ["Admin", "Accountant", "User", "Cashier"];
+const EXPENSE_ROLES = FULL_ACCESS_ROLES;
 
-const PAYROLL_ROLES = ["Admin", "Accountant", "User", "Cashier"];
+const PAYROLL_ROLES = FULL_ACCESS_ROLES;
 
 export const navigationItems = [
   {

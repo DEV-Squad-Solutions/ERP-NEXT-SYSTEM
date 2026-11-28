@@ -11,6 +11,9 @@ public sealed class CompanySettings
     public StockBalanceCheckMode StockBalanceCheckMode { get; set; } =
         StockBalanceCheckMode.None;
 
+    public InvoiceNumberMode InvoiceNumberMode { get; set; } =
+        InvoiceNumberMode.Auto;
+
     public string DefaultColorTheme { get; set; } = "default";
 
     public string DefaultThemeMode { get; set; } = "light";

@@ -83,6 +83,22 @@ public sealed class InvoicesController(
         return this.ToActionResult(result);
     }
 
+    /// <summary>
+    /// Returns the invoice numbering mode configured for the current company.
+    /// Readable by every authenticated user; only admins can change it through
+    /// the company settings endpoints.
+    /// </summary>
+    [HttpGet("numbering-settings")]
+    [ProducesResponseType<InvoiceNumberingSettingsResponse>(
+        StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetNumberingSettings(
+        CancellationToken cancellationToken)
+    {
+        var result = await invoiceQueries.GetNumberingSettingsAsync(
+            cancellationToken);
+        return this.ToActionResult(result);
+    }
+
     [HttpGet("{id:int}")]
     [ProducesResponseType<InvoiceResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]

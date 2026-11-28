@@ -1,4 +1,5 @@
 using System.Data;
+using System.Globalization;
 using static MiniErp.Application.Features.Invoices.InvoiceErrors;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using MiniErp.Application.Features.DriverTrips;
 using MiniErp.Domain.Entities.Invoicing;
 using MiniErp.Domain.Enums;
 using MiniErp.Infrastructure.Persistence;
+using MiniErp.Infrastructure.Services;
 using MiniErp.Infrastructure.Services.Cashboxes;
 
 namespace MiniErp.Infrastructure.Services.Invoices;
@@ -89,6 +91,35 @@ public sealed partial class InvoiceService(
             }
         }
 
+        var invoiceNumberMode = await dbContext.CompanySettings
+            .AsNoTracking()
+            .Where(settings => settings.CompanyId == companyId)
+            .Select(settings => settings.InvoiceNumberMode)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (invoiceNumberMode == InvoiceNumberMode.Auto &&
+            string.IsNullOrWhiteSpace(invoice.InvoiceNumber))
+        {
+            var prefix = string.Concat(
+                "INV-",
+                invoice.InvoiceDate.Year.ToString(CultureInfo.InvariantCulture));
+            var existingNumbers = dbContext.Invoices
+                .IgnoreQueryFilters()
+                .Where(existing => existing.CompanyId == companyId)
+                .Select(existing => existing.InvoiceNumber);
+
+            invoice.InvoiceNumber =
+                await EntityIdentifierGenerator.GenerateUniqueAsync(
+                    dbContext,
+                    prefix,
+                    companyId,
+                    existingNumbers,
+                    cancellationToken);
+        }
+
+        // The invoice number is only a reference value, so duplicates are
+        // allowed. Auto mode still assigns the next sequential number; in
+        // Manual mode the value is kept exactly as entered.
         await invoiceInventoryService.LockCostingAsync(
             request.Lines
                 .Where(line => line.ItemId.HasValue)

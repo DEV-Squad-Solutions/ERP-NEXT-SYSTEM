@@ -23,6 +23,11 @@ public sealed class CompanySettingsConfiguration
             .HasDefaultValue(Domain.Enums.StockBalanceCheckMode.None)
             .IsRequired();
 
+        builder.Property(settings => settings.InvoiceNumberMode)
+            .HasConversion<int>()
+            .HasDefaultValue(Domain.Enums.InvoiceNumberMode.Auto)
+            .IsRequired();
+
         builder.Property(settings => settings.DefaultColorTheme)
             .HasMaxLength(20)
             .HasDefaultValue("default")

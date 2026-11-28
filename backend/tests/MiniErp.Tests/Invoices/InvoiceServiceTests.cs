@@ -195,30 +195,61 @@ public sealed partial class InvoiceServiceTests
     }
 
     [Fact]
+    public async Task Add_GeneratesSequentialNumbersInAutomaticMode()
+    {
+        await using var database = await InvoiceTestDatabase.CreateAsync();
+        await database.Context.Database.ExecuteSqlRawAsync(
+            """
+            INSERT INTO FiscalYears (
+                Id, CompanyId, Name, StartDate, EndDate, Status, IsCurrent)
+            VALUES (3, 1, '2027', '2027-01-01', '2027-12-31', 1, 0);
+            """);
+        var service = database.CreateService();
+
+        var first = await service.AddAsync(
+            CreateRequest(InvoiceType.SalesReturn, invoiceNumber: ""));
+        var second = await service.AddAsync(
+            CreateRequest(InvoiceType.SalesReturn, invoiceNumber: ""));
+        var third = await service.AddAsync(
+            CreateRequest(
+                InvoiceType.SalesReturn,
+                invoiceNumber: "",
+                invoiceDate: new DateOnly(2027, 7, 25)));
+
+        Assert.True(first.IsSuccess, first.IsFailure ? first.Error.Description : null);
+        Assert.True(second.IsSuccess, second.IsFailure ? second.Error.Description : null);
+        Assert.True(third.IsSuccess, third.IsFailure ? third.Error.Description : null);
+        Assert.Equal("INV-2026-0001", first.Value.InvoiceNumber);
+        Assert.Equal("INV-2026-0002", second.Value.InvoiceNumber);
+        Assert.Equal("INV-2027-0001", third.Value.InvoiceNumber);
+    }
+
+    [Fact]
     public async Task Add_AllowsDuplicateEnteredInvoiceNumber()
     {
         await using var database = await InvoiceTestDatabase.CreateAsync();
+        await SetInvoiceNumberModeAsync(database, InvoiceNumberMode.Manual);
         var service = database.CreateService();
+
         var first = await service.AddAsync(
             CreateRequest(
                 InvoiceType.SalesReturn,
-                invoiceNumber: "INV-DUPLICATE"));
-
+                invoiceNumber: "REF-1001"));
         var duplicate = await service.AddAsync(
             CreateRequest(
                 InvoiceType.SalesReturn,
-                invoiceNumber: "  INV-DUPLICATE  "));
+                invoiceNumber: "REF-1001"));
 
-        Assert.True(first.IsSuccess);
-        Assert.True(duplicate.IsSuccess);
-        Assert.Equal("INV-DUPLICATE", duplicate.Value.InvoiceNumber);
+        Assert.True(first.IsSuccess, first.IsFailure ? first.Error.Description : null);
+        Assert.True(duplicate.IsSuccess, duplicate.IsFailure ? duplicate.Error.Description : null);
         Assert.Equal(2, await database.Context.Invoices.CountAsync());
     }
 
     [Fact]
-    public async Task Add_RejectsMissingEnteredInvoiceNumberInTheService()
+    public async Task Add_RejectsMissingEnteredInvoiceNumberInManualMode()
     {
         await using var database = await InvoiceTestDatabase.CreateAsync();
+        await SetInvoiceNumberModeAsync(database, InvoiceNumberMode.Manual);
         var request = CreateRequest(InvoiceType.SalesReturn) with
         {
             InvoiceNumber = "   "
@@ -229,6 +260,22 @@ public sealed partial class InvoiceServiceTests
         Assert.True(result.IsFailure);
         Assert.Equal("Invoices.InvoiceNumberInvalid", result.Error.Code);
         Assert.Equal(0, await database.Context.Invoices.CountAsync());
+    }
+
+    [Fact]
+    public async Task Add_KeepsEnteredInvoiceNumberInManualMode()
+    {
+        await using var database = await InvoiceTestDatabase.CreateAsync();
+        await SetInvoiceNumberModeAsync(database, InvoiceNumberMode.Manual);
+
+        var result = await database.CreateService().AddAsync(
+            CreateRequest(
+                InvoiceType.SalesReturn,
+                invoiceNumber: "  MANUAL-1001  "));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal("MANUAL-1001", result.Value.InvoiceNumber);
+        Assert.Equal(1, await database.Context.Invoices.CountAsync());
     }
 
     [Fact]
@@ -6978,16 +7025,16 @@ public sealed partial class InvoiceServiceTests
     }
 
     [Fact]
-    public void CreateValidator_RequiresEnteredInvoiceNumber()
+    public void CreateValidator_AllowsBlankInvoiceNumberForAutomaticMode()
     {
         var request = CreateRequest(InvoiceType.SalesReturn) with
         {
-            InvoiceNumber = "   "
+            InvoiceNumber = ""
         };
 
         var result = new InvoiceRequestValidator().Validate(request);
 
-        Assert.Contains(
+        Assert.DoesNotContain(
             result.Errors,
             error =>
                 error.PropertyName == nameof(InvoiceRequest.InvoiceNumber));
@@ -7271,6 +7318,14 @@ public sealed partial class InvoiceServiceTests
             WBScaleDifference: 0m,
             WBDiscount: 0m,
             WBTotal: wbTotal);
+
+    private static async Task SetInvoiceNumberModeAsync(
+        InvoiceTestDatabase database,
+        InvoiceNumberMode mode)
+    {
+        await database.Context.Database.ExecuteSqlInterpolatedAsync(
+            $"UPDATE CompanySettings SET InvoiceNumberMode = {(int)mode} WHERE CompanyId = 1");
+    }
 
     private static InvoiceRequest CreateRequest(
         InvoiceType invoiceType,
@@ -7763,6 +7818,7 @@ public sealed partial class InvoiceServiceTests
                     CompanyId INTEGER NOT NULL PRIMARY KEY,
                     BaseCurrency INTEGER NOT NULL DEFAULT 1,
                     StockBalanceCheckMode INTEGER NOT NULL DEFAULT 1,
+                    InvoiceNumberMode INTEGER NOT NULL DEFAULT 0,
                     FOREIGN KEY (CompanyId) REFERENCES Companies(Id) ON DELETE CASCADE
                 );
 

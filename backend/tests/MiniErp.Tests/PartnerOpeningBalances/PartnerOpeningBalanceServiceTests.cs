@@ -631,6 +631,7 @@ public sealed class PartnerOpeningBalanceServiceTests
                     CompanyId INTEGER NOT NULL PRIMARY KEY,
                     BaseCurrency INTEGER NOT NULL DEFAULT 1,
                     StockBalanceCheckMode INTEGER NOT NULL DEFAULT 1,
+                    InvoiceNumberMode INTEGER NOT NULL DEFAULT 0,
                     FOREIGN KEY (CompanyId) REFERENCES Companies(Id) ON DELETE CASCADE
                 );
 

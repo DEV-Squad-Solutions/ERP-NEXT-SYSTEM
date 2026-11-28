@@ -12,4 +12,5 @@ public sealed record CompanyResponse(
     DateTime CreatedAt,
     StockBalanceCheckMode StockBalanceCheckMode,
     CurrencyCode BaseCurrency,
+    InvoiceNumberMode InvoiceNumberMode,
     byte[] RowVersion);

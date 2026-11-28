@@ -125,7 +125,9 @@ public sealed class CompanyService(
         {
             BaseCurrency = request.BaseCurrency ?? CurrencyCode.EGP,
             StockBalanceCheckMode = request.StockBalanceCheckMode ??
-                StockBalanceCheckMode.None
+                StockBalanceCheckMode.None,
+            InvoiceNumberMode = request.InvoiceNumberMode ??
+                InvoiceNumberMode.Auto
         };
         dbContext.UserCompanies.Add(new UserCompany
         {
@@ -221,7 +223,9 @@ public sealed class CompanyService(
                 CompanyId = id,
                 BaseCurrency = request.BaseCurrency ?? CurrencyCode.EGP,
                 StockBalanceCheckMode = request.StockBalanceCheckMode ??
-                    StockBalanceCheckMode.None
+                    StockBalanceCheckMode.None,
+                InvoiceNumberMode = request.InvoiceNumberMode ??
+                    InvoiceNumberMode.Auto
             };
             dbContext.CompanySettings.Add(settings);
         }
@@ -231,6 +235,12 @@ public sealed class CompanyService(
             {
                 settings.StockBalanceCheckMode =
                     request.StockBalanceCheckMode.Value;
+            }
+
+            if (request.InvoiceNumberMode.HasValue)
+            {
+                settings.InvoiceNumberMode =
+                    request.InvoiceNumberMode.Value;
             }
 
             if (request.BaseCurrency.HasValue &&

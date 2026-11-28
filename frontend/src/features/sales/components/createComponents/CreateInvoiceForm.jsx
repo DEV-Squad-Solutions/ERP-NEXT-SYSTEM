@@ -17,8 +17,6 @@ import {
   CheckCircle2,
   CircleDot,
   RotateCcw,
-  Lock,
-  Unlock,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -33,7 +31,10 @@ import CountryFormModal from "../../../countries/components/CountryFormModal";
 import QuickAddCustomerModal from "../../../partners/components/PartnerSetupWizard";
 import QuickAddDriverModal from "../../../drivers/components/QuickAddDriverModal";
 import PackagingDrawer from "../PackagingDrawer";
-import { useCreateInvoiceMutation } from "../../../invoices/invoicesApi";
+import {
+  useCreateInvoiceMutation,
+  useGetInvoiceNumberingSettingsQuery,
+} from "../../../invoices/invoicesApi";
 import { buildCreateInvoiceRequest } from "../../../invoices/components/buildInvoicePayload";
 import LedgerPanel from "../../../../shared/components/ui/LedgerPanel";
 import LedgerField from "../../../../shared/components/ui/LedgerField";
@@ -119,13 +120,10 @@ const getCairoDate = () => {
     day: "2-digit",
   }).format(new Date());
 };
-const generateInvoiceNumber = () => {
-  const year = new Date().getFullYear();
-  return `INV-${year}-${Math.floor(Math.random() * 10000)}`;
-};
 const getDefaultHeader = () => ({
-  // رقم الفاتورة بيبدأ فاضي ومقفول: الباك إند هو اللي بيتحكم في
-  // الترقيم، ولو المستخدم حب يكتبه بنفسه بيفتح القفل من الزرار جنبه.
+  // رقم الفاتورة بيبدأ فاضي. في وضع التوليد التلقائي الباك إند بيرقّم
+  // الفاتورة وقت الحفظ حسب إعداد الشركة والسنة المالية، وفي الوضع اليدوي
+  // المستخدم بيكتب الرقم بنفسه.
   invoiceNumber: "",
 
   movementType: "",
@@ -314,9 +312,6 @@ export default function CreateInvoiceForm({ onSuccess }) {
     items: [],
   });
   const [itemsLocked, setItemsLocked] = useState(true);
-  // قفل رقم الفاتورة: مقفول افتراضيًا وفاضي لحد ما المستخدم يفتحه
-  // ويكتب رقم يدوي (أو نسيبه فاضي فيتولّد تلقائيًا وقت الحفظ).
-  const [invoiceNumberLocked, setInvoiceNumberLocked] = useState(true);
   const [isTemporaryDriver, setIsTemporaryDriver] = useState(false);
   const [fullReturnState, setFullReturnState] = useState(null);
   const [showErrors, setShowErrors] = useState(false);
@@ -325,6 +320,9 @@ export default function CreateInvoiceForm({ onSuccess }) {
   const [header, setHeader] = useState(getDefaultHeader);
 
   const selectedFiscalYear = useSelector(selectSelectedFiscalYear);
+  const { data: numberingSettings } = useGetInvoiceNumberingSettingsQuery();
+  const invoiceNumberMode = numberingSettings?.invoiceNumberMode ?? "Auto";
+  const invoiceNumberReadOnly = invoiceNumberMode === "Auto";
   const invoiceDateWarning = useMemo(
     () => getFiscalYearDateWarning(header.date, selectedFiscalYear),
     [header.date, selectedFiscalYear],
@@ -795,6 +793,11 @@ export default function CreateInvoiceForm({ onSuccess }) {
 
     const addMessage = (field, text) => messages.push({ field, text });
 
+    if (!invoiceNumberReadOnly && !header.invoiceNumber?.trim()) {
+      headerErrors.invoiceNumber = t("رقم الفاتورة مطلوب في الوضع اليدوي");
+      addMessage("invoiceNumber", headerErrors.invoiceNumber);
+    }
+
     if (!header.movementType) {
       headerErrors.movementType = t("اختر نوع الفاتورة");
       addMessage("movementType", t("اختر نوع الفاتورة (بيع / شراء / مرتجع)"));
@@ -968,6 +971,7 @@ export default function CreateInvoiceForm({ onSuccess }) {
     isReturnInvoice,
     returnLines,
     invoiceDateWarning,
+    invoiceNumberReadOnly,
   ]);
 
   const submitInvoice = useCallback(
@@ -989,18 +993,9 @@ export default function CreateInvoiceForm({ onSuccess }) {
 
       setShowErrors(false);
 
-      // لو المستخدم ساب رقم الفاتورة فاضي (الحالة الافتراضية المقفولة)
-      // بنولّد رقم بديل قبل الإرسال، لأن الـ API حاليًا بيرفض الرقم
-      // الفاضي. الرقم الظاهر بعد الحفظ هو اللي راجع من السيرفر.
-      const effectiveInvoiceNumber =
-        header.invoiceNumber?.trim() || generateInvoiceNumber();
-
-      if (!header.invoiceNumber?.trim()) {
-        setHeader((current) => ({
-          ...current,
-          invoiceNumber: effectiveInvoiceNumber,
-        }));
-      }
+      // في الوضع التلقائي بنبعت رقم فاضي والباك إند بيولّده حسب إعداد
+      // الشركة والسنة المالية. في الوضع اليدوي الرقم مطلوب ومتحقق منه فوق.
+      const effectiveInvoiceNumber = header.invoiceNumber?.trim() || "";
 
       // بعد كده الباك إند يبقى مصدر الحقيقة النهائي، وأي رفض إضافي
       // (رصيد/سعر/سنة مالية...) بيوصل في الـ catch تحت.
@@ -1071,7 +1066,6 @@ export default function CreateInvoiceForm({ onSuccess }) {
     setLines(Array.from({ length: 5 }, () => emptyLine()));
     setContainersMovement({ containerStoreId: null, items: [] });
     setIsTemporaryDriver(false);
-    setInvoiceNumberLocked(true);
     setFullReturnState(null);
     setShowErrors(false);
     setShowResetConfirm(false);
@@ -1122,51 +1116,32 @@ export default function CreateInvoiceForm({ onSuccess }) {
             }
           >
             <div className="grid grid-cols-1 sm:grid-cols-3">
-              <div data-field="invoiceNumber">
+              <div
+                data-field="invoiceNumber"
+                data-invalid={
+                  showErrors && Boolean(validation.headerErrors.invoiceNumber)
+                }
+              >
                 <LedgerField
                   label={t("رقم الفاتورة")}
-                  labelAddon={
-                    <button
-                      type="button"
-                      onClick={() => setInvoiceNumberLocked((value) => !value)}
-                      className="
-                    inline-flex h-5 w-5 items-center justify-center rounded
-                    border border-ink-400/20 bg-white text-primary-700
-                    transition hover:border-primary-400/50 hover:bg-primary-50
-                    active:scale-95
-                  "
-                      aria-pressed={!invoiceNumberLocked}
-                      aria-label={
-                        invoiceNumberLocked
-                          ? t("فتح الحقل لكتابة رقم الفاتورة يدويًا")
-                          : t("قفل الحقل والرجوع للتوليد التلقائي")
-                      }
-                      title={
-                        invoiceNumberLocked
-                          ? t("فتح الحقل لكتابة رقم الفاتورة يدويًا")
-                          : t("قفل الحقل والرجوع للتوليد التلقائي")
-                      }
-                    >
-                      {invoiceNumberLocked ? (
-                        <Unlock size={11} />
-                      ) : (
-                        <Lock size={11} />
-                      )}
-                    </button>
-                  }
                   value={header.invoiceNumber}
                   onChange={(e) =>
                     setHeaderField("invoiceNumber", e.target.value)
                   }
-                  readOnly={invoiceNumberLocked}
-                  disabled={invoiceNumberLocked}
+                  error={
+                    showErrors
+                      ? validation.headerErrors.invoiceNumber
+                      : undefined
+                  }
+                  readOnly={invoiceNumberReadOnly}
+                  disabled={invoiceNumberReadOnly}
                   placeholder={
-                    invoiceNumberLocked
+                    invoiceNumberReadOnly
                       ? t("يُولَّد تلقائيًا عند الحفظ")
                       : t("اكتب رقم الفاتورة يدويًا")
                   }
                   className={
-                    invoiceNumberLocked
+                    invoiceNumberReadOnly
                       ? "cursor-not-allowed bg-ink-900/[0.03] text-ink-500"
                       : ""
                   }

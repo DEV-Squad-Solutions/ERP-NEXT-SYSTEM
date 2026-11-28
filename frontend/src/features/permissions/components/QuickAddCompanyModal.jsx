@@ -30,6 +30,11 @@ const CURRENCIES = [
   { value: "KWD", label: t("دينار كويتي") },
 ];
 
+const INVOICE_NUMBER_MODES = [
+  { value: "Auto", label: t("تلقائي (يولّده النظام)") },
+  { value: "Manual", label: t("يدوي (يدخله المستخدم)") },
+];
+
 const schema = z.object({
   name: z.string().min(1, t("اسم الشركة مطلوب")).max(200),
   address: z.string().min(1, t("العنوان مطلوب")).max(500),
@@ -38,6 +43,7 @@ const schema = z.object({
   managerName: z.string().min(1, t("اسم المدير مطلوب")).max(200),
   stockBalanceCheckMode: z.enum(["None", "DateCheck", "FinalCheck", "Both"]),
   baseCurrency: z.enum(["EGP", "USD", "EUR", "GBP", "SAR", "AED", "KWD"]),
+  invoiceNumberMode: z.enum(["Auto", "Manual"]),
 });
 
 const emptyValues = {
@@ -48,6 +54,7 @@ const emptyValues = {
   managerName: "",
   stockBalanceCheckMode: "None",
   baseCurrency: "EGP",
+  invoiceNumberMode: "Auto",
 };
 
 /**
@@ -91,6 +98,7 @@ export default function QuickAddCompanyModal({
             managerName: company.managerName ?? "",
             stockBalanceCheckMode: company.stockBalanceCheckMode ?? "None",
             baseCurrency: company.baseCurrency ?? "EGP",
+            invoiceNumberMode: company.invoiceNumberMode ?? "Auto",
           }
         : emptyValues,
     );
@@ -192,6 +200,25 @@ export default function QuickAddCompanyModal({
               ))}
             </select>
           </div>
+        </div>
+
+        <div>
+          <label className="block mb-1.5 text-sm font-medium text-ink-900">
+            {t("نمط رقم الفاتورة")}
+          </label>
+          <select
+            {...register("invoiceNumberMode")}
+            className="w-full rounded-xl border border-ink-400/15 px-3.5 py-2.5 text-sm bg-white focus:outline-none focus:border-primary-500"
+          >
+            {INVOICE_NUMBER_MODES.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+          <p className="mt-1.5 text-xs leading-relaxed text-ink-500">
+            {t("تلقائي: يرقّم النظام الفواتير لكل شركة وسنة. يدوي: يدخل المستخدم الرقم وهو مرجي فقط وممكن يتكرر.")}
+          </p>
         </div>
 
         <Button type="submit" disabled={isLoading} className="w-full">

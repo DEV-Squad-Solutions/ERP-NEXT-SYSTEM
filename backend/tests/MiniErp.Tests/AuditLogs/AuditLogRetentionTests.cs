@@ -55,7 +55,13 @@ public sealed class AuditLogRetentionTests
                 new DbContextOptionsBuilder<ApplicationDbContext>().UseSqlite(connection).Options);
             await context.Database.ExecuteSqlRawAsync(
                 """
-                CREATE TABLE CompanySettings (CompanyId INTEGER PRIMARY KEY, AuditLogRetentionDays INTEGER NULL);
+                CREATE TABLE CompanySettings (
+                    CompanyId INTEGER PRIMARY KEY,
+                    AuditLogRetentionDays INTEGER NULL,
+                    BaseCurrency INTEGER NOT NULL DEFAULT 1,
+                    StockBalanceCheckMode INTEGER NOT NULL DEFAULT 0,
+                    InvoiceNumberMode INTEGER NOT NULL DEFAULT 0
+                );
                 CREATE TABLE AuditLogs (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT, CompanyId INTEGER NOT NULL, OccurredOn TEXT NOT NULL,
                     UserId TEXT NOT NULL, UserName TEXT NOT NULL, Role TEXT NOT NULL, Action TEXT NOT NULL,

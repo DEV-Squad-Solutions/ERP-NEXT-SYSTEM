@@ -31,6 +31,21 @@ public sealed partial class InvoiceQueryService(
 
     private readonly int companyId = currentCompanyContext.CompanyId;
 
+    public async Task<Result<InvoiceNumberingSettingsResponse>>
+        GetNumberingSettingsAsync(
+            CancellationToken cancellationToken = default)
+    {
+        var mode = await dbContext.CompanySettings
+            .AsNoTracking()
+            .Where(settings => settings.CompanyId == companyId)
+            .Select(settings => settings.InvoiceNumberMode)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return Result<InvoiceNumberingSettingsResponse>.Success(
+            new InvoiceNumberingSettingsResponse(
+                InvoiceNumberMode: mode));
+    }
+
     public async Task<Result<InvoicePagedResponse>> GetAllAsync(
         PaginationRequest pagination,
         InvoiceFilterRequest? filters = null,

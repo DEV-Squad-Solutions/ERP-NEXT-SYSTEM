@@ -253,7 +253,8 @@ public sealed class InvoiceItemPricingServiceTests
                     DefaultThemeMode TEXT NULL,
                     CompanyId INTEGER PRIMARY KEY,
                     BaseCurrency INTEGER NOT NULL,
-                    StockBalanceCheckMode INTEGER NOT NULL
+                    StockBalanceCheckMode INTEGER NOT NULL,
+                    InvoiceNumberMode INTEGER NOT NULL DEFAULT 0
                 );
 
                 CREATE TABLE BusinessPartners (

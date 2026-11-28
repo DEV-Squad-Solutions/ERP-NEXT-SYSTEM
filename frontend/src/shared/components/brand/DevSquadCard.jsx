@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Users } from "lucide-react";
+import { ArrowUpRight, Globe, Users } from "lucide-react";
 import { Facebook, Linkedin } from "./BrandIcons";
 
 import { t } from "../../../i18n";
@@ -12,11 +12,35 @@ const linkCls =
  * Compact brand card for the login, register and home pages.
  * Always dark so the logo (dark background) blends in on every theme.
  */
+export function DevSquadInline({ className = "", tone = "dark" }) {
+  const c =
+    tone === "light"
+      ? "text-white/55 hover:text-gold-400"
+      : "text-ink-400 hover:text-primary-500";
+  return (
+    <nav
+      aria-label="Dev Squad Solutions"
+      className={`flex items-center justify-center gap-3 text-[10px] print:hidden ${className}`}
+    >
+      <a href={DEVSQUAD.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className={`transition-colors ${c}`}>
+        <Facebook size={14} />
+      </a>
+      <a href={DEVSQUAD.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className={`transition-colors ${c}`}>
+        <Linkedin size={14} />
+      </a>
+      <span aria-hidden="true" className="h-3 w-px bg-current opacity-25" />
+      <Link to="/about" className={`font-medium transition-colors ${c}`}>
+        {t("عن الفريق")}
+      </Link>
+    </nav>
+  );
+}
+
 export default function DevSquadCard({ className = "" }) {
   return (
     <aside
       aria-label="Dev Squad Solutions"
-      className={`relative overflow-hidden rounded-2xl border border-white/10 bg-[#0b1220] p-4 text-white shadow-card print:hidden ${className}`}
+      className={`relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-[#070d1a] via-[#0b1220] to-[#10213f] p-4 text-white shadow-card print:hidden ${className}`}
     >
       <div
         aria-hidden="true"
@@ -40,6 +64,7 @@ export default function DevSquadCard({ className = "" }) {
           </p>
         </div>
       </div>
+      <div aria-hidden="true" className="relative mt-3 h-px w-full bg-gradient-to-r from-transparent via-gold-400/40 to-transparent" />
       <div className="relative mt-3 flex flex-wrap gap-2">
         <a href={DEVSQUAD.facebook} target="_blank" rel="noopener noreferrer" className={linkCls}>
           <Facebook size={14} aria-hidden="true" />
@@ -48,6 +73,10 @@ export default function DevSquadCard({ className = "" }) {
         <a href={DEVSQUAD.linkedin} target="_blank" rel="noopener noreferrer" className={linkCls}>
           <Linkedin size={14} aria-hidden="true" />
           LinkedIn
+        </a>
+        <a href={DEVSQUAD.website} target="_blank" rel="noopener noreferrer" className={linkCls}>
+          <Globe size={14} aria-hidden="true" />
+          {t("الموقع")}
         </a>
         <Link to="/about" className={linkCls}>
           <Users size={14} aria-hidden="true" />

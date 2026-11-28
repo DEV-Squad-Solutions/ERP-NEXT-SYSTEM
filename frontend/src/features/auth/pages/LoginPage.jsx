@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import CompanySelect from "../components/CompanySelect";
 import LoginForm from "../components/LoginForm";
-import DevSquadCard from "../../../shared/components/brand/DevSquadCard";
+import { DevSquadInline } from "../../../shared/components/brand/DevSquadCard";
 
 import { t } from "../../../i18n";
 import { getDir } from "../../../i18n";
@@ -141,6 +141,7 @@ export default function LoginPage() {
               </div>
 
               <div className="flex shrink-0 items-center gap-2 text-white/35">
+                <DevSquadInline tone="light" className="me-2" />
                 <a
                   href="https://dev-squad-orpin.vercel.app/"
                   target="_blank"
@@ -236,7 +237,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <DevSquadCard className="mt-3 shrink-0" />
+            <DevSquadInline className="mt-3 shrink-0" />
 
             <div className="mt-3 flex shrink-0 items-center justify-center gap-1 text-[9px] text-ink-300 motion-safe:animate-[fadeUp_0.5s_ease-out_300ms_both]">
               <span>© {new Date().getFullYear()}</span>

@@ -481,6 +481,20 @@ try {
     }
     Ok "System is ready"
 
+    # First-run setup token: only matters while no Admin exists yet. Never stops the install.
+    $script:setupToken = $null
+    try {
+        $st = Invoke-RestMethod -UseBasicParsing -Uri "http://localhost:$apiPort/api/v1/setup/status" -TimeoutSec 10
+        if ($st.requiresSetup -and $st.tokenRequired) {
+            $tok = Get-EnvValue ([IO.File]::ReadAllText($envFile, [Text.Encoding]::UTF8)) "SETUP_TOKEN"
+            if (-not $tok) {
+                $m = docker logs erp-api 2>&1 | Select-String -Pattern 'restarts\): ([0-9A-Fa-f]{32})' | Select-Object -Last 1
+                if ($m) { $tok = $m.Matches[0].Groups[1].Value }
+            }
+            $script:setupToken = $tok
+        }
+    } catch { }
+
     Write-Host ""
     Line "  +------------------------------------------------------------+" Green
     Line "  |  SUCCESS                                                   |" Green
@@ -489,6 +503,7 @@ try {
     Line "  Version   : $version" White
     Line ("  Open      : http://localhost{0}   (other PCs: http://192.168.1.5{0})" -f $(if ($webPort -ne "80") { ":$webPort" } else { "" })) White
     Line "  Health    : http://localhost:$apiPort/health/ready" White
+    if ($script:setupToken) { Line "  Setup token (type it once on the first-run page to create the first Admin): $($script:setupToken)" Yellow }
     foreach ($ob in $script:oldBackups) { Line "  Old SQL backup : $ob" White }
     Line "  Backup    : $bakName" White
     Line "  Log file  : $logFile" White

@@ -1,3 +1,4 @@
+using MiniErp.Api.Extensions;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Hangfire;
@@ -68,11 +69,7 @@ builder.Services
                 namingPolicy: null,
                 allowIntegerValues: true));
     });
-var allowedOrigins = builder.Configuration
-    .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>()
-    ?.Where(origin => !string.IsNullOrWhiteSpace(origin))
-    .ToArray() ?? [];
+var allowedOrigins = CorsOriginsConfig.Read(builder.Configuration);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(

@@ -32,6 +32,7 @@ const C = {
     cta: "تواصل معنا",
     seeWork: "شاهد أعمالنا",
     facts: [
+      { v: "30+", l: "نظام شغال فعليًا في السوق" },
       { v: "6", l: "مجالات تقنية نغطيها" },
       { v: "4", l: "خطوات واضحة من الفكرة للتسليم" },
       { v: "51-200", l: "حجم الشركة على لينكدإن" },
@@ -86,6 +87,7 @@ const C = {
     cta: "Contact us",
     seeWork: "See our work",
     facts: [
+      { v: "30+", l: "live systems running in the market" },
       { v: "6", l: "technical areas we cover" },
       { v: "4", l: "clear steps from idea to delivery" },
       { v: "51-200", l: "company size on LinkedIn" },
@@ -203,7 +205,7 @@ export default function PortfolioPage() {
       </header>
 
       <section className="mx-auto max-w-5xl px-4 pt-10 sm:px-6">
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
           {c.facts.map((f, i) => (
             <motion.div key={f.l} {...rise(i)} className="relative overflow-hidden rounded-2xl border border-ink-200/70 bg-white p-3 text-center shadow-card sm:p-5">
               <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary-500 to-gold-400" />

@@ -73,20 +73,32 @@ const REPORT_PATHS = [
   "/dashboard/reports/profitability/items",
 ];
 
-test("every report screen sits in the final Reports group, after all other screens", () => {
+const ADMIN_ONLY = [
+  "/dashboard/permissions",
+  "/dashboard/ai-center",
+  "/dashboard/price-changes",
+  "/dashboard/audit-log",
+];
+
+test("every report screen sits in the Reports group, after all normal screens and before Admin", () => {
   const all = ordered(["Admin"]);
   const reportsStart = Math.min(...REPORT_PATHS.map((p) => all.indexOf(p)));
   for (const p of REPORT_PATHS) assert.ok(all.includes(p), p);
-  const after = all.slice(reportsStart);
-  const nonReport = after.filter((p) => !p.startsWith("/dashboard/reports") && !REPORT_PATHS.includes(p));
-  // only the Admin-only management screens may come after the reports start... they must not
-  assert.deepEqual(nonReport, [], nonReport.join(","));
+  const between = all.slice(reportsStart, all.length - ADMIN_ONLY.length);
+  const stray = between.filter((p) => !p.startsWith("/dashboard/reports") && !REPORT_PATHS.includes(p));
+  assert.deepEqual(stray, [], stray.join(","));
+  assert.deepEqual(all.slice(-ADMIN_ONLY.length).sort(), [...ADMIN_ONLY].sort());
 });
 
-test("the last section header is Reports and nothing but report groups follows it", () => {
+test("section order: Admin is last, Reports just before it, normal sections first", () => {
   const items = removeEmptySections(filterNavigationItems(navigationItems, ["Admin"], []));
-  const lastSection = items.map((i, k) => (i.type === "section" ? k : -1)).filter((k) => k >= 0).pop();
-  assert.equal(items.length - lastSection, 2, "section + one Reports group");
+  const heads = items.filter((i) => i.type === "section").map((i) => i.label);
+  assert.equal(heads[heads.length - 1], heads.at(-1));
+  const n = heads.length;
+  assert.ok(n >= 4);
+  assert.equal(items[items.length - 1].path, "/dashboard/audit-log");
+  const reportsIdx = items.findIndex((i) => i.type === "section" && i.label === heads[n - 2]);
+  assert.equal(items[reportsIdx + 1].children?.length > 0, true, "Reports group follows its header");
 });
 
 test("role gating is unchanged for the moved reports", () => {

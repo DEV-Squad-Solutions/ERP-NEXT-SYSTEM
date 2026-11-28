@@ -244,6 +244,60 @@ export const navigationItems = [
 
   {
     type: "section",
+    label: t("المحاسبة"),
+    roles: FULL_ACCESS_ROLES,
+  },
+
+  {
+    label: t("قيود اليومية"),
+    path: "/dashboard/journal-entries",
+    icon: BookOpen,
+    end: true,
+    roles: FULL_ACCESS_ROLES,
+  },
+
+  {
+    label: t("دليل الحسابات"),
+    path: "/dashboard/accounts",
+    icon: ListTree,
+    end: true,
+    roles: FULL_ACCESS_ROLES,
+  },
+
+  {
+    label: t("تشكيل القوائم المالية"),
+    path: "/dashboard/financial-statements",
+    icon: ListTree,
+    end: true,
+    roles: FULL_ACCESS_ROLES,
+  },
+
+  {
+    label: t("السنوات المالية"),
+    path: "/dashboard/fiscal-years",
+    icon: CalendarRange,
+    end: true,
+    roles: FULL_ACCESS_ROLES,
+  },
+
+  {
+    label: t("إعدادات الربط المحاسبي"),
+    path: "/dashboard/account-mappings",
+    icon: Link2,
+    end: true,
+    roles: FULL_ACCESS_ROLES,
+  },
+
+  {
+    label: t("مراقبة الجاهزية المحاسبية"),
+    path: "/dashboard/accounting-readiness",
+    icon: ShieldCheck,
+    end: true,
+    roles: FULL_ACCESS_ROLES,
+  },
+
+  {
+    type: "section",
     label: t("الموارد البشرية"),
     roles: PAYROLL_ROLES,
   },
@@ -303,98 +357,6 @@ export const navigationItems = [
         roles: PAYROLL_ROLES,
       },
     ],
-  },
-
-  {
-    type: "section",
-    label: t("المحاسبة"),
-    roles: FULL_ACCESS_ROLES,
-  },
-
-  {
-    label: t("مراقبة الجاهزية المحاسبية"),
-    path: "/dashboard/accounting-readiness",
-    icon: ShieldCheck,
-    end: true,
-    roles: FULL_ACCESS_ROLES,
-  },
-
-  {
-    label: t("السنوات المالية"),
-    path: "/dashboard/fiscal-years",
-    icon: CalendarRange,
-    end: true,
-    roles: FULL_ACCESS_ROLES,
-  },
-
-  {
-    label: t("دليل الحسابات"),
-    path: "/dashboard/accounts",
-    icon: ListTree,
-    end: true,
-    roles: FULL_ACCESS_ROLES,
-  },
-
-  {
-    label: t("إعدادات الربط المحاسبي"),
-    path: "/dashboard/account-mappings",
-    icon: Link2,
-    end: true,
-    roles: FULL_ACCESS_ROLES,
-  },
-
-  {
-    label: t("قيود اليومية"),
-    path: "/dashboard/journal-entries",
-    icon: BookOpen,
-    end: true,
-    roles: FULL_ACCESS_ROLES,
-  },
-
-  {
-    label: t("تشكيل القوائم المالية"),
-    path: "/dashboard/financial-statements",
-    icon: ListTree,
-    end: true,
-    roles: FULL_ACCESS_ROLES,
-  },
-
-  {
-    type: "section",
-    label: t("الإدارة"),
-    roles: ["Admin"],
-  },
-
-  {
-    label: t("الشركات والمستخدمون"),
-    path: "/dashboard/permissions",
-    icon: ShieldCheck,
-    end: true,
-    roles: ["Admin"],
-  },
-
-  {
-    label: t("مركز الذكاء الاصطناعي"),
-    path: "/dashboard/ai-center",
-    icon: Sparkles,
-    end: true,
-    roles: ["Admin"],
-  },
-
-  {
-    label: t("تعديل أسعار الأصناف"),
-    path: "/dashboard/price-changes",
-    icon: ClipboardList,
-    end: true,
-    roles: ["Admin"],
-  },
-
-  {
-    label: t("سجل العمليات"),
-    path: "/dashboard/audit-log",
-    icon: ClipboardList,
-    end: true,
-    roles: ["Admin"],
   },
 
   {
@@ -568,5 +530,43 @@ export const navigationItems = [
         ],
       },
     ],
+  },
+
+  {
+    type: "section",
+    label: t("الإدارة"),
+    roles: ["Admin"],
+  },
+
+  {
+    label: t("الشركات والمستخدمون"),
+    path: "/dashboard/permissions",
+    icon: ShieldCheck,
+    end: true,
+    roles: ["Admin"],
+  },
+
+  {
+    label: t("مركز الذكاء الاصطناعي"),
+    path: "/dashboard/ai-center",
+    icon: Sparkles,
+    end: true,
+    roles: ["Admin"],
+  },
+
+  {
+    label: t("تعديل أسعار الأصناف"),
+    path: "/dashboard/price-changes",
+    icon: ClipboardList,
+    end: true,
+    roles: ["Admin"],
+  },
+
+  {
+    label: t("سجل العمليات"),
+    path: "/dashboard/audit-log",
+    icon: ClipboardList,
+    end: true,
+    roles: ["Admin"],
   },
 ];

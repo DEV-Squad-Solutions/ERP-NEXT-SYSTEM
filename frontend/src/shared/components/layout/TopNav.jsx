@@ -116,8 +116,7 @@ export default function TopNav({ onSwitchLayout }) {
     const SPLIT = {
       "/dashboard/payroll": "الموظفين",
       "/dashboard/payroll/attendance/records": "الحضور والمرتبات",
-      "/dashboard/accounting-readiness": "الحسابات والقيود",
-      "/dashboard/trial-balance/before-adjustments": "الموازين والقوائم",
+      "/dashboard/journal-entries": "الحسابات والقيود",
     };
     out.forEach((g, i) => {
       g.id = `g${i}`;
@@ -126,7 +125,7 @@ export default function TopNav({ onSwitchLayout }) {
       if (g.children.every((c) => !c.children?.length) && g.children.some((c) => SPLIT[c.path])) {
         const cols = [];
         g.children.forEach((c) => {
-          if (SPLIT[c.path]) cols.push({ label: t(SPLIT[c.path]), children: [] });
+          if (SPLIT[c.path] || !cols.length) cols.push({ label: t(SPLIT[c.path] || g.label), children: [] });
           cols[cols.length - 1].children.push(c);
         });
         g.children = cols;

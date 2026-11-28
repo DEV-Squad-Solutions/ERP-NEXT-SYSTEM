@@ -1,3 +1,5 @@
+using MiniErp.Application.Common.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniErp.Api.Extensions;
 using MiniErp.Application.Common.Models;
@@ -31,6 +33,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminUserOrAccountant)]
     [HttpGet("partner")]
     [ProducesResponseType<PartnerStatementResponse>(
         StatusCodes.Status200OK)]
@@ -166,6 +169,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("employee")]
     [HttpGet("/api/v{version:apiVersion}/dashboard/payroll/employees/statement")]
     [ProducesResponseType<EmployeeStatementResponse>(
@@ -183,6 +187,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("employee/{employeeId:int}/balance")]
     [ProducesResponseType<EmployeeAccountBalanceResponse>(
         StatusCodes.Status200OK)]
@@ -199,6 +204,7 @@ public sealed class StatementsController(
         return this.ToActionResult(result);
     }
 
+    [Authorize(Roles = ApplicationRoles.AdminOrAccountant)]
     [HttpGet("employee/{employeeId:int}/account")]
     [ProducesResponseType<EmployeeAccountSummaryResponse>(
         StatusCodes.Status200OK)]

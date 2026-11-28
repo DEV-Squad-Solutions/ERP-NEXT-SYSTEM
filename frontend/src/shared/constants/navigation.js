@@ -41,6 +41,8 @@ const LIMITED_ACCESS_ROLES = ["User", "Cashier"];
 
 const INVOICE_ROLES = ["Admin", "Accountant", "User", "Cashier"];
 
+const PARTNER_STATEMENT_ROLES = ["Admin", "Accountant", "User"];
+
 const TREASURY_ROLES = FULL_ACCESS_ROLES;
 
 const EXPENSE_ROLES = FULL_ACCESS_ROLES;
@@ -73,7 +75,7 @@ export const navigationItems = [
   {
     label: t("العملاء والموردين"),
     icon: Users,
-    roles: FULL_ACCESS_ROLES,
+    roles: PARTNER_STATEMENT_ROLES,
     children: [
       {
         label: t("قائمة العملاء والموردين"),
@@ -87,7 +89,7 @@ export const navigationItems = [
         path: "/dashboard/partners/statement",
         icon: FileText,
         end: true,
-        roles: FULL_ACCESS_ROLES,
+        roles: PARTNER_STATEMENT_ROLES,
       },
       {
         label: t("أرصدة افتتاحية"),

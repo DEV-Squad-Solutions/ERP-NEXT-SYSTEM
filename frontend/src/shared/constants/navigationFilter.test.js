@@ -109,3 +109,17 @@ test("role gating is unchanged for the moved reports", () => {
     for (const r of REPORT_PATHS) assert.ok(!p.includes(r), `${role} must not see ${r}`);
   }
 });
+
+test("partner statement is open to Admin, Accountant and User, never Cashier; employee statement is Admin and Accountant only", () => {
+  for (const role of ["Admin", "Accountant", "User"]) {
+    assert.ok(paths([role]).includes("/dashboard/partners/statement"), role);
+  }
+  assert.ok(!paths(["Cashier"]).includes("/dashboard/partners/statement"));
+  assert.ok(!paths(["User"]).includes("/dashboard/partners"), "partner list stays Admin/Accountant");
+  for (const role of ["Admin", "Accountant"]) {
+    assert.ok(paths([role]).includes("/dashboard/payroll/employees/statement"), role);
+  }
+  for (const role of ["User", "Cashier"]) {
+    assert.ok(!paths([role]).includes("/dashboard/payroll/employees/statement"), role);
+  }
+});

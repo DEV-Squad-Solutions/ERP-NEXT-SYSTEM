@@ -258,6 +258,7 @@ const INVOICE_ROLES = [
   ROLES.USER,
   ROLES.CASHIER,
 ];
+const PARTNER_STATEMENT_ROLES = [ROLES.ADMIN, ROLES.ACCOUNTANT, ROLES.USER];
 const TREASURY_ROLES = FULL_ACCESS_ROLES;
 const PAYROLL_ROLES = FULL_ACCESS_ROLES;
 const EXPENSE_ROLES = FULL_ACCESS_ROLES;
@@ -443,7 +444,7 @@ export const router = createBrowserRouter([
         path: "partners/statement",
         element: (
           <LazyPage>
-            <Role roles={FULL_ACCESS_ROLES}>
+            <Role roles={PARTNER_STATEMENT_ROLES}>
               <PartnerAccountPage />
             </Role>
           </LazyPage>

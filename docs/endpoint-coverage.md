@@ -103,7 +103,7 @@ ApiSmokeTests. Run: `ENDPOINT_MATRIX_OUT=docs/endpoint-coverage.md dotnet test -
 | GET | `/api/v1/Countries/select` | deny:401 | ok:200 | ok:200 | ok:200 | ok:200 |
 | GET | `/api/v1/Currencies/select` | deny:401 | ok:200 | ok:200 | ok:200 | ok:200 |
 | GET | `/api/v1/Dashboard` | deny:401 | ok:200 | ok:200 | deny:403 | deny:403 |
-| GET | `/api/v1/dashboard/payroll/employees/statement` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
+| GET | `/api/v1/dashboard/payroll/employees/statement` | deny:401 | ok:400 | ok:400 | deny:403 | deny:403 |
 | GET | `/api/v1/DriverOpeningBalances` | deny:401 | ok:200 | ok:200 | deny:403 | deny:403 |
 | POST | `/api/v1/DriverOpeningBalances` | deny:401 | ok:404 | deny:403 | deny:403 | deny:403 |
 | DELETE | `/api/v1/DriverOpeningBalances/{id:int}` | deny:401 | ok:400 | deny:403 | deny:403 | deny:403 |
@@ -259,14 +259,14 @@ ApiSmokeTests. Run: `ENDPOINT_MATRIX_OUT=docs/endpoint-coverage.md dotnet test -
 | GET | `/api/v1/Statements/cashbox` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
 | GET | `/api/v1/Statements/container-store` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
 | GET | `/api/v1/Statements/driver` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
-| GET | `/api/v1/Statements/employee` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
-| GET | `/api/v1/Statements/employee/{employeeId:int}/account` | deny:401 | ok:404 | ok:200 | ok:200 | ok:200 |
-| GET | `/api/v1/Statements/employee/{employeeId:int}/balance` | deny:401 | ok:404 | ok:200 | ok:200 | ok:200 |
+| GET | `/api/v1/Statements/employee` | deny:401 | ok:400 | ok:400 | deny:403 | deny:403 |
+| GET | `/api/v1/Statements/employee/{employeeId:int}/account` | deny:401 | ok:404 | ok:200 | deny:403 | deny:403 |
+| GET | `/api/v1/Statements/employee/{employeeId:int}/balance` | deny:401 | ok:404 | ok:200 | deny:403 | deny:403 |
 | GET | `/api/v1/Statements/expenses` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
 | GET | `/api/v1/Statements/financial-position` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
 | GET | `/api/v1/Statements/income-statement` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
 | GET | `/api/v1/Statements/operational-trial-balance` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
-| GET | `/api/v1/Statements/partner` | deny:401 | ok:400 | ok:400 | ok:400 | ok:400 |
+| GET | `/api/v1/Statements/partner` | deny:401 | ok:400 | ok:400 | ok:400 | deny:403 |
 | GET | `/api/v1/Statements/profitability/invoices` | deny:401 | ok:200 | ok:200 | ok:200 | ok:200 |
 | GET | `/api/v1/Statements/profitability/invoices/{invoiceId:int}` | deny:401 | ok:404 | ok:200 | ok:200 | ok:200 |
 | GET | `/api/v1/Statements/profitability/items` | deny:401 | ok:200 | ok:200 | ok:200 | ok:200 |
